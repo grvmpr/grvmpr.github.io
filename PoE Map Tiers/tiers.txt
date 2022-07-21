@@ -1,0 +1,162 @@
+Tier 1
+
+    Underground Sea
+    Arid Lake
+    Spider Forest
+    Cold River
+
+
+Tier 2
+
+    Museum
+    Tower
+    Peninsula
+    Dungeon
+    Bog
+    Acid Caverns
+    Frozen Cabins
+    Plaza
+
+
+Tier 3
+
+    Moon Temple
+    Necropolis
+    Ramparts
+    Basilica
+    Reef
+    Infested Valley
+    Carcass
+    Volcano
+
+
+Tier 4
+
+    Cemetery
+    Overgrown Shrine
+    Temple
+    Bazaar
+    Ashen Wood
+    Arsenal
+    Crimson Temple
+    Armoury
+
+
+Tier 5
+
+    Shore
+    Arena
+    Toxic Sewer
+    Dry Sea
+    Arcade
+    Tropical Island
+    Mud Geyser
+    Maze
+
+
+Tier 6
+
+    Atoll
+    Bramble Valley
+    Orchard
+    Primordial Pool
+    Summit
+    Crimson Township
+    Lair
+
+
+Tier 7
+
+    Bone Crypt
+    Thicket
+    Ivory Temple
+    Sepulchre
+    City Square
+    Lookout
+    Courtyard
+
+
+Tier 8
+
+    Mesa
+    Desert Spring
+    Terrace
+    Core
+    Colonnade
+    Desert
+    Gardens
+
+
+Tier 9
+
+    Glacier
+    Crystal Ore
+    Grotto
+    Lava Chamber
+    Promenade
+    Overgrown Ruin
+
+
+Tier 10
+
+    Dunes
+    Marshes
+    Waste Pool
+    Jungle Valley
+    Canyon
+    Mausoleum
+
+
+Tier 11
+
+    Villa
+    Wharf
+    Precinct
+    Cage
+    Dark Forest
+    Grave Trough
+
+
+Tier 12
+
+    Underground River
+    Vaal Pyramid
+    Mineral Pools
+    Pit
+    Foundry
+    Port
+
+
+Tier 13
+
+    Sunken City
+    Laboratory
+    Coral Ruins
+    Factory
+    Wasteland
+
+
+Tier 14
+
+    Strand
+    Alleyways
+    Beach
+    Fields
+    Fungal Hollow
+
+
+Tier 15
+
+    Cursed Crypt
+    Palace
+    Cells
+    Barrows
+    Park
+
+
+Tier 16
+
+    Lava Lake
+    Burial Chambers
+    Residence
+    Caldera
