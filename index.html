@@ -6,7 +6,7 @@
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/knockout/3.5.1/knockout-latest.js" integrity="sha512-2AL/VEauKkZqQU9BHgnv48OhXcJPx9vdzxN1JrKDVc4FPU/MEE/BZ6d9l0mP7VmvLsjtYwqiYQpDskK9dG8KBA==" crossorigin="anonymous"></script>
 	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous">
 	<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js" integrity="sha384-B4gt1jrGC7Jh4AgTPSdUtOBvfO8shuf57BaghqFfPlYxofvL8/KUEfYiJOMMV+rV" crossorigin="anonymous"></script>
-	<script src="main.js"></script>
+	<script src="poe/maptiers.js"></script>
     <script type="text/javascript"></script>
 	<style>
 	.list-group-item {
@@ -22,7 +22,7 @@
 			<li class="list-group-item" >
 				<button style="margin-top: 3px;" type="button" class="btn btn-outline-warning btn-sm" data-bind="text: 'Tier ' + $data.Tier">Small button</button>
 				<!-- ko foreach: $data.Maps -->
-				<button style="margin-top: 3px;" type="button" class="btn btn-sm" data-bind="text: $data.Name, css: $data.run == true ? 'btn-light' : 'btn-outline-success', attr: { id: 'btn_'+$data.Id }, click: $root.toggleMap">Small button</button>
+				<button style="margin-top: 3px;" type="button" class="btn btn-sm" data-bind="text: $data.Name, css: $data.run == true ? 'btn-outline-secondary' : 'btn-outline-success', attr: { id: 'btn_'+$data.Id }, click: $root.toggleMap">Small button</button>
 				<!-- /ko -->
 			</li>
 			<!-- /ko -->
