@@ -3,7 +3,9 @@
 void Main()
 {
 	/*
+    Get new map tiers when GGG makes the post containing [Item Filter Information] like the one below:
 	https://www.pathofexile.com/forum/view-thread/3265282/page/1
+
 	Copy
 	---------------------------------------------------
 	Tier 1
@@ -16,6 +18,11 @@ void Main()
 	    Lava Lake
 	    ...
 	---------------------------------------------------
+
+    INTO a local text file [tiers.txt]
+    RUN Linqpad pointing to [tiers.txt]
+    COPY results into [tiers.json] and commit repo
+
 	*/
 	
 	var input = System.IO.File.ReadAllLines(@"C:\Drop\tiers.txt").Where(p => p.Length > 1).ToList();
