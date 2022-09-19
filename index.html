@@ -6,7 +6,10 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" integrity="sha512-894YE6QWD5I59HgZOGReFYm4dnWc1Qt5NtvYSaNcOP+u1T9qYdvdihz0PPSiiqn/+/3e7Jo4EaG7TubfWGUrMQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/knockout/3.5.1/knockout-latest.js" integrity="sha512-2AL/VEauKkZqQU9BHgnv48OhXcJPx9vdzxN1JrKDVc4FPU/MEE/BZ6d9l0mP7VmvLsjtYwqiYQpDskK9dG8KBA==" crossorigin="anonymous"></script>
 	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous">
-	<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js" integrity="sha384-B4gt1jrGC7Jh4AgTPSdUtOBvfO8shuf57BaghqFfPlYxofvL8/KUEfYiJOMMV+rV" crossorigin="anonymous"></script>
+
+	<!--<script src="https://cdn.jsdelivr.net/npm/popper.js@1.12.9/dist/umd/popper.min.js"></script>-->
+
+	<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js" integrity="sha384-B4gt1jrGC7Jh4AgTPSdUtOBvfO8shuf57BaghqFfPlYxofvL8/KUEfYiJOMMV+rV" crossorigin="anonymous"></script>
 	<script src="PoEMapTiers.js"></script>
     <script type="text/javascript"></script>
 	<style>
@@ -19,6 +22,31 @@
 	.list-group-item {
 		background-color: #181A1B;
 	}
+	.hovertext {
+		position: relative;
+	}
+	.hovertext:before {
+		content: attr(data-hover);
+		visibility: hidden;
+		opacity: 0;
+		width: 140px;
+		background-color: black;
+		color: #fff;
+		text-align: center;
+		border-radius: 5px;
+		padding: 5px 0;
+		transition: opacity 1s ease-in-out;
+
+		position: absolute;
+		z-index: 1;
+		left: 0;
+		top: 110%;
+	}
+
+	.hovertext:hover:before {
+		opacity: 1;
+		visibility: visible;
+	}
 	</style>
 </head>
 <body>
@@ -29,7 +57,7 @@
 			<li class="list-group-item" >
 				<button style="margin-top: 3px;" type="button" class="btn btn-outline-warning btn-sm" data-bind="text: 'Tier ' + $data.Tier">Small button</button>
 				<!-- ko foreach: $data.Maps -->
-				<button style="margin-top: 3px;" type="button" class="btn btn-sm" data-bind="text: $data.Name, css: $data.run == true ? 'btn-outline-secondary' : 'btn-outline-success', attr: { id: 'btn_'+$data.Id }, click: $root.toggleMap">Small button</button>
+				<button style="margin-top: 3px;" type="button" class="btn btn-sm hovertext" data-bind="text: $data.Name, css: $data.run == true ? 'btn-outline-secondary' : 'btn-outline-success', attr: { 'data-hover': $data.Hover, 'id': 'btn_'+$data.Id }, click: $root.toggleMap">Small button</button>
 				<!-- /ko -->
 			</li>
 			<!-- /ko -->
