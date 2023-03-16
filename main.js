@@ -194,7 +194,6 @@ function groupByTier(filtered) {
             returnList.push(newTier);
         }
     });
-    console.log(returnList);
     return returnList;
 }
 
