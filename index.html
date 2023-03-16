@@ -1,68 +1,102 @@
-<html>
+<!doctype html>
+<html data-bs-theme="dark" lang="en">
+
 <head>
-    <meta charset="utf-8">
-    <title>PoE Maps</title>
-	<link rel="icon" type="image/x-icon" href="favicon.ico">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" integrity="sha512-894YE6QWD5I59HgZOGReFYm4dnWc1Qt5NtvYSaNcOP+u1T9qYdvdihz0PPSiiqn/+/3e7Jo4EaG7TubfWGUrMQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/knockout/3.5.1/knockout-latest.js" integrity="sha512-2AL/VEauKkZqQU9BHgnv48OhXcJPx9vdzxN1JrKDVc4FPU/MEE/BZ6d9l0mP7VmvLsjtYwqiYQpDskK9dG8KBA==" crossorigin="anonymous"></script>
-	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous">
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>PoE map progression</title>
 
-	<!--<script src="https://cdn.jsdelivr.net/npm/popper.js@1.12.9/dist/umd/popper.min.js"></script>-->
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"
+		integrity="sha512-894YE6QWD5I59HgZOGReFYm4dnWc1Qt5NtvYSaNcOP+u1T9qYdvdihz0PPSiiqn/+/3e7Jo4EaG7TubfWGUrMQ=="
+		crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/knockout/3.5.1/knockout-latest.js"
+		integrity="sha512-2AL/VEauKkZqQU9BHgnv48OhXcJPx9vdzxN1JrKDVc4FPU/MEE/BZ6d9l0mP7VmvLsjtYwqiYQpDskK9dG8KBA=="
+		crossorigin="anonymous"></script>
 
-	<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js" integrity="sha384-B4gt1jrGC7Jh4AgTPSdUtOBvfO8shuf57BaghqFfPlYxofvL8/KUEfYiJOMMV+rV" crossorigin="anonymous"></script>
-	<script src="PoEMapTiers.js"></script>
-    <script type="text/javascript"></script>
+	<script src="main.js"></script>
+	<script type="text/javascript"></script>
+
+	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet"
+		integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD" crossorigin="anonymous">
+
 	<style>
-	body {
-  		background-color: #181A1B;
-	}
-	.card {
-  		background-color: #181A1B;
-	}
-	.list-group-item {
-		background-color: #181A1B;
-	}
-	.hovertext {
-		position: relative;
-	}
-	.hovertext:before {
-		content: attr(data-hover);
-		visibility: hidden;
-		opacity: 0;
-		width: 140px;
-		background-color: black;
-		color: #fff;
-		text-align: center;
-		border-radius: 5px;
-		padding: 5px 0;
-		transition: opacity 1s ease-in-out;
+		.btn-toolbar {
+			padding-bottom: 9px;
+		}
 
-		position: absolute;
-		z-index: 1;
-		left: 0;
-		top: 110%;
-	}
+		.btn-group {
+			padding-bottom: 9px;
+		}
 
-	.hovertext:hover:before {
-		opacity: 1;
-		visibility: visible;
-	}
+		.txt-blue {
+			color: blue;
+		}
+
+		.glow-button {
+			/*color: rgba(202, 195, 195, 0.5);*/
+			box-shadow: 0 5px 15px rgba(255, 255, 255, 0.7);
+		}
+
+		.hovertext {
+			position: relative;
+		}
+
+		.hovertext:before {
+			content: attr(data-hover);
+			visibility: hidden;
+			opacity: 0;
+			width: 140px;
+			background-color: black;
+			color: #fff;
+			text-align: center;
+			border-radius: 5px;
+			padding: 5px 0;
+			transition: opacity 1s ease-in-out;
+
+			position: absolute;
+			z-index: 1;
+			left: 0;
+			top: 110%;
+		}
+
+		.hovertext:hover:before {
+			opacity: 1;
+			visibility: visible;
+		}
 	</style>
 </head>
+
 <body>
-	<div id="dvContainer">
-		<div class="card">
-		  <ul class="list-group list-group-flush">
-			<!-- ko foreach: Tiers -->
-			<li class="list-group-item" >
-				<button style="margin-top: 3px;" type="button" class="btn btn-outline-warning btn-sm" data-bind="text: 'Tier ' + $data.Tier">Small button</button>
-				<!-- ko foreach: $data.Maps -->
-				<button style="margin-top: 3px;" type="button" class="btn btn-sm hovertext" data-bind="text: $data.Name, css: $data.run == true ? 'btn-outline-secondary' : 'btn-outline-success', attr: { 'data-hover': $data.Hover, 'id': 'btn_'+$data.Id }, click: $root.toggleMap">Small button</button>
-				<!-- /ko -->
-			</li>
-			<!-- /ko -->
-		  </ul>
+	<h1>Map progression</h1>
+	<div class="container-fluid" id="dvContainer">
+		<div class="btn-toolbar mb-3" role="toolbar" aria-label="Toolbar with button groups">
+			<div class="input-group">
+				<div class="input-group-text" id="btnGroupAddon">Filter</div>
+				<input type="text" class="form-control" placeholder="Map name or tier" aria-label="Input group example"
+					data-bind="value: currentFilter" aria-describedby="btnGroupAddon">
+			</div>
 		</div>
-   </div>
+		<!-- ko foreach: filteredMaps -->
+		<div class="btn-toolbar" role="toolbar" aria-label="Tier 1">
+			<div class="btn-group me-2" role="group" aria-label="Tier name">
+				<button type="button" class="btn" data-bind="text: 'Tier ' + $data.Tier, css: Css">--</button>
+			</div>
+			<div class="btn-group me-2" role="group" aria-label="Tier map list">
+				<!-- ko foreach: $data.Maps -->
+				<button type="button" class="hovertext btn "
+					data-bind="text: $data.Name, css: $data.css, attr: { 'data-hover': $data.Hover, 'id': 'btn_'+$data.Id }, click: $root.toggleMap">--</button>
+				<!-- /ko -->
+			</div>
+		</div>
+		<!-- /ko -->
+	</div>
+	<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"
+		integrity="sha384-oBqDVmMz9ATKxIep9tiCxS/Z9fNfEXiDAYTujMAeBAsjFuCZSmKbSSUnQlmh/jp3"
+		crossorigin="anonymous"></script>
+	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.min.js"
+		integrity="sha384-mQ93GR66B00ZXjt0YO5KlohRA5SY2XofN4zfuZxLkoj1gXtW8ANNCe9d5Y3eG5eD"
+		crossorigin="anonymous"></script>
+
 </body>
+
 </html>

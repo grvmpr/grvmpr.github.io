@@ -38,7 +38,7 @@ $(document).ready(function () {
 					map.LayoutTier = sel.BossNotes;
 					map.Hover = '';
 
-					// '♥ ★★★☆☆☠⚠•'
+					// '♥ ★★★☆☆☠⚠• 💞'
 					if (isNullOrUndefined(sel.BossRippy) == false && sel.BossRippy) {
 						map.Name = map.Name + ' ☠';
 					}
@@ -159,7 +159,7 @@ function apiGetMapDetails(callback) {
 }
 
 function isNullOrUndefined(obj) {
-	if (typeof(obj) !== "undefined" && obj !== null ) {
+	if (typeof (obj) !== "undefined" && obj !== null) {
 		return false;
 	}
 	else {
