@@ -5,7 +5,12 @@ Array.prototype.first = function (propertySelector = obj => obj) {
 const _vm = new MainModel();
 var runMaps = [];
 
+const _debugmode = false;
+
 $(document).ready(function () {
+
+    if (_debugmode) { load(); return; }
+
     apiGetMapDetails((jsonDetails) => {
         _jsonDetails = jsonDetails;
         apiGetMapData((json) => {
@@ -75,7 +80,7 @@ function load() {
                 map.Hover = map.Hover + ' • ' + sel.BossNotes;
             }
             if (isNullOrUndefined(sel.LayoutTier) == false && sel.LayoutTier.length > 0) {
-                map.Hover = map.Hover + ' [' + sel.LayoutTier + ']';
+                map.Hover = '[' + sel.LayoutTier + '] ' + map.Hover;
             }
         });
 
@@ -231,7 +236,6 @@ function isNullOrUndefined(obj) {
         return true;
     }
 }
-
 /*
 var _maps = [
     { "Name": "Strand", "Id": 1, "Tier": 1 },
@@ -336,7 +340,7 @@ var _maps = [
     { "Name": "Ghetto", "Id": 100, "Tier": 16 }
 ];
 
-var jsonDetails = [
+var _jsonDetails = [
     {
         "Name": "Strand",
         "LayoutTier": "S",
@@ -350,8 +354,8 @@ var jsonDetails = [
         "Name": "Overgrown Ruin",
         "LayoutTier": "C",
         "LayoutNotes": "Indoor",
-        "CardTier": "",
-        "CardNotes": "",
+        "CardTier": "A",
+        "CardNotes": "The Wedding Gift (Arakaali's Fang)",
         "BossRippy": false,
         "BossNotes": "Phased gear"
     },
@@ -378,7 +382,7 @@ var jsonDetails = [
         "LayoutTier": "C",
         "LayoutNotes": "Open Maze",
         "CardTier": "C",
-        "CardNotes": "Wealth and Power",
+        "CardNotes": "Wealth and Power (Level 4 Enlighten)",
         "BossRippy": true,
         "BossNotes": "RIP"
     },
@@ -387,7 +391,7 @@ var jsonDetails = [
         "LayoutTier": "C",
         "LayoutNotes": "Indoor",
         "CardTier": "S",
-        "CardNotes": "Apothecary T9+ & more",
+        "CardNotes": "Apothecary T9+ (Mageblood)",
         "BossRippy": false,
         "BossNotes": ""
     },
@@ -450,7 +454,7 @@ var jsonDetails = [
         "LayoutTier": "D",
         "LayoutNotes": "Indoor",
         "CardTier": "C",
-        "CardNotes": "Celestial Justicar",
+        "CardNotes": "Celestial Justicar (6 Link Astral)",
         "BossRippy": false,
         "BossNotes": ""
     },
@@ -486,7 +490,7 @@ var jsonDetails = [
         "LayoutTier": "F",
         "LayoutNotes": "Indoor maze",
         "CardTier": "B",
-        "CardNotes": "The Nurse Chains That Bind",
+        "CardNotes": "The Nurse, Chains That Bind (6 Link Body Armour)",
         "BossRippy": true,
         "BossNotes": "RIP"
     },
@@ -513,7 +517,7 @@ var jsonDetails = [
         "LayoutTier": "B",
         "LayoutNotes": "Circuit",
         "CardTier": "S",
-        "CardNotes": "Apothecary T10+ & more",
+        "CardNotes": "Apothecary T10+ (Mageblood)",
         "BossRippy": true,
         "BossNotes": "RIP"
     },
@@ -522,7 +526,7 @@ var jsonDetails = [
         "LayoutTier": "A",
         "LayoutNotes": "Circuit",
         "CardTier": "C",
-        "CardNotes": "The Spark and The Flame",
+        "CardNotes": "The Spark and The Flame (Berek's Respite)",
         "BossRippy": false,
         "BossNotes": ""
     },
@@ -540,7 +544,7 @@ var jsonDetails = [
         "LayoutTier": "D",
         "LayoutNotes": "Indoor maze",
         "CardTier": "B",
-        "CardNotes": "Unrequited Love",
+        "CardNotes": "Unrequited Love (19x Mirror Shard), Arrogance of the Vaal (2 implicit double corrupt unique)",
         "BossRippy": true,
         "BossNotes": "Gear RIP"
     },
@@ -548,8 +552,8 @@ var jsonDetails = [
         "Name": "Phantasmagoria",
         "LayoutTier": "B",
         "LayoutNotes": "Tight",
-        "CardTier": "",
-        "CardNotes": "",
+        "CardTier": "S",
+        "CardNotes": "The Doctor (Headhunter)",
         "BossRippy": true,
         "BossNotes": "RIP"
     },
@@ -576,7 +580,7 @@ var jsonDetails = [
         "LayoutTier": "F",
         "LayoutNotes": "Indoor maze",
         "CardTier": "C",
-        "CardNotes": "Chains That Bind",
+        "CardNotes": "Chains That Bind (6 Link Body Armour)",
         "BossRippy": true,
         "BossNotes": "RIP"
     },
@@ -594,7 +598,7 @@ var jsonDetails = [
         "LayoutTier": "C",
         "LayoutNotes": "Indoor",
         "CardTier": "C",
-        "CardNotes": "The Enlightened",
+        "CardNotes": "The Enlightened (Level 3 Enlighten)",
         "BossRippy": false,
         "BossNotes": ""
     },
@@ -612,7 +616,7 @@ var jsonDetails = [
         "LayoutTier": "C",
         "LayoutNotes": "Windy",
         "CardTier": "S",
-        "CardNotes": "Apothecary T8+",
+        "CardNotes": "Apothecary T8+ (Mageblood)",
         "BossRippy": true,
         "BossNotes": "Gear RIP both very much so"
     },
@@ -633,6 +637,15 @@ var jsonDetails = [
         "CardNotes": "",
         "BossRippy": false,
         "BossNotes": "Phased"
+    },
+    {
+        "Name": "Core",
+        "LayoutTier": "A",
+        "LayoutNotes": "Tight",
+        "CardTier": "A",
+        "CardNotes": "Broken Promises (Diamond Ring Item Level 87 Two-Implicit Synthesised)",
+        "BossRippy": false,
+        "BossNotes": "Multi Boss"
     },
     {
         "Name": "Mud Geyser",
@@ -657,7 +670,7 @@ var jsonDetails = [
         "LayoutTier": "D",
         "LayoutNotes": "Indoor maze",
         "CardTier": "A",
-        "CardNotes": "The Fiend",
+        "CardNotes": "The Fiend (Headhunter)",
         "BossRippy": false,
         "BossNotes": "Phased gear"
     },
@@ -702,7 +715,7 @@ var jsonDetails = [
         "LayoutTier": "A",
         "LayoutNotes": "Open circuit",
         "CardTier": "C",
-        "CardNotes": "The Spark and The Flame",
+        "CardNotes": "The Spark and The Flame (Berek's Respite)",
         "BossRippy": false,
         "BossNotes": ""
     },
@@ -720,7 +733,7 @@ var jsonDetails = [
         "LayoutTier": "D",
         "LayoutNotes": "Outdoor maze",
         "CardTier": "A",
-        "CardNotes": "The Doctor",
+        "CardNotes": "The Doctor (Headhunter)",
         "BossRippy": true,
         "BossNotes": "RIP"
     },
@@ -738,7 +751,7 @@ var jsonDetails = [
         "LayoutTier": "A",
         "LayoutNotes": "Linear",
         "CardTier": "B",
-        "CardNotes": "The Patient Dying Anguish",
+        "CardNotes": "The Patient, Dying Anguish (Level 19 Gem Alternate Quality +19%)",
         "BossRippy": true,
         "BossNotes": "Phased mech gear RIP"
     },
@@ -828,7 +841,7 @@ var jsonDetails = [
         "LayoutTier": "F",
         "LayoutNotes": "Indoor maze",
         "CardTier": "B",
-        "CardNotes": "Unrequited Love",
+        "CardNotes": "Unrequited Love (19x Mirror Shard)",
         "BossRippy": true,
         "BossNotes": "Phased RIP"
     },
@@ -855,16 +868,25 @@ var jsonDetails = [
         "LayoutTier": "C",
         "LayoutNotes": "Indoor",
         "CardTier": "B",
-        "CardNotes": "The Sephirot",
+        "CardNotes": "The Sephirot (10x Divine Orb)",
         "BossRippy": false,
+        "BossNotes": ""
+    },
+    {
+        "Name": "Sepulchre",
+        "LayoutTier": "B",
+        "LayoutNotes": "Indoor",
+        "CardTier": "S",
+        "CardNotes": "The Doctor (Headhunter)",
+        "BossRippy": true,
         "BossNotes": ""
     },
     {
         "Name": "Residence",
         "LayoutTier": "C",
         "LayoutNotes": "Indoor",
-        "CardTier": "A",
-        "CardNotes": "Dapper Prodigy",
+        "CardTier": "S",
+        "CardNotes": "Dapper Prodigy, The Sephirot (10x Divine Orb)",
         "BossRippy": false,
         "BossNotes": ""
     },
@@ -1026,9 +1048,18 @@ var jsonDetails = [
         "LayoutTier": "D",
         "LayoutNotes": "Indoor maze",
         "CardTier": "C",
-        "CardNotes": "Celestial Justicar",
+        "CardNotes": "Celestial Justicar (6 Link Astral)",
         "BossRippy": true,
         "BossNotes": "Mech RIP"
+    },
+    {
+        "Name": "Crystal Ore",
+        "LayoutTier": "C",
+        "LayoutNotes": "Indoor maze",
+        "CardTier": "A",
+        "CardNotes": "Immortal Resolve (6 Linked Body Armour)",
+        "BossRippy": false,
+        "BossNotes": "Phased"
     },
     {
         "Name": "Marshes",
@@ -1044,7 +1075,7 @@ var jsonDetails = [
         "LayoutTier": "A",
         "LayoutNotes": "Linear",
         "CardTier": "B",
-        "CardNotes": "The Patient Dying Anguish",
+        "CardNotes": "The Patient, Dying Anguish (Level 19 Gem Alternate Quality +19%)",
         "BossRippy": false,
         "BossNotes": ""
     },
@@ -1053,7 +1084,7 @@ var jsonDetails = [
         "LayoutTier": "B",
         "LayoutNotes": "Linear",
         "CardTier": "S",
-        "CardNotes": "Dying Anguish",
+        "CardNotes": "Dying Anguish (Level 19 Gem Alternate Quality +19%)",
         "BossRippy": false,
         "BossNotes": "Phased gear (bleeds)"
     },
@@ -1071,7 +1102,7 @@ var jsonDetails = [
         "LayoutTier": "F",
         "LayoutNotes": "Outdoor maze",
         "CardTier": "B",
-        "CardNotes": "The Patient Dying Anguish",
+        "CardNotes": "The Patient, Dying Anguish (Level 19 Gem Alternate Quality +19%)",
         "BossRippy": false,
         "BossNotes": ""
     },
@@ -1205,8 +1236,8 @@ var jsonDetails = [
         "Name": "Waste Pool",
         "LayoutTier": "A",
         "LayoutNotes": "Indoor circuit",
-        "CardTier": "",
-        "CardNotes": "",
+        "CardTier": "S",
+        "CardNotes": "The Doctor (Headhunter)",
         "BossRippy": false,
         "BossNotes": "Phased mech"
     },
@@ -1238,5 +1269,4 @@ var jsonDetails = [
         "BossNotes": ""
     }
 ]
-
 */
