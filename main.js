@@ -18,7 +18,7 @@ $(document).ready(function () {
 function load() {
     var selection = getParameterByName('ids');
 
-    if (selection != null) {
+    if (selection != null && selection.length > 0) {
         runMaps = selection.split(",").map(function (item) {
             return parseInt(item, 10);
         })
