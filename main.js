@@ -87,7 +87,7 @@ function load() {
 function MainModel() {
     var self = this;
     self.maps = ko.observableArray([]);
-
+    self.version = ko.observable('3.21');
     self.currentFilter = ko.observable('');
 
     self.rippy = ko.observable(false);
