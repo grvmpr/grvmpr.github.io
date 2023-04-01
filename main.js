@@ -48,6 +48,7 @@ function load() {
             map.Hover = '';
             map.CardNotes = sel.CardNotes;
             map.CardTier = sel.CardTier;
+            map.LayoutTier = sel.LayoutTier;
 
             // '♥ ★★★☆☆☠⚠•'
             if (isNullOrUndefined(sel.BossRippy) == false && sel.BossRippy) {
@@ -107,7 +108,10 @@ function MainModel() {
             ko.utils.arrayFilter(self.maps(), function (map) {
                 map.highlight = map.Name.toLowerCase().includes(self.currentFilter()) /* name */
                     || map?.CardNotes?.toLowerCase().includes(self.currentFilter()) /* div card */
-                    || (self.currentFilter()?.includes('Tier: ') && map?.CardTier.toLowerCase().includes(self.currentFilter()?.replace('Tier: ', ''))); /* div card tier */
+                    || (self.currentFilter()?.toLowerCase().includes('tier: ') && map?.CardTier.toLowerCase().includes(self.currentFilter()?.replace('tier: ', '')))    /* div card tier */
+                    || (self.currentFilter()?.toLowerCase().includes('tier ') && map?.CardTier.toLowerCase().includes(self.currentFilter()?.replace('tier ', '')))      /* div card tier */
+                    || (self.currentFilter()?.toLowerCase().includes('tier: ') && map?.LayoutTier.toLowerCase().includes(self.currentFilter()?.replace('tier: ', '')))  /* layout tier */
+                    || (self.currentFilter()?.toLowerCase().includes('tier ') && map?.LayoutTier.toLowerCase().includes(self.currentFilter()?.replace('tier ', '')));   /* layout tier */
 
                 //map.defaultCss = map.css == 'glow-button' ? map.defaultCss : ''
                 map.css = map.highlight ? map.defaultCss + ' glow-button' : map.defaultCss;
