@@ -12,8 +12,8 @@
     "Name": "Overgrown Ruin",
     "LayoutTier": "C",
     "LayoutNotes": "Indoor",
-    "CardTier": "",
-    "CardNotes": "",
+    "CardTier": "A",
+    "CardNotes": "The Wedding Gift",
     "BossRippy": false,
     "BossNotes": "Phased gear"
   },
@@ -202,7 +202,7 @@
     "LayoutTier": "D",
     "LayoutNotes": "Indoor maze",
     "CardTier": "B",
-    "CardNotes": "Unrequited Love",
+    "CardNotes": "Unrequited Love, Arrogance of the Vaal",
     "BossRippy": true,
     "BossNotes": "Gear RIP"
   },
@@ -210,8 +210,8 @@
     "Name": "Phantasmagoria",
     "LayoutTier": "B",
     "LayoutNotes": "Tight",
-    "CardTier": "",
-    "CardNotes": "",
+    "CardTier": "S",
+    "CardNotes": "The Doctor",
     "BossRippy": true,
     "BossNotes": "RIP"
   },
@@ -295,6 +295,15 @@
     "CardNotes": "",
     "BossRippy": false,
     "BossNotes": "Phased"
+  },
+  {
+    "Name": "Core",
+    "LayoutTier": "A",
+    "LayoutNotes": "Tight",
+    "CardTier": "A",
+    "CardNotes": "Broken Promises",
+    "BossRippy": false,
+    "BossNotes": "Multi Boss"
   },
   {
     "Name": "Mud Geyser",
@@ -522,11 +531,20 @@
     "BossNotes": ""
   },
   {
+    "Name": "Sepulchre",
+    "LayoutTier": "B",
+    "LayoutNotes": "Indoor",
+    "CardTier": "S",
+    "CardNotes": "The Doctor",
+    "BossRippy": true,
+    "BossNotes": ""
+  },
+  {
     "Name": "Residence",
     "LayoutTier": "C",
     "LayoutNotes": "Indoor",
-    "CardTier": "A",
-    "CardNotes": "Dapper Prodigy",
+    "CardTier": "S",
+    "CardNotes": "Dapper Prodigy, The Sephirot",
     "BossRippy": false,
     "BossNotes": ""
   },
@@ -691,6 +709,15 @@
     "CardNotes": "Celestial Justicar",
     "BossRippy": true,
     "BossNotes": "Mech RIP"
+  },
+  {
+    "Name": "Crystal Ore",
+    "LayoutTier": "C",
+    "LayoutNotes": "Indoor maze",
+    "CardTier": "A",
+    "CardNotes": "Immortal Resolve",
+    "BossRippy": false,
+    "BossNotes": "Phased"
   },
   {
     "Name": "Marshes",
@@ -867,8 +894,8 @@
     "Name": "Waste Pool",
     "LayoutTier": "A",
     "LayoutNotes": "Indoor circuit",
-    "CardTier": "",
-    "CardNotes": "",
+    "CardTier": "S",
+    "CardNotes": "The Doctor",
     "BossRippy": false,
     "BossNotes": "Phased mech"
   },
