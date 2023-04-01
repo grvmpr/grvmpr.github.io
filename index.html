@@ -26,6 +26,7 @@
 
 		.btn-group {
 			padding-bottom: 9px;
+			padding-right: 5px;
 		}
 
 		.txt-blue {
@@ -81,12 +82,59 @@
 			<div class="btn-group me-2" role="group" aria-label="Tier name">
 				<button type="button" class="btn" data-bind="text: 'Tier ' + $data.Tier, css: Css">--</button>
 			</div>
-			<div class="btn-group me-2" role="group" aria-label="Tier map list">
-				<!-- ko foreach: $data.Maps -->
+
+			<!-- ko foreach: $data.Maps -->
+			<div class="btn-group">
 				<button type="button" class="hovertext btn "
 					data-bind="text: $data.Name, css: $data.css, attr: { 'data-hover': $data.Hover, 'id': 'btn_'+$data.Id }, click: $root.toggleMap">--</button>
+				<button type="button" class="btn dropdown-toggle dropdown-toggle-split "
+					data-bind="css: $data.css, attr: { 'data-hover': $data.Hover, 'id': 'btndd_'+$data.Id }"
+					data-bs-toggle="dropdown" aria-expanded="false">
+					<span class="visually-hidden">Toggle Dropdown</span>
+				</button>
+				<!-- ko if: $data.Extra -->
+				<ul class="dropdown-menu">
+					<li class="list-group-item d-flex justify-content-between align-items-start"
+						style="padding-left: 5px;padding-right: 5px; width: 200px">
+						<div class="ms-2 me-auto">
+							<div class="fw-bold" data-bind="text: $data.Original" style="padding-bottom: 5px;">
+								Subheading</div>
+							<h6 class="card-subtitle mb-2 text-body-secondary rounded-pill"
+								data-bind="text: $data.LayoutNotes">-</h6>
+							<h6 class="card-subtitle mb-2 text-body-secondary rounded-pill"
+								data-bind="text: $data.BossNotes">-</h6>
+						</div>
+						<span class="badge bg-primary rounded-pill" data-bind="text: $data.LayoutTier">14</span>
+					</li>
+					<li class="list-group-item d-flex justify-content-between align-items-start"
+						style="padding-left: 5px;padding-right: 5px; width: 200px">
+						<div class="ms-2 me-auto">
+							<div data-bind="text: $data.CardNotes">Subheading</div>
+						</div>
+						<span class="badge bg-primary rounded-pill" data-bind="text: $data.CardTier">14</span>
+					</li>
+					<li>
+						<hr class="dropdown-divider">
+					</li>
+					<li>
+						<a class="dropdown-item" href="#" target="_blank" class="card-link"
+							data-bind="attr: { 'href': 'https://www.poewiki.net/wiki/'+$data.Original+' Map' }">Map
+							link</a>
+					</li>
+				</ul>
+				<!-- /ko -->
+				<!-- ko ifnot: $data.Extra -->
+				<ul class="dropdown-menu">
+					<li>
+						<a class="dropdown-item" href="#" target="_blank" class="card-link"
+							data-bind="attr: { 'href': 'https://www.poewiki.net/wiki/'+$data.Original+' Map' }">Map
+							link</a>
+					</li>
+				</ul>
 				<!-- /ko -->
 			</div>
+			<!-- /ko -->
+
 		</div>
 		<!-- /ko -->
 	</div>

@@ -44,7 +44,8 @@ function load() {
         map.css = map.run === true ? 'btn-outline-secondary' : 'btn-outline-success';
         map.defaultCss = map.css;
         map.Hover = 'no data available'
-
+        map.Extra = false;
+        map.Original = map.Name;
 
         var sels = _jsonDetails.filter(function (item) {
             return item.Name == map.Name;
@@ -54,7 +55,10 @@ function load() {
             map.CardNotes = sel.CardNotes;
             map.CardTier = sel.CardTier;
             map.LayoutTier = sel.LayoutTier;
-
+            map.BossNotes = sel.BossNotes;
+            map.Original = sel.Name;
+            map.LayoutNotes = sel.LayoutNotes;
+            map.Extra = true;
             // '♥ ★★★☆☆☠⚠•'
             if (isNullOrUndefined(sel.BossRippy) == false && sel.BossRippy) {
                 map.Name = map.Name + ' ☠';
@@ -133,10 +137,12 @@ function MainModel() {
         tryRemoveItem(runMaps, item);
         if (item.run == true) {
             $("#btn_" + item.Id).removeClass("btn-outline-success").addClass("btn-outline-secondary");
+            $("#btndd_" + item.Id).removeClass("btn-outline-success").addClass("btn-outline-secondary");
             runMaps.push(item.Id);
         }
         else {
             $("#btn_" + item.Id).removeClass("btn-outline-secondary").addClass("btn-outline-success");
+            $("#btndd_" + item.Id).removeClass("btn-outline-secondary").addClass("btn-outline-success");
         }
         var url = window.location.href.replace(window.location.search, '');
         window.history.pushState('page2', 'Title', url + "?ids=" + runMaps.toString());
