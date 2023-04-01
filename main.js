@@ -46,6 +46,9 @@ function load() {
         });
         sels.forEach(function (sel) {
             map.Hover = '';
+            map.CardNotes = sel.CardNotes;
+            map.CardTier = sel.CardTier;
+
             // '♥ ★★★☆☆☠⚠•'
             if (isNullOrUndefined(sel.BossRippy) == false && sel.BossRippy) {
                 map.Name = map.Name + ' ☠';
@@ -102,7 +105,9 @@ function MainModel() {
             }));
             */
             ko.utils.arrayFilter(self.maps(), function (map) {
-                map.highlight = map.Name.toLowerCase().includes(self.currentFilter());
+                map.highlight = map.Name.toLowerCase().includes(self.currentFilter()) /* name */
+                    || map.CardNotes.toLowerCase().includes(self.currentFilter()) /* div card */
+                    || (self.currentFilter()?.includes('Tier: ') && map.CardTier.toLowerCase().includes(self.currentFilter()?.replace('Tier: ', ''))); /* div card tier */
 
                 //map.defaultCss = map.css == 'glow-button' ? map.defaultCss : ''
                 map.css = map.highlight ? map.defaultCss + ' glow-button' : map.defaultCss;
