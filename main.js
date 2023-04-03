@@ -4,7 +4,6 @@ Array.prototype.first = function (propertySelector = obj => obj) {
 
 const _vm = new MainModel();
 var runMaps = [];
-
 const _debugmode = false;
 
 $(document).ready(function () {
@@ -14,8 +13,12 @@ $(document).ready(function () {
     apiGetMapDetails((jsonDetails) => {
         _jsonDetails = jsonDetails;
         apiGetMapData((json) => {
-            _maps = json;
-            load();
+            apiGetCardDetails((csv) => {
+                console.log(csv);
+                _parsedData = parseCsvString(csv);
+                _maps = json;
+                load();
+            });
         });
     });
 });
@@ -46,14 +49,41 @@ function load() {
         map.Hover = 'no data available'
         map.Extra = false;
         map.Original = map.Name;
+        map.DivCards = [];
+        map.Search = map.Name + ' ';
+
+        var divs = _parsedData.filter(function (item) {
+            return item[0] == map.Name;
+        });
+
+        divs.forEach(function (div) {
+            map.Extra = true;
+            map.DivCards.push({
+                Map: div[0],
+                Name: div[1],
+                Stack: div[2],
+                Reward: div[3],
+                Tier: div[4],
+                Alert: div[4] == 'GodTier' || div[4] == 'UsefulAF',
+                tierCss: div[4] == 'GodTier'
+                    ? 'badge text-bg-danger'
+                    : div[4] == 'UsefulAF' ? 'badge text-bg-warning' : 'badge text-bg-secondary'
+            });
+
+            if (map.CardTier != 'S' && div[4] == 'UsefulAF') { map.CardTier = 'A' }
+            if (div[4] == 'GodTier') { map.CardTier = 'S' }
+            map.Search = map.Search + div[1] + ' ' + div[3] + ' '
+        });
+
+
 
         var sels = _jsonDetails.filter(function (item) {
             return item.Name == map.Name;
         });
         sels.forEach(function (sel) {
             map.Hover = '';
-            map.CardNotes = sel.CardNotes;
-            map.CardTier = sel.CardTier;
+            //map.CardNotes = sel.CardNotes;
+            //map.CardTier = sel.CardTier;
             map.LayoutTier = sel.LayoutTier;
             map.BossNotes = sel.BossNotes;
             map.Original = sel.Name;
@@ -66,14 +96,17 @@ function load() {
             if (isNullOrUndefined(sel.LayoutTier) == false && (sel.LayoutTier == 'S' || sel.LayoutTier == 'A')) {
                 map.Name = map.Name + ' 💞';
             }
+            /*
             if (isNullOrUndefined(sel.CardTier) == false) {
                 if (sel.CardTier == 'S' || sel.CardTier == 'A') {
-                    map.Name = map.Name + ' ⭐';
+                    map.Name = map.Name + ' ⭐ 🟢 ⛔';
                 }
                 else if (sel.CardTier.length > 0) {
                     map.Name = map.Name + ' …';
                 }
             }
+            */
+            /*
             if (isNullOrUndefined(sel.LayoutNotes) == false && sel.LayoutNotes.length > 0) {
                 map.Hover = map.Hover + sel.LayoutNotes;
             }
@@ -86,7 +119,22 @@ function load() {
             if (isNullOrUndefined(sel.LayoutTier) == false && sel.LayoutTier.length > 0) {
                 map.Hover = '[' + sel.LayoutTier + '] ' + map.Hover;
             }
+            */
         });
+
+        if (isNullOrUndefined(map.CardTier) == false) {
+            if (map.CardTier == 'S') {
+                map.Name = map.Name + ' ⭐';
+            }
+            else if (map.CardTier == 'A') {
+                map.Name = map.Name + ' ⛛';
+            }
+            else if (map.CardTier.length > 0) {
+                map.Name = map.Name + ' …';
+            }
+        }
+
+        console.log(map.Search);
 
         _vm.maps.push(map);
     });
@@ -115,12 +163,8 @@ function MainModel() {
             }));
             */
             ko.utils.arrayFilter(self.maps(), function (map) {
-                map.highlight = map.Name.toLowerCase().includes(self.currentFilter()) /* name */
-                    || map?.CardNotes?.toLowerCase().includes(self.currentFilter()) /* div card */
-                    || (self.currentFilter()?.toLowerCase().includes('tier: ') && map?.CardTier.toLowerCase().includes(self.currentFilter()?.replace('tier: ', '')))    /* div card tier */
-                    || (self.currentFilter()?.toLowerCase().includes('tier ') && map?.CardTier.toLowerCase().includes(self.currentFilter()?.replace('tier ', '')))      /* div card tier */
-                    || (self.currentFilter()?.toLowerCase().includes('tier: ') && map?.LayoutTier.toLowerCase().includes(self.currentFilter()?.replace('tier: ', '')))  /* layout tier */
-                    || (self.currentFilter()?.toLowerCase().includes('tier ') && map?.LayoutTier.toLowerCase().includes(self.currentFilter()?.replace('tier ', '')));   /* layout tier */
+                map.highlight = map.Name.toLowerCase().includes(self.currentFilter().toLowerCase()) /* name */
+                    || map?.Search?.toLowerCase().includes(self.currentFilter().toLowerCase());
 
                 //map.defaultCss = map.css == 'glow-button' ? map.defaultCss : ''
                 map.css = map.highlight ? map.defaultCss + ' glow-button' : map.defaultCss;
@@ -191,6 +235,27 @@ function apiGetMapDetails(callback) {
     req.send();
 }
 
+function apiGetCardDetails(callback) {
+    const url = `https://grvmpr.github.io/divcards.csv`;
+    const req = new XMLHttpRequest();
+    req.open("GET", url, true);
+    //req.setRequestHeader("Accept", "application/json");
+    //req.setRequestHeader("Content-Type", "application/json; charset=utf-8");
+    req.onreadystatechange = function () {
+        if (this.readyState === 4) {
+            req.onreadystatechange = null;
+            if (this.status === 200) {
+                //const result = JSON.parse(this.response);
+                callback(this.response);
+            } else {
+                // TODO do error callback
+                const xxx = '';
+            }
+        }
+    };
+    req.send();
+}
+
 function groupByTier(filtered) {
     var returnList = [];
     filtered.forEach(function (dataRow, index) {
@@ -241,6 +306,46 @@ function isNullOrUndefined(obj) {
     else {
         return true;
     }
+}
+
+if (_debugmode == false) {
+    var parseCsvString = function (csv) {
+        let currentCsvIndex = 0;
+        let table = [];
+        let row = [];
+        let currentItem = null;
+        while (currentCsvIndex < csv.length) {
+            let c = csv[currentCsvIndex];
+            currentCsvIndex++;
+
+            switch (c) {
+                case ' ':
+                    if (currentItem === null) continue;
+                    else currentItem += c;
+                    break;
+                case ',':
+                    if (currentItem !== null) currentItem = currentItem.trim();
+                    row.push(currentItem);
+                    currentItem = null;
+                    break;
+                case '\r':
+                    continue;
+                case '\n':
+                    if (currentItem !== null) currentItem = currentItem.trim();
+                    row.push(currentItem);
+                    currentItem = null;
+                    table.push(row);
+                    row = [];
+                    break;
+                default:
+                    if (currentItem === null) currentItem = c;
+                    else currentItem += c;
+                    break;
+            }
+        }
+        table.push(row);
+        return table;
+    };
 }
 /*
 var _maps = [
