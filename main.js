@@ -56,8 +56,6 @@ function load() {
             return item[0] == map.Name;
         });
 
-        divs.sort((a, b) => (a.div[1] > b.div[1]) ? 1 : ((b.div[1] > a.div[1]) ? -1 : 0));
-
         divs.forEach(function (div) {
             map.Extra = true;
             map.DivCards.push({
@@ -76,6 +74,8 @@ function load() {
             if (div[4] == 'GodTier') { map.CardTier = 'S' }
             map.Search = map.Search + div[1] + ' ' + div[3] + ' '
         });
+
+        map.DivCards.sort((a, b) => (a.Name > b.Name) ? 1 : ((b.Name > a.Name) ? -1 : 0));
 
         var sels = _jsonDetails.filter(function (item) {
             return item.Name == map.Name;
