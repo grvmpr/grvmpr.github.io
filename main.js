@@ -56,6 +56,8 @@ function load() {
             return item[0] == map.Name;
         });
 
+        divs.sort((a, b) => (a.div[1] > b.div[1]) ? 1 : ((b.div[1] > a.div[1]) ? -1 : 0));
+
         divs.forEach(function (div) {
             map.Extra = true;
             map.DivCards.push({
@@ -75,15 +77,11 @@ function load() {
             map.Search = map.Search + div[1] + ' ' + div[3] + ' '
         });
 
-
-
         var sels = _jsonDetails.filter(function (item) {
             return item.Name == map.Name;
         });
         sels.forEach(function (sel) {
             map.Hover = '';
-            //map.CardNotes = sel.CardNotes;
-            //map.CardTier = sel.CardTier;
             map.LayoutTier = sel.LayoutTier;
             map.BossNotes = sel.BossNotes;
             map.Original = sel.Name;
@@ -96,30 +94,6 @@ function load() {
             if (isNullOrUndefined(sel.LayoutTier) == false && (sel.LayoutTier == 'S' || sel.LayoutTier == 'A')) {
                 map.Name = map.Name + ' 💞';
             }
-            /*
-            if (isNullOrUndefined(sel.CardTier) == false) {
-                if (sel.CardTier == 'S' || sel.CardTier == 'A') {
-                    map.Name = map.Name + ' ⭐ 🟢 ⛔';
-                }
-                else if (sel.CardTier.length > 0) {
-                    map.Name = map.Name + ' …';
-                }
-            }
-            */
-            /*
-            if (isNullOrUndefined(sel.LayoutNotes) == false && sel.LayoutNotes.length > 0) {
-                map.Hover = map.Hover + sel.LayoutNotes;
-            }
-            if (isNullOrUndefined(sel.CardNotes) == false && sel.CardNotes.length > 0) {
-                map.Hover = map.Hover + ' • ' + sel.CardNotes;
-            }
-            if (isNullOrUndefined(sel.BossNotes) == false && sel.BossNotes.length > 0) {
-                map.Hover = map.Hover + ' • ' + sel.BossNotes;
-            }
-            if (isNullOrUndefined(sel.LayoutTier) == false && sel.LayoutTier.length > 0) {
-                map.Hover = '[' + sel.LayoutTier + '] ' + map.Hover;
-            }
-            */
         });
 
         if (isNullOrUndefined(map.CardTier) == false) {
