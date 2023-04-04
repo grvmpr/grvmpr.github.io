@@ -1,162 +1,163 @@
+Map Tiers
 Tier 1
 
-    Strand
-    Mausoleum
-    Lava Lake
-    Terrace
+    Bone Crypt
+    Scriptorium
+    Alleyways
+    Colonnade
 
 
 Tier 2
 
-    Moon Temple
-    Arachnid Tomb
-    Crimson Temple
-    Castle Ruins
-    Cage
-    Forking River
-    Spider Forest
-    Alleyways
+    Dunes
+    Stagnation
+    Silo
+    Dry Sea
+    Excavation
+    Belfry
+    Precinct
+    Grotto
 
 
 Tier 3
 
-    Bone Crypt
-    Museum
-    Phantasmagoria
-    Port
-    Coves
-    Caldera
-    Sepulchre
-    Plateau
+    Overgrown Shrine
+    Strand
+    Lair
+    Infested Valley
+    Shrine
+    Primordial Blocks
+    Primordial Pool
+    Fields
 
 
 Tier 4
 
-    Atoll
-    Shore
+    Cemetery
+    Moon Temple
     Vaal Pyramid
-    Residence
-    Coral Ruins
-    Spider Lair
-    Thicket
-    Arachnid Nest
+    Lighthouse
+    Orchard
+    Laboratory
+    Port
+    Tower
 
 
 Tier 5
 
-    Temple
+    Atoll
     Courtyard
-    Acid Caverns
-    Ivory Temple
-    Laboratory
-    Bog
-    Silo
-    Pier
+    City Square
+    Marshes
+    Mineral Pools
+    Plateau
+    Arcade
+    Residence
 
 
 Tier 6
 
-    Overgrown Shrine
+    Shore
     Promenade
-    Sulphur Vents
-    Peninsula
-    Haunted Mansion
-    Iceberg
-    Volcano
+    Pit
+    Phantasmagoria
+    Castle Ruins
+    Waste Pool
+    Toxic Sewer
 
 
 Tier 7
 
-    Necropolis
-    Precinct
-    Mineral Pools
-    Factory
-    Burial Chambers
-    Crater
-    Frozen Cabins
+    Cursed Crypt
+    Canyon
+    Sulphur Vents
+    Relic Chambers
+    Chateau
+    Coral Ruins
+    Forbidden Woods
 
 
 Tier 8
 
-    Estuary
-    Primordial Blocks
-    Arsenal
-    Dungeon
-    Academy
-    Crimson Township
-    Leyline
+    Crimson Temple
+    Shipyard
+    Caldera
+    Armoury
+    Arachnid Tomb
+    Flooded Mine
+    Crystal Ore
 
 
 Tier 9
 
-    Bazaar
-    Primordial Pool
-    Desert
-    Dark Forest
-    Colosseum
-    Arcade
+    Wasteland
+    Ramparts
+    Pier
+    Overgrown Ruin
+    Cold River
+    Siege
 
 
 Tier 10
 
-    Underground River
-    Gardens
-    Forbidden Woods
-    Grave Trough
-    Defiled Cathedral
-    Lookout
+    Underground Sea
+    Foundry
+    Arachnid Nest
+    Cells
+    Factory
+    Plaza
 
 
 Tier 11
 
-    Wasteland
-    City Square
-    Mesa
-    Infested Valley
-    Dry Sea
-    Villa
+    Malformation
+    Fungal Hollow
+    Beach
+    Geode
+    Crimson Township
+    Frozen Cabins
 
 
 Tier 12
 
-    Cemetery
-    Cursed Crypt
-    Courthouse
-    Cold River
-    Colonnade
-    Shipyard
+    Museum
+    Necropolis
+    Desert Spring
+    Conservatory
+    Jungle Valley
+    Wharf
 
 
 Tier 13
 
-    Lair
-    Orchard
-    Shrine
-    Plaza
-    Channel
+    Arid Lake
+    Leyline
+    Defiled Cathedral
+    Crater
+    Thicket
 
 
 Tier 14
 
-    Underground Sea
+    Temple
     Maze
-    Canyon
-    Sunken City
-    Carcass
+    Barrows
+    Dungeon
+    Terrace
 
 
 Tier 15
 
-    Dunes
-    Foundry
-    Overgrown Ruin
-    Ashen Wood
-    Grotto
+    Underground River
+    Tropical Island
+    Colosseum
+    Core
+    Racecourse
 
 
 Tier 16
 
-    Ancient City
-    Toxic Sewer
-    Graveyard
-    Ghetto
+    Dig
+    Volcano
+    Coves
+    Arsenal
