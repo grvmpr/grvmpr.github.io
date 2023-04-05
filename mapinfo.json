@@ -1,0 +1,1422 @@
+[
+    {
+        "Name": "Item",
+        "BossList": [],
+        "LayoutTier": "",
+        "LayoutNotes": "",
+        "BossRippy": false,
+        "BossNotes": ""
+    },
+    {
+        "Name": "Academy",
+        "BossList": [
+            "The Arbiter of Knowledge"
+        ],
+        "LayoutTier": "",
+        "LayoutNotes": "",
+        "BossRippy": false,
+        "BossNotes": ""
+    },
+    {
+        "Name": "Acid Caverns",
+        "BossList": [
+            "Rama The Kinslayer",
+            "Kalria The Fallen",
+            "Invari The Bloodshaper",
+            "Lokan The Deceiver",
+            "Marchak The Betrayer",
+            "Berrots The Breaker",
+            "Vessider The Unrivaled",
+            "Morgrants The Deafening",
+            "Lokan The Deceiver"
+        ],
+        "LayoutTier": "C",
+        "LayoutNotes": "Circuit indoor",
+        "BossRippy": true,
+        "BossNotes": "Mech Gear RIP"
+    },
+    {
+        "Name": "Acton's Nightmare",
+        "BossList": [
+            "Rose",
+            "Thorn"
+        ],
+        "LayoutTier": "",
+        "LayoutNotes": "",
+        "BossRippy": false,
+        "BossNotes": ""
+    },
+    {
+        "Name": "Alleyways",
+        "BossList": [
+            "Calderus"
+        ],
+        "LayoutTier": "B",
+        "LayoutNotes": "Mostly linear",
+        "BossRippy": false,
+        "BossNotes": ""
+    },
+    {
+        "Name": "Altered Distant Memory",
+        "BossList": [
+            "Tahsin Warmaker"
+        ],
+        "LayoutTier": "",
+        "LayoutNotes": "",
+        "BossRippy": false,
+        "BossNotes": ""
+    },
+    {
+        "Name": "Ancient City",
+        "BossList": [
+            "Legius Garhall"
+        ],
+        "LayoutTier": "C",
+        "LayoutNotes": "Outdoor maze",
+        "BossRippy": false,
+        "BossNotes": ""
+    },
+    {
+        "Name": "Arachnid Nest",
+        "BossList": [
+            "Spinner of False Hope"
+        ],
+        "LayoutTier": "D",
+        "LayoutNotes": "Indoor maze",
+        "BossRippy": false,
+        "BossNotes": "Phased"
+    },
+    {
+        "Name": "Arachnid Tomb",
+        "BossList": [
+            "Hybrid Widow"
+        ],
+        "LayoutTier": "C",
+        "LayoutNotes": "Indoor",
+        "BossRippy": false,
+        "BossNotes": ""
+    },
+    {
+        "Name": "Arcade",
+        "BossList": [
+            "Herald of Ashes",
+            "Herald of Thunder"
+        ],
+        "LayoutTier": "C",
+        "LayoutNotes": "Open obstacles",
+        "BossRippy": false,
+        "BossNotes": ""
+    },
+    {
+        "Name": "Arsenal",
+        "BossList": [
+            "The Steel Soul"
+        ],
+        "LayoutTier": "F",
+        "LayoutNotes": "Outdoor maze",
+        "BossRippy": false,
+        "BossNotes": ""
+    },
+    {
+        "Name": "Ashen Wood",
+        "BossList": [
+            "Lord of the Ashen Arrow"
+        ],
+        "LayoutTier": "A",
+        "LayoutNotes": "Open",
+        "BossRippy": false,
+        "BossNotes": ""
+    },
+    {
+        "Name": "Atoll",
+        "BossList": [
+            "Puruna the Challenger"
+        ],
+        "LayoutTier": "A",
+        "LayoutNotes": "Circuit",
+        "BossRippy": false,
+        "BossNotes": ""
+    },
+    {
+        "Name": "Augmented Distant Memory",
+        "BossList": [
+            "Tahsin Warmaker"
+        ],
+        "LayoutTier": "",
+        "LayoutNotes": "",
+        "BossRippy": false,
+        "BossNotes": ""
+    },
+    {
+        "Name": "Bazaar",
+        "BossList": [
+            "Ancient Sculptor"
+        ],
+        "LayoutTier": "",
+        "LayoutNotes": "",
+        "BossRippy": false,
+        "BossNotes": ""
+    },
+    {
+        "Name": "Bog",
+        "BossList": [
+            "Skullbeak"
+        ],
+        "LayoutTier": "A",
+        "LayoutNotes": "Open",
+        "BossRippy": false,
+        "BossNotes": ""
+    },
+    {
+        "Name": "Bone Crypt",
+        "BossList": [
+            "Xixic High Necromancer"
+        ],
+        "LayoutTier": "D",
+        "LayoutNotes": "Indoor",
+        "BossRippy": false,
+        "BossNotes": ""
+    },
+    {
+        "Name": "Burial Chambers",
+        "BossList": [
+            "Witch of the Cauldron"
+        ],
+        "LayoutTier": "",
+        "LayoutNotes": "",
+        "BossRippy": false,
+        "BossNotes": ""
+    },
+    {
+        "Name": "Caer Blaidd, Wolfpack's Den",
+        "BossList": [
+            "Winterfang",
+            "Solus Pack Alpha",
+            "Storm Eye"
+        ],
+        "LayoutTier": "",
+        "LayoutNotes": "",
+        "BossRippy": false,
+        "BossNotes": ""
+    },
+    {
+        "Name": "Cage",
+        "BossList": [
+            "Executioner Bloodwing"
+        ],
+        "LayoutTier": "",
+        "LayoutNotes": "",
+        "BossRippy": false,
+        "BossNotes": ""
+    },
+    {
+        "Name": "Caldera",
+        "BossList": [
+            "The Infernal King"
+        ],
+        "LayoutTier": "B",
+        "LayoutNotes": "Long windy",
+        "BossRippy": false,
+        "BossNotes": "Gear"
+    },
+    {
+        "Name": "Canyon",
+        "BossList": [
+            "Stonebeak Battle Fowl",
+            "Gnar Eater of Carrion"
+        ],
+        "LayoutTier": "S",
+        "LayoutNotes": "Linear",
+        "BossRippy": true,
+        "BossNotes": "RIP"
+    },
+    {
+        "Name": "Carcass",
+        "BossList": [
+            "Amalgam of Nightmares"
+        ],
+        "LayoutTier": "D",
+        "LayoutNotes": "Indoor",
+        "BossRippy": false,
+        "BossNotes": "Phased gear"
+    },
+    {
+        "Name": "Castle Ruins",
+        "BossList": [
+            "Leif the Swift-Handed"
+        ],
+        "LayoutTier": "B",
+        "LayoutNotes": "Open",
+        "BossRippy": false,
+        "BossNotes": "Gear"
+    },
+    {
+        "Name": "Cemetery",
+        "BossList": [
+            "Erebix Light's Bane"
+        ],
+        "LayoutTier": "A",
+        "LayoutNotes": "Open",
+        "BossRippy": false,
+        "BossNotes": "Mech"
+    },
+    {
+        "Name": "Channel",
+        "BossList": [
+            "The Winged Death"
+        ],
+        "LayoutTier": "",
+        "LayoutNotes": "",
+        "BossRippy": false,
+        "BossNotes": ""
+    },
+    {
+        "Name": "City Square",
+        "BossList": [
+            "Pileah Corpse Burner",
+            "Pileah Burning Corpse",
+            "Carius the Unnatural"
+        ],
+        "LayoutTier": "",
+        "LayoutNotes": "",
+        "BossRippy": false,
+        "BossNotes": ""
+    },
+    {
+        "Name": "Cold River",
+        "BossList": [
+            "Khor Sister of Shadows",
+            "Ara Sister of Light"
+        ],
+        "LayoutTier": "C",
+        "LayoutNotes": "Circuit",
+        "BossRippy": true,
+        "BossNotes": "Mech Gear RIP"
+    },
+    {
+        "Name": "Colonnade",
+        "BossList": [
+            "Tyrant"
+        ],
+        "LayoutTier": "A",
+        "LayoutNotes": "Linear",
+        "BossRippy": true,
+        "BossNotes": "Phased mech gear RIP"
+    },
+    {
+        "Name": "Colosseum",
+        "BossList": [
+            "Ambrius Legion Slayer"
+        ],
+        "LayoutTier": "D",
+        "LayoutNotes": "Tight",
+        "BossRippy": false,
+        "BossNotes": "Phased mech"
+    },
+    {
+        "Name": "Coral Ruins",
+        "BossList": [
+            "Captain Tanner Lightfoot"
+        ],
+        "LayoutTier": "F",
+        "LayoutNotes": "Outdoor maze",
+        "BossRippy": false,
+        "BossNotes": "Phased"
+    },
+    {
+        "Name": "Cortex",
+        "BossList": [
+            "Tahsin Warmaker"
+        ],
+        "LayoutTier": "",
+        "LayoutNotes": "",
+        "BossRippy": false,
+        "BossNotes": ""
+    },
+    {
+        "Name": "Courthouse",
+        "BossList": [
+            "Bolt Brownfur Earth Churner",
+            "Thena Moga the Crimson Storm",
+            "Ion Darkshroud the Hungering Blade"
+        ],
+        "LayoutTier": "",
+        "LayoutNotes": "",
+        "BossRippy": false,
+        "BossNotes": ""
+    },
+    {
+        "Name": "Courtyard",
+        "BossList": [
+            "Oriath's Virtue",
+            "Oriath's Vengeance",
+            "Oriath's Vigil"
+        ],
+        "LayoutTier": "",
+        "LayoutNotes": "",
+        "BossRippy": false,
+        "BossNotes": ""
+    },
+    {
+        "Name": "Coves",
+        "BossList": [
+            "Telvar the Inebriated",
+            "Pirate Treasure"
+        ],
+        "LayoutTier": "",
+        "LayoutNotes": "",
+        "BossRippy": false,
+        "BossNotes": ""
+    },
+    {
+        "Name": "Crater",
+        "BossList": [
+            "Megaera"
+        ],
+        "LayoutTier": "B",
+        "LayoutNotes": "Tight",
+        "BossRippy": false,
+        "BossNotes": "Gear"
+    },
+    {
+        "Name": "Crimson Temple",
+        "BossList": [
+            "The Sanguine Siren"
+        ],
+        "LayoutTier": "C",
+        "LayoutNotes": "Indoor",
+        "BossRippy": false,
+        "BossNotes": ""
+    },
+    {
+        "Name": "Crimson Township",
+        "BossList": [
+            "Kadaris Crimson Mayor"
+        ],
+        "LayoutTier": "C",
+        "LayoutNotes": "Windy",
+        "BossRippy": true,
+        "BossNotes": "Gear RIP both very much so"
+    },
+    {
+        "Name": "Cursed Crypt",
+        "BossList": [
+            "Pagan Bishop of Agony"
+        ],
+        "LayoutTier": "D",
+        "LayoutNotes": "Indoor maze",
+        "BossRippy": true,
+        "BossNotes": "Mech RIP"
+    },
+    {
+        "Name": "Dark Forest",
+        "BossList": [
+            "The Cursed King"
+        ],
+        "LayoutTier": "B",
+        "LayoutNotes": "Open",
+        "BossRippy": true,
+        "BossNotes": "Phased mech gear RIP"
+    },
+    {
+        "Name": "Death and Taxes",
+        "BossList": [
+            "Avatar of Apocalypse"
+        ],
+        "LayoutTier": "",
+        "LayoutNotes": "",
+        "BossRippy": false,
+        "BossNotes": ""
+    },
+    {
+        "Name": "Defiled Cathedral",
+        "BossList": [
+            "Woad Mockery of Man"
+        ],
+        "LayoutTier": "B",
+        "LayoutNotes": "Circuit",
+        "BossRippy": true,
+        "BossNotes": "RIP"
+    },
+    {
+        "Name": "Desert",
+        "BossList": [
+            "Preethi Eye-Pecker"
+        ],
+        "LayoutTier": "C",
+        "LayoutNotes": "Open",
+        "BossRippy": false,
+        "BossNotes": ""
+    },
+    {
+        "Name": "Doryani's Machinarium",
+        "BossList": [
+            "The Apex Assembly"
+        ],
+        "LayoutTier": "",
+        "LayoutNotes": "",
+        "BossRippy": false,
+        "BossNotes": ""
+    },
+    {
+        "Name": "Dry Sea",
+        "BossList": [
+            "Gazuul Droughtspawn"
+        ],
+        "LayoutTier": "C",
+        "LayoutNotes": "Circuit",
+        "BossRippy": false,
+        "BossNotes": ""
+    },
+    {
+        "Name": "Dunes",
+        "BossList": [
+            "The Blacksmith"
+        ],
+        "LayoutTier": "A",
+        "LayoutNotes": "Open",
+        "BossRippy": false,
+        "BossNotes": ""
+    },
+    {
+        "Name": "Dungeon",
+        "BossList": [
+            "Penitentiary Incarcerator"
+        ],
+        "LayoutTier": "F",
+        "LayoutNotes": "Indoor maze",
+        "BossRippy": true,
+        "BossNotes": "RIP"
+    },
+    {
+        "Name": "Estuary",
+        "BossList": [
+            "Sumter the Twisted"
+        ],
+        "LayoutTier": "",
+        "LayoutNotes": "",
+        "BossRippy": false,
+        "BossNotes": ""
+    },
+    {
+        "Name": "Factory",
+        "BossList": [
+            "Pesquin the Mad Baron"
+        ],
+        "LayoutTier": "D",
+        "LayoutNotes": "Indoor",
+        "BossRippy": true,
+        "BossNotes": "Mech RIP"
+    },
+    {
+        "Name": "Forbidden Woods",
+        "BossList": [
+            "Skictis Frostkeeper",
+            "Corruptor Eedaiak",
+            "Takatax Brittlethorn"
+        ],
+        "LayoutTier": "",
+        "LayoutNotes": "",
+        "BossRippy": false,
+        "BossNotes": ""
+    },
+    {
+        "Name": "Forge of the Phoenix",
+        "BossList": [
+            "Guardian of the Phoenix"
+        ],
+        "LayoutTier": "",
+        "LayoutNotes": "",
+        "BossRippy": false,
+        "BossNotes": ""
+    },
+    {
+        "Name": "Forking River",
+        "BossList": [
+            "Ormud Fiend of the Flood"
+        ],
+        "LayoutTier": "C",
+        "LayoutNotes": "Linear but messy",
+        "BossRippy": true,
+        "BossNotes": "Mech RIP"
+    },
+    {
+        "Name": "Foundry",
+        "BossList": [
+            "The Shifting Ire",
+            "Ciergan Shadow Alchemist"
+        ],
+        "LayoutTier": "B",
+        "LayoutNotes": "Circuit",
+        "BossRippy": true,
+        "BossNotes": "RIP"
+    },
+    {
+        "Name": "Frozen Cabins",
+        "BossList": [
+            "Captain Clayborne The Accursed"
+        ],
+        "LayoutTier": "C",
+        "LayoutNotes": "Windy",
+        "BossRippy": false,
+        "BossNotes": ""
+    },
+    {
+        "Name": "Gardens",
+        "BossList": [
+            "Sallazzang",
+            "Sallazzang"
+        ],
+        "LayoutTier": "D",
+        "LayoutNotes": "Linear but messy",
+        "BossRippy": false,
+        "BossNotes": "Phased. DO NOT make boss metamorph"
+    },
+    {
+        "Name": "Ghetto",
+        "BossList": [
+            "Lady Stormflay"
+        ],
+        "LayoutTier": "C",
+        "LayoutNotes": "Outdoor maze",
+        "BossRippy": true,
+        "BossNotes": "RIP"
+    },
+    {
+        "Name": "Grave Trough",
+        "BossList": [
+            "The Restless Shade"
+        ],
+        "LayoutTier": "D",
+        "LayoutNotes": "Lots of levels",
+        "BossRippy": true,
+        "BossNotes": "Mech RIP"
+    },
+    {
+        "Name": "Graveyard",
+        "BossList": [
+            "Thunderskull",
+            "Champion of Frost",
+            "Steelpoint the Avenger"
+        ],
+        "LayoutTier": "",
+        "LayoutNotes": "",
+        "BossRippy": false,
+        "BossNotes": ""
+    },
+    {
+        "Name": "Grotto",
+        "BossList": [
+            "Void Anomaly"
+        ],
+        "LayoutTier": "B",
+        "LayoutNotes": "Circuit",
+        "BossRippy": false,
+        "BossNotes": ""
+    },
+    {
+        "Name": "Hall of Grandmasters",
+        "BossList": [],
+        "LayoutTier": "",
+        "LayoutNotes": "",
+        "BossRippy": false,
+        "BossNotes": ""
+    },
+    {
+        "Name": "Hallowed Ground",
+        "BossList": [
+            "Maker of Mires"
+        ],
+        "LayoutTier": "",
+        "LayoutNotes": "",
+        "BossRippy": false,
+        "BossNotes": ""
+    },
+    {
+        "Name": "Haunted Mansion",
+        "BossList": [
+            "Barthol the Pure",
+            "Barthol the Corruptor"
+        ],
+        "LayoutTier": "",
+        "LayoutNotes": "",
+        "BossRippy": false,
+        "BossNotes": ""
+    },
+    {
+        "Name": "Iceberg",
+        "BossList": [
+            "Yorishi Aurora-sage",
+            "Jeinei Yuushu",
+            "Otesha the Giantslayer"
+        ],
+        "LayoutTier": "",
+        "LayoutNotes": "",
+        "BossRippy": false,
+        "BossNotes": ""
+    },
+    {
+        "Name": "Infested Valley",
+        "BossList": [
+            "Gorulis Will-Thief"
+        ],
+        "LayoutTier": "",
+        "LayoutNotes": "",
+        "BossRippy": false,
+        "BossNotes": ""
+    },
+    {
+        "Name": "Infused Beachhead",
+        "BossList": [
+            "<<>>"
+        ],
+        "LayoutTier": "",
+        "LayoutNotes": "",
+        "BossRippy": false,
+        "BossNotes": ""
+    },
+    {
+        "Name": "Ivory Temple",
+        "BossList": [
+            "Sanctum Enforcer",
+            "Sanctum Guardian"
+        ],
+        "LayoutTier": "",
+        "LayoutNotes": "",
+        "BossRippy": false,
+        "BossNotes": ""
+    },
+    {
+        "Name": "Laboratory",
+        "BossList": [
+            "Riftwalker"
+        ],
+        "LayoutTier": "D",
+        "LayoutNotes": "Backtrack",
+        "BossRippy": false,
+        "BossNotes": "Phased Mech"
+    },
+    {
+        "Name": "Lair",
+        "BossList": [
+            "Lycius Midnight's Howl"
+        ],
+        "LayoutTier": "B",
+        "LayoutNotes": "Windy indoor",
+        "BossRippy": true,
+        "BossNotes": "Phased mech gear RIP"
+    },
+    {
+        "Name": "Lair of the Hydra",
+        "BossList": [
+            "Guardian of the Hydra"
+        ],
+        "LayoutTier": "",
+        "LayoutNotes": "",
+        "BossRippy": false,
+        "BossNotes": ""
+    },
+    {
+        "Name": "Lava Lake",
+        "BossList": [
+            "Kitava The Destroyer"
+        ],
+        "LayoutTier": "B",
+        "LayoutNotes": "Open dead ends",
+        "BossRippy": true,
+        "BossNotes": "Phased gear mech RIP"
+    },
+    {
+        "Name": "Leyline",
+        "BossList": [
+            "Mirage of Bones"
+        ],
+        "LayoutTier": "C",
+        "LayoutNotes": "Open",
+        "BossRippy": false,
+        "BossNotes": "Phased"
+    },
+    {
+        "Name": "Lookout",
+        "BossList": [
+            "The Grey Plague"
+        ],
+        "LayoutTier": "",
+        "LayoutNotes": "",
+        "BossRippy": false,
+        "BossNotes": ""
+    },
+    {
+        "Name": "Maelström of Chaos",
+        "BossList": [
+            "Merveil the Returned",
+            "Merveil the Reflection"
+        ],
+        "LayoutTier": "",
+        "LayoutNotes": "",
+        "BossRippy": false,
+        "BossNotes": ""
+    },
+    {
+        "Name": "Mao Kun",
+        "BossList": [
+            "Fairgraves Never Dying"
+        ],
+        "LayoutTier": "",
+        "LayoutNotes": "",
+        "BossRippy": false,
+        "BossNotes": ""
+    },
+    {
+        "Name": "Mausoleum",
+        "BossList": [
+            "Tolman the Exhumer"
+        ],
+        "LayoutTier": "B",
+        "LayoutNotes": "Circuit",
+        "BossRippy": true,
+        "BossNotes": "RIP"
+    },
+    {
+        "Name": "Maze",
+        "BossList": [
+            "Shadow of the Vaal"
+        ],
+        "LayoutTier": "F",
+        "LayoutNotes": "Indoor maze",
+        "BossRippy": true,
+        "BossNotes": "Phased RIP"
+    },
+    {
+        "Name": "Maze of the Minotaur",
+        "BossList": [
+            "Guardian of the Minotaur"
+        ],
+        "LayoutTier": "",
+        "LayoutNotes": "",
+        "BossRippy": false,
+        "BossNotes": ""
+    },
+    {
+        "Name": "Mesa",
+        "BossList": [
+            "Oak the Mighty"
+        ],
+        "LayoutTier": "A",
+        "LayoutNotes": "Circuit",
+        "BossRippy": false,
+        "BossNotes": "Gear"
+    },
+    {
+        "Name": "Mineral Pools",
+        "BossList": [
+            "Shock and Horror"
+        ],
+        "LayoutTier": "",
+        "LayoutNotes": "",
+        "BossRippy": false,
+        "BossNotes": ""
+    },
+    {
+        "Name": "Moon Temple",
+        "BossList": [
+            "Sebbert Crescent's Point"
+        ],
+        "LayoutTier": "C",
+        "LayoutNotes": "Open Maze",
+        "BossRippy": true,
+        "BossNotes": "RIP"
+    },
+    {
+        "Name": "Museum",
+        "BossList": [
+            "He of Many Pieces"
+        ],
+        "LayoutTier": "D",
+        "LayoutNotes": "Indoor",
+        "BossRippy": false,
+        "BossNotes": "Gear"
+    },
+    {
+        "Name": "Necropolis",
+        "BossList": [
+            "Burtok Conjurer of Bones"
+        ],
+        "LayoutTier": "D",
+        "LayoutNotes": "Indoor maze",
+        "BossRippy": true,
+        "BossNotes": "Mech RIP"
+    },
+    {
+        "Name": "Oba's Cursed Trove",
+        "BossList": [
+            "Merveil the Returned",
+            "Merveil the Reflection"
+        ],
+        "LayoutTier": "",
+        "LayoutNotes": "",
+        "BossRippy": false,
+        "BossNotes": ""
+    },
+    {
+        "Name": "Olmec's Sanctum",
+        "BossList": [
+            "Olmec the All Stone"
+        ],
+        "LayoutTier": "",
+        "LayoutNotes": "",
+        "BossRippy": false,
+        "BossNotes": ""
+    },
+    {
+        "Name": "Orchard",
+        "BossList": [
+            "Vision of Justice"
+        ],
+        "LayoutTier": "C",
+        "LayoutNotes": "Open maze",
+        "BossRippy": false,
+        "BossNotes": "Mech"
+    },
+    {
+        "Name": "Overgrown Ruin",
+        "BossList": [
+            "Visceris"
+        ],
+        "LayoutTier": "C",
+        "LayoutNotes": "Indoor",
+        "BossRippy": false,
+        "BossNotes": "Phased gear"
+    },
+    {
+        "Name": "Overgrown Shrine",
+        "BossList": [
+            "Maligaro the Mutilator"
+        ],
+        "LayoutTier": "C",
+        "LayoutNotes": "Indoor",
+        "BossRippy": true,
+        "BossNotes": "Phased mech gear RIP"
+    },
+    {
+        "Name": "Peninsula",
+        "BossList": [
+            "Titan of the Grove"
+        ],
+        "LayoutTier": "A",
+        "LayoutNotes": "Open",
+        "BossRippy": false,
+        "BossNotes": ""
+    },
+    {
+        "Name": "Phantasmagoria",
+        "BossList": [
+            "Erythrophagia"
+        ],
+        "LayoutTier": "B",
+        "LayoutNotes": "Tight",
+        "BossRippy": true,
+        "BossNotes": "RIP"
+    },
+    {
+        "Name": "Pier",
+        "BossList": [
+            "Ancient Architect"
+        ],
+        "LayoutTier": "B",
+        "LayoutNotes": "Outdoor windy",
+        "BossRippy": false,
+        "BossNotes": ""
+    },
+    {
+        "Name": "Pillars of Arun",
+        "BossList": [
+            "Talin Faithbreaker"
+        ],
+        "LayoutTier": "",
+        "LayoutNotes": "",
+        "BossRippy": false,
+        "BossNotes": ""
+    },
+    {
+        "Name": "Pit of the Chimera",
+        "BossList": [
+            "Guardian of the Chimera"
+        ],
+        "LayoutTier": "",
+        "LayoutNotes": "",
+        "BossRippy": false,
+        "BossNotes": ""
+    },
+    {
+        "Name": "Plateau",
+        "BossList": [
+            "Puruna the Challenger",
+            "Poporo the Highest Spire"
+        ],
+        "LayoutTier": "A",
+        "LayoutNotes": "Open circuit",
+        "BossRippy": false,
+        "BossNotes": ""
+    },
+    {
+        "Name": "Plaza",
+        "BossList": [
+            "The Goddess"
+        ],
+        "LayoutTier": "F",
+        "LayoutNotes": "Maze",
+        "BossRippy": false,
+        "BossNotes": "Mech"
+    },
+    {
+        "Name": "Poorjoy's Asylum",
+        "BossList": [
+            "Mistress Hyseria"
+        ],
+        "LayoutTier": "",
+        "LayoutNotes": "",
+        "BossRippy": false,
+        "BossNotes": ""
+    },
+    {
+        "Name": "Port",
+        "BossList": [
+            "Unravelling Horror",
+            "Unravelling Horror",
+            "Unravelling Horror",
+            "Unravelling Horror",
+            "Unravelling Horror"
+        ],
+        "LayoutTier": "B",
+        "LayoutNotes": "Linear",
+        "BossRippy": false,
+        "BossNotes": "Phased gear (bleeds)"
+    },
+    {
+        "Name": "Precinct",
+        "BossList": [
+            "Torr Olgosso",
+            "Damoi Tui",
+            "Orra Greengate",
+            "Augustina Solaria",
+            "Wilorin Demontamer",
+            "Eoin Greyfur",
+            "Igna Phoenix"
+        ],
+        "LayoutTier": "C",
+        "LayoutNotes": "Open can get lost",
+        "BossRippy": true,
+        "BossNotes": "Gear RIP"
+    },
+    {
+        "Name": "Primordial Blocks",
+        "BossList": [
+            "High Lithomancer"
+        ],
+        "LayoutTier": "",
+        "LayoutNotes": "",
+        "BossRippy": false,
+        "BossNotes": ""
+    },
+    {
+        "Name": "Primordial Pool",
+        "BossList": [
+            "Nightmare's Omen"
+        ],
+        "LayoutTier": "B",
+        "LayoutNotes": "Outdoor",
+        "BossRippy": false,
+        "BossNotes": ""
+    },
+    {
+        "Name": "Promenade",
+        "BossList": [
+            "Blackguard Tempest",
+            "Blackguard Avenger"
+        ],
+        "LayoutTier": "A",
+        "LayoutNotes": "Linear",
+        "BossRippy": false,
+        "BossNotes": ""
+    },
+    {
+        "Name": "Replica Cortex",
+        "BossList": [
+            "Tahsin Warmaker"
+        ],
+        "LayoutTier": "",
+        "LayoutNotes": "",
+        "BossRippy": false,
+        "BossNotes": ""
+    },
+    {
+        "Name": "Replica Pillars of Arun",
+        "BossList": [
+            "Talin Faithbreaker"
+        ],
+        "LayoutTier": "",
+        "LayoutNotes": "",
+        "BossRippy": false,
+        "BossNotes": ""
+    },
+    {
+        "Name": "Replica Poorjoy's Asylum",
+        "BossList": [
+            "Mistress Hyseria"
+        ],
+        "LayoutTier": "",
+        "LayoutNotes": "",
+        "BossRippy": false,
+        "BossNotes": ""
+    },
+    {
+        "Name": "Residence",
+        "BossList": [
+            "Excellis Aurafix"
+        ],
+        "LayoutTier": "C",
+        "LayoutNotes": "Indoor",
+        "BossRippy": false,
+        "BossNotes": ""
+    },
+    {
+        "Name": "Rewritten Distant Memory",
+        "BossList": [
+            "Tahsin Warmaker"
+        ],
+        "LayoutTier": "",
+        "LayoutNotes": "",
+        "BossRippy": false,
+        "BossNotes": ""
+    },
+    {
+        "Name": "Sepulchre",
+        "BossList": [
+            "Doedre the Defiler",
+            "Doedre the Defiler"
+        ],
+        "LayoutTier": "B",
+        "LayoutNotes": "Indoor",
+        "BossRippy": true,
+        "BossNotes": ""
+    },
+    {
+        "Name": "Shipyard",
+        "BossList": [
+            "Musky \"Two-Eyes\" Grenn",
+            "Susara Siren of Pondium",
+            "Lussi \"Rotmother\" Roth"
+        ],
+        "LayoutTier": "",
+        "LayoutNotes": "",
+        "BossRippy": false,
+        "BossNotes": ""
+    },
+    {
+        "Name": "Shore",
+        "BossList": [
+            "Belcer the Pirate Lord"
+        ],
+        "LayoutTier": "S",
+        "LayoutNotes": "Outdoor",
+        "BossRippy": false,
+        "BossNotes": ""
+    },
+    {
+        "Name": "Shrine",
+        "BossList": [
+            "Piety the Empyrean",
+            "Piety the Empyrean"
+        ],
+        "LayoutTier": "D",
+        "LayoutNotes": "Indoor maze",
+        "BossRippy": false,
+        "BossNotes": "Phased gear"
+    },
+    {
+        "Name": "Silo",
+        "BossList": [
+            "Renkarr The Kiln Keeper"
+        ],
+        "LayoutTier": "B",
+        "LayoutNotes": "Linear",
+        "BossRippy": false,
+        "BossNotes": "Phased"
+    },
+    {
+        "Name": "Spider Forest",
+        "BossList": [
+            "Enticer of Rot"
+        ],
+        "LayoutTier": "D",
+        "LayoutNotes": "Outdoor maze",
+        "BossRippy": true,
+        "BossNotes": "RIP"
+    },
+    {
+        "Name": "Spider Lair",
+        "BossList": [
+            "Thraxia"
+        ],
+        "LayoutTier": "",
+        "LayoutNotes": "",
+        "BossRippy": false,
+        "BossNotes": ""
+    },
+    {
+        "Name": "Strand",
+        "BossList": [
+            "Master of the Blade",
+            "Massier"
+        ],
+        "LayoutTier": "S",
+        "LayoutNotes": "Linear",
+        "BossRippy": false,
+        "BossNotes": ""
+    },
+    {
+        "Name": "Sulphur Vents",
+        "BossList": [
+            "The Gorgon"
+        ],
+        "LayoutTier": "B",
+        "LayoutNotes": "Open",
+        "BossRippy": false,
+        "BossNotes": ""
+    },
+    {
+        "Name": "Sunken City",
+        "BossList": [
+            "Armala the Widow"
+        ],
+        "LayoutTier": "",
+        "LayoutNotes": "",
+        "BossRippy": false,
+        "BossNotes": ""
+    },
+    {
+        "Name": "Temple",
+        "BossList": [
+            "Jorus Sky's Edge"
+        ],
+        "LayoutTier": "C",
+        "LayoutNotes": "Indoor",
+        "BossRippy": false,
+        "BossNotes": ""
+    },
+    {
+        "Name": "Terrace",
+        "BossList": [
+            "Varhesh Shimmering Aberration"
+        ],
+        "LayoutTier": "B",
+        "LayoutNotes": "Windy",
+        "BossRippy": false,
+        "BossNotes": "Phased mech"
+    },
+    {
+        "Name": "The Beachhead",
+        "BossList": [
+            "<<>>"
+        ],
+        "LayoutTier": "",
+        "LayoutNotes": "",
+        "BossRippy": false,
+        "BossNotes": ""
+    },
+    {
+        "Name": "The Beachhead",
+        "BossList": [
+            "<<>>"
+        ],
+        "LayoutTier": "",
+        "LayoutNotes": "",
+        "BossRippy": false,
+        "BossNotes": ""
+    },
+    {
+        "Name": "The Beachhead",
+        "BossList": [
+            "<<>>"
+        ],
+        "LayoutTier": "",
+        "LayoutNotes": "",
+        "BossRippy": false,
+        "BossNotes": ""
+    },
+    {
+        "Name": "The Coward's Trial",
+        "BossList": [
+            "Infector of Dreams"
+        ],
+        "LayoutTier": "",
+        "LayoutNotes": "",
+        "BossRippy": false,
+        "BossNotes": ""
+    },
+    {
+        "Name": "The Putrid Cloister",
+        "BossList": [
+            "Headmistress Braeta"
+        ],
+        "LayoutTier": "",
+        "LayoutNotes": "",
+        "BossRippy": false,
+        "BossNotes": ""
+    },
+    {
+        "Name": "The Tower of Ordeals",
+        "BossList": [
+            "The Trialmaster"
+        ],
+        "LayoutTier": "",
+        "LayoutNotes": "",
+        "BossRippy": false,
+        "BossNotes": ""
+    },
+    {
+        "Name": "The Twilight Temple",
+        "BossList": [
+            "Selenia the Endless Night",
+            "Helial the Day Unending"
+        ],
+        "LayoutTier": "",
+        "LayoutNotes": "",
+        "BossRippy": false,
+        "BossNotes": ""
+    },
+    {
+        "Name": "The Vinktar Square",
+        "BossList": [
+            "Avatar of Thunder"
+        ],
+        "LayoutTier": "",
+        "LayoutNotes": "",
+        "BossRippy": false,
+        "BossNotes": ""
+    },
+    {
+        "Name": "Thicket",
+        "BossList": [
+            "The Primal One"
+        ],
+        "LayoutTier": "C",
+        "LayoutNotes": "Indoor",
+        "BossRippy": false,
+        "BossNotes": ""
+    },
+    {
+        "Name": "Toxic Sewer",
+        "BossList": [
+            "Arachnoxia"
+        ],
+        "LayoutTier": "",
+        "LayoutNotes": "",
+        "BossRippy": false,
+        "BossNotes": ""
+    },
+    {
+        "Name": "Twisted Distant Memory",
+        "BossList": [
+            "Tahsin Warmaker"
+        ],
+        "LayoutTier": "",
+        "LayoutNotes": "",
+        "BossRippy": false,
+        "BossNotes": ""
+    },
+    {
+        "Name": "Underground River",
+        "BossList": [
+            "It That Fell"
+        ],
+        "LayoutTier": "A",
+        "LayoutNotes": "Windy",
+        "BossRippy": true,
+        "BossNotes": "RIP"
+    },
+    {
+        "Name": "Underground Sea",
+        "BossList": [
+            "Merveil the Returned",
+            "Merveil the Reflection"
+        ],
+        "LayoutTier": "C",
+        "LayoutNotes": "Indoor maze",
+        "BossRippy": false,
+        "BossNotes": "Phased mech"
+    },
+    {
+        "Name": "Vaal Pyramid",
+        "BossList": [
+            "The Fallen Queen",
+            "The Hollow Lady",
+            "The Broken Prince"
+        ],
+        "LayoutTier": "D",
+        "LayoutNotes": "Indoor maze",
+        "BossRippy": true,
+        "BossNotes": "Gear RIP"
+    },
+    {
+        "Name": "Vaal Temple",
+        "BossList": [
+            "K'aj Q'ura",
+            "K'aj Y'ara'az",
+            "K'aj A'alai"
+        ],
+        "LayoutTier": "",
+        "LayoutNotes": "",
+        "BossRippy": false,
+        "BossNotes": ""
+    },
+    {
+        "Name": "Vaults of Atziri",
+        "BossList": [],
+        "LayoutTier": "",
+        "LayoutNotes": "",
+        "BossRippy": false,
+        "BossNotes": ""
+    },
+    {
+        "Name": "Villa",
+        "BossList": [
+            "The High Templar"
+        ],
+        "LayoutTier": "C",
+        "LayoutNotes": "Indoor",
+        "BossRippy": false,
+        "BossNotes": ""
+    },
+    {
+        "Name": "Volcano",
+        "BossList": [
+            "Forest of Flames"
+        ],
+        "LayoutTier": "",
+        "LayoutNotes": "",
+        "BossRippy": false,
+        "BossNotes": ""
+    },
+    {
+        "Name": "Wasteland",
+        "BossList": [
+            "The Brittle Emperor"
+        ],
+        "LayoutTier": "C",
+        "LayoutNotes": "Open",
+        "BossRippy": false,
+        "BossNotes": "Gear"
+    },
+    {
+        "Name": "Whakawairua Tuahu",
+        "BossList": [
+            "Tormented Temptress"
+        ],
+        "LayoutTier": "",
+        "LayoutNotes": "",
+        "BossRippy": false,
+        "BossNotes": ""
+    }
+]
