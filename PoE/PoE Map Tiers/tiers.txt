@@ -1,33 +1,33 @@
 Tier 1
 
     Bone Crypt
-    Scriptorium
-    Alleyways
-    Colonnade
+    Arena
+    Barrows
+    Plateau
 
 
 Tier 2
 
     Dunes
     Stagnation
-    Silo
-    Dry Sea
-    Excavation
-    Belfry
-    Precinct
-    Grotto
+    Primordial Blocks
+    Estuary
+    Grave Trough
+    Beach
+    Wasteland
+    Mineral Pools
 
 
 Tier 3
 
     Overgrown Shrine
     Strand
-    Lair
-    Infested Valley
-    Shrine
-    Primordial Blocks
-    Primordial Pool
-    Fields
+    Cold River
+    Lookout
+    Residence
+    Bog
+    Forking River
+    Mesa
 
 
 Tier 4
@@ -35,128 +35,128 @@ Tier 4
     Cemetery
     Moon Temple
     Vaal Pyramid
-    Lighthouse
-    Orchard
-    Laboratory
-    Port
-    Tower
+    Primordial Pool
+    Malformation
+    Iceberg
+    Graveyard
+    Cage
 
 
 Tier 5
 
     Atoll
     Courtyard
-    City Square
-    Marshes
-    Mineral Pools
-    Plateau
-    Arcade
-    Residence
+    Volcano
+    Bazaar
+    Cells
+    Tropical Island
+    Leyline
+    Alleyways
 
 
 Tier 6
 
     Shore
     Promenade
-    Pit
-    Phantasmagoria
-    Castle Ruins
-    Waste Pool
-    Toxic Sewer
+    Thicket
+    Acid Caverns
+    Dark Forest
+    Arachnid Tomb
+    Academy
 
 
 Tier 7
 
     Cursed Crypt
-    Canyon
-    Sulphur Vents
-    Relic Chambers
-    Chateau
-    Coral Ruins
-    Forbidden Woods
+    Pit
+    Precinct
+    Pen
+    Pier
+    Lava Chamber
+    Frozen Cabins
 
 
 Tier 8
 
-    Crimson Temple
-    Shipyard
-    Caldera
-    Armoury
-    Arachnid Tomb
-    Flooded Mine
-    Crystal Ore
+    Port
+    Castle Ruins
+    Factory
+    Chateau
+    Arcade
+    Waterways
+    Terrace
 
 
 Tier 9
 
-    Wasteland
-    Ramparts
-    Pier
-    Overgrown Ruin
-    Cold River
-    Siege
+    Haunted Mansion
+    Racecourse
+    Summit
+    Arachnid Nest
+    Carcass
+    Flooded Mine
 
 
 Tier 10
 
     Underground Sea
-    Foundry
-    Arachnid Nest
-    Cells
-    Factory
-    Plaza
+    Orchard
+    Basilica
+    Crimson Temple
+    Tower
+    Vault
 
 
 Tier 11
 
-    Malformation
-    Fungal Hollow
-    Beach
+    Coves
+    Colonnade
+    Dungeon
     Geode
-    Crimson Township
-    Frozen Cabins
+    Excavation
+    City Square
 
 
 Tier 12
 
     Museum
     Necropolis
-    Desert Spring
-    Conservatory
-    Jungle Valley
-    Wharf
+    Mausoleum
+    Courthouse
+    Palace
+    Sulphur Vents
 
 
 Tier 13
 
-    Arid Lake
-    Leyline
-    Defiled Cathedral
-    Crater
-    Thicket
+    Caldera
+    Lava Lake
+    Colosseum
+    Sunken City
+    Glacier
 
 
 Tier 14
 
     Temple
     Maze
-    Barrows
-    Dungeon
-    Terrace
+    Wharf
+    Reef
+    Fungal Hollow
 
 
 Tier 15
 
     Underground River
-    Tropical Island
-    Colosseum
-    Core
-    Racecourse
+    Mud Geyser
+    Phantasmagoria
+    Siege
+    Spider Forest
 
 
 Tier 16
 
-    Dig
-    Volcano
-    Coves
-    Arsenal
+    Channel
+    Infested Valley
+    Silo
+    Ivory Temple
