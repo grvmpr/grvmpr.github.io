@@ -5,7 +5,7 @@ Array.prototype.first = function (propertySelector = obj => obj) {
 const _vm = new MainModel();
 var runMaps = [];
 const _debugmode = false;
-const _VERSION = '3.23';
+const _VERSION = '3.23 (2023.12.13)';
 
 $(document).ready(function () {
 
