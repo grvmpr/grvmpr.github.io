@@ -5,7 +5,7 @@ Array.prototype.first = function (propertySelector = obj => obj) {
 const _vm = new MainModel();
 var runMaps = [];
 const _debugmode = false;
-const _VERSION = '3.23 (2023.12.13)';
+//const _VERSION = '3.23 (2023.12.13)';
 
 $(document).ready(function () {
 
@@ -120,7 +120,7 @@ function load() {
 function MainModel() {
     var self = this;
     self.maps = ko.observableArray([]);
-    self.version = _VERSION;
+    self.version = '3.23 (2023.12.13)';
     self.currentFilter = ko.observable('');
 
     self.rippy = ko.observable(false);
