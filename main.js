@@ -5,6 +5,7 @@ Array.prototype.first = function (propertySelector = obj => obj) {
 const _vm = new MainModel();
 var runMaps = [];
 const _debugmode = false;
+const _VERSION = '3.23';
 
 $(document).ready(function () {
 
@@ -119,7 +120,7 @@ function load() {
 function MainModel() {
     var self = this;
     self.maps = ko.observableArray([]);
-    self.version = '3.23';
+    self.version = _VERSION;
     self.currentFilter = ko.observable('');
 
     self.rippy = ko.observable(false);
@@ -164,6 +165,7 @@ function MainModel() {
         }
         var url = window.location.href.replace(window.location.search, '');
         window.history.pushState('page2', 'Title', url + "?ids=" + runMaps.toString());
+		location.reload();
     }
 }
 
