@@ -1,3 +1,13 @@
+apiGetMapData((json) => {
+    apiGetCardDetails((csv) => {
+        console.log(csv);
+        _parsedData = parseCsvString(csv);
+        _maps = json;
+        load();
+    });
+});
+
+
 function apiGetMapData(callback) {
     const url = `https://grvmpr.github.io/tiers.json`;
     const req = new XMLHttpRequest();
