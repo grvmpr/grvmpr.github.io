@@ -1,3 +1,9 @@
+function getByName(list, name) {
+	return list.filter(function (item) {
+		return item.Name == name;
+	});
+}
+
 apiGetMapData((json) => {
     apiGetCardDetails((csv) => {
         console.log(csv);
