@@ -34,3 +34,366 @@ function apiGetMapData(callback) {
     };
     req.send();
 }
+
+
+
+
+
+
+
+
+### Pipeline to build and release the PowerPlatform solution for Power Platform projects. [Gareth Howells 18-Nov-2022]
+name: $(Year:yyyy).$(Month).$(DayOfMonth).$(Rev:r)
+variables:
+  - name: PowerPlatform-DEV-ServiceConnection # Config in Project Settings / Service connections - PowerPlatform service connection type with sys admin access to PowerPlatform DEV environment
+    value: "MH-Desire-DEV-AppID"
+  - name: PowerPlatform-SolutionPath # Repo folder path for the Power Platform solutions
+    value: "Desire.Solutions"
+  - name: PowerPlatform-SolutionName # Name of the Power Platform solution
+    value: "Desire"
+  - name: PowerPlatform-PortalPath # Repo folder path for the Power Platform portal content
+    value: "Desire.Portal"
+  - name: "PowerPlatform-PortalName" # Name of the portal parent website record to deploy
+    value: "Desire-Portal-Website"
+  - name: PowerPlatform-Dev-WebsiteId
+    value: ecb794e6-d237-ed11-9db0-002248941047
+  - name: PowerPlatformExportDataSchemaFile # Schema path & file name created using Config Migration Tool
+    value: "Desire.Pipelines\\Desire.MasterDataMigrationSchema.xml"
+  - name: PowerPlatformExportDataFile # Path and name of data file which stores the exported data
+    value: "Desire.MasterData.zip"
+  
+# No CI trigger
+trigger: none 
+
+schedules: # Schedule nightly build - NOTE: Times are UTC/GMT! (14:00 UTC = 24:00 BNE)
+- cron: "0 14 * * *"
+  displayName: Daily midnight build
+  branches:
+    include:
+    - main
+
+stages:
+- stage: Build # The build stage builds the solution from DEV to the code repo!
+  displayName: Build
+  pool:
+    vmImage: 'windows-latest'
+  jobs:
+  # Build the Desire solution from DEV to repo
+  - job:
+    displayName: "Build Solution"
+    steps:
+    # Check out the code and keep the token so we can tag the repository
+    - checkout: self
+      persistCredentials: true
+    # Install the tools on the build agent
+    - task: PowerPlatformToolInstaller@2
+      inputs:
+        DefaultVersion: true
+      displayName: 'Install Power Platform Tools'
+    # Confirm connectivity to Power Platform environment
+    - task: PowerPlatformWhoAmi@2
+      inputs:
+        authenticationType: 'PowerPlatformSPN'
+        PowerPlatformSPN: '$(PowerPlatform-DEV-ServiceConnection)'
+      displayName: 'Power Platform Who Am I'     
+    # Update the solution version number
+    - task: PowerPlatformSetSolutionVersion@2
+      inputs:
+        authenticationType: 'PowerPlatformSPN'
+        PowerPlatformSPN: 'MH-Desire-DEV-AppID'
+        SolutionName: '$(PowerPlatform-SolutionName)'
+        SolutionVersionNumber: '$(Build.BuildNumber)'
+    # Publish the solution
+    - task: PowerPlatformPublishCustomizations@2
+      inputs:
+        authenticationType: 'PowerPlatformSPN'
+        PowerPlatformSPN: 'MH-Desire-DEV-AppID'
+    # # Take a backup of DEV
+    # Temp disabled due to Error: The service principal with id '14f871e4-3934-4968-a965-48f8220a6f90' for application *** does not have permission to access the path 'https://10.0.1.5:20193/providers/Microsoft.BusinessAppPlatform/scopes/admin/environments?`$expand=permissions&api-version=2020-08-01' in tenant fff1b7fc-e70a-4033-9508-e3ac2e2544fa.
+    # - task: PowerPlatformBackupEnvironment@2
+    #   inputs:
+    #     authenticationType: 'PowerPlatformSPN'
+    #     PowerPlatformSPN: 'MH-Desire-DEV-AppID'
+    #     BackupLabel: 'Full Backup - $(Build.BuildNumber)'
+    #     Notes: 'Backup created by build pipeline'
+    # Export the unmanaged solution
+    - task: PowerPlatformExportSolution@2
+      inputs:
+        authenticationType: 'PowerPlatformSPN'
+        PowerPlatformSPN: '$(PowerPlatform-DEV-ServiceConnection)'
+        SolutionName: '$(PowerPlatform-SolutionName)'
+        SolutionOutputFile: '$(Build.SourcesDirectory)\$(PowerPlatform-SolutionPath)\Unmanaged\$(PowerPlatform-SolutionName)_unmanaged.zip'
+        Managed: false
+        ExportAutoNumberingSettings: false
+        ExportCalendarSettings: false
+        ExportCustomizationSettings: false
+        ExportEmailTrackingSettings: false
+        ExportGeneralSettings: false
+        ExportIsvConfig: false
+        ExportMarketingSettings: false
+        ExportOutlookSynchronizationSettings: false
+        ExportRelationshipRoles: false
+        ExportSales: false
+      displayName: 'Export Unmanaged Solution - $(PowerPlatform-SolutionName)_umanaged.zip'
+    # Export the managed solution
+    - task: PowerPlatformExportSolution@2
+      inputs:
+        authenticationType: 'PowerPlatformSPN'
+        PowerPlatformSPN: '$(PowerPlatform-DEV-ServiceConnection)'
+        SolutionName: '$(PowerPlatform-SolutionName)'
+        SolutionOutputFile: '$(Build.SourcesDirectory)\$(PowerPlatform-SolutionPath)\Managed\$(PowerPlatform-SolutionName)_managed.zip'
+        Managed: true
+        ExportAutoNumberingSettings: false
+        ExportCalendarSettings: false
+        ExportCustomizationSettings: false
+        ExportEmailTrackingSettings: false
+        ExportGeneralSettings: false
+        ExportIsvConfig: false
+        ExportMarketingSettings: false
+        ExportOutlookSynchronizationSettings: false
+        ExportRelationshipRoles: false
+        ExportSales: false
+      displayName: 'Export Managed Solution - $(PowerPlatform-SolutionName)_managed.zip'
+    # Publish managed solution as build artifact
+    - publish: $(Build.SourcesDirectory)\$(PowerPlatform-SolutionPath)\Managed\$(PowerPlatform-SolutionName)_managed.zip
+      artifact: 'ManagedSolution'
+    # Unpack the unmanaged solution (for source control)
+    - task: PowerPlatformUnpackSolution@2
+      inputs:
+        SolutionInputFile: '$(Build.SourcesDirectory)\$(PowerPlatform-SolutionPath)\Unmanaged\$(PowerPlatform-SolutionName)_unmanaged.zip'
+        SolutionTargetFolder: '$(Build.SourcesDirectory)\$(PowerPlatform-SolutionPath)\Unpacked\'
+        SolutionType: Unmanaged
+      displayName: 'Unpack Solution'
+    # Run the solution checker over the unmanaged solution and publish as build artifact for retention
+    - task: PowerPlatformChecker@2
+      inputs:
+        authenticationType: 'PowerPlatformSPN'
+        PowerPlatformSPN: '$(PowerPlatform-DEV-ServiceConnection)'
+        RuleSet: '0ad12346-e108-40b8-a956-9a8f95ea18c9'
+        FileLocation: localFiles
+        FilesToAnalyze: '$(Build.SourcesDirectory)\$(PowerPlatform-SolutionPath)\Managed\$(PowerPlatform-SolutionName)_managed.zip'
+        ArtifactDestinationName: 'SolutionCheckerResults'
+        UseDefaultPACheckerEndpoint: true
+        FailOnPowerAppsCheckerAnalysisError: true
+        ErrorLevel: CriticalIssueCount
+        ErrorThreshold: 1
+      displayName: 'Run Solution Checker On Managed Solution'
+    # Get the solution checker results for source control
+    - task: DownloadPipelineArtifact@2
+      inputs:
+        buildType: 'current'
+        artifactName: 'SolutionCheckerResults'
+        targetPath: '$(Build.SourcesDirectory)\$(PowerPlatform-SolutionPath)\CheckerResults\'
+      displayName: 'Download Solution Checker Results' 
+  # Build the Power Portal content to the repo
+    # Download Portal content from DEV
+    - task: PowerPlatformDownloadPaportal@2
+      inputs:
+        authenticationType: 'PowerPlatformSPN'
+        PowerPlatformSPN: 'MH-Desire-DEV-AppID'
+        DownloadPath: '$(Build.SourcesDirectory)\$(PowerPlatform-PortalPath)\'
+        WebsiteId: '$(PowerPlatform-Dev-WebsiteId)'
+        Overwrite: true
+    # Zip up the downloaded portal content
+    - task: ArchiveFiles@2
+      inputs:
+        rootFolderOrFile: '$(Build.SourcesDirectory)\$(PowerPlatform-PortalPath)\$(PowerPlatform-PortalName)\'
+        includeRootFolder: false
+        archiveType: 'zip'
+        archiveFile: '$(Build.SourcesDirectory)\$(PowerPlatform-PortalPath)\$(PowerPlatform-PortalName).zip'
+        replaceExistingArchive: true 
+    # Publish zipped portal content as pipeline artifact
+    - publish: '$(Build.SourcesDirectory)\$(PowerPlatform-PortalPath)\$(PowerPlatform-PortalName).zip'
+      artifact: 'PortalContent'    
+    # Export master & reference data from DEV using schema created with Config Migration Tool
+    - task: PowerPlatformExportData@2
+      inputs:
+        authenticationType: 'PowerPlatformSPN'
+        PowerPlatformSPN: 'MH-Desire-DEV-AppID'
+        Environment: '$(BuildTools.EnvironmentUrl)'
+        SchemaFile: '$(Build.SourcesDirectory)\$(PowerPlatformExportDataSchemaFile)'
+        DataFile: '$(Build.SourcesDirectory)\$(PowerPlatformExportDataFile)'
+        Overwrite: true
+    # Publish exported master data as build artifact
+    - publish: '$(Build.SourcesDirectory)\$(PowerPlatformExportDataFile)'
+      artifact: 'MasterData'
+    # Commit to the repo and tag with build number
+    - script: |
+        git config user.email "auto.build@devops.onmicrosoft.com"
+        git config user.name "Automatic Build"
+        git add --all
+        git commit -a -m "Commit changes from Build #$(Build.BuildNumber)"
+        git push origin HEAD:refs/heads/main
+        git tag -a "build/$(Build.BuildNumber)" -m "Tag Build #$(Build.BuildNumber)"
+        git push --tags
+      workingDirectory: $(Build.SourcesDirectory)
+      displayName: Git Commit and Tag to main branch from from pipeline
+      env:
+        System_AccessToken: $(System.AccessToken)
+
+- stage: TST # The TST stage releases the solution to the TST environment!
+  dependsOn: Build
+  jobs:
+  - deployment: TST
+    # Release the solution to the TST environment
+    displayName: "Deploy to TST"
+    pool:
+      vmImage: 'windows-latest'
+    environment: desire-tst-env
+    workspace:
+      clean: all
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          # Install the tools on the build agent
+          - task: microsoft-IsvExpTools.PowerPlatform-BuildTools.tool-installer.PowerPlatformToolInstaller@2
+            displayName: 'Power Platform Tool Installer '
+          # Import the solution
+          - task: microsoft-IsvExpTools.PowerPlatform-BuildTools.import-solution.PowerPlatformImportSolution@2
+            displayName: 'Power Platform Import Solution '
+            inputs:
+              authenticationType: PowerPlatformSPN
+              PowerPlatformSPN: 'MH-Desire-TST-AppID'
+              SolutionInputFile: '$(Pipeline.Workspace)/ManagedSolution/Desire_managed.zip'
+              ConvertToManaged: true
+          # Publish the customisations
+          - task: microsoft-IsvExpTools.PowerPlatform-BuildTools.publish-customizations.PowerPlatformPublishCustomizations@2
+            displayName: 'Power Platform Publish Customizations '
+            inputs:
+              authenticationType: PowerPlatformSPN
+              PowerPlatformSPN: 'MH-Desire-TST-AppID'
+          # Extract the portal configuration zip file
+          - task: ExtractFiles@1
+            displayName: 'Extract files '
+            inputs:
+              archiveFilePatterns: '$(Pipeline.Workspace)/PortalContent/$(PowerPlatform-PortalName).zip'
+              destinationFolder: '$(Pipeline.Workspace)/$(PowerPlatform-PortalPath)/Extracted/'
+          # Upload the portal configuration
+          - task: microsoft-IsvExpTools.PowerPlatform-BuildTools.upload-paportal.PowerPlatformUploadPaportal@2
+            displayName: 'Power Platform Upload PAPortal '
+            inputs:
+              authenticationType: PowerPlatformSPN
+              PowerPlatformSPN: 'MH-Desire-TST-AppID'
+              UploadPath: '$(Pipeline.Workspace)/$(PowerPlatform-PortalPath)/Extracted/'
+              deploymentProfile: tst
+          # Import the master data
+          - task: microsoft-IsvExpTools.PowerPlatform-BuildTools.import-data.PowerPlatformImportData@2
+            displayName: 'Power Platform Import Data '
+            inputs:
+              authenticationType: PowerPlatformSPN
+              PowerPlatformSPN: 'MH-Desire-TST-AppID'
+              DataFile: '$(Pipeline.Workspace)/MasterData/Desire.MasterData.zip'
+
+- stage: STG # The STG stage releases the solution to the STG environment!
+  dependsOn: 
+  - Build
+  - TST
+  jobs:
+  - deployment: STG
+    # Release the solution to the STG environment
+    displayName: "Deploy to STG"
+    pool:
+      vmImage: 'windows-latest'
+    environment: desire-stg-env
+    workspace:
+      clean: all
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          # Install the build tools on the agent
+          - task: microsoft-IsvExpTools.PowerPlatform-BuildTools.tool-installer.PowerPlatformToolInstaller@2
+            displayName: 'Power Platform Tool Installer '
+          # Import the solution
+          - task: microsoft-IsvExpTools.PowerPlatform-BuildTools.import-solution.PowerPlatformImportSolution@2
+            displayName: 'Power Platform Import Solution '
+            inputs:
+              authenticationType: PowerPlatformSPN
+              PowerPlatformSPN: 'MH-Desire-STG-AppID'
+              SolutionInputFile: '$(Pipeline.Workspace)/ManagedSolution/Desire_managed.zip'
+              ConvertToManaged: true
+          # Publish the customisations
+          - task: microsoft-IsvExpTools.PowerPlatform-BuildTools.publish-customizations.PowerPlatformPublishCustomizations@2
+            displayName: 'Power Platform Publish Customizations '
+            inputs:
+              authenticationType: PowerPlatformSPN
+              PowerPlatformSPN: 'MH-Desire-STG-AppID'
+          # Extract the portal configuration zip file
+          - task: ExtractFiles@1
+            displayName: 'Extract files '
+            inputs:
+              archiveFilePatterns: '$(Pipeline.Workspace)/PortalContent/$(PowerPlatform-PortalName).zip'
+              destinationFolder: '$(Pipeline.Workspace)/$(PowerPlatform-PortalPath)/Extracted/'
+          # Upload the portal configuration
+          - task: microsoft-IsvExpTools.PowerPlatform-BuildTools.upload-paportal.PowerPlatformUploadPaportal@2
+            displayName: 'Power Platform Upload PAPortal '
+            inputs:
+              authenticationType: PowerPlatformSPN
+              PowerPlatformSPN: 'MH-Desire-STG-AppID'
+              UploadPath: '$(Pipeline.Workspace)/$(PowerPlatform-PortalPath)/Extracted/'
+              deploymentProfile: stg
+          # Import the master data
+          - task: microsoft-IsvExpTools.PowerPlatform-BuildTools.import-data.PowerPlatformImportData@2
+            displayName: 'Power Platform Import Data '
+            inputs:
+              authenticationType: PowerPlatformSPN
+              PowerPlatformSPN: 'MH-Desire-STG-AppID'
+              DataFile: '$(Pipeline.Workspace)/MasterData/Desire.MasterData.zip'
+
+- stage: PROD # The PROD stage releases the solution to the PROD environment!
+  dependsOn: 
+  - Build
+  - TST
+  - STG
+  jobs:
+  - deployment: PROD
+    # Release the solution to the PROD environment
+    displayName: "Deploy to PROD"
+    pool:
+      vmImage: 'windows-latest'
+    environment: desire-prod-env
+    workspace:
+      clean: all
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          # Install the build tools on the agent
+          - task: microsoft-IsvExpTools.PowerPlatform-BuildTools.tool-installer.PowerPlatformToolInstaller@2
+            displayName: 'Power Platform Tool Installer '
+          # Import the solution
+          - task: microsoft-IsvExpTools.PowerPlatform-BuildTools.import-solution.PowerPlatformImportSolution@2
+            displayName: 'Power Platform Import Solution '
+            inputs:
+              authenticationType: PowerPlatformSPN
+              PowerPlatformSPN: 'MH-Desire-PROD-AppID'
+              SolutionInputFile: '$(Pipeline.Workspace)/ManagedSolution/Desire_managed.zip'
+              ConvertToManaged: true
+          # Publish the customisations
+          - task: microsoft-IsvExpTools.PowerPlatform-BuildTools.publish-customizations.PowerPlatformPublishCustomizations@2
+            displayName: 'Power Platform Publish Customizations '
+            inputs:
+              authenticationType: PowerPlatformSPN
+              PowerPlatformSPN: 'MH-Desire-PROD-AppID'
+          # Extract the portal configuration zip file
+          - task: ExtractFiles@1
+            displayName: 'Extract files '
+            inputs:
+              archiveFilePatterns: '$(Pipeline.Workspace)/PortalContent/$(PowerPlatform-PortalName).zip'
+              destinationFolder: '$(Pipeline.Workspace)/$(PowerPlatform-PortalPath)/Extracted/'
+          # Upload the portal configuration
+          - task: microsoft-IsvExpTools.PowerPlatform-BuildTools.upload-paportal.PowerPlatformUploadPaportal@2
+            displayName: 'Power Platform Upload PAPortal '
+            inputs:
+              authenticationType: PowerPlatformSPN
+              PowerPlatformSPN: 'MH-Desire-PROD-AppID'
+              UploadPath: '$(Pipeline.Workspace)/$(PowerPlatform-PortalPath)/Extracted/'
+              deploymentProfile: prod
+          # Import the master data
+          - task: microsoft-IsvExpTools.PowerPlatform-BuildTools.import-data.PowerPlatformImportData@2
+            displayName: 'Power Platform Import Data '
+            inputs:
+              authenticationType: PowerPlatformSPN
+              PowerPlatformSPN: 'MH-Desire-PROD-AppID'
+              DataFile: '$(Pipeline.Workspace)/MasterData/Desire.MasterData.zip'
