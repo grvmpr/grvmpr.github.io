@@ -416,3 +416,11 @@ workflow()?['tags/flowDisplayName']
 ---
 
 @{body('Select_error_details')}
+
+@item()?['status']
+
+
+
+https://raw.githubusercontent.com/deathbeam/maps-of-exile/main/site/src/data/monsters.json
+https://raw.githubusercontent.com/deathbeam/maps-of-exile/main/site/src/data/cards.json
+https://raw.githubusercontent.com/deathbeam/maps-of-exile/main/site/src/data/maps.json
