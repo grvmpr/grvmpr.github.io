@@ -120,7 +120,7 @@ function load() {
 function MainModel() {
     var self = this;
     self.maps = ko.observableArray([]);
-    self.version = '3.23 (2023.12.13)';
+    self.version = '3.24 (2024.03.26)';
     self.currentFilter = ko.observable('');
 
     self.rippy = ko.observable(false);
@@ -165,7 +165,7 @@ function MainModel() {
         }
         var url = window.location.href.replace(window.location.search, '');
         window.history.pushState('page2', 'Title', url + "?ids=" + runMaps.toString());
-		location.reload();
+        location.reload();
     }
 }
 

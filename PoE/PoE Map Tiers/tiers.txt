@@ -5,7 +5,6 @@
     Shipyard
     Desert Spring
 
-
 Tier 2
 
     Dunes
@@ -29,7 +28,6 @@ Tier 3
     Fungal Hollow
     Channel
 
-
 Tier 4
 
     Cemetery
@@ -40,7 +38,6 @@ Tier 4
     Foundry
     Primordial Pool
     Cells
-
 
 Tier 5
 
@@ -53,7 +50,6 @@ Tier 5
     Cage
     Phantasmagoria
 
-
 Tier 6
 
     Shore
@@ -63,7 +59,6 @@ Tier 6
     Waterways
     Tower
     Basilica
-
 
 Tier 7
 
@@ -75,7 +70,6 @@ Tier 7
     Dungeon
     Bramble Valley
 
-
 Tier 8
 
     Orchard
@@ -86,7 +80,6 @@ Tier 8
     Frozen Cabins
     Ashen Wood
 
-
 Tier 9
 
     Park
@@ -95,7 +88,6 @@ Tier 9
     Stagnation
     Academy
     Glacier
-
 
 Tier 10
 
@@ -106,7 +98,6 @@ Tier 10
     Arachnid Nest
     Grotto
 
-
 Tier 11
 
     Acid Caverns
@@ -115,7 +106,6 @@ Tier 11
     Sulphur Vents
     Forking River
     Conservatory
-
 
 Tier 12
 
@@ -126,7 +116,6 @@ Tier 12
     Crimson Temple
     Palace
 
-
 Tier 13
 
     Flooded Mine
@@ -134,7 +123,6 @@ Tier 13
     Terrace
     Grave Trough
     Shrine
-
 
 Tier 14
 
@@ -144,7 +132,6 @@ Tier 14
     Estuary
     Defiled Cathedral
 
-
 Tier 15
 
     Underground River
@@ -153,14 +140,12 @@ Tier 15
     Port
     Vault
 
-
 Tier 16
 
     Plateau
     Lava Chamber
     Castle Ruins
     Thicket
-
 
 Tier 17
 

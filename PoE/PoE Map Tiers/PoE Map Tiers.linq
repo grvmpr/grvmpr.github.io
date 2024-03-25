@@ -17,13 +17,14 @@ void Main()
 	*/
 	
 	var input = System.IO.File.ReadAllLines(@"H:\My Drive\Source\github\grvmpr.github.io\PoE\PoE Map Tiers\tiers.txt").Where(p => p.Length > 1).ToList();
+	//input.Dump();
     var tier = 0;
     var index = 1;
     var sb = new StringBuilder();
 
     foreach (var item in input)
     {
-        if (item.StartsWith("Tier"))
+        if (item.Trim().StartsWith("Tier"))
         {
             tier = int.Parse(item.Replace("Tier", "").Trim());
         }
@@ -37,9 +38,8 @@ void Main()
             index++;
         }
     }
-	
-	var outputFile = @"H:\My Drive\Source\github\grvmpr.github.io\tiers.json";
     string jsonString = $"[{sb.ToString()}]";
+	var outputFile = @"H:\My Drive\Source\github\grvmpr.github.io\tiers.json";
 	System.IO.File.WriteAllText (outputFile, jsonString);
 	jsonString.Dump();
 }
