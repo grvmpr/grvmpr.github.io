@@ -1,151 +1,166 @@
- Tier 1
+Tier 1
 
     Bone Crypt
-    Crimson Township
-    Shipyard
-    Desert Spring
+    Siege
+    Gardens
+    Scriptorium
+
 
 Tier 2
 
     Dunes
-    Iceberg
-    Pier
-    Arsenal
-    Belfry
-    Arcade
-    Wharf
     Lair
+    Lava Lake
+    Tropical Island
+    Carcass
+    Dark Forest
+    Dungeon
+    Flooded Mine
 
 
 Tier 3
 
     Overgrown Shrine
     Strand
-    Volcano
-    Crystal Ore
-    Toxic Sewer
-    Mausoleum
+    Marshes
     Fungal Hollow
-    Channel
+    Armoury
+    Cage
+    Dry Sea
+    Bog
+
 
 Tier 4
 
     Cemetery
     Moon Temple
     Vaal Pyramid
-    Canyon
-    Fields
-    Foundry
-    Primordial Pool
+    Mesa
     Cells
+    Mausoleum
+    Vault
+    Relic Chambers
+
 
 Tier 5
 
     Atoll
     Courtyard
+    Summit
+    Fields
+    Colonnade
+    Ancient City
+    Plateau
     Graveyard
-    Gardens
-    Siege
-    Burial Chambers
-    Cage
-    Phantasmagoria
+
 
 Tier 6
 
     Shore
     Promenade
-    Dry Sea
-    Arid Lake
-    Waterways
-    Tower
-    Basilica
+    Colosseum
+    Defiled Cathedral
+    Castle Ruins
+    Belfry
+    Estuary
+
 
 Tier 7
 
     Cursed Crypt
-    Waste Pool
-    Silo
-    Spider Forest
-    Courthouse
-    Dungeon
+    Channel
     Bramble Valley
+    Spider Forest
+    Chateau
+    Forbidden Woods
+    Racecourse
+
 
 Tier 8
 
-    Orchard
+    Ramparts
+    City Square
+    Arachnid Tomb
+    Cold River
+    Desert
     Jungle Valley
-    Lava Lake
-    Sunken City
-    Reef
-    Frozen Cabins
-    Ashen Wood
+    Silo
+
 
 Tier 9
 
-    Park
-    Lookout
-    Tropical Island
-    Stagnation
-    Academy
-    Glacier
+    Haunted Mansion
+    Spider Lair
+    Palace
+    Toxic Sewer
+    Coral Ruins
+    Basilica
+
 
 Tier 10
 
     Underground Sea
-    Pit
-    Wasteland
-    Excavation
-    Arachnid Nest
-    Grotto
+    Sulphur Vents
+    Malformation
+    Dig
+    Leyline
+    Burial Chambers
+
 
 Tier 11
 
-    Acid Caverns
-    Plaza
-    Residence
-    Sulphur Vents
-    Forking River
-    Conservatory
+    Port
+    Pier
+    Crimson Township
+    Foundry
+    Crater
+    Grotto
+
 
 Tier 12
 
     Museum
     Necropolis
-    Barrows
-    Bog
-    Crimson Temple
-    Palace
+    Infested Valley
+    Geode
+    Courthouse
+    Lookout
+
 
 Tier 13
 
-    Flooded Mine
-    Mineral Pools
-    Terrace
-    Grave Trough
-    Shrine
+    Caldera
+    Arcade
+    Glacier
+    Desert Spring
+    Ashen Wood
+
 
 Tier 14
 
     Temple
     Maze
-    Forbidden Woods
-    Estuary
-    Defiled Cathedral
+    Beach
+    Residence
+    Coves
+
 
 Tier 15
 
     Underground River
-    Cold River
-    Arena
-    Port
-    Vault
+    Academy
+    Pit
+    Terrace
+    Alleyways
+
 
 Tier 16
 
-    Plateau
-    Lava Chamber
-    Castle Ruins
-    Thicket
+    Orchard
+    Crystal Ore
+    Sepulchre
+    Lighthouse
+
 
 Tier 17
 
