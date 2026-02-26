@@ -44,7 +44,7 @@
 
         .app-shell {
             width: 100%;
-            max-width: 1120px;
+            max-width: 1440px;
             background: #020617;
             border-radius: 24px;
             border: 1px solid rgba(148, 163, 184, 0.12);
@@ -126,7 +126,7 @@
             display: grid;
             grid-template-columns: 1fr 0.6fr 1.2fr 0.5fr 0.7fr;
             padding: 8px 10px;
-            font-size: 13px;
+            font-size: 15px;
             align-items: center;
             column-gap: 8px;
         }
@@ -174,7 +174,7 @@
             width: 100%;
             border-collapse: collapse;
             margin-top: 10px;
-            font-size: 12px;
+            font-size: 15px;
         }
 
         th,
@@ -335,10 +335,23 @@
         }
 
         .ta-top {
-            display: flex;
+            /* display: flex; */
             align-items: flex-start;
             height: 100%;
             /* Aligns content to the top */
+        }
+
+        .col-mat-totals {
+            width: 80px; 
+            text-align: right;
+        }
+
+        .member-summary {
+            width: 250px; 
+        }
+
+        .col-w {
+            width: 150px; 
         }
     </style>
 </head>
@@ -363,7 +376,7 @@
                         <div>Name</div>
                         <div>Type</div>
                         <div>Materials</div>
-                        <div>Total</div>
+                        <div class="col-mat-totals">Total</div>
                         <div>Actions</div>
                     </div>
                 </div>
@@ -377,7 +390,7 @@
 
             <!-- RIGHT SIDE -->
             <section class="card">
-                <h2>Totals & ingredients</h2>
+                <h2>Material Breakdown</h2>
 
                 <div class="summary-label hide-me">Grand total (sum of all material values)</div>
                 <div class="summary-value hide-me" id="grand-total">—</div>
@@ -388,26 +401,29 @@
                     <thead>
                         <tr>
                             <th>Material</th>
-                            <th>Total</th>
+                            <th class="col-mat-totals">Total</th>
                         </tr>
                     </thead>
                     <tbody id="currency-table"></tbody>
                 </table>
+                
+                <br>
 
-                <div class="summary-label" style="margin-top:10px;">Ingredient breakdown</div>
+                <div class="summary-label" style="margin-top:10px;">Material Breakdown (Artisan)</div>
                 <table>
                     <thead>
                         <tr>
-                            <th>Ingredient</th>
-                            <th>Quantity</th>
+                            <th>Material</th>
+                            <th class="col-mat-totals">Total</th>
                         </tr>
                     </thead>
                     <tbody id="ingredient-table"></tbody>
                 </table>
+                
             </section>
 
             <section class="card">
-                <h2>Party Members</h2>
+                <h2>Hero List</h2>
 
                 <div id="members-list" class="gear-list">
                     <div class="gear-header">
@@ -421,6 +437,22 @@
                 <button class="btn btn-primary" id="add-member-btn" style="margin-top:12px;">＋ Add Member</button>
             </section>
 
+            <!--
+            <section class="card">
+                <h2>Material Breakdown (Artisan)</h2>
+
+                <div class="summary-label" style="margin-top:10px;">Ingredient which can be bought from artisans</div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Ingredient</th>
+                            <th>Quantity</th>
+                        </tr>
+                    </thead>
+                    <tbody id="ingredient-table"></tbody>
+                </table>
+            </section>
+            -->
         </div>
     </div>
 
@@ -463,7 +495,7 @@
 
     <div id="member-modal" class="modal">
         <div class="modal-content">
-            <h2>Edit Member</h2>
+            <!--<h2>Edit Member</h2>-->
 
             <label>Name</label>
             <input id="member-name" type="text">
@@ -471,7 +503,7 @@
             <label>Build</label>
             <input id="member-build" type="text">
 
-            <h3>Armor</h3>
+            <!--<h3>Armor</h3>-->
             <div id="member-armor-fields"></div>
 
             <h3>Weapons</h3>
@@ -686,7 +718,7 @@
           <div class="ta-top">${piece.name || `Piece ${index + 1}`}</div>
           <div class="ta-top">${piece.type || "—"}</div>
           <div class="ta-top">${formatCostList(piece.cost)}</div>
-          <div class="ta-top">${sumPieceCost(piece.cost)}</div>
+          <div class="ta-top col-mat-totals">${sumPieceCost(piece.cost)}</div>
           <div class="member-actions ta-top">
             <button class="btn btn-ghost btn-sm" type="button" title="Edit" onclick="openEditModal(${index})">✎</button>
             <button class="btn btn-ghost btn-sm" type="button" title="Clone" onclick="cloneGear(${index})">➁</button>
@@ -719,7 +751,7 @@
                     currencyChips.appendChild(chip);
 
                     const tr = document.createElement("tr");
-                    tr.innerHTML = `<td>${cur}</td><td>${val}</td>`;
+                    tr.innerHTML = `<td>${cur}</td><td class="col-mat-totals">${val}</td>`;
                     currencyTable.appendChild(tr);
                 });
 
@@ -728,7 +760,7 @@
                 .sort((a, b) => a[0].localeCompare(b[0]))
                 .forEach(([ing, qty]) => {
                     const tr = document.createElement("tr");
-                    tr.innerHTML = `<td>${ing}</td><td>${qty}</td>`;
+                    tr.innerHTML = `<td>${ing}</td><td class="col-mat-totals">${qty}</td>`;
                     ingredientTable.appendChild(tr);
                 });
 
@@ -750,8 +782,8 @@
                     row.className = "gear-row member-row";
 
                     row.innerHTML = `
-        <div class="ta-top">${m.name}</div>
-        <div class="ta-top">${m.build}</div>
+        <div class="ta-top col-w">${m.name}</div>
+        <div class="ta-top col-w">${m.build}</div>
         <div class="member-summary ta-top">${getMemberSummary(m) || "-"}</div>
         <div class="member-actions ta-top">
           <button class="btn btn-ghost btn-sm" title="Edit" onclick="openMemberModal(${index})">✎</button>
