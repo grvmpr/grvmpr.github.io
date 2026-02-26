@@ -1,0 +1,1128 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>Gear Cost Composer</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <style>
+        :root {
+            --bg: #050816;
+            --bg-alt: #0b1020;
+            --card: #111827;
+            --accent: #38bdf8;
+            --accent-soft: rgba(56, 189, 248, 0.15);
+            --text: #e5e7eb;
+            --muted: #9ca3af;
+            --border: #1f2937;
+            --danger: #f97373;
+            --radius-lg: 14px;
+            --radius-md: 10px;
+            --shadow-soft: 0 18px 45px rgba(15, 23, 42, 0.75);
+            --shadow-subtle: 0 10px 30px rgba(15, 23, 42, 0.6);
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            background: radial-gradient(circle at top, #1f2937 0, #020617 55%);
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            padding: 32px 16px;
+        }
+
+        .hide-me {
+            display: none;
+        }
+
+        .app-shell {
+            width: 100%;
+            max-width: 1120px;
+            background: #020617;
+            border-radius: 24px;
+            border: 1px solid rgba(148, 163, 184, 0.12);
+            box-shadow: var(--shadow-soft);
+            padding: 24px;
+            position: relative;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            align-items: center;
+            gap: 12px;
+        }
+
+        h1 {
+            font-size: 24px;
+            margin: 0;
+        }
+
+        .accent {
+            color: var(--accent);
+        }
+
+        .subtitle {
+            font-size: 13px;
+            color: var(--muted);
+            margin-top: 4px;
+        }
+
+        .pill {
+            padding: 4px 10px;
+            border-radius: 999px;
+            border: 1px solid rgba(148, 163, 184, 0.4);
+            font-size: 11px;
+            color: var(--muted);
+            white-space: nowrap;
+        }
+
+        .layout {
+            display: grid;
+            grid-template-columns: 1.4fr 1fr;
+            gap: 20px;
+        }
+
+        @media (max-width: 900px) {
+            .layout {
+                grid-template-columns: 1fr;
+            }
+
+            header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+        }
+
+        .card {
+            background: var(--card);
+            border-radius: var(--radius-lg);
+            padding: 16px;
+            border: 1px solid rgba(148, 163, 184, 0.2);
+        }
+
+        .card h2 {
+            margin: 0 0 8px;
+            font-size: 16px;
+        }
+
+        .gear-list {
+            margin-top: 12px;
+            border: 1px solid rgba(148, 163, 184, 0.2);
+            border-radius: var(--radius-md);
+            overflow: hidden;
+        }
+
+        .gear-header,
+        .gear-row {
+            display: grid;
+            grid-template-columns: 1fr 0.6fr 1.2fr 0.5fr 0.7fr;
+            padding: 8px 10px;
+            font-size: 13px;
+            align-items: center;
+            column-gap: 8px;
+        }
+
+        .gear-header {
+            background: rgba(255, 255, 255, 0.05);
+            text-transform: uppercase;
+            font-size: 11px;
+            color: var(--muted);
+        }
+
+        .gear-row:nth-child(even) {
+            background: rgba(255, 255, 255, 0.03);
+        }
+
+        .btn {
+            padding: 6px 12px;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            font-size: 12px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+        }
+
+        .btn-primary {
+            background: var(--accent);
+            color: #000;
+        }
+
+        .btn-ghost {
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .btn-sm {
+            padding: 4px 8px;
+            font-size: 11px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+            font-size: 12px;
+        }
+
+        th,
+        td {
+            padding: 6px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        th {
+            text-transform: uppercase;
+            color: var(--muted);
+            font-size: 11px;
+            text-align: left;
+        }
+
+        .muted {
+            color: var(--muted);
+        }
+
+        .summary-label {
+            font-size: 11px;
+            text-transform: uppercase;
+            color: var(--muted);
+            margin-top: 4px;
+        }
+
+        .summary-value {
+            font-size: 18px;
+            font-weight: 600;
+            margin-top: 2px;
+        }
+
+        .chip-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-top: 6px;
+        }
+
+        .chip {
+            padding: 3px 8px;
+            border-radius: 999px;
+            border: 1px solid rgba(148, 163, 184, 0.4);
+            font-size: 11px;
+            color: var(--muted);
+        }
+
+        .chip strong {
+            color: var(--text);
+            font-weight: 500;
+        }
+
+        .modal {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.65);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 999;
+        }
+
+        .modal-content {
+            background: var(--card);
+            padding: 20px;
+            width: 420px;
+            max-width: 95vw;
+            border-radius: 12px;
+            border: 1px solid rgba(148, 163, 184, 0.25);
+            box-shadow: var(--shadow-subtle);
+        }
+
+        .modal-content h2 {
+            margin-top: 0;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+
+        .modal-content label {
+            display: block;
+            font-size: 12px;
+            margin-bottom: 4px;
+            color: var(--muted);
+        }
+
+        .modal-content input,
+        .modal-content select {
+            width: 100%;
+            margin-bottom: 10px;
+            padding: 8px;
+            border-radius: 6px;
+            border: 1px solid rgba(148, 163, 184, 0.3);
+            background: #0f172a;
+            color: var(--text);
+            font-size: 13px;
+        }
+
+        .material-row {
+            display: flex;
+            gap: 6px;
+            margin-bottom: 6px;
+        }
+
+        .material-row input {
+            flex: 1;
+        }
+
+        .modal-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .member-actions {
+            display: flex;
+            flex-wrap: nowrap;
+            gap: 4px;
+            white-space: nowrap;
+            width: 50px;
+        }
+
+        /* Armor section layout */
+        .armor-slot-block {
+            margin-bottom: 14px;
+            padding: 8px 10px;
+            border: 1px solid rgba(148, 163, 184, 0.2);
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.03);
+        }
+
+        .armor-slot-title {
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 6px;
+            color: var(--accent);
+            text-transform: capitalize;
+        }
+
+        .armor-slot-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .armor-field label {
+            font-size: 11px;
+            color: var(--muted);
+        }
+
+        .armor-field input {
+            width: 100%;
+            padding: 6px;
+            border-radius: 6px;
+            border: 1px solid rgba(148, 163, 184, 0.3);
+            background: #0f172a;
+            color: var(--text);
+        }
+
+        .ta-top {
+            display: flex;
+            align-items: flex-start;
+            height: 100%;
+            /* Aligns content to the top */
+        }
+    </style>
+</head>
+
+<body>
+    <div class="app-shell">
+        <header>
+            <div>
+                <h1>GW <span class="accent">Planner</span></h1>
+                <!--<div class="subtitle">Add and edit gear pieces, then see total costs and ingredient breakdown.</div>-->
+            </div>
+            <div class="pill" id="gear-count-pill">0 pieces</div>
+        </header>
+
+        <div class="layout">
+            <!-- LEFT SIDE -->
+            <section class="card">
+                <h2>Item configuration</h2>
+
+                <div class="gear-list" id="gear-list">
+                    <div class="gear-header">
+                        <div>Name</div>
+                        <div>Type</div>
+                        <div>Materials</div>
+                        <div>Total</div>
+                        <div>Actions</div>
+                    </div>
+                </div>
+
+                <button class="btn btn-primary" id="add-gear-btn" style="margin-top:12px;">＋ Add gear</button>
+
+                <button class="btn btn-ghost" id="save-loadout-btn">Save Loadout</button>
+                <button class="btn btn-ghost" id="load-loadout-btn">Load Loadout</button>
+
+            </section>
+
+            <!-- RIGHT SIDE -->
+            <section class="card">
+                <h2>Totals & ingredients</h2>
+
+                <div class="summary-label hide-me">Grand total (sum of all material values)</div>
+                <div class="summary-value hide-me" id="grand-total">—</div>
+
+                <div class="summary-label hide-me">Material totals</div>
+                <div class="chip-row" id="currency-chips"></div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Material</th>
+                            <th>Total</th>
+                        </tr>
+                    </thead>
+                    <tbody id="currency-table"></tbody>
+                </table>
+
+                <div class="summary-label" style="margin-top:10px;">Ingredient breakdown</div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Ingredient</th>
+                            <th>Quantity</th>
+                        </tr>
+                    </thead>
+                    <tbody id="ingredient-table"></tbody>
+                </table>
+            </section>
+
+            <section class="card">
+                <h2>Party Members</h2>
+
+                <div id="members-list" class="gear-list">
+                    <div class="gear-header">
+                        <div>Name</div>
+                        <div>Build</div>
+                        <div>Gear</div>
+                        <div>Actions</div>
+                    </div>
+                </div>
+
+                <button class="btn btn-primary" id="add-member-btn" style="margin-top:12px;">＋ Add Member</button>
+            </section>
+
+        </div>
+    </div>
+
+    <!-- Modal -->
+    <div id="edit-modal" class="modal">
+        <div class="modal-content">
+            <h2>Edit gear piece</h2>
+
+            <label for="edit-name">Name</label>
+            <input id="edit-name" type="text">
+
+            <label for="edit-type">Type</label>
+            <select id="edit-type"></select>
+
+            <label>Materials</label>
+            <div id="materials-list"></div>
+
+            <button class="btn btn-ghost btn-sm" id="add-material-btn" type="button">＋ Add material</button>
+
+            <div class="modal-actions">
+                <button class="btn btn-ghost" type="button" onclick="closeEditModal()">Cancel</button>
+                <button class="btn btn-primary" type="button" onclick="saveGear()">Save</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="loadout-modal" class="modal">
+        <div class="modal-content">
+            <h2>Loadout</h2>
+
+            <label>Paste compressed Base64 loadout</label>
+            <textarea id="loadout-input" style="width:100%;height:120px;"></textarea>
+
+            <div class="modal-actions">
+                <button class="btn btn-ghost" onclick="closeLoadoutModal()">Cancel</button>
+                <button class="btn btn-primary" onclick="applyLoadout()">Load</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="member-modal" class="modal">
+        <div class="modal-content">
+            <h2>Edit Member</h2>
+
+            <label>Name</label>
+            <input id="member-name" type="text">
+
+            <label>Build</label>
+            <input id="member-build" type="text">
+
+            <h3>Armor</h3>
+            <div id="member-armor-fields"></div>
+
+            <h3>Weapons</h3>
+            <label>Mainhand Req</label>
+            <input id="member-main-req" type="number">
+
+            <label>Mainhand Stat</label>
+            <input id="member-main-stat" type="text">
+
+            <label>Mainhand Mods</label>
+            <input id="member-main-mods" type="text">
+
+            <label>Offhand Req</label>
+            <input id="member-off-req" type="number">
+
+            <label>Mainhand Stat</label>
+            <input id="member-off-stat" type="text">
+
+            <label>Offhand Mods</label>
+            <input id="member-off-mods" type="text">
+
+            <div class="modal-actions">
+                <button class="btn btn-ghost" onclick="closeMemberModal()">Cancel</button>
+                <button class="btn btn-primary" onclick="saveMember()">Save</button>
+            </div>
+        </div>
+    </div>
+
+
+    <script>
+        const data = {
+            "_config": {
+                "professions": ["Ritualist", "Mesmer"],
+                "gear-types": ["Head", "Chest", "Legs", "Gloves", "Boots", "Weapon", "Offhand", "Con"],
+                "currency-ingredients": [
+                    {
+                        "currency": "Bolt of Damask", "ingredients": [
+                            { "ingredient": "Plant Fibre", "quantity": 5 },
+                            { "ingredient": "Glittering Dust", "quantity": 5 },
+                            { "ingredient": "Gold", "quantity": 200 }
+                        ]
+                    },
+                    {
+                        "currency": "Bolt of Linen", "ingredients": [
+                            { "ingredient": "Plant Fibre", "quantity": 5 },
+                            { "ingredient": "Gold", "quantity": 200 }
+                        ]
+                    },
+                    {
+                        "currency": "Bolt of Silk", "ingredients": [
+                            { "ingredient": "Cloth", "quantity": 10 },
+                            { "ingredient": "Glittering Dust", "quantity": 10 },
+                            { "ingredient": "Gold", "quantity": 250 }
+                        ]
+                    },
+                    {
+                        "currency": "Deldrimor Steel Ingot", "ingredients": [
+                            { "ingredient": "Iron Ingot", "quantity": 10 },
+                            { "ingredient": "Lump of Charcoal", "quantity": 1 },
+                            { "ingredient": "Glittering Dust", "quantity": 5 },
+                            { "ingredient": "Gold", "quantity": 200 }
+                        ]
+                    },
+                    {
+                        "currency": "Elonian Leather Square", "ingredients": [
+                            { "ingredient": "Tanned Hide Square", "quantity": 5 },
+                            { "ingredient": "Glittering Dust", "quantity": 5 },
+                            { "ingredient": "Gold", "quantity": 50 }
+                        ]
+                    },
+                    {
+                        "currency": "Leather Square", "ingredients": [
+                            { "ingredient": "Tanned Hide Square", "quantity": 5 },
+                            { "ingredient": "Gold", "quantity": 50 }
+                        ]
+                    },
+                    {
+                        "currency": "Lump of Charcoal", "ingredients": [
+                            { "ingredient": "Wood Plank", "quantity": 10 },
+                            { "ingredient": "Gold", "quantity": 200 }
+                        ]
+                    },
+                    {
+                        "currency": "Roll of Parchment", "ingredients": [
+                            { "ingredient": "Wood Plank", "quantity": 5 },
+                            { "ingredient": "Gold", "quantity": 20 }
+                        ]
+                    },
+                    {
+                        "currency": "Roll of Vellum", "ingredients": [
+                            { "ingredient": "Wood Plank", "quantity": 5 },
+                            { "ingredient": "Glittering Dust", "quantity": 5 },
+                            { "ingredient": "Gold", "quantity": 20 }
+                        ]
+                    },
+                    {
+                        "currency": "Spiritwood Plank", "ingredients": [
+                            { "ingredient": "Wood Plank", "quantity": 5 },
+                            { "ingredient": "Glittering Dust", "quantity": 10 },
+                            { "ingredient": "Gold", "quantity": 100 }
+                        ]
+                    },
+                    {
+                        "currency": "Steel Ingot", "ingredients": [
+                            { "ingredient": "Iron Ingot", "quantity": 10 },
+                            { "ingredient": "Lump of Charcoal", "quantity": 1 },
+                            { "ingredient": "Gold", "quantity": 200 }
+                        ]
+                    },
+                    {
+                        "currency": "Tempered Glass Vial", "ingredients": [
+                            { "ingredient": "Glittering Dust", "quantity": 5 },
+                            { "ingredient": "Gold", "quantity": 20 }
+                        ]
+                    },
+                    {
+                        "currency": "Vial of Ink", "ingredients": [
+                            { "ingredient": "Plant Fibre", "quantity": 4 },
+                            { "ingredient": "Tempered Glass Vial", "quantity": 1 },
+                            { "ingredient": "Gold", "quantity": 20 }
+                        ]
+                    },
+                    {
+                        "currency": "Platinum", "ingredients": [
+                            { "ingredient": "Gold", "quantity": 1000 }
+                        ]
+                    }
+                ]
+            },
+            "gear": [
+                {
+                    "name": "Luxon Armor",
+                    "type": "Head",
+                    "cost": [
+                        { "currency": "Platinum", "value": 1 },
+                        { "currency": "Jadeite Shard", "value": 3 },
+                        { "currency": "Vial of Ink", "value": 4 },
+                        { "currency": "Bolt of Cloth", "value": 25 }
+                    ]
+                },
+                {
+                    "name": "Luxon Armor",
+                    "type": "Chest",
+                    "cost": [
+                        { "currency": "Platinum", "value": 1 },
+                        { "currency": "Jadeite Shard", "value": 9 },
+                        { "currency": "Vial of Ink", "value": 12 },
+                        { "currency": "Bolt of Cloth", "value": 75 }
+                    ]
+                }
+            ],
+            "members": [{ "order": 1, "name": "Gwen", "build": "E-Surge", "head": { "insignia": "", "rune": "" }, "chest": { "insignia": "Prodigy", "rune": "" }, "legs": { "insignia": "", "rune": "" }, "gloves": { "insignia": "", "rune": "" }, "boots": { "insignia": "", "rune": "" }, "mainhand": { "req": 9, "stat": "Domination", "mods": "20/20 Staff" }, "offhand": { "req": "", "mods": "" } }, { "order": 2, "name": "Olias", "build": "MM Mesmer", "head": { "insignia": "", "rune": "Minor Death" }, "chest": { "insignia": "Undertaker", "rune": "" }, "legs": { "insignia": "", "rune": "" }, "gloves": { "insignia": "", "rune": "" }, "boots": { "insignia": "", "rune": "" }, "mainhand": { "req": 8, "stat": "Death", "mods": "15/15 Staff" }, "offhand": { "req": "", "mods": "" } }]
+        };
+
+        const currencyIngredientMap = {};
+        data._config["currency-ingredients"].forEach(entry => {
+            currencyIngredientMap[entry.currency] = entry.ingredients;
+        });
+
+        const gearListEl = document.getElementById("gear-list");
+        const gearCountPill = document.getElementById("gear-count-pill");
+        const currencyTable = document.getElementById("currency-table");
+        const ingredientTable = document.getElementById("ingredient-table");
+        const grandTotalEl = document.getElementById("grand-total");
+        const currencyChips = document.getElementById("currency-chips");
+
+        function formatCostList(costArr) {
+            if (!costArr || !costArr.length) return "—";
+            return costArr.map(c => `${c.value}×${c.currency}`).join(", ");
+        }
+
+        function sumPieceCost(costArr) {
+            if (!costArr) return 0;
+            return costArr.reduce((sum, c) => sum + (Number(c.value) || 0), 0);
+        }
+
+        function aggregateCurrencies() {
+            const totals = {};
+            data.gear.forEach(piece => {
+                (piece.cost || []).forEach(c => {
+                    totals[c.currency] = (totals[c.currency] || 0) + (Number(c.value) || 0);
+                });
+            });
+            return totals;
+        }
+
+        function expandIngredients(currencyTotals) {
+            const ingredients = {};
+            for (const [currency, amount] of Object.entries(currencyTotals)) {
+                const mapping = currencyIngredientMap[currency];
+                if (mapping) {
+                    mapping.forEach(entry => {
+                        ingredients[entry.ingredient] =
+                            (ingredients[entry.ingredient] || 0) +
+                            entry.quantity * amount;
+                    });
+                } else {
+                    ingredients[currency] = (ingredients[currency] || 0) + amount;
+                }
+            }
+            return ingredients;
+        }
+
+        function renderGearList() {
+            document.querySelectorAll(".gear-row").forEach(e => e.remove());
+
+            data.gear.forEach((piece, index) => {
+                const row = document.createElement("div");
+                row.className = "gear-row";
+
+                row.innerHTML = `
+          <div class="ta-top">${piece.name || `Piece ${index + 1}`}</div>
+          <div class="ta-top">${piece.type || "—"}</div>
+          <div class="ta-top">${formatCostList(piece.cost)}</div>
+          <div class="ta-top">${sumPieceCost(piece.cost)}</div>
+          <div class="member-actions ta-top">
+            <button class="btn btn-ghost btn-sm" type="button" title="Edit" onclick="openEditModal(${index})">✎</button>
+            <button class="btn btn-ghost btn-sm" type="button" title="Clone" onclick="cloneGear(${index})">➁</button>
+            <button class="btn btn-ghost btn-sm" type="button" title="Delete" onclick="deleteGear(${index})">✕</button>
+          </div>
+        `;
+
+                gearListEl.appendChild(row);
+            });
+
+            gearCountPill.textContent = `${data.gear.length} piece${data.gear.length === 1 ? "" : "s"}`;
+            renderTotals();
+        }
+
+        function renderTotals() {
+            const currencyTotals = aggregateCurrencies();
+            const ingredientTotals = expandIngredients(currencyTotals);
+
+            const grandTotal = Object.values(currencyTotals).reduce((a, b) => a + b, 0);
+            grandTotalEl.textContent = grandTotal || "—";
+
+            currencyChips.innerHTML = "";
+            currencyTable.innerHTML = "";
+            Object.entries(currencyTotals)
+                .sort((a, b) => a[0].localeCompare(b[0]))
+                .forEach(([cur, val]) => {
+                    const chip = document.createElement("div");
+                    chip.className = "chip";
+                    chip.innerHTML = `<strong>${cur}</strong> · ${val}`;
+                    currencyChips.appendChild(chip);
+
+                    const tr = document.createElement("tr");
+                    tr.innerHTML = `<td>${cur}</td><td>${val}</td>`;
+                    currencyTable.appendChild(tr);
+                });
+
+            ingredientTable.innerHTML = "";
+            Object.entries(ingredientTotals)
+                .sort((a, b) => a[0].localeCompare(b[0]))
+                .forEach(([ing, qty]) => {
+                    const tr = document.createElement("tr");
+                    tr.innerHTML = `<td>${ing}</td><td>${qty}</td>`;
+                    ingredientTable.appendChild(tr);
+                });
+
+            if (!Object.keys(currencyTotals).length) {
+                currencyTable.innerHTML = `<tr><td colspan="2" class="muted">No currency costs defined.</td></tr>`;
+            }
+            if (!Object.keys(ingredientTotals).length) {
+                ingredientTable.innerHTML = `<tr><td colspan="2" class="muted">No ingredients to display.</td></tr>`;
+            }
+        }
+
+        function renderMembers() {
+            document.querySelectorAll(".member-row").forEach(e => e.remove());
+
+            data.members
+                .sort((a, b) => a.order - b.order)
+                .forEach((m, index) => {
+                    const row = document.createElement("div");
+                    row.className = "gear-row member-row";
+
+                    row.innerHTML = `
+        <div class="ta-top">${m.name}</div>
+        <div class="ta-top">${m.build}</div>
+        <div class="member-summary ta-top">${getMemberSummary(m) || "-"}</div>
+        <div class="member-actions ta-top">
+          <button class="btn btn-ghost btn-sm" title="Edit" onclick="openMemberModal(${index})">✎</button>
+          <button class="btn btn-ghost btn-sm" title="Clone" onclick="cloneMember(${index})">➁</button>
+          <button class="btn btn-ghost btn-sm" onclick="moveMemberUp(${index})">↑</button>
+          <button class="btn btn-ghost btn-sm" onclick="moveMemberDown(${index})">↓</button>
+          <button class="btn btn-ghost btn-sm" title="Delete" onclick="deleteMember(${index})">✕</button>
+        </div>
+      `;
+
+                    document.getElementById("members-list").appendChild(row);
+                });
+        }
+
+        function getMemberSummary(member) {
+            const slots = ["head", "chest", "legs", "gloves", "boots", "mainhand", "offhand"];
+
+            return slots
+                .map(slot => {
+                    const ins = member[slot]?.insignia?.trim();
+                    const rune = member[slot]?.rune?.trim();
+
+                    const req = member[slot]?.req?.trim();
+                    const stat = member[slot]?.stat?.trim();
+                    const mods = member[slot]?.mods?.trim();
+
+                    // Skip empty slots entirely
+                    if (!ins && !rune && !req && !stat && !mods) return null;
+
+                    // Build the inner text: "Prodigy", "Prodigy, Superior Vigor", etc.
+                    const parts = [];
+                    if (ins) parts.push(ins);
+                    if (rune) parts.push(rune);
+
+                    if (req) parts.push(`R${req}`);
+                    if (stat) parts.push(stat);
+                    if (mods) parts.push(mods);
+
+                    return `${slot.toUpperCase()} (${parts.join(", ")})`;
+                })
+                .filter(Boolean)
+                .join(", ");
+        }
+
+        let editingIndex = null;
+
+        function openEditModal(index) {
+            editingIndex = index;
+            const piece = data.gear[index];
+
+            document.getElementById("edit-name").value = piece.name || "";
+
+            const typeSelect = document.getElementById("edit-type");
+            typeSelect.innerHTML = "";
+            data._config["gear-types"].forEach(t => {
+                const opt = document.createElement("option");
+                opt.value = t;
+                opt.textContent = t;
+                if (t === piece.type) opt.selected = true;
+                typeSelect.appendChild(opt);
+            });
+
+            const materialsList = document.getElementById("materials-list");
+            materialsList.innerHTML = "";
+            (piece.cost || []).forEach(c => addMaterialRow(c.currency, c.value));
+
+            document.getElementById("edit-modal").style.display = "flex";
+        }
+
+        function closeEditModal() {
+            document.getElementById("edit-modal").style.display = "none";
+            editingIndex = null;
+        }
+
+        function addMaterialRow(currency = "", value = "") {
+            const row = document.createElement("div");
+            row.className = "material-row";
+
+            row.innerHTML = `
+        <input type="text" class="mat-currency" placeholder="Currency" value="${currency}">
+        <input type="number" class="mat-value" placeholder="Value" value="${value}">
+        <button class="btn btn-ghost btn-sm" type="button" onclick="this.parentElement.remove()">✕</button>
+      `;
+
+            document.getElementById("materials-list").appendChild(row);
+        }
+
+        function cloneGear(index) {
+            const original = data.gear[index];
+
+            // Deep clone the object
+            const clone = JSON.parse(JSON.stringify(original));
+
+            // Optional: tweak the name so users can tell it's a clone
+            clone.name = original.name + " (Copy)";
+
+            // Add to list
+            data.gear.push(clone);
+
+            // Re-render UI
+            renderGearList();
+            renderMembers();
+
+            // Persist to localStorage
+            saveToLocalStorage();
+        }
+
+        document.getElementById("add-material-btn").onclick = () => addMaterialRow();
+
+        function saveGear() {
+            if (editingIndex == null) return;
+            const piece = data.gear[editingIndex];
+
+            piece.name = document.getElementById("edit-name").value.trim();
+            piece.type = document.getElementById("edit-type").value;
+
+            const currencies = Array.from(document.querySelectorAll(".mat-currency"));
+            const values = Array.from(document.querySelectorAll(".mat-value"));
+
+            piece.cost = currencies
+                .map((c, i) => ({
+                    currency: c.value.trim(),
+                    value: Number(values[i].value) || 0
+                }))
+                .filter(c => c.currency && c.value > 0);
+
+            closeEditModal();
+            renderGearList();
+            renderMembers();
+            saveToLocalStorage();
+        }
+
+        function deleteGear(index) {
+            data.gear.splice(index, 1);
+            renderGearList();
+            renderMembers();
+            saveToLocalStorage();
+        }
+
+        // -----------------------------
+        // SAVE LOADOUT
+        // -----------------------------
+        function saveLoadout() {
+            const json = JSON.stringify(data);
+            const base64 = btoa(unescape(encodeURIComponent(json)));
+            document.getElementById("loadout-input").value = base64;
+
+            //document.getElementById("loadout-input").focus(); // Focus the textarea element
+            //document.getElementById("loadout-input").select(); // Select all text within the element
+
+            openLoadoutModal()
+        }
+
+        // -----------------------------
+        // LOAD LOADOUT
+        // -----------------------------
+        function openLoadoutModal() {
+            document.getElementById("loadout-modal").style.display = "flex";
+        }
+
+        function closeLoadoutModal() {
+            document.getElementById("loadout-modal").style.display = "none";
+        }
+
+        function applyLoadout() {
+            try {
+                const base64 = document.getElementById("loadout-input").value.trim();
+                const json = decodeURIComponent(escape(atob(base64)));
+                //const json = decodeURIComponent(base64);
+                const loaded = JSON.parse(json);
+                // Replace global data 
+                Object.keys(data).forEach(k => delete data[k]);
+                Object.assign(data, loaded);
+
+                closeLoadoutModal();
+                renderGearList();
+                renderMembers();
+                saveToLocalStorage();
+            } catch (e) {
+                console.error("Load error:", e);
+                alert("Invalid loadout string. Error: " + e.message);
+            }
+        }
+
+        // -----------------------------
+        // LOCAL STORAGE SUPPORT
+        // -----------------------------
+        const STORAGE_KEY = "gw-gear_loadout";
+
+        // Save automatically whenever gear changes
+        function saveToLocalStorage() {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+        }
+
+        // Load automatically on page load
+        function loadFromLocalStorage() {
+            const saved = localStorage.getItem(STORAGE_KEY);
+            if (!saved) return;
+
+            try {
+                const loaded = JSON.parse(saved);
+                Object.keys(data).forEach(k => delete data[k]);
+                Object.assign(data, loaded);
+            } catch (e) {
+                console.warn("Failed to load saved loadout.");
+            }
+        }
+
+
+        document.getElementById("add-gear-btn").addEventListener("click", () => {
+            const defaultType = data._config["gear-types"][0] || "Head";
+            data.gear.push({
+                name: "New Piece",
+                type: defaultType,
+                cost: []
+            });
+            renderGearList();
+            renderMembers();
+            openEditModal(data.gear.length - 1);
+            saveToLocalStorage();
+        });
+
+        window.addEventListener("click", (e) => {
+            const modal = document.getElementById("edit-modal");
+            if (e.target === modal) {
+                closeEditModal();
+            }
+        });
+
+        document.getElementById("save-loadout-btn").onclick = saveLoadout;
+        document.getElementById("load-loadout-btn").onclick = openLoadoutModal;
+
+        let editingMemberIndex = null;
+
+        function openMemberModal(index) {
+            editingMemberIndex = index;
+            const m = data.members[index];
+
+            document.getElementById("member-name").value = m.name;
+            document.getElementById("member-build").value = m.build;
+
+            document.getElementById("member-main-req").value = m.mainhand.req;
+            document.getElementById("member-main-stat").value = m.mainhand.stat;
+            document.getElementById("member-main-mods").value = m.mainhand.mods;
+
+            document.getElementById("member-off-req").value = m.offhand.req;
+            document.getElementById("member-off-stat").value = m.offhand.stat;
+            document.getElementById("member-off-mods").value = m.offhand.mods;
+
+            const armorFields = document.getElementById("member-armor-fields");
+            armorFields.innerHTML = "";
+
+            ["head", "chest", "legs", "gloves", "boots"].forEach(slot => {
+                armorFields.innerHTML += `
+    <div class="armor-slot-block">
+      <div class="armor-slot-title">${slot.toUpperCase()}</div>
+
+      <div class="armor-slot-row">
+        <div class="armor-field">
+          <label>Insignia</label>
+          <input id="armor-${slot}-insignia" value="${m[slot].insignia}">
+        </div>
+
+        <div class="armor-field">
+          <label>Rune</label>
+          <input id="armor-${slot}-rune" value="${m[slot].rune}">
+        </div>
+      </div>
+    </div>
+  `;
+            });
+
+
+            document.getElementById("member-modal").style.display = "flex";
+        }
+
+        function closeMemberModal() {
+            document.getElementById("member-modal").style.display = "none";
+        }
+
+        function saveMember() {
+            const m = data.members[editingMemberIndex];
+
+            m.name = document.getElementById("member-name").value;
+            m.build = document.getElementById("member-build").value;
+
+            m.mainhand.req = document.getElementById("member-main-req").value;
+            m.mainhand.stat = document.getElementById("member-main-stat").value;
+            m.mainhand.mods = document.getElementById("member-main-mods").value;
+
+            m.offhand.req = document.getElementById("member-off-req").value;
+            m.offhand.stat = document.getElementById("member-off-stat").value;
+            m.offhand.mods = document.getElementById("member-off-mods").value;
+
+            ["head", "chest", "legs", "gloves", "boots"].forEach(slot => {
+                m[slot].insignia = document.getElementById(`armor-${slot}-insignia`).value;
+                m[slot].rune = document.getElementById(`armor-${slot}-rune`).value;
+            });
+
+            closeMemberModal();
+            renderMembers();
+            saveToLocalStorage();
+        }
+
+        document.getElementById("add-member-btn").onclick = () => {
+            if (!data.members) { data.members = []; }
+            const nextOrder = data.members.length + 1;
+            data.members.push({
+                order: nextOrder,
+                name: "New Member",
+                build: "",
+                head: { insignia: "", rune: "" },
+                chest: { insignia: "", rune: "" },
+                legs: { insignia: "", rune: "" },
+                gloves: { insignia: "", rune: "" },
+                boots: { insignia: "", rune: "" },
+                mainhand: { req: "", stat: "", mods: "" },
+                offhand: { req: "", stat: "", mods: "" }
+            });
+            renderMembers();
+            saveToLocalStorage();
+        };
+
+        function cloneMember(index) {
+            const clone = JSON.parse(JSON.stringify(data.members[index]));
+            clone.order = data.members.length + 1;
+            clone.name += " (Copy)";
+            data.members.push(clone);
+            renderMembers();
+            saveToLocalStorage();
+        }
+
+        function deleteMember(index) {
+            data.members.splice(index, 1);
+            data.members.forEach((m, i) => m.order = i + 1);
+            renderMembers();
+            saveToLocalStorage();
+        }
+
+        function moveMemberUp(index) {
+            if (index === 0) return;
+            const temp = data.members[index];
+            data.members[index] = data.members[index - 1];
+            data.members[index - 1] = temp;
+            data.members.forEach((m, i) => m.order = i + 1);
+            renderMembers();
+            saveToLocalStorage();
+        }
+
+        function moveMemberDown(index) {
+            if (index === data.members.length - 1) return;
+            const temp = data.members[index];
+            data.members[index] = data.members[index + 1];
+            data.members[index + 1] = temp;
+            data.members.forEach((m, i) => m.order = i + 1);
+            renderMembers();
+            saveToLocalStorage();
+        }
+
+        document.getElementById('loadout-input')?.addEventListener('click', function (event) {
+            event.target.select();
+        });;
+
+        //myTextarea.addEventListener('click', function (event) {
+        //    event.target.select();
+        //});
+
+        loadFromLocalStorage();
+        renderGearList();
+        renderMembers();
+    </script>
+</body>
+
+</html>
