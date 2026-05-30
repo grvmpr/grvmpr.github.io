@@ -185,6 +185,10 @@
         .rounded-lg {
             border-radius: 0.2rem;
         }
+
+        .rounded-3xl {
+            border-radius: 0.5rem !important;
+        }
     </style>
 </head>
 
@@ -201,7 +205,7 @@
                     </div>
                     <div>
                         <h1 class="font-display text-3xl font-semibold tracking-tighter">GW SKILL HUNTER</h1>
-                        <p class="text-[10px] text-zinc-500 -mt-1 tracking-[3px]">GUILD WARS • WIKI MONITOR</p>
+                        <p class="text-[10px] text-zinc-500 -mt-1 tracking-[3px]">GUILD WARS • SKILL CONSOLIDATION</p>
                     </div>
                 </div>
 
@@ -382,7 +386,7 @@
                 All links open the official Guild Wars Wiki in a new tab.
             </div>
             <div class="flex items-center gap-x-4">
-                <span>Built with ❤️ for the Guild Wars community</span>
+                <span>Still sane, exile?</span>
             </div>
         </div>
     </div>
@@ -704,10 +708,11 @@
                             <div class="relative group/map">
                                 <img src="${mapUrl}" 
                                      alt="Map showing location of ${item.from || 'source'}"
-                                     class="w-[148px] h-[70px] object-cover rounded-xl border border-zinc-700 shadow-inner cursor-pointer hover:border-cyan-600 transition-all"
-                                     onclick="window.open('${mapUrl}', '_blank')">
+                                     class="w-[148px] h-[70px] object-cover rounded-xl border border-zinc-700 shadow-inner cursor-pointer hover:border-cyan-600 transition-all">
                                 <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent rounded-xl opacity-0 group-hover/map:opacity-100 transition-opacity flex items-end justify-center pb-1">
-                                    <span class="text-[9px] font-mono tracking-widest text-white/80">VIEW MAP</span>
+                                    <a href="${mapUrl}" target="_blank" rel="noopener noreferrer">
+                                        <span class="text-[9px] font-mono tracking-widest text-white/80">VIEW MAP</span>
+                                    </a>
                                 </div>
                             </div>
                         ` : `

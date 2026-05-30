@@ -132,16 +132,6 @@
   {
     "name": "\"Victory Is Mine!\"",
     "url": "/wiki/%22Victory_Is_Mine!%22",
-    "from": "Jono Yawpyawl",
-    "from_url": "/wiki/Jono_Yawpyawl",
-    "profession": "Warrior",
-    "icon": "/images/thumb/0/0b/%22Victory_Is_Mine%21%22.jpg/25px-%22Victory_Is_Mine%21%22.jpg",
-    "map": "/images/thumb/f/f7/Spearhead_Peak_Grawl_bosses_map.jpg/150px-Spearhead_Peak_Grawl_bosses_map.jpg",
-    "key": "\"Victory Is Mine!\"-Jono Yawpyawl"
-  },
-  {
-    "name": "\"Victory Is Mine!\"",
-    "url": "/wiki/%22Victory_Is_Mine!%22",
     "from": "Sakalo Yawpyawl",
     "from_url": "/wiki/Sakalo_Yawpyawl",
     "profession": "Warrior",
@@ -240,16 +230,6 @@
     "key": "Angelic Bond-Shakor Firespear"
   },
   {
-    "name": "Angelic Bond",
-    "url": "/wiki/Angelic_Bond",
-    "from": "Shakor Firespear",
-    "from_url": "/wiki/Shakor_Firespear",
-    "profession": "Paragon",
-    "icon": "/images/thumb/6/6e/Angelic_Bond.jpg/25px-Angelic_Bond.jpg",
-    "map": "/images/thumb/0/01/Shakor_Firespear_map.jpg/146px-Shakor_Firespear_map.jpg",
-    "key": "Angelic Bond-Shakor Firespear"
-  },
-  {
     "name": "Animate Flesh Golem",
     "url": "/wiki/Animate_Flesh_Golem",
     "from": "Ghial the Bone Dancer",
@@ -308,16 +288,6 @@
     "icon": "/images/thumb/4/4e/Anthem_of_Guidance.jpg/25px-Anthem_of_Guidance.jpg",
     "map": null,
     "key": "Anthem of Guidance-Battlelord Turgar"
-  },
-  {
-    "name": "Arcane Languor",
-    "url": "/wiki/Arcane_Languor",
-    "from": "Arcane Ancient Phi",
-    "from_url": "/wiki/Arcane_Ancient_Phi",
-    "profession": "Mesmer",
-    "icon": "/images/thumb/d/d5/Arcane_Languor.jpg/25px-Arcane_Languor.jpg",
-    "map": "/images/thumb/8/8c/Arcane_Ancient_Phi_map.jpg/200px-Arcane_Ancient_Phi_map.jpg",
-    "key": "Arcane Languor-Arcane Ancient Phi"
   },
   {
     "name": "Arcane Languor",
@@ -508,16 +478,6 @@
     "icon": "/images/thumb/5/5e/Aura_of_the_Lich.jpg/25px-Aura_of_the_Lich.jpg",
     "map": "/images/thumb/0/05/Cerris_map.jpg/150px-Cerris_map.jpg",
     "key": "Aura of the Lich-Cerris"
-  },
-  {
-    "name": "Auspicious Parry",
-    "url": "/wiki/Auspicious_Parry",
-    "from": "Sword Ancient Kai",
-    "from_url": "/wiki/Sword_Ancient_Kai",
-    "profession": "Warrior",
-    "icon": "/images/thumb/0/09/Auspicious_Parry.jpg/25px-Auspicious_Parry.jpg",
-    "map": "/images/thumb/7/75/Sword_Ancient_Kai_map.jpg/146px-Sword_Ancient_Kai_map.jpg",
-    "key": "Auspicious Parry-Sword Ancient Kai"
   },
   {
     "name": "Auspicious Parry",
@@ -762,16 +722,6 @@
   {
     "name": "Barrage",
     "url": "/wiki/Barrage",
-    "from": "Docu Kindleshot",
-    "from_url": "/wiki/Docu_Kindleshot",
-    "profession": "Ranger",
-    "icon": "/images/thumb/9/93/Barrage.jpg/25px-Barrage.jpg",
-    "map": "/images/thumb/6/66/Docu_Kindleshot_map.jpg/150px-Docu_Kindleshot_map.jpg",
-    "key": "Barrage-Docu Kindleshot"
-  },
-  {
-    "name": "Barrage",
-    "url": "/wiki/Barrage",
     "from": "Storm of Destruction",
     "from_url": "/wiki/Storm_of_Destruction",
     "profession": "Ranger",
@@ -808,16 +758,6 @@
     "icon": "/images/thumb/d/dd/Battle_Rage.jpg/25px-Battle_Rage.jpg",
     "map": null,
     "key": "Battle Rage-Krogg Shmush (Shiverpeak Mountains)"
-  },
-  {
-    "name": "Battle Rage",
-    "url": "/wiki/Battle_Rage",
-    "from": "Arrahhsh Mountainclub",
-    "from_url": "/wiki/Arrahhsh_Mountainclub",
-    "profession": "Warrior",
-    "icon": "/images/thumb/d/dd/Battle_Rage.jpg/25px-Battle_Rage.jpg",
-    "map": "/images/thumb/9/9a/Arrahhsh_Mountainclub_map.jpg/146px-Arrahhsh_Mountainclub_map.jpg",
-    "key": "Battle Rage-Arrahhsh Mountainclub"
   },
   {
     "name": "Battle Rage",
@@ -998,16 +938,6 @@
     "icon": "/images/thumb/5/51/Broad_Head_Arrow.jpg/25px-Broad_Head_Arrow.jpg",
     "map": "/images/thumb/7/73/The_Afflicted_Susei_map.jpg/150px-The_Afflicted_Susei_map.jpg",
     "key": "Broad Head Arrow-The Afflicted Susei"
-  },
-  {
-    "name": "Broad Head Arrow",
-    "url": "/wiki/Broad_Head_Arrow",
-    "from": "The Afflicted Huan (ranger)",
-    "from_url": "/wiki/The_Afflicted_Huan_(ranger)",
-    "profession": "Ranger",
-    "icon": "/images/thumb/5/51/Broad_Head_Arrow.jpg/25px-Broad_Head_Arrow.jpg",
-    "map": "/images/thumb/b/ba/The_Afflicted_Huan_%28Ranger%29_map.jpg/150px-The_Afflicted_Huan_%28Ranger%29_map.jpg",
-    "key": "Broad Head Arrow-The Afflicted Huan (ranger)"
   },
   {
     "name": "Broad Head Arrow",
@@ -1882,16 +1812,6 @@
   {
     "name": "Devastating Hammer",
     "url": "/wiki/Devastating_Hammer",
-    "from": "Perfected Armor",
-    "from_url": "/wiki/Perfected_Armor",
-    "profession": "Warrior",
-    "icon": "/images/thumb/3/3a/Devastating_Hammer.jpg/25px-Devastating_Hammer.jpg",
-    "map": "/images/thumb/8/8f/Perfected_Armor_map.jpg/150px-Perfected_Armor_map.jpg",
-    "key": "Devastating Hammer-Perfected Armor"
-  },
-  {
-    "name": "Devastating Hammer",
-    "url": "/wiki/Devastating_Hammer",
     "from": "Tembarr Treefall",
     "from_url": "/wiki/Tembarr_Treefall",
     "profession": "Warrior",
@@ -2122,16 +2042,6 @@
   {
     "name": "Earth Shaker",
     "url": "/wiki/Earth_Shaker",
-    "from": "Monstrous Afflicted Warrior",
-    "from_url": "/wiki/Monstrous_Afflicted_Warrior",
-    "profession": "Warrior",
-    "icon": "/images/thumb/a/ac/Earth_Shaker.jpg/25px-Earth_Shaker.jpg",
-    "map": "/images/thumb/2/29/Monstrous_Afflicted_Warrior_map.jpg/150px-Monstrous_Afflicted_Warrior_map.jpg",
-    "key": "Earth Shaker-Monstrous Afflicted Warrior"
-  },
-  {
-    "name": "Earth Shaker",
-    "url": "/wiki/Earth_Shaker",
     "from": "Jormungand",
     "from_url": "/wiki/Jormungand",
     "profession": "Warrior",
@@ -2242,16 +2152,6 @@
   {
     "name": "Elemental Attunement",
     "url": "/wiki/Elemental_Attunement",
-    "from": "Chung, the Attuned",
-    "from_url": "/wiki/Chung,_the_Attuned",
-    "profession": "Elementalist",
-    "icon": "/images/thumb/3/34/Elemental_Attunement.jpg/25px-Elemental_Attunement.jpg",
-    "map": "/images/thumb/b/b0/Chung%2C_the_Attuned_map.jpg/150px-Chung%2C_the_Attuned_map.jpg",
-    "key": "Elemental Attunement-Chung, the Attuned"
-  },
-  {
-    "name": "Elemental Attunement",
-    "url": "/wiki/Elemental_Attunement",
     "from": "Corsair Commander (elementalist)",
     "from_url": "/wiki/Corsair_Commander_(elementalist)",
     "profession": "Elementalist",
@@ -2338,16 +2238,6 @@
     "icon": "/images/thumb/8/8c/Energy_Drain.jpg/25px-Energy_Drain.jpg",
     "map": "/images/thumb/4/43/Imp_bosses_in_Ice_Floe_map.jpg/150px-Imp_bosses_in_Ice_Floe_map.jpg",
     "key": "Energy Drain-Gambol Headrainer"
-  },
-  {
-    "name": "Energy Drain",
-    "url": "/wiki/Energy_Drain",
-    "from": "Sniik Hungrymind",
-    "from_url": "/wiki/Sniik_Hungrymind",
-    "profession": "Mesmer",
-    "icon": "/images/thumb/8/8c/Energy_Drain.jpg/25px-Energy_Drain.jpg",
-    "map": "/images/thumb/7/72/Sniik_Hungrymind_Spearhead_Peak_map.jpg/146px-Sniik_Hungrymind_Spearhead_Peak_map.jpg",
-    "key": "Energy Drain-Sniik Hungrymind"
   },
   {
     "name": "Energy Drain",
@@ -2482,16 +2372,6 @@
   {
     "name": "Energy Surge",
     "url": "/wiki/Energy_Surge",
-    "from": "Milefaun Mindflayer",
-    "from_url": "/wiki/Milefaun_Mindflayer",
-    "profession": "Mesmer",
-    "icon": "/images/thumb/f/f6/Energy_Surge.jpg/25px-Energy_Surge.jpg",
-    "map": "/images/thumb/5/52/Milefaun_Mindflayer_map.jpg/150px-Milefaun_Mindflayer_map.jpg",
-    "key": "Energy Surge-Milefaun Mindflayer"
-  },
-  {
-    "name": "Energy Surge",
-    "url": "/wiki/Energy_Surge",
     "from": "Monstrous Afflicted Mesmer",
     "from_url": "/wiki/Monstrous_Afflicted_Mesmer",
     "profession": "Mesmer",
@@ -2572,26 +2452,6 @@
   {
     "name": "Enraged Smash",
     "url": "/wiki/Enraged_Smash",
-    "from": "The Afflicted Ako",
-    "from_url": "/wiki/The_Afflicted_Ako",
-    "profession": "Warrior",
-    "icon": "/images/thumb/a/a6/Enraged_Smash.jpg/25px-Enraged_Smash.jpg",
-    "map": "/images/thumb/8/87/The_Afflicted_Ako_map.jpg/150px-The_Afflicted_Ako_map.jpg",
-    "key": "Enraged Smash-The Afflicted Ako"
-  },
-  {
-    "name": "Enraged Smash",
-    "url": "/wiki/Enraged_Smash",
-    "from": "The Afflicted Maaka",
-    "from_url": "/wiki/The_Afflicted_Maaka",
-    "profession": "Warrior",
-    "icon": "/images/thumb/a/a6/Enraged_Smash.jpg/25px-Enraged_Smash.jpg",
-    "map": null,
-    "key": "Enraged Smash-The Afflicted Maaka"
-  },
-  {
-    "name": "Enraged Smash",
-    "url": "/wiki/Enraged_Smash",
     "from": "The Afflicted Maaka",
     "from_url": "/wiki/The_Afflicted_Maaka",
     "profession": "Warrior",
@@ -2628,26 +2488,6 @@
     "icon": "/images/thumb/d/db/Equinox.jpg/25px-Equinox.jpg",
     "map": "/images/thumb/f/f6/Ranger%27s_Construct_map.jpg/150px-Ranger%27s_Construct_map.jpg",
     "key": "Equinox-Ranger's Construct"
-  },
-  {
-    "name": "Equinox",
-    "url": "/wiki/Equinox",
-    "from": "Ranger's Construct",
-    "from_url": "/wiki/Ranger%27s_Construct",
-    "profession": "Ranger",
-    "icon": "/images/thumb/d/db/Equinox.jpg/25px-Equinox.jpg",
-    "map": "/images/thumb/f/f6/Ranger%27s_Construct_map.jpg/150px-Ranger%27s_Construct_map.jpg",
-    "key": "Equinox-Ranger's Construct"
-  },
-  {
-    "name": "Escape",
-    "url": "/wiki/Escape",
-    "from": "Whuup Buumbuul",
-    "from_url": "/wiki/Whuup_Buumbuul",
-    "profession": "Ranger",
-    "icon": "/images/thumb/a/a2/Escape.jpg/25px-Escape.jpg",
-    "map": null,
-    "key": "Escape-Whuup Buumbuul"
   },
   {
     "name": "Escape",
@@ -2952,82 +2792,12 @@
   {
     "name": "Famine",
     "url": "/wiki/Famine",
-    "from": "Famished Ancient Brrne",
-    "from_url": "/wiki/Famished_Ancient_Brrne",
-    "profession": "Ranger",
-    "icon": "/images/thumb/d/d4/Famine.jpg/25px-Famine.jpg",
-    "map": "/images/thumb/8/8f/Famished_Ancient_Brrne_map.jpg/150px-Famished_Ancient_Brrne_map.jpg",
-    "key": "Famine-Famished Ancient Brrne"
-  },
-  {
-    "name": "Famine",
-    "url": "/wiki/Famine",
     "from": "Bound Zojun",
     "from_url": "/wiki/Bound_Zojun",
     "profession": "Ranger",
     "icon": "/images/thumb/d/d4/Famine.jpg/25px-Famine.jpg",
     "map": "/images/thumb/3/37/Tahnnakai_Temple_map.jpg/200px-Tahnnakai_Temple_map.jpg",
     "key": "Famine-Bound Zojun"
-  },
-  {
-    "name": "Feast of Corruption",
-    "url": "/wiki/Feast_of_Corruption",
-    "from": "Maw the Mountain Heart",
-    "from_url": "/wiki/Maw_the_Mountain_Heart",
-    "profession": "Necromancer",
-    "icon": "/images/thumb/4/47/Feast_of_Corruption.jpg/25px-Feast_of_Corruption.jpg",
-    "map": "/images/thumb/9/97/Maw_the_Mountain_Heart_map.jpg/150px-Maw_the_Mountain_Heart_map.jpg",
-    "key": "Feast of Corruption-Maw the Mountain Heart"
-  },
-  {
-    "name": "Feast of Corruption",
-    "url": "/wiki/Feast_of_Corruption",
-    "from": "Maw the Mountain Heart",
-    "from_url": "/wiki/Maw_the_Mountain_Heart",
-    "profession": "Necromancer",
-    "icon": "/images/thumb/4/47/Feast_of_Corruption.jpg/25px-Feast_of_Corruption.jpg",
-    "map": "/images/thumb/9/97/Maw_the_Mountain_Heart_map.jpg/150px-Maw_the_Mountain_Heart_map.jpg",
-    "key": "Feast of Corruption-Maw the Mountain Heart"
-  },
-  {
-    "name": "Feast of Corruption",
-    "url": "/wiki/Feast_of_Corruption",
-    "from": "Maw the Mountain Heart",
-    "from_url": "/wiki/Maw_the_Mountain_Heart",
-    "profession": "Necromancer",
-    "icon": "/images/thumb/4/47/Feast_of_Corruption.jpg/25px-Feast_of_Corruption.jpg",
-    "map": "/images/thumb/9/97/Maw_the_Mountain_Heart_map.jpg/150px-Maw_the_Mountain_Heart_map.jpg",
-    "key": "Feast of Corruption-Maw the Mountain Heart"
-  },
-  {
-    "name": "Feast of Corruption",
-    "url": "/wiki/Feast_of_Corruption",
-    "from": "Maw the Mountain Heart",
-    "from_url": "/wiki/Maw_the_Mountain_Heart",
-    "profession": "Necromancer",
-    "icon": "/images/thumb/4/47/Feast_of_Corruption.jpg/25px-Feast_of_Corruption.jpg",
-    "map": "/images/thumb/9/97/Maw_the_Mountain_Heart_map.jpg/150px-Maw_the_Mountain_Heart_map.jpg",
-    "key": "Feast of Corruption-Maw the Mountain Heart"
-  },
-  {
-    "name": "Feast of Corruption",
-    "url": "/wiki/Feast_of_Corruption",
-    "from": "Maw the Mountain Heart",
-    "from_url": "/wiki/Maw_the_Mountain_Heart",
-    "profession": "Necromancer",
-    "icon": "/images/thumb/4/47/Feast_of_Corruption.jpg/25px-Feast_of_Corruption.jpg",
-    "map": "/images/thumb/9/97/Maw_the_Mountain_Heart_map.jpg/150px-Maw_the_Mountain_Heart_map.jpg",
-    "key": "Feast of Corruption-Maw the Mountain Heart"
-  },
-  {
-    "name": "Feast of Corruption",
-    "url": "/wiki/Feast_of_Corruption",
-    "from": "Maw the Mountain Heart",
-    "from_url": "/wiki/Maw_the_Mountain_Heart",
-    "profession": "Necromancer",
-    "icon": "/images/thumb/4/47/Feast_of_Corruption.jpg/25px-Feast_of_Corruption.jpg",
-    "map": "/images/thumb/9/97/Maw_the_Mountain_Heart_map.jpg/150px-Maw_the_Mountain_Heart_map.jpg",
-    "key": "Feast of Corruption-Maw the Mountain Heart"
   },
   {
     "name": "Feast of Corruption",
@@ -3220,16 +2990,6 @@
     "key": "Gladiator's Defense-Facet of Destruction"
   },
   {
-    "name": "Gladiator's Defense",
-    "url": "/wiki/Gladiator%27s_Defense",
-    "from": "Facet of Destruction",
-    "from_url": "/wiki/Facet_of_Destruction",
-    "profession": "Warrior",
-    "icon": "/images/thumb/8/8e/Gladiator%27s_Defense.jpg/25px-Gladiator%27s_Defense.jpg",
-    "map": null,
-    "key": "Gladiator's Defense-Facet of Destruction"
-  },
-  {
     "name": "Glass Arrows",
     "url": "/wiki/Glass_Arrows",
     "from": "Nandet, Glass Weaver",
@@ -3288,16 +3048,6 @@
     "icon": "/images/thumb/e/e8/Glimmer_of_Light.jpg/25px-Glimmer_of_Light.jpg",
     "map": "/images/thumb/f/fa/Chiossen%2C_Soothing_Breeze_map.jpg/150px-Chiossen%2C_Soothing_Breeze_map.jpg",
     "key": "Glimmer of Light-Chiossen, Soothing Breeze"
-  },
-  {
-    "name": "Glimmering Mark",
-    "url": "/wiki/Glimmering_Mark",
-    "from": "Edibbo Kepkep",
-    "from_url": "/wiki/Edibbo_Kepkep",
-    "profession": "Elementalist",
-    "icon": "/images/thumb/8/82/Glimmering_Mark.jpg/25px-Glimmering_Mark.jpg",
-    "map": "/images/thumb/f/f7/Spearhead_Peak_Grawl_bosses_map.jpg/150px-Spearhead_Peak_Grawl_bosses_map.jpg",
-    "key": "Glimmering Mark-Edibbo Kepkep"
   },
   {
     "name": "Glimmering Mark",
@@ -3438,16 +3188,6 @@
     "icon": "/images/thumb/5/5e/Grenth%27s_Balance.jpg/25px-Grenth%27s_Balance.jpg",
     "map": "/images/thumb/b/bc/Armind_the_Balancer_map.jpg/146px-Armind_the_Balancer_map.jpg",
     "key": "Grenth's Balance-Armind the Balancer"
-  },
-  {
-    "name": "Grenth's Balance",
-    "url": "/wiki/Grenth%27s_Balance",
-    "from": "Facet of Death",
-    "from_url": "/wiki/Facet_of_Death",
-    "profession": "Necromancer",
-    "icon": "/images/thumb/5/5e/Grenth%27s_Balance.jpg/25px-Grenth%27s_Balance.jpg",
-    "map": "/images/thumb/b/be/Facet_of_Death_map.jpg/200px-Facet_of_Death_map.jpg",
-    "key": "Grenth's Balance-Facet of Death"
   },
   {
     "name": "Grenth's Balance",
@@ -3688,16 +3428,6 @@
     "icon": "/images/thumb/6/63/Hundred_Blades.jpg/25px-Hundred_Blades.jpg",
     "map": null,
     "key": "Hundred Blades-Undead Prince Rurik"
-  },
-  {
-    "name": "Hundred Blades",
-    "url": "/wiki/Hundred_Blades",
-    "from": "Warrior's Construct",
-    "from_url": "/wiki/Warrior%27s_Construct",
-    "profession": "Warrior",
-    "icon": "/images/thumb/6/63/Hundred_Blades.jpg/25px-Hundred_Blades.jpg",
-    "map": "/images/5/50/Warrior%27s_Construct_map.jpg",
-    "key": "Hundred Blades-Warrior's Construct"
   },
   {
     "name": "Hundred Blades",
@@ -4020,16 +3750,6 @@
     "key": "Lacerate-Ryver Mossplanter"
   },
   {
-    "name": "Lacerate",
-    "url": "/wiki/Lacerate",
-    "from": "Ryver Mossplanter",
-    "from_url": "/wiki/Ryver_Mossplanter",
-    "profession": "Ranger",
-    "icon": "/images/thumb/f/fa/Lacerate.jpg/25px-Lacerate.jpg",
-    "map": "/images/thumb/e/e3/Ryver_Mossplanter_map.jpg/150px-Ryver_Mossplanter_map.jpg",
-    "key": "Lacerate-Ryver Mossplanter"
-  },
-  {
     "name": "Life Barrier",
     "url": "/wiki/Life_Barrier",
     "from": "Esnhal Hardwood",
@@ -4048,16 +3768,6 @@
     "icon": "/images/thumb/c/ca/Life_Barrier.jpg/25px-Life_Barrier.jpg",
     "map": null,
     "key": "Life Barrier-Quickroot"
-  },
-  {
-    "name": "Life Sheath",
-    "url": "/wiki/Life_Sheath",
-    "from": "Monk's Construct",
-    "from_url": "/wiki/Monk%27s_Construct",
-    "profession": "Monk",
-    "icon": "/images/thumb/d/de/Life_Sheath.jpg/25px-Life_Sheath.jpg",
-    "map": "/images/1/18/Monk%27s_Construct_map.jpg",
-    "key": "Life Sheath-Monk's Construct"
   },
   {
     "name": "Life Sheath",
@@ -4520,16 +4230,6 @@
     "key": "Mantra of Recall-Facet of Illusions"
   },
   {
-    "name": "Mantra of Recall",
-    "url": "/wiki/Mantra_of_Recall",
-    "from": "Facet of Illusions",
-    "from_url": "/wiki/Facet_of_Illusions",
-    "profession": "Mesmer",
-    "icon": "/images/thumb/a/a0/Mantra_of_Recall.jpg/25px-Mantra_of_Recall.jpg",
-    "map": null,
-    "key": "Mantra of Recall-Facet of Illusions"
-  },
-  {
     "name": "Mantra of Recovery",
     "url": "/wiki/Mantra_of_Recovery",
     "from": "Ayassah Hess",
@@ -4850,16 +4550,6 @@
     "key": "Melandru's Resilience-Facet of Creation"
   },
   {
-    "name": "Melandru's Resilience",
-    "url": "/wiki/Melandru%27s_Resilience",
-    "from": "Facet of Creation",
-    "from_url": "/wiki/Facet_of_Creation",
-    "profession": "Ranger",
-    "icon": "/images/thumb/b/b0/Melandru%27s_Resilience.jpg/25px-Melandru%27s_Resilience.jpg",
-    "map": null,
-    "key": "Melandru's Resilience-Facet of Creation"
-  },
-  {
     "name": "Melandru's Shot",
     "url": "/wiki/Melandru%27s_Shot",
     "from": "Valis the Rampant",
@@ -4992,16 +4682,6 @@
   {
     "name": "Mind Burn",
     "url": "/wiki/Mind_Burn",
-    "from": "The Afflicted Kam",
-    "from_url": "/wiki/The_Afflicted_Kam",
-    "profession": "Elementalist",
-    "icon": "/images/thumb/4/4f/Mind_Burn.jpg/25px-Mind_Burn.jpg",
-    "map": "/images/thumb/a/a1/The_Afflicted_Kam_map.jpg/150px-The_Afflicted_Kam_map.jpg",
-    "key": "Mind Burn-The Afflicted Kam"
-  },
-  {
-    "name": "Mind Burn",
-    "url": "/wiki/Mind_Burn",
     "from": "Argo",
     "from_url": "/wiki/Argo",
     "profession": "Elementalist",
@@ -5068,16 +4748,6 @@
     "icon": "/images/thumb/b/be/Mind_Freeze.jpg/25px-Mind_Freeze.jpg",
     "map": "/images/thumb/4/43/Imp_bosses_in_Ice_Floe_map.jpg/150px-Imp_bosses_in_Ice_Floe_map.jpg",
     "key": "Mind Freeze-Skitt Skizzle"
-  },
-  {
-    "name": "Mind Freeze",
-    "url": "/wiki/Mind_Freeze",
-    "from": "Maak Frostfriend",
-    "from_url": "/wiki/Maak_Frostfriend",
-    "profession": "Elementalist",
-    "icon": "/images/thumb/b/be/Mind_Freeze.jpg/25px-Mind_Freeze.jpg",
-    "map": "/images/thumb/d/de/Maak_Frostfriend_Spearhead_Peak_map.jpg/146px-Maak_Frostfriend_Spearhead_Peak_map.jpg",
-    "key": "Mind Freeze-Maak Frostfriend"
   },
   {
     "name": "Mind Freeze",
@@ -5160,16 +4830,6 @@
     "key": "Mirror of Ice-Elemental's Construct"
   },
   {
-    "name": "Mirror of Ice",
-    "url": "/wiki/Mirror_of_Ice",
-    "from": "Elemental's Construct",
-    "from_url": "/wiki/Elemental%27s_Construct",
-    "profession": "Elementalist",
-    "icon": "/images/thumb/3/33/Mirror_of_Ice.jpg/25px-Mirror_of_Ice.jpg",
-    "map": "/images/6/67/Elemental%27s_Construct_map.jpg",
-    "key": "Mirror of Ice-Elemental's Construct"
-  },
-  {
     "name": "Mist Form",
     "url": "/wiki/Mist_Form",
     "from": "Eidolon",
@@ -5208,26 +4868,6 @@
     "icon": "/images/thumb/f/f3/Mist_Form.jpg/25px-Mist_Form.jpg",
     "map": "/images/thumb/3/37/Brrrr_Windburn_map.jpg/146px-Brrrr_Windburn_map.jpg",
     "key": "Mist Form-Brrrr Windburn"
-  },
-  {
-    "name": "Mist Form",
-    "url": "/wiki/Mist_Form",
-    "from": "Eidolon",
-    "from_url": "/wiki/Eidolon",
-    "profession": "Elementalist",
-    "icon": "/images/thumb/f/f3/Mist_Form.jpg/25px-Mist_Form.jpg",
-    "map": null,
-    "key": "Mist Form-Eidolon"
-  },
-  {
-    "name": "Mist Form",
-    "url": "/wiki/Mist_Form",
-    "from": "Eidolon",
-    "from_url": "/wiki/Eidolon",
-    "profession": "Elementalist",
-    "icon": "/images/thumb/f/f3/Mist_Form.jpg/25px-Mist_Form.jpg",
-    "map": null,
-    "key": "Mist Form-Eidolon"
   },
   {
     "name": "Mist Form",
@@ -5298,16 +4938,6 @@
     "icon": "/images/thumb/b/b6/Oath_Shot.jpg/25px-Oath_Shot.jpg",
     "map": "/images/thumb/2/2a/Ring_of_Fire_Mursaat_Map.jpg/150px-Ring_of_Fire_Mursaat_Map.jpg",
     "key": "Oath Shot-Cairn the Troubling"
-  },
-  {
-    "name": "Oath Shot",
-    "url": "/wiki/Oath_Shot",
-    "from": "Perfected Cloak",
-    "from_url": "/wiki/Perfected_Cloak",
-    "profession": "Ranger",
-    "icon": "/images/thumb/b/b6/Oath_Shot.jpg/25px-Oath_Shot.jpg",
-    "map": null,
-    "key": "Oath Shot-Perfected Cloak"
   },
   {
     "name": "Obsidian Flesh",
@@ -5650,26 +5280,6 @@
     "key": "Pious Renewal-Facet of Spirit"
   },
   {
-    "name": "Pious Renewal",
-    "url": "/wiki/Pious_Renewal",
-    "from": "Facet of Spirit",
-    "from_url": "/wiki/Facet_of_Spirit",
-    "profession": "Dervish",
-    "icon": "/images/thumb/3/36/Pious_Renewal.jpg/25px-Pious_Renewal.jpg",
-    "map": null,
-    "key": "Pious Renewal-Facet of Spirit"
-  },
-  {
-    "name": "Plague Signet",
-    "url": "/wiki/Plague_Signet",
-    "from": "Allobo Dimdim",
-    "from_url": "/wiki/Allobo_Dimdim",
-    "profession": "Necromancer",
-    "icon": "/images/thumb/b/b1/Plague_Signet.jpg/25px-Plague_Signet.jpg",
-    "map": "/images/thumb/f/f7/Spearhead_Peak_Grawl_bosses_map.jpg/150px-Spearhead_Peak_Grawl_bosses_map.jpg",
-    "key": "Plague Signet-Allobo Dimdim"
-  },
-  {
     "name": "Plague Signet",
     "url": "/wiki/Plague_Signet",
     "from": "Allobo Dimdim",
@@ -5732,16 +5342,6 @@
   {
     "name": "Poison Arrow",
     "url": "/wiki/Poison_Arrow",
-    "from": "Kekona Pippip",
-    "from_url": "/wiki/Kekona_Pippip",
-    "profession": "Ranger",
-    "icon": "/images/thumb/f/fd/Poison_Arrow.jpg/25px-Poison_Arrow.jpg",
-    "map": "/images/thumb/f/f7/Spearhead_Peak_Grawl_bosses_map.jpg/150px-Spearhead_Peak_Grawl_bosses_map.jpg",
-    "key": "Poison Arrow-Kekona Pippip"
-  },
-  {
-    "name": "Poison Arrow",
-    "url": "/wiki/Poison_Arrow",
     "from": "Salani Pippip",
     "from_url": "/wiki/Salani_Pippip",
     "profession": "Ranger",
@@ -5778,16 +5378,6 @@
     "icon": "/images/thumb/5/5e/Power_Block.jpg/25px-Power_Block.jpg",
     "map": "/images/thumb/6/61/Justiciar_Sevaan_location.jpg/200px-Justiciar_Sevaan_location.jpg",
     "key": "Power Block-Justiciar Sevaan"
-  },
-  {
-    "name": "Power Block",
-    "url": "/wiki/Power_Block",
-    "from": "Anmat the Trickster",
-    "from_url": "/wiki/Anmat_the_Trickster",
-    "profession": "Mesmer",
-    "icon": "/images/thumb/5/5e/Power_Block.jpg/25px-Power_Block.jpg",
-    "map": "/images/thumb/b/be/Sacnoth_Valley_Charr_Bosses_map.jpg/200px-Sacnoth_Valley_Charr_Bosses_map.jpg",
-    "key": "Power Block-Anmat the Trickster"
   },
   {
     "name": "Power Block",
@@ -5928,16 +5518,6 @@
     "icon": "/images/thumb/d/d8/Primal_Rage.jpg/25px-Primal_Rage.jpg",
     "map": "/images/thumb/c/c8/Reefclaw_Ragebound_Location.jpg/150px-Reefclaw_Ragebound_Location.jpg",
     "key": "Primal Rage-Reefclaw Ragebound"
-  },
-  {
-    "name": "Psychic Distraction",
-    "url": "/wiki/Psychic_Distraction",
-    "from": "Mesmer's Construct",
-    "from_url": "/wiki/Mesmer%27s_Construct",
-    "profession": "Mesmer",
-    "icon": "/images/thumb/7/70/Psychic_Distraction.jpg/25px-Psychic_Distraction.jpg",
-    "map": "/images/e/ed/Mesmer%27s_Construct_map.jpg",
-    "key": "Psychic Distraction-Mesmer's Construct"
   },
   {
     "name": "Psychic Distraction",
@@ -6098,16 +5678,6 @@
     "icon": "/images/thumb/e/e4/Ray_of_Judgment.jpg/25px-Ray_of_Judgment.jpg",
     "map": "/images/thumb/c/cf/The_Afflicted_Cho_map.jpg/146px-The_Afflicted_Cho_map.jpg",
     "key": "Ray of Judgment-The Afflicted Cho"
-  },
-  {
-    "name": "Ray of Judgment",
-    "url": "/wiki/Ray_of_Judgment",
-    "from": "The Afflicted Miju",
-    "from_url": "/wiki/The_Afflicted_Miju",
-    "profession": "Monk",
-    "icon": "/images/thumb/e/e4/Ray_of_Judgment.jpg/25px-Ray_of_Judgment.jpg",
-    "map": "/images/thumb/d/d0/The_Afflicted_Miju_map.jpg/150px-The_Afflicted_Miju_map.jpg",
-    "key": "Ray of Judgment-The Afflicted Miju"
   },
   {
     "name": "Ray of Judgment",
@@ -6502,26 +6072,6 @@
   {
     "name": "Shadow Form",
     "url": "/wiki/Shadow_Form",
-    "from": "The Afflicted Soon Kim",
-    "from_url": "/wiki/The_Afflicted_Soon_Kim",
-    "profession": "Assassin",
-    "icon": "/images/thumb/e/e4/Shadow_Form.jpg/25px-Shadow_Form.jpg",
-    "map": "/images/thumb/a/a9/The_Afflicted_Soon_Kim_map.jpg/150px-The_Afflicted_Soon_Kim_map.jpg",
-    "key": "Shadow Form-The Afflicted Soon Kim"
-  },
-  {
-    "name": "Shadow Form",
-    "url": "/wiki/Shadow_Form",
-    "from": "The Afflicted Senku",
-    "from_url": "/wiki/The_Afflicted_Senku",
-    "profession": "Assassin",
-    "icon": "/images/thumb/e/e4/Shadow_Form.jpg/25px-Shadow_Form.jpg",
-    "map": null,
-    "key": "Shadow Form-The Afflicted Senku"
-  },
-  {
-    "name": "Shadow Form",
-    "url": "/wiki/Shadow_Form",
     "from": "The Afflicted Senku",
     "from_url": "/wiki/The_Afflicted_Senku",
     "profession": "Assassin",
@@ -6538,16 +6088,6 @@
     "icon": "/images/thumb/e/e4/Shadow_Form.jpg/25px-Shadow_Form.jpg",
     "map": "/images/thumb/e/ec/Elusive_Black_Moa_map.jpg/150px-Elusive_Black_Moa_map.jpg",
     "key": "Shadow Form-Elusive Black Moa"
-  },
-  {
-    "name": "Shadow Form",
-    "url": "/wiki/Shadow_Form",
-    "from": "Fah Yu the Shadow's Eye",
-    "from_url": "/wiki/Fah_Yu_the_Shadow%27s_Eye",
-    "profession": "Assassin",
-    "icon": "/images/thumb/e/e4/Shadow_Form.jpg/25px-Shadow_Form.jpg",
-    "map": "/images/thumb/d/d1/Fah_Yu_the_Shadows_Eye_map.jpg/200px-Fah_Yu_the_Shadows_Eye_map.jpg",
-    "key": "Shadow Form-Fah Yu the Shadow's Eye"
   },
   {
     "name": "Shadow Form",
@@ -6810,16 +6350,6 @@
     "key": "Shield of Regeneration-Facet of Existence"
   },
   {
-    "name": "Shield of Regeneration",
-    "url": "/wiki/Shield_of_Regeneration",
-    "from": "Facet of Existence",
-    "from_url": "/wiki/Facet_of_Existence",
-    "profession": "Monk",
-    "icon": "/images/thumb/e/eb/Shield_of_Regeneration.jpg/25px-Shield_of_Regeneration.jpg",
-    "map": null,
-    "key": "Shield of Regeneration-Facet of Existence"
-  },
-  {
     "name": "Shockwave",
     "url": "/wiki/Shockwave",
     "from": "Azukhan Stonewrath",
@@ -6922,16 +6452,6 @@
   {
     "name": "Shroud of Silence",
     "url": "/wiki/Shroud_of_Silence",
-    "from": "Silent Ancient Onata",
-    "from_url": "/wiki/Silent_Ancient_Onata",
-    "profession": "Assassin",
-    "icon": "/images/thumb/d/d0/Shroud_of_Silence.jpg/25px-Shroud_of_Silence.jpg",
-    "map": "/images/thumb/5/50/Silent_Ancient_Onata_map.jpg/150px-Silent_Ancient_Onata_map.jpg",
-    "key": "Shroud of Silence-Silent Ancient Onata"
-  },
-  {
-    "name": "Shroud of Silence",
-    "url": "/wiki/Shroud_of_Silence",
     "from": "Bound Vizu",
     "from_url": "/wiki/Bound_Vizu",
     "profession": "Assassin",
@@ -6998,16 +6518,6 @@
     "icon": "/images/thumb/a/aa/Signet_of_Judgment.jpg/25px-Signet_of_Judgment.jpg",
     "map": null,
     "key": "Signet of Judgment-Fawl Driftstalker"
-  },
-  {
-    "name": "Signet of Judgment",
-    "url": "/wiki/Signet_of_Judgment",
-    "from": "Frostbite",
-    "from_url": "/wiki/Frostbite",
-    "profession": "Monk",
-    "icon": "/images/thumb/a/aa/Signet_of_Judgment.jpg/25px-Signet_of_Judgment.jpg",
-    "map": "/images/thumb/c/c2/Frostbite_map.jpg/150px-Frostbite_map.jpg",
-    "key": "Signet of Judgment-Frostbite"
   },
   {
     "name": "Signet of Judgment",
@@ -7340,16 +6850,6 @@
     "key": "Soul Bind-Necromancer's Construct"
   },
   {
-    "name": "Soul Bind",
-    "url": "/wiki/Soul_Bind",
-    "from": "Necromancer's Construct",
-    "from_url": "/wiki/Necromancer%27s_Construct",
-    "profession": "Necromancer",
-    "icon": "/images/thumb/6/6c/Soul_Bind.jpg/25px-Soul_Bind.jpg",
-    "map": "/images/thumb/d/dd/Necromancer%27s_Construct_map.jpg/150px-Necromancer%27s_Construct_map.jpg",
-    "key": "Soul Bind-Necromancer's Construct"
-  },
-  {
     "name": "Soul Leech",
     "url": "/wiki/Soul_Leech",
     "from": "Goss Darkweb",
@@ -7402,16 +6902,6 @@
   {
     "name": "Soul Twisting",
     "url": "/wiki/Soul_Twisting",
-    "from": "Ritualist's Construct",
-    "from_url": "/wiki/Ritualist%27s_Construct",
-    "profession": "Ritualist",
-    "icon": "/images/thumb/2/24/Soul_Twisting.jpg/25px-Soul_Twisting.jpg",
-    "map": "/images/thumb/a/a3/Ritualist%27s_Construct_map.jpg/150px-Ritualist%27s_Construct_map.jpg",
-    "key": "Soul Twisting-Ritualist's Construct"
-  },
-  {
-    "name": "Soul Twisting",
-    "url": "/wiki/Soul_Twisting",
     "from": "Monstrous Afflicted Ritualist",
     "from_url": "/wiki/Monstrous_Afflicted_Ritualist",
     "profession": "Ritualist",
@@ -7428,16 +6918,6 @@
     "icon": "/images/thumb/0/08/Spell_Breaker.jpg/25px-Spell_Breaker.jpg",
     "map": "/images/thumb/9/91/Snake_Dance_Griffon_Boss_map.jpg/146px-Snake_Dance_Griffon_Boss_map.jpg",
     "key": "Spell Breaker-Raptorhawk"
-  },
-  {
-    "name": "Spell Breaker",
-    "url": "/wiki/Spell_Breaker",
-    "from": "Untouched Ancient Ky",
-    "from_url": "/wiki/Untouched_Ancient_Ky",
-    "profession": "Monk",
-    "icon": "/images/thumb/0/08/Spell_Breaker.jpg/25px-Spell_Breaker.jpg",
-    "map": "/images/thumb/b/b2/Untouched_Ancient_Ky_map.jpg/250px-Untouched_Ancient_Ky_map.jpg",
-    "key": "Spell Breaker-Untouched Ancient Ky"
   },
   {
     "name": "Spell Breaker",
@@ -7672,16 +7152,6 @@
   {
     "name": "Star Burst",
     "url": "/wiki/Star_Burst",
-    "from": "Star Ancient Koosun",
-    "from_url": "/wiki/Star_Ancient_Koosun",
-    "profession": "Elementalist",
-    "icon": "/images/thumb/5/5a/Star_Burst.jpg/25px-Star_Burst.jpg",
-    "map": "/images/thumb/f/f3/Star_Ancient_Koosun_map.jpg/250px-Star_Ancient_Koosun_map.jpg",
-    "key": "Star Burst-Star Ancient Koosun"
-  },
-  {
-    "name": "Star Burst",
-    "url": "/wiki/Star_Burst",
     "from": "Bound Teinei",
     "from_url": "/wiki/Bound_Teinei",
     "profession": "Elementalist",
@@ -7738,16 +7208,6 @@
     "icon": "/images/thumb/f/f0/Stolen_Speed.jpg/25px-Stolen_Speed.jpg",
     "map": "/images/thumb/6/64/The_Afflicted_Meeka_map.jpg/150px-The_Afflicted_Meeka_map.jpg",
     "key": "Stolen Speed-The Afflicted Meeka"
-  },
-  {
-    "name": "Stolen Speed",
-    "url": "/wiki/Stolen_Speed",
-    "from": "The Afflicted Li Yun",
-    "from_url": "/wiki/The_Afflicted_Li_Yun",
-    "profession": "Mesmer",
-    "icon": "/images/thumb/f/f0/Stolen_Speed.jpg/25px-Stolen_Speed.jpg",
-    "map": "/images/thumb/a/ab/The_Afflicted_Li_Yun_map.jpg/150px-The_Afflicted_Li_Yun_map.jpg",
-    "key": "Stolen Speed-The Afflicted Li Yun"
   },
   {
     "name": "Stolen Speed",
@@ -7962,16 +7422,6 @@
   {
     "name": "Temple Strike",
     "url": "/wiki/Temple_Strike",
-    "from": "Assassin's Construct",
-    "from_url": "/wiki/Assassin%27s_Construct",
-    "profession": "Assassin",
-    "icon": "/images/thumb/9/9b/Temple_Strike.jpg/25px-Temple_Strike.jpg",
-    "map": "/images/thumb/d/d4/Assassin%27s_Construct_map.jpg/150px-Assassin%27s_Construct_map.jpg",
-    "key": "Temple Strike-Assassin's Construct"
-  },
-  {
-    "name": "Temple Strike",
-    "url": "/wiki/Temple_Strike",
     "from": "Lai, Graceful Blade",
     "from_url": "/wiki/Lai,_Graceful_Blade",
     "profession": "Assassin",
@@ -8162,16 +7612,6 @@
   {
     "name": "Unyielding Aura",
     "url": "/wiki/Unyielding_Aura",
-    "from": "Kaia Wupwup",
-    "from_url": "/wiki/Kaia_Wupwup",
-    "profession": "Monk",
-    "icon": "/images/thumb/e/e6/Unyielding_Aura.jpg/25px-Unyielding_Aura.jpg",
-    "map": "/images/thumb/f/f7/Spearhead_Peak_Grawl_bosses_map.jpg/150px-Spearhead_Peak_Grawl_bosses_map.jpg",
-    "key": "Unyielding Aura-Kaia Wupwup"
-  },
-  {
-    "name": "Unyielding Aura",
-    "url": "/wiki/Unyielding_Aura",
     "from": "Ipillo Wupwup",
     "from_url": "/wiki/Ipillo_Wupwup",
     "profession": "Monk",
@@ -8328,16 +7768,6 @@
     "icon": "/images/thumb/b/b9/Vow_of_Strength.jpg/25px-Vow_of_Strength.jpg",
     "map": null,
     "key": "Vow of Strength-Corsair Commander (dervish)"
-  },
-  {
-    "name": "Wail of Doom",
-    "url": "/wiki/Wail_of_Doom",
-    "from": "Doomed Ancient Kkraz",
-    "from_url": "/wiki/Doomed_Ancient_Kkraz",
-    "profession": "Necromancer",
-    "icon": "/images/thumb/d/d8/Wail_of_Doom.jpg/25px-Wail_of_Doom.jpg",
-    "map": "/images/thumb/4/49/Doomed_Ancient_Kkraz_map.jpg/250px-Doomed_Ancient_Kkraz_map.jpg",
-    "key": "Wail of Doom-Doomed Ancient Kkraz"
   },
   {
     "name": "Wail of Doom",
@@ -8628,26 +8058,6 @@
     "icon": "/images/thumb/7/78/Weapon_of_Quickening.jpg/25px-Weapon_of_Quickening.jpg",
     "map": "/images/thumb/6/61/The_Afflicted_Hakaru_map.jpg/225px-The_Afflicted_Hakaru_map.jpg",
     "key": "Weapon of Quickening-The Afflicted Hakaru"
-  },
-  {
-    "name": "Weapon of Quickening",
-    "url": "/wiki/Weapon_of_Quickening",
-    "from": "The Afflicted Hakaru",
-    "from_url": "/wiki/The_Afflicted_Hakaru",
-    "profession": "Ritualist",
-    "icon": "/images/thumb/7/78/Weapon_of_Quickening.jpg/25px-Weapon_of_Quickening.jpg",
-    "map": "/images/thumb/6/61/The_Afflicted_Hakaru_map.jpg/225px-The_Afflicted_Hakaru_map.jpg",
-    "key": "Weapon of Quickening-The Afflicted Hakaru"
-  },
-  {
-    "name": "Weapon of Quickening",
-    "url": "/wiki/Weapon_of_Quickening",
-    "from": "The Afflicted Xenxo",
-    "from_url": "/wiki/The_Afflicted_Xenxo",
-    "profession": "Ritualist",
-    "icon": "/images/thumb/7/78/Weapon_of_Quickening.jpg/25px-Weapon_of_Quickening.jpg",
-    "map": null,
-    "key": "Weapon of Quickening-The Afflicted Xenxo"
   },
   {
     "name": "Weapon of Quickening",
