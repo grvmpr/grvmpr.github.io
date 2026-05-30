@@ -404,9 +404,9 @@
                             <i class="fa-solid fa-map text-zinc-950 text-lg"></i>
                         </div>
                         <div>
-                            <h3 id="modal-skill-name" class="font-display text-xl font-semibold tracking-tight">Map
+                            <h3 id="modal-from" class="font-display text-xl font-semibold tracking-tight">Map
                                 Location</h3>
-                            <p id="modal-from" class="text-xs text-zinc-500 mt-0.5">Elite Skill Source</p>
+                            <p id="modal-skill-name" class="text-xs text-zinc-500 mt-0.5">Elite Skill</p>
                         </div>
                     </div>
                     <div class="flex items-center gap-x-2">
@@ -808,7 +808,7 @@
 
             img.src = mapUrlLarge ? mapUrlLarge : mapUrl;
             skillEl.textContent = skillName;
-            fromEl.textContent = from ? `Source: ${from}` : 'Elite Skill Location';
+            fromEl.textContent = from ? `${from}` : 'Elite Skill Source';
 
             if (skillUrl && skillUrl !== '#') {
                 wikiLink.href = skillUrl;
