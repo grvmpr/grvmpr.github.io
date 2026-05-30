@@ -806,7 +806,7 @@
             const fromEl = document.getElementById('modal-from');
             const wikiLink = document.getElementById('modal-wiki-link');
 
-            img.src = mapUrl;
+            img.src = mapUrlLarge ? mapUrlLarge : mapUrl;
             skillEl.textContent = skillName;
             fromEl.textContent = from ? `Source: ${from}` : 'Elite Skill Location';
 
