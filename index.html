@@ -189,6 +189,10 @@
         .rounded-3xl {
             border-radius: 0.5rem !important;
         }
+
+        .cursor-pointer {
+            cursor: pointer;
+        }
     </style>
 </head>
 
@@ -404,7 +408,8 @@
                             <i class="fa-solid fa-map text-zinc-950 text-lg"></i>
                         </div>
                         <div>
-                            <h3 id="modal-from" class="font-display text-xl font-semibold tracking-tight">Map
+                            <h3 id="modal-from"
+                                class="font-display text-xl font-semibold tracking-tight cursor-pointer">Map
                                 Location</h3>
                             <p id="modal-skill-name" class="text-xs text-zinc-500 mt-0.5">Elite Skill</p>
                         </div>
@@ -805,6 +810,17 @@
             const skillEl = document.getElementById('modal-skill-name');
             const fromEl = document.getElementById('modal-from');
             const wikiLink = document.getElementById('modal-wiki-link');
+
+            fromEl.addEventListener('click', function (e) {
+                navigator.clipboard.writeText(`/target ${from}`).then(() => {
+                    fromEl.textContent = 'Copied to clipboard!';
+                    setTimeout(() => {
+                        fromEl.textContent = from ? `${from}` : 'Elite Skill Source';
+                    }, 2000);
+                }).catch(err => {
+                    console.error('Failed to copy text: ', err);
+                });
+            });
 
             img.src = mapUrlLarge ? mapUrlLarge : mapUrl;
             skillEl.textContent = skillName;
