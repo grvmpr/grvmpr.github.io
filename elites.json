@@ -286,7 +286,7 @@
     "from_url": "/wiki/Battlelord_Turgar",
     "profession": "Paragon",
     "icon": "/images/thumb/4/4e/Anthem_of_Guidance.jpg/25px-Anthem_of_Guidance.jpg",
-    "map": null,
+    "map": "/images/thumb/6/64/The_Cold_Touch_of_the_Past.jpg/200px-The_Cold_Touch_of_the_Past.jpg",
     "key": "Anthem of Guidance-Battlelord Turgar"
   },
   {
@@ -746,7 +746,7 @@
     "from_url": "/wiki/Smukk_Foombool",
     "profession": "Warrior",
     "icon": "/images/thumb/d/dd/Battle_Rage.jpg/25px-Battle_Rage.jpg",
-    "map": null,
+    "map": "/images/thumb/e/ec/Snake_Dance_troll_boss_spawn_locations.jpg/96px-Snake_Dance_troll_boss_spawn_locations.jpg",
     "key": "Battle Rage-Smukk Foombool"
   },
   {
@@ -756,7 +756,7 @@
     "from_url": "/wiki/Krogg_Shmush_(Shiverpeak_Mountains)",
     "profession": "Warrior",
     "icon": "/images/thumb/d/dd/Battle_Rage.jpg/25px-Battle_Rage.jpg",
-    "map": null,
+    "map": "/images/thumb/6/6f/Talus_Chute_troll_boss_spawn_locations.jpg/160px-Talus_Chute_troll_boss_spawn_locations.jpg",
     "key": "Battle Rage-Krogg Shmush (Shiverpeak Mountains)"
   },
   {
@@ -1136,7 +1136,7 @@
     "from_url": "/wiki/Marika_Granitehand",
     "profession": "Warrior",
     "icon": "/images/thumb/f/f9/Cleave.jpg/25px-Cleave.jpg",
-    "map": null,
+    "map": "/images/thumb/9/97/Iron_Mines_of_Moladune_warrior_boss_spawn_locations.jpg/160px-Iron_Mines_of_Moladune_warrior_boss_spawn_locations.jpg",
     "key": "Cleave-Marika Granitehand"
   },
   {
@@ -1716,7 +1716,7 @@
     "from_url": "/wiki/Obrhit_Barkwood",
     "profession": "Warrior",
     "icon": "/images/thumb/1/16/Defy_Pain.jpg/25px-Defy_Pain.jpg",
-    "map": null,
+    "map": "/images/thumb/c/c2/Frozen_Forest_Pinesoul_boss_locations.jpg/150px-Frozen_Forest_Pinesoul_boss_locations.jpg",
     "key": "Defy Pain-Obrhit Barkwood"
   },
   {
@@ -1726,7 +1726,7 @@
     "from_url": "/wiki/Clobberhusk",
     "profession": "Warrior",
     "icon": "/images/thumb/1/16/Defy_Pain.jpg/25px-Defy_Pain.jpg",
-    "map": null,
+    "map": "/images/thumb/6/66/Lornar%27s_Pass_Pinesoul_boss_locations.jpg/150px-Lornar%27s_Pass_Pinesoul_boss_locations.jpg",
     "key": "Defy Pain-Clobberhusk"
   },
   {
@@ -1776,7 +1776,7 @@
     "from_url": "/wiki/Martigris_the_Stalwart",
     "profession": "Warrior",
     "icon": "/images/thumb/3/3a/Devastating_Hammer.jpg/25px-Devastating_Hammer.jpg",
-    "map": null,
+    "map": "/images/thumb/2/2f/Iron_Mines_of_Moladune_boss_locations.jpg/150px-Iron_Mines_of_Moladune_boss_locations.jpg",
     "key": "Devastating Hammer-Martigris the Stalwart"
   },
   {
@@ -1976,7 +1976,7 @@
     "from_url": "/wiki/Slonak_Copperbark",
     "profession": "Warrior",
     "icon": "/images/thumb/b/b9/Dwarven_Battle_Stance.jpg/25px-Dwarven_Battle_Stance.jpg",
-    "map": null,
+    "map": "/images/thumb/9/97/Iron_Mines_of_Moladune_warrior_boss_spawn_locations.jpg/160px-Iron_Mines_of_Moladune_warrior_boss_spawn_locations.jpg",
     "key": "Dwarven Battle Stance-Slonak Copperbark"
   },
   {
@@ -2016,7 +2016,7 @@
     "from_url": "/wiki/Kor_Stonewrath",
     "profession": "Warrior",
     "icon": "/images/thumb/a/ac/Earth_Shaker.jpg/25px-Earth_Shaker.jpg",
-    "map": null,
+    "map": "/images/1/14/Snake_Dance_giant_boss_locations.jpg",
     "key": "Earth Shaker-Kor Stonewrath"
   },
   {
@@ -2296,7 +2296,7 @@
     "from_url": "/wiki/Balasi_the_Arcane",
     "profession": "Mesmer",
     "icon": "/images/thumb/f/f6/Energy_Surge.jpg/25px-Energy_Surge.jpg",
-    "map": null,
+    "map": "/images/thumb/2/2f/Iron_Mines_of_Moladune_boss_locations.jpg/150px-Iron_Mines_of_Moladune_boss_locations.jpg",
     "key": "Energy Surge-Balasi the Arcane"
   },
   {
@@ -2496,7 +2496,7 @@
     "from_url": "/wiki/Whuup_Buumbuul",
     "profession": "Ranger",
     "icon": "/images/thumb/a/a2/Escape.jpg/25px-Escape.jpg",
-    "map": null,
+    "map": "/images/thumb/6/6f/Talus_Chute_troll_boss_spawn_locations.jpg/160px-Talus_Chute_troll_boss_spawn_locations.jpg",
     "key": "Escape-Whuup Buumbuul"
   },
   {
@@ -2596,7 +2596,7 @@
     "from_url": "/wiki/Cyss_Gresshla",
     "profession": "Elementalist",
     "icon": "/images/thumb/9/97/Ether_Renewal.jpg/25px-Ether_Renewal.jpg",
-    "map": null,
+    "map": "/images/thumb/c/cb/Dunes_of_Despair_random_boss_spawn_locations.jpg/150px-Dunes_of_Despair_random_boss_spawn_locations.jpg",
     "key": "Ether Renewal-Cyss Gresshla"
   },
   {
@@ -2736,7 +2736,7 @@
     "from_url": "/wiki/Gorgaan_Hatemonger",
     "profession": "Warrior",
     "icon": "/images/thumb/3/30/Eviscerate.jpg/25px-Eviscerate.jpg",
-    "map": null,
+    "map": "/images/thumb/c/cd/The_Breach_Charr_boss_locations.jpg/150px-The_Breach_Charr_boss_locations.jpg",
     "key": "Eviscerate-Gorgaan Hatemonger"
   },
   {
@@ -3756,7 +3756,7 @@
     "from_url": "/wiki/Esnhal_Hardwood",
     "profession": "Monk",
     "icon": "/images/thumb/c/ca/Life_Barrier.jpg/25px-Life_Barrier.jpg",
-    "map": null,
+    "map": "/images/thumb/c/c2/Frozen_Forest_Pinesoul_boss_locations.jpg/150px-Frozen_Forest_Pinesoul_boss_locations.jpg",
     "key": "Life Barrier-Esnhal Hardwood"
   },
   {
@@ -3766,7 +3766,7 @@
     "from_url": "/wiki/Quickroot",
     "profession": "Monk",
     "icon": "/images/thumb/c/ca/Life_Barrier.jpg/25px-Life_Barrier.jpg",
-    "map": null,
+    "map": "/images/thumb/6/66/Lornar%27s_Pass_Pinesoul_boss_locations.jpg/150px-Lornar%27s_Pass_Pinesoul_boss_locations.jpg",
     "key": "Life Barrier-Quickroot"
   },
   {
@@ -3846,7 +3846,7 @@
     "from_url": "/wiki/Feodor_the_Baneful",
     "profession": "Necromancer",
     "icon": "/images/thumb/4/49/Life_Transfer.jpg/25px-Life_Transfer.jpg",
-    "map": null,
+    "map": "/images/thumb/2/2f/Iron_Mines_of_Moladune_boss_locations.jpg/150px-Iron_Mines_of_Moladune_boss_locations.jpg",
     "key": "Life Transfer-Feodor the Baneful"
   },
   {
@@ -4236,7 +4236,7 @@
     "from_url": "/wiki/Ayassah_Hess",
     "profession": "Mesmer",
     "icon": "/images/thumb/0/00/Mantra_of_Recovery.jpg/25px-Mantra_of_Recovery.jpg",
-    "map": null,
+    "map": "/images/thumb/c/cb/Dunes_of_Despair_random_boss_spawn_locations.jpg/150px-Dunes_of_Despair_random_boss_spawn_locations.jpg",
     "key": "Mantra of Recovery-Ayassah Hess"
   },
   {
@@ -4336,7 +4336,7 @@
     "from_url": "/wiki/Lokar_Icemender",
     "profession": "Monk",
     "icon": "/images/thumb/1/1b/Mark_of_Protection.jpg/25px-Mark_of_Protection.jpg",
-    "map": null,
+    "map": "/images/thumb/9/97/Iron_Mines_of_Moladune_warrior_boss_spawn_locations.jpg/160px-Iron_Mines_of_Moladune_warrior_boss_spawn_locations.jpg",
     "key": "Mark of Protection-Lokar Icemender"
   },
   {
@@ -4366,7 +4366,7 @@
     "from_url": "/wiki/Custodian_Kora",
     "profession": "Ranger",
     "icon": "/images/thumb/5/50/Marksman%27s_Wager.jpg/25px-Marksman%27s_Wager.jpg",
-    "map": null,
+    "map": "/images/thumb/c/cb/Dunes_of_Despair_random_boss_spawn_locations.jpg/150px-Dunes_of_Despair_random_boss_spawn_locations.jpg",
     "key": "Marksman's Wager-Custodian Kora"
   },
   {
@@ -4906,7 +4906,7 @@
     "from_url": "/wiki/Hilios_the_Dutiful",
     "profession": "Ranger",
     "icon": "/images/thumb/b/b6/Oath_Shot.jpg/25px-Oath_Shot.jpg",
-    "map": null,
+    "map": "/images/thumb/2/2f/Iron_Mines_of_Moladune_boss_locations.jpg/150px-Iron_Mines_of_Moladune_boss_locations.jpg",
     "key": "Oath Shot-Hilios the Dutiful"
   },
   {
@@ -5146,7 +5146,7 @@
     "from_url": "/wiki/Byssha_Hisst",
     "profession": "Necromancer",
     "icon": "/images/thumb/3/39/Order_of_the_Vampire.jpg/25px-Order_of_the_Vampire.jpg",
-    "map": null,
+    "map": "/images/thumb/c/cb/Dunes_of_Despair_random_boss_spawn_locations.jpg/150px-Dunes_of_Despair_random_boss_spawn_locations.jpg",
     "key": "Order of the Vampire-Byssha Hisst"
   },
   {
@@ -5546,7 +5546,7 @@
     "from_url": "/wiki/Thul_Boulderrain",
     "profession": "Ranger",
     "icon": "/images/thumb/9/96/Punishing_Shot.jpg/25px-Punishing_Shot.jpg",
-    "map": null,
+    "map": "/images/1/14/Snake_Dance_giant_boss_locations.jpg",
     "key": "Punishing Shot-Thul Boulderrain"
   },
   {
@@ -7446,7 +7446,7 @@
     "from_url": "/wiki/Kratos_the_Foul",
     "profession": "Elementalist",
     "icon": "/images/thumb/b/bc/Thunderclap.jpg/25px-Thunderclap.jpg",
-    "map": null,
+    "map": "/images/thumb/2/2f/Iron_Mines_of_Moladune_boss_locations.jpg/150px-Iron_Mines_of_Moladune_boss_locations.jpg",
     "key": "Thunderclap-Kratos the Foul"
   },
   {
@@ -7666,7 +7666,7 @@
     "from_url": "/wiki/Unthet_Rotwood",
     "profession": "Necromancer",
     "icon": "/images/thumb/4/4a/Virulence.jpg/25px-Virulence.jpg",
-    "map": null,
+    "map": "/images/thumb/c/c2/Frozen_Forest_Pinesoul_boss_locations.jpg/150px-Frozen_Forest_Pinesoul_boss_locations.jpg",
     "key": "Virulence-Unthet Rotwood"
   },
   {
@@ -7806,7 +7806,7 @@
     "from_url": "/wiki/Arkhel_Havenwood",
     "profession": "Elementalist",
     "icon": "/images/thumb/3/3f/Ward_Against_Harm.jpg/25px-Ward_Against_Harm.jpg",
-    "map": null,
+    "map": "/images/thumb/c/c2/Frozen_Forest_Pinesoul_boss_locations.jpg/150px-Frozen_Forest_Pinesoul_boss_locations.jpg",
     "key": "Ward Against Harm-Arkhel Havenwood"
   },
   {
@@ -7836,7 +7836,7 @@
     "from_url": "/wiki/Custodian_Fidius",
     "profession": "Warrior",
     "icon": "/images/thumb/c/c2/Warrior%27s_Endurance.jpg/25px-Warrior%27s_Endurance.jpg",
-    "map": null,
+    "map": "/images/thumb/c/cb/Dunes_of_Despair_random_boss_spawn_locations.jpg/150px-Dunes_of_Despair_random_boss_spawn_locations.jpg",
     "key": "Warrior's Endurance-Custodian Fidius"
   },
   {
@@ -8256,7 +8256,7 @@
     "from_url": "/wiki/Dassk_Arossyss",
     "profession": "Monk",
     "icon": "/images/thumb/1/17/Word_of_Healing.jpg/25px-Word_of_Healing.jpg",
-    "map": null,
+    "map": "/images/thumb/c/cb/Dunes_of_Despair_random_boss_spawn_locations.jpg/150px-Dunes_of_Despair_random_boss_spawn_locations.jpg",
     "key": "Word of Healing-Dassk Arossyss"
   },
   {
