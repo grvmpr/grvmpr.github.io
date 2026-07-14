@@ -1,0 +1,1081 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FARMERS ALMANAC • Tyrian Festivals</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Georgia:wght@400;700&display=swap');
+
+        :root {
+            --color-bg: #0B0E14;
+            --color-surface: #141821;
+            --color-surface-2: #1C2230;
+            --color-text: #E8DFC9;
+            --color-muted: #8A8578;
+            --color-accent: #C9A962;
+            --color-success: #4ADE80;
+            --color-upcoming: #60A5FA;
+            --color-past: #4B5563;
+            --font-display: "Playfair Display", Georgia, "Times New Roman", serif;
+            --font-body: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+            --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+            --radius: 10px;
+            --radius-lg: 16px;
+            --shadow: 0 10px 30px -15px rgba(0, 0, 0, 0.5);
+            --shadow-gold: 0 0 0 1px rgba(201, 169, 98, 0.15);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: var(--color-bg);
+            color: var(--color-text);
+            font-family: var(--font-body);
+            line-height: 1.6;
+            min-height: 100vh;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .container {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 0 24px;
+        }
+
+        /* Header */
+        header {
+            border-bottom: 1px solid rgba(201, 169, 98, 0.1);
+            background: rgba(11, 14, 20, 0.95);
+            backdrop-filter: blur(12px);
+            position: sticky;
+            top: 0;
+            z-index: 50;
+        }
+
+        .header-content {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 20px 0;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .logo-mark {
+            width: 42px;
+            height: 42px;
+            border: 2px solid var(--color-accent);
+            border-radius: 9999px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .logo-mark::before {
+            content: '';
+            width: 18px;
+            height: 18px;
+            background: var(--color-accent);
+            border-radius: 9999px;
+            opacity: 0.9;
+        }
+
+        .logo-text {
+            font-family: var(--font-display);
+            font-size: 28px;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            color: var(--color-text);
+        }
+
+        .logo-sub {
+            font-size: 10px;
+            letter-spacing: 0.2em;
+            color: var(--color-muted);
+            margin-top: -4px;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .live-clock {
+            font-family: var(--font-mono);
+            font-size: 13px;
+            color: var(--color-muted);
+            background: var(--color-surface);
+            padding: 6px 14px;
+            border-radius: 9999px;
+            border: 1px solid rgba(201, 169, 98, 0.1);
+        }
+
+        /* Hero / Tracker */
+        #tracker-hero {
+            margin-top: 40px;
+            margin-bottom: 60px;
+            background: linear-gradient(145deg, var(--color-surface) 0%, #0F131B 100%);
+            border: 1px solid rgba(201, 169, 98, 0.15);
+            border-radius: var(--radius-lg);
+            padding: 48px 52px;
+            box-shadow: var(--shadow);
+            position: relative;
+            overflow: hidden;
+        }
+
+        #tracker-hero::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -20%;
+            width: 420px;
+            height: 420px;
+            background: radial-gradient(circle, rgba(201, 169, 98, 0.06) 0%, transparent 70%);
+            pointer-events: none;
+        }
+
+        .tracker-grid {
+            display: grid;
+            grid-template-columns: 1fr 1.1fr;
+            gap: 48px;
+            align-items: center;
+        }
+
+        @media (max-width: 900px) {
+            .tracker-grid {
+                grid-template-columns: 1fr;
+                gap: 36px;
+            }
+        }
+
+        .tracker-info h2 {
+            font-family: var(--font-display);
+            font-size: 42px;
+            line-height: 1.05;
+            letter-spacing: -0.02em;
+            margin-bottom: 12px;
+        }
+
+        .tracker-dates {
+            font-size: 15px;
+            color: var(--color-muted);
+            margin-bottom: 24px;
+            letter-spacing: 0.5px;
+        }
+
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 4px 14px 4px 10px;
+            border-radius: 9999px;
+            font-size: 12px;
+            font-weight: 600;
+            letter-spacing: 0.08em;
+            margin-bottom: 16px;
+            border: 1px solid currentColor;
+        }
+
+        .status-badge.ongoing {
+            color: var(--color-success);
+            background: rgba(74, 222, 128, 0.08);
+        }
+
+        .status-badge.upcoming {
+            color: var(--color-upcoming);
+            background: rgba(96, 165, 250, 0.08);
+        }
+
+        .countdown-label {
+            font-size: 11px;
+            letter-spacing: 0.15em;
+            color: var(--color-muted);
+            margin-bottom: 16px;
+            text-transform: uppercase;
+        }
+
+        .dials-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+        }
+
+        .dial {
+            background: var(--color-surface-2);
+            border-radius: var(--radius);
+            padding: 16px 12px 20px;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .dial:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px -10px rgba(0, 0, 0, 0.4);
+        }
+
+        .dial svg {
+            width: 100%;
+            max-width: 108px;
+            height: auto;
+            margin: 0 auto 8px;
+            display: block;
+        }
+
+        .dial-value {
+            font-family: var(--font-mono);
+            font-size: 28px;
+            font-weight: 700;
+            line-height: 1;
+            color: var(--color-text);
+            margin-bottom: 2px;
+        }
+
+        .dial-label {
+            font-size: 10px;
+            letter-spacing: 0.12em;
+            color: var(--color-muted);
+            text-transform: uppercase;
+        }
+
+        /* Event Ledger */
+        .section-header {
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-between;
+            margin-bottom: 24px;
+        }
+
+        .section-header h3 {
+            font-family: var(--font-display);
+            font-size: 28px;
+            letter-spacing: -0.01em;
+        }
+
+        .section-header p {
+            color: var(--color-muted);
+            font-size: 14px;
+        }
+
+        .events-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 18px;
+        }
+
+        .event-card {
+            background: var(--color-surface);
+            border: 1px solid rgba(201, 169, 98, 0.1);
+            border-radius: var(--radius);
+            padding: 22px 24px;
+            transition: all 0.2s cubic-bezier(0.23, 1, 0.32, 1);
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .event-card:hover {
+            border-color: rgba(201, 169, 98, 0.35);
+            transform: translateY(-3px);
+            box-shadow: 0 15px 25px -12px rgba(0, 0, 0, 0.35);
+        }
+
+        .event-card.tracked {
+            border-color: var(--color-accent);
+            box-shadow: 0 0 0 1px rgba(201, 169, 98, 0.2);
+        }
+
+        .event-card.tracked::after {
+            content: 'TRACKING';
+            position: absolute;
+            top: 14px;
+            right: 14px;
+            background: var(--color-accent);
+            color: #0B0E14;
+            font-size: 9px;
+            font-weight: 700;
+            letter-spacing: 0.1em;
+            padding: 1px 8px;
+            border-radius: 3px;
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 14px;
+        }
+
+        .date-range {
+            font-family: var(--font-mono);
+            font-size: 12px;
+            color: var(--color-muted);
+            letter-spacing: 0.5px;
+        }
+
+        .status-pill {
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            padding: 3px 10px;
+            border-radius: 9999px;
+            white-space: nowrap;
+        }
+
+        .status-pill.ongoing {
+            background: rgba(74, 222, 128, 0.15);
+            color: var(--color-success);
+        }
+
+        .status-pill.upcoming {
+            background: rgba(96, 165, 250, 0.12);
+            color: var(--color-upcoming);
+        }
+
+        .status-pill.past {
+            background: rgba(75, 85, 99, 0.2);
+            color: var(--color-past);
+        }
+
+        .event-name {
+            font-size: 19px;
+            font-weight: 600;
+            line-height: 1.3;
+            margin-bottom: 14px;
+            color: var(--color-text);
+        }
+
+        .card-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 12px;
+            color: var(--color-muted);
+        }
+
+        .duration {
+            font-family: var(--font-mono);
+        }
+
+        /* Footer */
+        footer {
+            margin-top: 80px;
+            padding: 32px 0 48px;
+            border-top: 1px solid rgba(201, 169, 98, 0.08);
+            text-align: center;
+        }
+
+        .footer-text {
+            font-size: 12px;
+            color: var(--color-muted);
+            letter-spacing: 0.3px;
+        }
+
+        /* Utility */
+        .muted {
+            color: var(--color-muted);
+        }
+
+        .gold {
+            color: var(--color-accent);
+        }
+
+        .section {
+            margin-bottom: 32px;
+        }
+
+        .manual-banner {
+            background: rgba(201, 169, 98, 0.1);
+            border: 1px solid rgba(201, 169, 98, 0.3);
+            color: var(--color-accent);
+            padding: 10px 18px;
+            border-radius: var(--radius);
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 13px;
+        }
+
+        .btn-reset {
+            background: transparent;
+            border: 1px solid currentColor;
+            color: inherit;
+            padding: 4px 14px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 0.05em;
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+
+        .btn-reset:hover {
+            background: var(--color-accent);
+            color: #0B0E14;
+            border-color: var(--color-accent);
+        }
+
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border-width: 0;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header>
+            <div class="container">
+                <div class="header-content">
+                    <div class="logo">
+                        <div class="logo-mark"></div>
+                        <div>
+                            <div class="logo-text">FARMERS ALMANAC</div>
+                            <div class="logo-sub">TYRIAN FESTIVALS • 2026</div>
+                        </div>
+                    </div>
+
+                    <div class="header-right">
+                        <div class="live-clock" id="live-clock">— : — : —</div>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <div class="container">
+            <!-- Live Tracker Hero -->
+            <section id="tracker-hero">
+                <div id="manual-banner" class="manual-banner" style="display: none;">
+                    <span>Viewing custom selection. Countdown is paused from auto mode.</span>
+                    <button onclick="resetToAutoTrack()" class="btn-reset">RESUME AUTO</button>
+                </div>
+
+                <div class="tracker-grid">
+                    <!-- Info -->
+                    <div class="tracker-info">
+                        <div id="status-badge" class="status-badge">
+                            <span id="status-dot">●</span>
+                            <span id="status-text">AWAITING</span>
+                        </div>
+
+                        <h2 id="event-name">Wintersday in July</h2>
+                        <p id="event-dates" class="tracker-dates">25 JUL — 01 AUG 2026</p>
+
+                        <div style="margin-top: 8px;">
+                            <span id="event-duration" style="font-size: 13px; color: var(--color-muted);"></span>
+                        </div>
+                    </div>
+
+                    <!-- Countdown -->
+                    <div>
+                        <div class="countdown-label" id="countdown-label">TIME UNTIL THE FESTIVAL BEGINS</div>
+
+                        <div class="dials-grid" id="dials-grid">
+                            <!-- Populated by JS -->
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Event Ledger -->
+            <section class="section">
+                <div class="section-header">
+                    <div>
+                        <h3>All Annual Events</h3>
+                        <p class="muted">All recorded festivals across the annual cycle</p>
+                    </div>
+                </div>
+
+                <div id="events-grid" class="events-grid">
+                    <!-- Populated dynamically by JavaScript -->
+                </div>
+            </section>
+        </div>
+
+        <footer>
+            <div class="container">
+                <p class="footer-text">
+                    Live client-side tracker • Data from official Guild Wars festival schedule<br>
+                    All times calculated against your local clock • Inspired by the world of Tyria
+                </p>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        // ==================== DATA ====================
+        const rawEvents = [
+            { name: "Canthan New Year", start: "2026-02-01T05:00:00+10:00", end: "2026-02-08T05:00:00+10:00" },
+            { name: "Lucky Treats Week", start: "2026-03-15T05:00:00+10:00", end: "2026-03-22T05:00:00+10:00" },
+            { name: "Sweet Treats Week", start: "2026-04-11T05:00:00+10:00", end: "2026-04-18T05:00:00+10:00" },
+            { name: "Guild Wars Anniversary Celebration", start: "2026-04-23T05:00:00+10:00", end: "2026-05-07T05:00:00+10:00" },
+            { name: "Dragon Festival", start: "2026-06-28T05:00:00+10:00", end: "2026-07-05T05:00:00+10:00" },
+            { name: "Wintersday in July", start: "2026-07-25T05:00:00+10:00", end: "2026-08-01T05:00:00+10:00" },
+            { name: "Wayfarer's Reverie", start: "2026-08-26T05:00:00+10:00", end: "2026-09-02T05:00:00+10:00" },
+            { name: "Pirate Week", start: "2026-09-14T05:00:00+10:00", end: "2026-09-21T05:00:00+10:00" },
+            { name: "Breast Cancer Awareness Month", start: "2026-10-02T05:00:00+10:00", end: "2026-11-03T05:00:00+10:00" },
+            { name: "Halloween", start: "2026-10-19T05:00:00+10:00", end: "2026-11-03T05:00:00+10:00" },
+            { name: "Special Treats Week", start: "2026-11-22T05:00:00+10:00", end: "2026-11-29T05:00:00+10:00" },
+            { name: "Wintersday", start: "2026-12-20T05:00:00+10:00", end: "2027-01-03T05:00:00+10:00" }
+        ];
+
+        // Parse into Date objects
+        let events = rawEvents.map(ev => ({
+            name: ev.name,
+            start: new Date(ev.start),
+            end: new Date(ev.end)
+        }));
+
+        // ==================== STATE ====================
+        let trackedEvent = null;
+        let isManualTrack = false;
+        let manualTrackedEvent = null;
+        let countdownInterval = null;
+        let clockInterval = null;
+
+        // ==================== HELPERS ====================
+        function formatDateRange(start, end) {
+            const optsShort = { month: 'short', day: 'numeric' };
+            const startStr = start.toLocaleDateString('en-US', optsShort);
+            const endStr = end.toLocaleDateString('en-US', optsShort);
+
+            const yearStart = start.getFullYear();
+            const yearEnd = end.getFullYear();
+
+            if (yearStart === yearEnd) {
+                return `${startStr} — ${endStr} ${yearStart}`;
+            } else {
+                return `${startStr} ${yearStart} — ${endStr} ${yearEnd}`;
+            }
+        }
+
+        function getDurationDays(start, end) {
+            const diff = end.getTime() - start.getTime();
+            return Math.round(diff / (1000 * 60 * 60 * 24));
+        }
+
+        function computeStatus(event, now = new Date()) {
+            if (now >= event.end) return 'past';
+            if (now >= event.start && now < event.end) return 'ongoing';
+            return 'upcoming';
+        }
+
+        function getTimeParts(targetDate) {
+            const now = new Date();
+            let diff = targetDate.getTime() - now.getTime();
+            const isNegative = diff < 0;
+
+            if (isNegative) diff = 0;
+
+            const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+
+            return { days, hours, minutes, seconds, isNegative };
+        }
+
+        function getEventDurationLabel(event) {
+            const days = getDurationDays(event.start, event.end);
+            return `${days} day${days !== 1 ? 's' : ''}`;
+        }
+
+        // ==================== DIAL RENDERING ====================
+        function createDialHTML(id, label) {
+            const isDays = id === 'days';
+            return `
+                <div class="dial" id="dial-${id}">
+                    <svg width="108" height="108" viewBox="0 0 110 110" style="margin-bottom: 6px;">
+                        <!-- Background track -->
+                        <circle 
+                            cx="55" cy="55" r="46" 
+                            fill="none" 
+                            stroke="#2A3140" 
+                            stroke-width="7"
+                        />
+                        <!-- Progress arc -->
+                        <circle 
+                            id="progress-${id}"
+                            cx="55" cy="55" r="46" 
+                            fill="none" 
+                            stroke="${isDays ? '#C9A962' : '#C9A962'}" 
+                            stroke-width="7"
+                            stroke-linecap="round"
+                            stroke-dasharray="289.03"
+                            stroke-dashoffset="0"
+                            style="transition: stroke-dashoffset 0.4s cubic-bezier(0.23, 1, 0.32, 1);"
+                        />
+                        <!-- Center circle for depth -->
+                        <circle cx="55" cy="55" r="32" fill="#1C2230"/>
+                        
+                        <!-- Value text -->
+                        <text 
+                            id="value-${id}" 
+                            x="55" y="58" 
+                            text-anchor="middle" 
+                            dominant-baseline="middle"
+                            fill="#E8DFC9"
+                            font-family="ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace"
+                            font-size="26"
+                            font-weight="700"
+                        >00</text>
+                        
+                        <!-- Small label inside -->
+                        <text 
+                            x="55" y="76" 
+                            text-anchor="middle" 
+                            fill="#8A8578"
+                            font-family="system-ui, -apple-system, sans-serif"
+                            font-size="8.5"
+                            letter-spacing="1px"
+                        >${label}</text>
+                    </svg>
+                </div>
+            `;
+        }
+
+        function updateDial(id, value, maxForFraction, modeColor) {
+            const valueEl = document.getElementById(`value-${id}`);
+            const progressEl = document.getElementById(`progress-${id}`);
+
+            if (!valueEl || !progressEl) return;
+
+            // Update displayed number with leading zero
+            const displayVal = String(value).padStart(2, '0');
+            if (valueEl.textContent !== displayVal) {
+                valueEl.style.transition = 'none';
+                valueEl.textContent = displayVal;
+
+                // Subtle pop animation on change
+                requestAnimationFrame(() => {
+                    valueEl.style.transition = 'transform 0.2s cubic-bezier(0.23,1,0.32,1), opacity 0.2s ease';
+                    valueEl.style.transform = 'scale(1.08)';
+                    setTimeout(() => {
+                        if (valueEl) valueEl.style.transform = 'scale(1)';
+                    }, 180);
+                });
+            }
+
+            // Update progress arc
+            const circumference = 289.03;
+            let fraction;
+
+            if (id === 'days') {
+                fraction = 1; // Always full ring for days
+            } else {
+                fraction = maxForFraction > 0 ? (value / maxForFraction) : 0;
+            }
+
+            const offset = circumference * (1 - fraction);
+            progressEl.setAttribute('stroke-dashoffset', offset);
+
+            // Dynamic stroke color based on mode
+            if (modeColor) {
+                progressEl.setAttribute('stroke', modeColor);
+            }
+        }
+
+        // ==================== TRACKER LOGIC ====================
+        function findBestTrackedEvent(now = new Date()) {
+            // 1. Check for ongoing events (pick soonest ending)
+            const ongoing = events
+                .filter(e => now >= e.start && now < e.end)
+                .sort((a, b) => a.end.getTime() - b.end.getTime());
+
+            if (ongoing.length > 0) {
+                return { event: ongoing[0], mode: 'ending' };
+            }
+
+            // 2. Find next upcoming
+            const upcoming = events
+                .filter(e => e.start > now)
+                .sort((a, b) => a.start.getTime() - b.start.getTime());
+
+            if (upcoming.length > 0) {
+                return { event: upcoming[0], mode: 'starting' };
+            }
+
+            // 3. Fallback: most recent past event
+            const past = [...events].sort((a, b) => b.end.getTime() - a.end.getTime());
+            if (past.length > 0) {
+                return { event: past[0], mode: 'ended' };
+            }
+
+            return null;
+        }
+
+        function updateTrackedEvent() {
+            const now = new Date();
+
+            if (isManualTrack && manualTrackedEvent) {
+                // Keep manual selection unless it no longer makes sense
+                const status = computeStatus(manualTrackedEvent, now);
+                if (status === 'past' && trackedEvent && trackedEvent.mode !== 'ended') {
+                    // Auto revert if event fully concluded
+                    resetToAutoTrack();
+                    return;
+                }
+                trackedEvent = { event: manualTrackedEvent, mode: status === 'ongoing' ? 'ending' : (status === 'upcoming' ? 'starting' : 'ended') };
+            } else {
+                trackedEvent = findBestTrackedEvent(now);
+                isManualTrack = false;
+            }
+        }
+
+        function setManualTrack(eventObj) {
+            manualTrackedEvent = eventObj;
+            isManualTrack = true;
+            updateTrackedEvent();
+            renderHero();
+            updateCountdown();
+            highlightTrackedCard();
+
+            // Show manual banner
+            document.getElementById('manual-banner').style.display = 'flex';
+        }
+
+        function resetToAutoTrack() {
+            isManualTrack = false;
+            manualTrackedEvent = null;
+            document.getElementById('manual-banner').style.display = 'none';
+            updateTrackedEvent();
+            renderHero();
+            updateCountdown();
+            highlightTrackedCard();
+        }
+
+        function renderHero() {
+            if (!trackedEvent || !trackedEvent.event) return;
+
+            const { event, mode } = trackedEvent;
+            const now = new Date();
+            const status = computeStatus(event, now);
+
+            // Status badge
+            const badge = document.getElementById('status-badge');
+            const statusText = document.getElementById('status-text');
+
+            badge.className = `status-badge ${status}`;
+
+            if (status === 'ongoing') {
+                statusText.textContent = 'UNFOLDING NOW';
+                badge.style.borderColor = 'var(--color-success)';
+            } else if (status === 'upcoming') {
+                statusText.textContent = 'AWAITING';
+                badge.style.borderColor = 'var(--color-upcoming)';
+            } else {
+                statusText.textContent = 'CONCLUDED';
+                badge.style.borderColor = 'var(--color-past)';
+            }
+
+            // Event name & dates
+            document.getElementById('event-name').textContent = event.name;
+            document.getElementById('event-dates').textContent = formatDateRange(event.start, event.end);
+            document.getElementById('event-duration').innerHTML =
+                `<span class="gold">•</span> ${getEventDurationLabel(event)}`;
+
+            // Countdown label
+            const labelEl = document.getElementById('countdown-label');
+            if (status === 'ongoing') {
+                labelEl.textContent = 'THIS FESTIVAL CONCLUDES IN';
+                labelEl.style.color = 'var(--color-success)';
+            } else if (status === 'upcoming') {
+                labelEl.textContent = 'TIME UNTIL THE FESTIVAL BEGINS';
+                labelEl.style.color = 'var(--color-muted)';
+            } else {
+                labelEl.textContent = 'THIS FESTIVAL HAS CONCLUDED';
+                labelEl.style.color = 'var(--color-past)';
+            }
+
+            // Initial dial render if not present
+            const dialsContainer = document.getElementById('dials-grid');
+            if (dialsContainer.children.length === 0) {
+                dialsContainer.innerHTML =
+                    createDialHTML('days', 'DAYS') +
+                    createDialHTML('hours', 'HOURS') +
+                    createDialHTML('minutes', 'MINUTES') +
+                    createDialHTML('seconds', 'SECONDS');
+            }
+        }
+
+        function updateCountdown() {
+            if (!trackedEvent || !trackedEvent.event) return;
+
+            const { event, mode } = trackedEvent;
+            const now = new Date();
+            const status = computeStatus(event, now);
+
+            let targetDate;
+            if (status === 'ongoing') {
+                targetDate = event.end;
+            } else if (status === 'upcoming') {
+                targetDate = event.start;
+            } else {
+                // Show zeros for concluded
+                updateDial('days', 0, 1, '#4B5563');
+                updateDial('hours', 0, 24, '#4B5563');
+                updateDial('minutes', 0, 60, '#4B5563');
+                updateDial('seconds', 0, 60, '#4B5563');
+                return;
+            }
+
+            const parts = getTimeParts(targetDate);
+            const modeColor = status === 'ongoing' ? '#4ADE80' : '#C9A962';
+
+            // Update each dial
+            updateDial('days', parts.days, 1, modeColor);           // days always full ring
+            updateDial('hours', parts.hours, 24, modeColor);
+            updateDial('minutes', parts.minutes, 60, modeColor);
+            updateDial('seconds', parts.seconds, 60, modeColor);
+        }
+
+        // ==================== EVENT CARDS ====================
+        function createEventCard(event) {
+            const now = new Date();
+            const status = computeStatus(event, now);
+            const isTracked = trackedEvent && trackedEvent.event.name === event.name;
+
+            const card = document.createElement('div');
+            card.className = `event-card ${isTracked ? 'tracked' : ''}`;
+            card.dataset.eventName = event.name;
+
+            const dateRange = formatDateRange(event.start, event.end);
+            const duration = getEventDurationLabel(event);
+
+            let statusHTML = '';
+            if (status === 'ongoing') {
+                statusHTML = `<span class="status-pill ongoing">UNFOLDING</span>`;
+            } else if (status === 'upcoming') {
+                statusHTML = `<span class="status-pill upcoming">UPCOMING</span>`;
+            } else {
+                statusHTML = `<span class="status-pill past">CONCLUDED</span>`;
+            }
+
+            card.innerHTML = `
+                <div class="card-header">
+                    <span class="date-range">${dateRange}</span>
+                    ${statusHTML}
+                </div>
+                <h4 class="event-name">${event.name}</h4>
+                <div class="card-meta">
+                    <span class="duration">${duration}</span>
+                    <span style="font-size:10px; opacity:0.6;">${status === 'past' ? 'PAST' : (status === 'ongoing' ? 'LIVE' : 'NEXT')}</span>
+                </div>
+            `;
+
+            // Click handler - track this event if not past
+            card.addEventListener('click', () => {
+                if (status !== 'past') {
+                    setManualTrack(event);
+                    // Scroll to hero smoothly
+                    document.getElementById('tracker-hero').scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'center'
+                    });
+                } else {
+                    // Briefly highlight that it's concluded
+                    card.style.transition = 'all 0.1s ease';
+                    card.style.borderColor = 'var(--color-past)';
+                    setTimeout(() => {
+                        if (card) card.style.borderColor = 'rgba(201, 169, 98, 0.1)';
+                    }, 600);
+                }
+            });
+
+            return card;
+        }
+
+        function renderEventCards() {
+            const grid = document.getElementById('events-grid');
+            grid.innerHTML = '';
+
+            // Sort by start date
+            const sortedEvents = [...events].sort((a, b) => a.start.getTime() - b.start.getTime());
+
+            sortedEvents.forEach(event => {
+                const card = createEventCard(event);
+                grid.appendChild(card);
+            });
+        }
+
+        function highlightTrackedCard() {
+            const cards = document.querySelectorAll('.event-card');
+            cards.forEach(card => {
+                const name = card.dataset.eventName;
+                const isTracked = trackedEvent && trackedEvent.event.name === name;
+
+                if (isTracked) {
+                    card.classList.add('tracked');
+                } else {
+                    card.classList.remove('tracked');
+                }
+            });
+        }
+
+        function refreshCardStatuses() {
+            const cards = document.querySelectorAll('.event-card');
+            const now = new Date();
+
+            cards.forEach(card => {
+                const name = card.dataset.eventName;
+                const event = events.find(e => e.name === name);
+                if (!event) return;
+
+                const status = computeStatus(event, now);
+                const statusContainer = card.querySelector('.card-header');
+
+                // Remove old pill
+                const oldPill = statusContainer.querySelector('.status-pill');
+                if (oldPill) oldPill.remove();
+
+                let newPillHTML = '';
+                if (status === 'ongoing') {
+                    newPillHTML = `<span class="status-pill ongoing">UNFOLDING</span>`;
+                } else if (status === 'upcoming') {
+                    newPillHTML = `<span class="status-pill upcoming">UPCOMING</span>`;
+                } else {
+                    newPillHTML = `<span class="status-pill past">CONCLUDED</span>`;
+                }
+
+                statusContainer.insertAdjacentHTML('beforeend', newPillHTML);
+
+                // Update meta text
+                const meta = card.querySelector('.card-meta span:last-child');
+                if (meta) {
+                    meta.textContent = status === 'past' ? 'PAST' : (status === 'ongoing' ? 'LIVE' : 'NEXT');
+                }
+            });
+        }
+
+        // ==================== LIVE UPDATES ====================
+        function updateLiveClock() {
+            const clockEl = document.getElementById('live-clock');
+            const now = new Date();
+
+            const timeStr = now.toLocaleTimeString('en-US', {
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit',
+                hour12: false
+            });
+
+            clockEl.textContent = timeStr;
+        }
+
+        function startLiveUpdates() {
+            // Clear any existing
+            if (countdownInterval) clearInterval(countdownInterval);
+            if (clockInterval) clearInterval(clockInterval);
+
+            // Main update loop - every second
+            countdownInterval = setInterval(() => {
+                const previousTrackedName = trackedEvent ? trackedEvent.event.name : null;
+                const previousMode = trackedEvent ? trackedEvent.mode : null;
+
+                updateTrackedEvent();
+
+                // Re-render hero only if tracked event or mode changed
+                const currentName = trackedEvent ? trackedEvent.event.name : null;
+                const currentMode = trackedEvent ? trackedEvent.mode : null;
+
+                if (currentName !== previousTrackedName || currentMode !== previousMode) {
+                    renderHero();
+                    highlightTrackedCard();
+                }
+
+                updateCountdown();
+            }, 1000);
+
+            // Slower updates for list statuses (every 45 seconds)
+            setInterval(() => {
+                refreshCardStatuses();
+                highlightTrackedCard();
+            }, 45000);
+
+            // Live clock every second
+            clockInterval = setInterval(updateLiveClock, 1000);
+            updateLiveClock(); // initial
+        }
+
+        // ==================== INITIALIZATION ====================
+        function initializeDials() {
+            const container = document.getElementById('dials-grid');
+            if (container.children.length === 0) {
+                container.innerHTML =
+                    createDialHTML('days', 'DAYS') +
+                    createDialHTML('hours', 'HOURS') +
+                    createDialHTML('minutes', 'MINUTES') +
+                    createDialHTML('seconds', 'SECONDS');
+            }
+        }
+
+        function initialize() {
+            // Initial computation
+            updateTrackedEvent();
+
+            // Render hero
+            initializeDials();
+            renderHero();
+            updateCountdown();
+
+            // Render all event cards
+            renderEventCards();
+            highlightTrackedCard();
+
+            // Start live intervals
+            startLiveUpdates();
+
+            // Keyboard accessibility hint (Escape resets manual)
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' && isManualTrack) {
+                    resetToAutoTrack();
+                }
+            });
+
+            // Easter egg: clicking logo resets everything
+            const logo = document.querySelector('.logo');
+            if (logo) {
+                logo.style.cursor = 'pointer';
+                logo.addEventListener('click', () => {
+                    if (isManualTrack) {
+                        resetToAutoTrack();
+                    } else {
+                        // Force refresh tracked
+                        updateTrackedEvent();
+                        renderHero();
+                        updateCountdown();
+                    }
+                });
+            }
+
+            // Final accessibility: announce that it's a live tracker
+            console.log('%c[Aetheric Almanac] Live Tyrian event tracker initialized. Dark mode enabled by default.', 'color:#8A8578');
+        }
+
+        // Boot the application
+        window.onload = initialize;
+    </script>
+</body>
+
+</html>
