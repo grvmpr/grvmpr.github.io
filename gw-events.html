@@ -452,7 +452,7 @@
                         <div class="logo-mark"></div>
                         <div>
                             <div class="logo-text">FARMERS ALMANAC</div>
-                            <div class="logo-sub">TYRIAN FESTIVALS • 2026</div>
+                            <div class="logo-sub" id="logo-year">TYRIAN FESTIVALS • 202x</div>
                         </div>
                     </div>
 
@@ -480,7 +480,7 @@
                         </div>
 
                         <h2 id="event-name">Wintersday in July</h2>
-                        <p id="event-dates" class="tracker-dates">25 JUL — 01 AUG 2026</p>
+                        <p id="event-dates" class="tracker-dates">25 JUL — 01 AUG 202x</p>
 
                         <div style="margin-top: 8px;">
                             <span id="event-duration" style="font-size: 13px; color: var(--color-muted);"></span>
@@ -502,7 +502,7 @@
             <section class="section">
                 <div class="section-header">
                     <div>
-                        <h3>All Annual Events</h3>
+                        <h3>All Annual Special Events</h3>
                         <p class="muted">All recorded festivals across the annual cycle</p>
                     </div>
                 </div>
@@ -540,12 +540,46 @@
             { name: "Wintersday", start: "2026-12-20T05:00:00+10:00", end: "2027-01-03T05:00:00+10:00" }
         ];
 
-        // Parse into Date objects
-        let events = rawEvents.map(ev => ({
-            name: ev.name,
-            start: new Date(ev.start),
-            end: new Date(ev.end)
-        }));
+        // ==================== YEAR-AGNOSTIC EVENT DATES ====================
+        function getYearAgnosticEvents() {
+            const now = new Date();
+            const currentYear = now.getFullYear();
+
+            return rawEvents.map(raw => {
+                // Parse original dates to extract month/day/time (preserving +10:00 logic)
+                const origStart = new Date(raw.start);
+                const origEnd = new Date(raw.end);
+
+                const startMonth = String(origStart.getUTCMonth() + 1).padStart(2, '0');
+                const startDay = String(origStart.getUTCDate()).padStart(2, '0');
+                const startTime = raw.start.split('T')[1].split('+')[0];
+
+                const endMonth = String(origEnd.getUTCMonth() + 1).padStart(2, '0');
+                const endDay = String(origEnd.getUTCDate()).padStart(2, '0');
+                const endTime = raw.end.split('T')[1].split('+')[0];
+
+                // Build dates for the current calendar year
+                let start = new Date(`${currentYear}-${startMonth}-${startDay}T${startTime}+10:00`);
+                let endYear = currentYear;
+
+                // Handle events that cross into the next year (e.g. Wintersday Dec 20 → Jan 3)
+                if (parseInt(endMonth) < parseInt(startMonth) ||
+                    (parseInt(endMonth) === parseInt(startMonth) && parseInt(endDay) < parseInt(startDay))) {
+                    endYear = currentYear + 1;
+                }
+
+                let end = new Date(`${endYear}-${endMonth}-${endDay}T${endTime}+10:00`);
+
+                return {
+                    name: raw.name,
+                    start: start,
+                    end: end
+                };
+            });
+        }
+
+        // Initialize events using current year (recurring annually)
+        let events = getYearAgnosticEvents();
 
         // ==================== STATE ====================
         let trackedEvent = null;
@@ -1031,6 +1065,12 @@
         }
 
         function initialize() {
+            // Set dynamic year in header (year-agnostic)
+            const yearEl = document.getElementById('logo-year');
+            if (yearEl) {
+                yearEl.textContent = `TYRIAN FESTIVALS • ${new Date().getFullYear()}`;
+            }
+
             // Initial computation
             updateTrackedEvent();
 
