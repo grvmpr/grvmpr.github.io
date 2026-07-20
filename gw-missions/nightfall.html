@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Nightfall Missions — Guide Index</title>
+  <style>
+:root {
+  --bg: #070a0f; --panel: #101820; --panel2: #15202c; --border: #243044;
+  --text: #dce6f0; --muted: #8a9bb0; --dim: #5c6f86; --accent: #3ecfff; --gold: #e8c56a;
+  --font: "Segoe UI", system-ui, -apple-system, sans-serif;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { font-size: clamp(15px, 0.7vw + 0.3vh, 18px); scroll-behavior: smooth; }
+body {
+  font-family: var(--font); background: var(--bg); color: var(--text); line-height: 1.5; min-height: 100vh;
+  background-image:
+    radial-gradient(ellipse 80% 40% at 50% -10%, rgba(42, 110, 170, 0.2), transparent),
+    radial-gradient(ellipse 50% 30% at 100% 80%, rgba(80, 40, 120, 0.08), transparent);
+}
+a { color: var(--accent); text-decoration: none; }
+a:hover { color: #7de0ff; text-decoration: underline; }
+.wrap { max-width: 1100px; margin: 0 auto; padding: 1.5rem 1.25rem 3rem; }
+header.hero { margin-bottom: 1.5rem; padding-bottom: 1.25rem; border-bottom: 1px solid var(--border); }
+.kicker {
+  font-size: 0.75rem; letter-spacing: 0.14em; text-transform: uppercase;
+  color: var(--accent); font-weight: 700; margin-bottom: 0.35rem;
+}
+h1 {
+  font-size: clamp(1.6rem, 2.5vw, 2.2rem); font-weight: 800; letter-spacing: -0.02em;
+  background: linear-gradient(135deg, #e8f4ff, var(--accent));
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+}
+.sub { color: var(--muted); margin-top: 0.5rem; max-width: 52rem; }
+.meta-row { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.9rem; align-items: center; }
+.tag {
+  font-size: 0.72rem; font-weight: 650; letter-spacing: 0.04em; text-transform: uppercase;
+  padding: 0.28rem 0.6rem; border-radius: 999px;
+  background: rgba(62, 207, 255, 0.12); color: var(--accent);
+  border: 1px solid rgba(62, 207, 255, 0.25); text-decoration: none;
+}
+.tag:hover { filter: brightness(1.1); text-decoration: none; }
+.tag.gold { background: rgba(232, 197, 106, 0.12); color: var(--gold); border-color: rgba(232, 197, 106, 0.3); }
+.campaign-switch { display: flex; flex-wrap: wrap; gap: 0.45rem; margin: 1rem 0 1.25rem; }
+.campaign-switch a {
+  font-size: 0.85rem; font-weight: 700; padding: 0.5rem 0.9rem;
+  border-radius: 10px; background: var(--panel); border: 1px solid var(--border);
+  color: var(--muted); text-decoration: none;
+}
+.campaign-switch a:hover { color: var(--text); border-color: #2a4a6a; text-decoration: none; }
+.campaign-switch a.active { color: #0a1018; background: var(--accent); border-color: transparent; }
+.toc { display: flex; flex-wrap: wrap; gap: 0.4rem; margin: 0 0 1.5rem; }
+.toc a {
+  font-size: 0.78rem; font-weight: 600; padding: 0.35rem 0.7rem;
+  border-radius: 8px; background: var(--panel); border: 1px solid var(--border);
+  color: var(--muted); text-decoration: none;
+}
+.toc a:hover { color: var(--text); border-color: #2a4a6a; text-decoration: none; }
+.region { margin-bottom: 1.75rem; }
+.region-title {
+  display: flex; align-items: baseline; gap: 0.75rem;
+  margin-bottom: 0.75rem; padding-bottom: 0.4rem; border-bottom: 1px solid var(--border);
+}
+.region-title h2 { font-size: 1.05rem; font-weight: 750; }
+.region-title span { font-size: 0.78rem; color: var(--dim); }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 0.65rem; }
+.card {
+  display: flex; flex-direction: column; gap: 0.35rem; padding: 0.9rem 1rem;
+  background: var(--panel); border: 1px solid var(--border); border-radius: 12px;
+  text-decoration: none; color: inherit; position: relative; overflow: hidden;
+  transition: border-color 0.15s, transform 0.12s, background 0.15s, box-shadow 0.15s;
+}
+.card::before {
+  content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 3px;
+  background: var(--accent); opacity: 0.7;
+}
+.card:hover {
+  border-color: #2a4a6a; background: var(--panel2); transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.3); text-decoration: none; color: inherit;
+}
+.card-num { font-size: 0.7rem; font-weight: 750; letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent); }
+.card-name { font-size: 1.02rem; font-weight: 700; color: var(--text); line-height: 1.25; }
+.card-region { font-size: 0.78rem; color: var(--dim); }
+.card-extra { font-size: 0.75rem; color: var(--muted); }
+.card-go { margin-top: 0.35rem; font-size: 0.78rem; font-weight: 650; color: var(--accent); }
+.notes {
+  margin-top: 2rem; padding: 1rem 1.1rem; background: var(--panel);
+  border: 1px solid var(--border); border-radius: 12px; font-size: 0.88rem; color: var(--muted);
+}
+.notes h3 { color: var(--gold); font-size: 0.85rem; margin-bottom: 0.45rem; text-transform: uppercase; letter-spacing: 0.06em; }
+.notes ul { padding-left: 1.15rem; }
+.notes li { margin-bottom: 0.3rem; }
+footer { margin-top: 2rem; text-align: center; font-size: 0.75rem; color: var(--dim); }
+
+    :root { --accent: #c78bff; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header class="hero">
+      <div class="kicker">Guild Wars · Campaign Guide</div>
+      <h1>Nightfall Missions</h1>
+      <p class="sub">Second-monitor guides for all primary storyline missions in Guild Wars Nightfall (Elona).</p>
+      <div class="meta-row">
+        <span class="tag">20 Missions</span>
+        <span class="tag gold">Nightfall</span>
+        <span class="tag">4K vertical · large map</span>
+        <a class="tag" href="https://wiki.guildwars.com/wiki/List_of_Nightfall_missions_and_primary_quests" target="_blank" rel="noopener">Wiki list ↗</a>
+      </div>
+    </header>
+    <nav class="campaign-switch" aria-label="Campaigns"><a class="" href="prohecies.html">Prophecies</a><a class="" href="factions.html">Factions</a><a class="active" href="nightfall.html">Nightfall</a></nav>
+    <nav class="toc" aria-label="Regions"><a href="#region-istan">Istan</a><a href="#region-kourna">Kourna</a><a href="#region-vabbi">Vabbi</a><a href="#region-the-desolation">The Desolation</a><a href="#region-realm-of-torment">Realm of Torment</a></nav>
+    <section class="region" id="region-istan">
+  <div class="region-title">
+    <h2>Istan</h2>
+    <span>3 missions</span>
+  </div>
+  <div class="grid"><a class="card" href="nightfall/1_Chahbek_Village.html">
+  <div class="card-num">Mission 1</div>
+  <div class="card-name">Chahbek Village</div>
+  <div class="card-region">Istan</div>
+  <div class="card-extra">Hero: Koss</div>
+  <div class="card-go">Open guide →</div>
+</a><a class="card" href="nightfall/2_Jokanur_Diggings.html">
+  <div class="card-num">Mission 2</div>
+  <div class="card-name">Jokanur Diggings</div>
+  <div class="card-region">Istan</div>
+  <div class="card-extra">Hero: Melonni</div>
+  <div class="card-go">Open guide →</div>
+</a><a class="card" href="nightfall/3_Blacktide_Den.html">
+  <div class="card-num">Mission 3</div>
+  <div class="card-name">Blacktide Den</div>
+  <div class="card-region">Istan</div>
+  <div class="card-extra">Hero: Tahlkora</div>
+  <div class="card-go">Open guide →</div>
+</a></div>
+</section><section class="region" id="region-kourna">
+  <div class="region-title">
+    <h2>Kourna</h2>
+    <span>6 missions</span>
+  </div>
+  <div class="grid"><a class="card" href="nightfall/4_Consulate_Docks.html">
+  <div class="card-num">Mission 4</div>
+  <div class="card-name">Consulate Docks</div>
+  <div class="card-region">Kourna</div>
+  <div class="card-extra">Hero: Dunkoro</div>
+  <div class="card-go">Open guide →</div>
+</a><a class="card" href="nightfall/5_Venta_Cemetery.html">
+  <div class="card-num">Mission 5</div>
+  <div class="card-name">Venta Cemetery</div>
+  <div class="card-region">Kourna</div>
+  <div class="card-extra">Hero: Koss</div>
+  <div class="card-go">Open guide →</div>
+</a><a class="card" href="nightfall/6_Kodonur_Crossroads.html">
+  <div class="card-num">Mission 6</div>
+  <div class="card-name">Kodonur Crossroads</div>
+  <div class="card-region">Kourna</div>
+  <div class="card-extra">Hero: Zhed Shadowhoof</div>
+  <div class="card-go">Open guide →</div>
+</a><a class="card" href="nightfall/7_Pogahn_Passage.html">
+  <div class="card-num">Mission 7a</div>
+  <div class="card-name">Pogahn Passage</div>
+  <div class="card-region">Kourna</div>
+  <div class="card-extra">Margrid path · Hero: Margrid the Sly</div>
+  <div class="card-go">Open guide →</div>
+</a><a class="card" href="nightfall/8_Rilohn_Refuge.html">
+  <div class="card-num">Mission 7b</div>
+  <div class="card-name">Rilohn Refuge</div>
+  <div class="card-region">Kourna</div>
+  <div class="card-extra">Master of Whispers path · Hero: Master of Whispers</div>
+  <div class="card-go">Open guide →</div>
+</a><a class="card" href="nightfall/9_Moddok_Crevice.html">
+  <div class="card-num">Mission 8</div>
+  <div class="card-name">Moddok Crevice</div>
+  <div class="card-region">Kourna</div>
+  <div class="card-extra">Hero: Dunkoro</div>
+  <div class="card-go">Open guide →</div>
+</a></div>
+</section><section class="region" id="region-vabbi">
+  <div class="region-title">
+    <h2>Vabbi</h2>
+    <span>6 missions</span>
+  </div>
+  <div class="grid"><a class="card" href="nightfall/10_Tihark_Orchard.html">
+  <div class="card-num">Mission 9</div>
+  <div class="card-name">Tihark Orchard</div>
+  <div class="card-region">Vabbi</div>
+  
+  <div class="card-go">Open guide →</div>
+</a><a class="card" href="nightfall/11_Dasha_Vestibule.html">
+  <div class="card-num">Mission 10a</div>
+  <div class="card-name">Dasha Vestibule</div>
+  <div class="card-region">Vabbi</div>
+  <div class="card-extra">Margrid path · Hero: Margrid the Sly</div>
+  <div class="card-go">Open guide →</div>
+</a><a class="card" href="nightfall/12_Dzagonur_Bastion.html">
+  <div class="card-num">Mission 10b</div>
+  <div class="card-name">Dzagonur Bastion</div>
+  <div class="card-region">Vabbi</div>
+  <div class="card-extra">Master of Whispers path · Hero: Master of Whispers</div>
+  <div class="card-go">Open guide →</div>
+</a><a class="card" href="nightfall/13_Grand_Court_of_Sebelkeh.html">
+  <div class="card-num">Mission 11</div>
+  <div class="card-name">Grand Court of Sebelkeh</div>
+  <div class="card-region">Vabbi</div>
+  <div class="card-extra">Hero: Tahlkora</div>
+  <div class="card-go">Open guide →</div>
+</a><a class="card" href="nightfall/14_Jennurs_Horde.html">
+  <div class="card-num">Mission 12a</div>
+  <div class="card-name">Jennur&#x27;s Horde</div>
+  <div class="card-region">Vabbi</div>
+  <div class="card-extra">Garden path · Hero: Koss</div>
+  <div class="card-go">Open guide →</div>
+</a><a class="card" href="nightfall/15_Nundu_Bay.html">
+  <div class="card-num">Mission 12b</div>
+  <div class="card-name">Nundu Bay</div>
+  <div class="card-region">Vabbi</div>
+  <div class="card-extra">Ronjok path · Hero: Melonni</div>
+  <div class="card-go">Open guide →</div>
+</a></div>
+</section><section class="region" id="region-the-desolation">
+  <div class="region-title">
+    <h2>The Desolation</h2>
+    <span>2 missions</span>
+  </div>
+  <div class="grid"><a class="card" href="nightfall/16_Gate_of_Desolation.html">
+  <div class="card-num">Mission 13</div>
+  <div class="card-name">Gate of Desolation</div>
+  <div class="card-region">The Desolation</div>
+  <div class="card-extra">Hero: Zhed Shadowhoof</div>
+  <div class="card-go">Open guide →</div>
+</a><a class="card" href="nightfall/17_Ruins_of_Morah.html">
+  <div class="card-num">Mission 14</div>
+  <div class="card-name">Ruins of Morah</div>
+  <div class="card-region">The Desolation</div>
+  <div class="card-extra">Hero: General Morgahn</div>
+  <div class="card-go">Open guide →</div>
+</a></div>
+</section><section class="region" id="region-realm-of-torment">
+  <div class="region-title">
+    <h2>Realm of Torment</h2>
+    <span>3 missions</span>
+  </div>
+  <div class="grid"><a class="card" href="nightfall/18_Gate_of_Pain.html">
+  <div class="card-num">Mission 15</div>
+  <div class="card-name">Gate of Pain</div>
+  <div class="card-region">Realm of Torment</div>
+  <div class="card-extra">Hero: Dunkoro</div>
+  <div class="card-go">Open guide →</div>
+</a><a class="card" href="nightfall/19_Gate_of_Madness.html">
+  <div class="card-num">Mission 16</div>
+  <div class="card-name">Gate of Madness</div>
+  <div class="card-region">Realm of Torment</div>
+  
+  <div class="card-go">Open guide →</div>
+</a><a class="card" href="nightfall/20_Abaddons_Gate.html">
+  <div class="card-num">Mission 17</div>
+  <div class="card-name">Abaddon&#x27;s Gate</div>
+  <div class="card-region">Realm of Torment</div>
+  
+  <div class="card-go">Open guide →</div>
+</a></div>
+</section>
+    <div class="notes"><h3>Storyline notes</h3><ul><li>Istan tutorial (or skip) leads into Chahbek Village; required heroes are noted per mission.</li><li>Non-Nightfall characters join at Kamadan with Battle Preparations (before Consulate Docks / The Time is Nigh).</li><li>Forks: Margrid (Pogahn / Dasha) vs Master of Whispers (Rilohn / Dzagonur) are mutually exclusive for heroes at that time.</li><li>Jennur’s Horde vs Nundu Bay are not mutually exclusive — only one is required to continue.</li><li>Challenge missions and The Ebony Citadel of Mallyx are optional and not listed here.</li></ul></div>
+    <footer>
+      Content adapted from
+      <a href="https://wiki.guildwars.com/wiki/List_of_Nightfall_missions_and_primary_quests" target="_blank" rel="noopener">Guild Wars Wiki</a>
+      · Maps &amp; text © ArenaNet / NCsoft · Local offline guides
+    </footer>
+  </div>
+</body>
+</html>

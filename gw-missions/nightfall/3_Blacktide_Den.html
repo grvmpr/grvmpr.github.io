@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Blacktide Den</title>
+  <style>
+:root {
+  --bg-deep: #070a0f;
+  --bg-panel: #101820;
+  --bg-panel-2: #15202c;
+  --border: #243044;
+  --border-glow: #2a4a6a;
+  --text: #dce6f0;
+  --text-muted: #8a9bb0;
+  --text-dim: #5c6f86;
+  --accent: #3ecfff;
+  --accent-soft: rgba(62, 207, 255, 0.12);
+  --gold: #e8c56a;
+  --gold-soft: rgba(232, 197, 106, 0.12);
+  --bonus: #7dffb3;
+  --bonus-soft: rgba(125, 255, 179, 0.1);
+  --danger: #ff6b6b;
+  --danger-soft: rgba(255, 107, 107, 0.1);
+  --hm: #c78bff;
+  --hm-soft: rgba(199, 139, 255, 0.12);
+  --radius: 10px;
+  --font: "Segoe UI", system-ui, -apple-system, sans-serif;
+  --chrome-h: 3.1rem;
+  --gap: 0.5rem;
+  --pad: 0.7rem;
+  /* Readable on 4K vertical (~2160×3840) */
+  --walk-size: clamp(1.05rem, 0.55vw + 0.55vh, 1.35rem);
+  --bonus-size: clamp(1.05rem, 0.55vw + 0.55vh, 1.35rem);
+  --body-size: clamp(0.95rem, 0.4vw + 0.4vh, 1.1rem);
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html {
+  scroll-behavior: smooth;
+  font-size: clamp(16px, 0.55vw + 0.45vh, 20px);
+  height: 100%;
+  scroll-padding-top: calc(var(--chrome-h) + 0.5rem);
+}
+body {
+  font-family: var(--font);
+  background: var(--bg-deep);
+  color: var(--text);
+  line-height: 1.45;
+  min-height: 100%;
+  height: 100%;
+  overflow: hidden;
+  background-image: radial-gradient(ellipse 70% 25% at 50% 0%, rgba(42, 100, 160, 0.14), transparent);
+}
+a { color: var(--accent); text-decoration: none; }
+a:hover { color: #7de0ff; text-decoration: underline; }
+.app {
+  display: grid;
+  grid-template-rows: var(--chrome-h) 1fr;
+  height: 100vh; height: 100dvh;
+  max-height: 100vh; max-height: 100dvh;
+}
+.top-chrome {
+  display: flex; align-items: center; gap: 0.65rem;
+  padding: 0 0.7rem;
+  background: rgba(8, 12, 18, 0.97);
+  border-bottom: 1px solid var(--border);
+  z-index: 100; min-height: var(--chrome-h);
+}
+.brand { display: flex; align-items: baseline; gap: 0.55rem; min-width: 0; flex-shrink: 0; }
+.brand-mission {
+  font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase;
+  color: var(--accent); font-weight: 700; white-space: nowrap;
+}
+.brand-name {
+  font-size: 1.1rem; font-weight: 750; color: var(--text);
+  white-space: nowrap; letter-spacing: -0.02em;
+}
+.brand-meta { font-size: 0.75rem; color: var(--text-dim); white-space: nowrap; }
+.chip-nav {
+  display: flex; flex: 1; gap: 0.3rem; overflow-x: auto;
+  scrollbar-width: none; min-width: 0; justify-content: center;
+}
+.chip-nav::-webkit-scrollbar { display: none; }
+.chip-nav a {
+  flex: 0 0 auto; padding: 0.3rem 0.65rem; border-radius: 999px;
+  font-size: 0.78rem; font-weight: 600; color: var(--text-muted);
+  background: var(--bg-panel); border: 1px solid var(--border);
+  text-decoration: none; white-space: nowrap;
+}
+.chip-nav a:hover {
+  color: var(--text); border-color: var(--border-glow);
+  background: #1a2836; text-decoration: none;
+}
+.chip-nav a[href="#map"] { color: var(--accent); border-color: rgba(62, 207, 255, 0.35); }
+.chip-nav a[href="#bonus"] { color: var(--bonus); border-color: rgba(125, 255, 179, 0.3); }
+.chip-nav a[href="#hard-mode"] { color: var(--hm); border-color: rgba(199, 139, 255, 0.3); }
+.chip-nav a[href="#bosses"] { color: #ff9a9a; border-color: rgba(255, 107, 107, 0.3); }
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 0.3rem;
+  padding: 0.42rem 0.85rem; border-radius: 8px; font-weight: 650; font-size: 0.8rem;
+  border: none; cursor: pointer; text-decoration: none; white-space: nowrap; flex-shrink: 0;
+}
+.btn:hover { text-decoration: none; }
+.btn-next {
+  background: linear-gradient(135deg, #1a6a9a, #1ab0e0); color: #fff;
+  box-shadow: 0 2px 12px rgba(26, 140, 200, 0.35);
+}
+.btn-next:hover { color: #fff; filter: brightness(1.08); }
+.btn-wiki, .btn-idx, .btn-prev {
+  background: var(--bg-panel); color: var(--text-muted);
+  border: 1px solid var(--border); padding: 0.42rem 0.65rem;
+}
+.btn-wiki:hover, .btn-idx:hover, .btn-prev:hover {
+  color: var(--accent); border-color: var(--border-glow);
+}
+.chrome-actions { display: flex; gap: 0.35rem; flex-shrink: 0; }
+
+/* Map-dominant workspace */
+.workspace {
+  display: grid;
+  grid-template-columns: minmax(480px, 1.15fr) minmax(0, 1fr);
+  grid-template-rows: 1fr;
+  gap: var(--gap); padding: var(--gap);
+  min-height: 0; height: 100%; overflow: hidden;
+}
+.col-map {
+  display: grid;
+  grid-template-rows: 1fr auto;
+  gap: var(--gap);
+  min-height: 0; min-width: 0;
+}
+.col-main {
+  display: grid;
+  /* objectives compact | walkthrough HUGE | bonus+hm | bosses+tips */
+  grid-template-rows: auto minmax(0, 1.6fr) minmax(0, 1.05fr) minmax(0, 0.75fr);
+  gap: var(--gap); min-height: 0; min-width: 0; overflow: hidden;
+}
+.row-obj { min-height: 0; }
+.row-bonus-hm {
+  display: grid; grid-template-columns: 1.15fr 0.85fr; gap: var(--gap); min-height: 0;
+}
+.row-lower {
+  display: grid; grid-template-columns: 1.15fr 0.85fr; gap: var(--gap); min-height: 0;
+}
+.panel {
+  background: var(--bg-panel); border: 1px solid var(--border); border-radius: var(--radius);
+  padding: var(--pad); display: flex; flex-direction: column; min-height: 0; overflow: hidden;
+}
+.panel-scroll {
+  overflow-y: auto; overflow-x: hidden; min-height: 0; flex: 1; padding-right: 0.3rem;
+  scrollbar-width: thin; scrollbar-color: var(--border) transparent;
+  font-size: var(--body-size);
+}
+.panel-scroll::-webkit-scrollbar { width: 8px; }
+.panel-scroll::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+.panel-title {
+  display: flex; align-items: center; gap: 0.4rem;
+  font-size: 0.82rem; font-weight: 750; letter-spacing: 0.05em; text-transform: uppercase;
+  color: var(--text); margin-bottom: 0.45rem; padding-bottom: 0.35rem;
+  border-bottom: 1px solid var(--border); flex-shrink: 0;
+}
+.panel-title .icon {
+  width: 1.3rem; height: 1.3rem; border-radius: 5px;
+  display: inline-flex; align-items: center; justify-content: center; font-size: 0.75rem;
+}
+.panel.map-panel {
+  border-color: var(--border-glow);
+  background: linear-gradient(180deg, #0e1620 0%, var(--bg-panel) 100%);
+  /* Map takes almost all left column */
+  min-height: 0;
+}
+.panel.objectives { border-top: 2px solid var(--accent); }
+.panel.walkthrough { border-top: 3px solid #5eb8e8; }
+.panel.bonus { border-top: 3px solid var(--bonus); }
+.panel.hard-mode { border-top: 2px solid var(--hm); }
+.panel.bosses { border-top: 2px solid var(--danger); }
+.panel.other { border-top: 2px solid var(--text-muted); }
+
+/* Emphasized reading panels */
+.panel.walkthrough .panel-scroll,
+.panel.walkthrough .wiki-block {
+  font-size: var(--walk-size) !important;
+  line-height: 1.55;
+}
+.panel.bonus .panel-scroll,
+.panel.bonus .wiki-block {
+  font-size: var(--bonus-size) !important;
+  line-height: 1.55;
+}
+.panel.walkthrough .panel-scroll li,
+.panel.bonus .panel-scroll li {
+  margin-bottom: 0.45rem;
+}
+.panel.walkthrough .panel-scroll p,
+.panel.bonus .panel-scroll p {
+  margin-bottom: 0.55rem;
+}
+
+.icon-map { background: var(--accent-soft); color: var(--accent); }
+.icon-obj { background: var(--accent-soft); color: var(--accent); }
+.icon-walk { background: rgba(94, 184, 232, 0.15); color: #5eb8e8; }
+.icon-bonus { background: var(--bonus-soft); color: var(--bonus); }
+.icon-hm { background: var(--hm-soft); color: var(--hm); }
+.icon-boss { background: var(--danger-soft); color: var(--danger); }
+.icon-other { background: rgba(138, 155, 176, 0.15); color: var(--text-muted); }
+
+.map-wrap {
+  flex: 1; min-height: 0; display: flex; flex-direction: column;
+  align-items: center; justify-content: center; gap: 0.4rem;
+}
+.map-frame {
+  flex: 1; min-height: 0; width: 100%;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: 10px; overflow: hidden;
+  border: 2px solid var(--border-glow);
+  box-shadow: 0 0 0 1px rgba(62, 207, 255, 0.1), 0 12px 40px rgba(0, 0, 0, 0.45);
+  background: #05080c; cursor: zoom-in;
+}
+.map-frame img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  image-rendering: auto;
+}
+.map-caption { font-size: 0.72rem; color: var(--text-dim); flex-shrink: 0; }
+.map-missing {
+  color: var(--text-dim); font-size: 1rem; text-align: center; padding: 2rem;
+}
+
+.wiki-block ul, .panel-scroll ul,
+.wiki-block ol, .panel-scroll ol { padding-left: 1.2rem; margin: 0.3rem 0 0.5rem; }
+.wiki-block li, .panel-scroll li { margin-bottom: 0.32rem; }
+.wiki-block p, .panel-scroll p { margin-bottom: 0.45rem; }
+.wiki-block img, .panel-scroll img { vertical-align: middle; max-height: 1.35em; width: auto; }
+.wiki-block table, .panel-scroll table {
+  width: 100%; border-collapse: collapse; font-size: 0.9em; margin: 0.4rem 0;
+}
+.wiki-block th, .wiki-block td, .panel-scroll th, .panel-scroll td {
+  border: 1px solid var(--border); padding: 0.3rem 0.45rem; text-align: left;
+}
+.lede { font-size: 0.92rem; color: var(--text-muted); margin-bottom: 0.35rem; }
+
+/* Collapsed summary */
+details.summary-details {
+  background: var(--bg-panel);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  border-top: 2px solid var(--gold);
+  padding: 0.35rem 0.65rem;
+  flex-shrink: 0;
+}
+details.summary-details summary {
+  cursor: pointer;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--gold);
+  padding: 0.35rem 0;
+  list-style: none;
+}
+details.summary-details summary::-webkit-details-marker { display: none; }
+details.summary-details summary::before {
+  content: "▸ ";
+  color: var(--text-dim);
+}
+details.summary-details[open] summary::before { content: "▾ "; }
+details.summary-details .summary-body {
+  padding: 0.35rem 0 0.55rem;
+  font-size: 0.88rem;
+  color: var(--text-muted);
+  max-height: 18vh;
+  overflow-y: auto;
+}
+
+.boss-note { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.4rem; }
+.boss-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.4rem; }
+.boss-card {
+  background: var(--bg-panel-2); border: 1px solid var(--border);
+  border-radius: 8px; padding: 0.5rem 0.6rem;
+}
+.boss-card-head { font-size: 0.95rem; margin-bottom: 0.2rem; }
+.boss-card-head a { color: #eef6fc; font-weight: 700; }
+.boss-card-head a:hover { color: var(--accent); }
+.boss-elite { font-size: 0.88rem; }
+.elite-label { color: var(--gold); font-weight: 650; margin-right: 0.25rem; }
+.elite-link { color: #ffd78a; font-weight: 650; }
+.elite-link:hover { color: #ffe9b5; }
+.elite-none { color: var(--text-dim); font-style: italic; font-size: 0.85rem; }
+.boss-meta { font-size: 0.78rem; color: var(--text-dim); margin-top: 0.15rem; }
+
+.callout {
+  margin-top: 0.4rem; padding: 0.45rem 0.6rem; border-radius: 6px;
+  font-size: 0.88rem; border-left: 3px solid; line-height: 1.4;
+}
+.callout.tip { background: var(--accent-soft); border-color: var(--accent); color: #b8eaff; }
+.callout.warn { background: var(--danger-soft); border-color: var(--danger); color: #ffb4b4; }
+
+.lightbox {
+  display: none; position: fixed; inset: 0; z-index: 1000; background: rgba(0,0,0,0.94);
+  align-items: center; justify-content: center; padding: 1.5rem; cursor: zoom-out;
+}
+.lightbox.open { display: flex; }
+.lightbox img {
+  max-width: 96vw; max-height: 96vh; border-radius: 8px;
+  border: 2px solid var(--border-glow); object-fit: contain;
+}
+
+@media (min-height: 2400px) {
+  :root {
+    --walk-size: clamp(1.15rem, 0.7vh + 0.3vw, 1.5rem);
+    --bonus-size: clamp(1.15rem, 0.7vh + 0.3vw, 1.5rem);
+    --gap: 0.65rem;
+    --pad: 0.85rem;
+  }
+  .workspace { grid-template-columns: minmax(560px, 1.2fr) minmax(0, 1fr); }
+}
+@media (min-width: 1800px) and (min-height: 2000px) {
+  .workspace { grid-template-columns: minmax(600px, 1.25fr) minmax(0, 1fr); }
+}
+@media (max-height: 1100px) {
+  body { overflow: auto; height: auto; }
+  .app { height: auto; max-height: none; min-height: 100vh; }
+  .workspace {
+    height: auto; overflow: visible; grid-template-columns: 1fr; grid-template-rows: auto;
+  }
+  .col-map { grid-template-rows: auto; }
+  .col-main { overflow: visible; grid-template-rows: auto; }
+  .row-bonus-hm, .row-lower { grid-template-columns: 1fr; }
+  .panel { max-height: none; overflow: visible; }
+  .panel-scroll { overflow: visible; }
+  .map-frame { min-height: 360px; max-height: 55vh; }
+}
+
+    :root { --accent: #c78bff; --accent-soft: #c78bff22; }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header class="top-chrome">
+      <div class="brand">
+        <span class="brand-mission">M3</span>
+        <span class="brand-name">Blacktide Den</span>
+        <span class="brand-meta">Nightfall · Istan · Cooperative · Medium</span>
+      </div>
+      <nav class="chip-nav" aria-label="Sections">
+        <a href="#map">Map</a>
+        <a href="#walkthrough">Walkthrough</a>
+        <a href="#bonus">Bonus</a>
+        <a href="#objectives">Objectives</a>
+        <a href="#hard-mode">Hard Mode</a>
+        <a href="#bosses">Bosses</a>
+        <a href="#other">Tips</a>
+      </nav>
+      <div class="chrome-actions">
+        <a class="btn btn-idx" href="../nightfall.html">Index</a>
+        <a class="btn btn-prev" href="2_Jokanur_Diggings.html">← Prev</a>
+        <a class="btn btn-wiki" href="https://wiki.guildwars.com/wiki/Blacktide_Den" target="_blank" rel="noopener">Wiki ↗</a>
+        <a class="btn btn-next" href="4_Consulate_Docks.html">Next: Consulate Docks →</a>
+      </div>
+    </header>
+
+    <div class="workspace">
+      <div class="col-map">
+        <section class="panel map-panel" id="map">
+          <h2 class="panel-title"><span class="icon icon-map">◉</span> Mission Map</h2>
+          <div class="map-wrap">
+            <div class="map-frame" id="mapOpen" title="Click to enlarge">
+              <img src="../maps/nightfall_03_Blacktide_Den_map.jpg" alt="Blacktide Den mission map" />
+            </div>
+            <p class="map-caption">Click to enlarge · Local cache · <a href="https://wiki.guildwars.com/wiki/Blacktide_Den" target="_blank" rel="noopener">Wiki</a></p>
+        </div>
+        </section>
+
+        <details class="summary-details" id="summary">
+          <summary>Summary (click to expand)</summary>
+          <div class="summary-body">
+            <p>Tahlkora insists that she overheard Varesh and General Kahyet plotting to weaken Istan . You infiltrate the corsairs to investigate these claims and make your way through the bogs to rendezvous with Kahyet and prevent a deal from going ahead.</p>
+            <p style="margin-top:0.4rem;"><strong>Region:</strong> Istan · <strong>Mission:</strong> 3 of 20 · <strong>Type:</strong> Cooperative<br/><strong>Required hero:</strong> Tahlkora</p>
+            <p style="margin-top:0.35rem;"><a href="https://wiki.guildwars.com/wiki/Blacktide_Den" target="_blank" rel="noopener">Full wiki article ↗</a></p>
+          </div>
+        </details>
+      </div>
+
+      <div class="col-main">
+        <section class="panel objectives row-obj" id="objectives">
+          <h2 class="panel-title"><span class="icon icon-obj">✓</span> Objectives</h2>
+          <div class="panel-scroll wiki-block"><p>Find <a href="https://wiki.guildwars.com/wiki/General_Kahyet" rel="noopener" target="_blank" title="General Kahyet">General Kahyet</a>. Prevent her from striking a deal with <a href="https://wiki.guildwars.com/wiki/Ironfist" rel="noopener" target="_blank" title="Ironfist">Ironfist</a>, the corsair captain.
+</p><ul><li>ADDED: Eliminate Ironfist's envoy and crew.</li>
+<li>ADDED: Steal the corsair garb.</li>
+<li>ADDED: Pass through the <a href="https://wiki.guildwars.com/wiki/Kourna" rel="noopener" target="_blank" title="Kourna">Kournan</a> check point.</li>
+<li>ADDED: Follow <a href="https://wiki.guildwars.com/wiki/Captain_Besuz" rel="noopener" target="_blank" title="Captain Besuz">Captain Besuz</a> to the meeting with Kahyet.</li>
+<li>ADDED: Kill Kahyet.</li>
+<li>*BONUS* Clear <a href="https://wiki.guildwars.com/wiki/Lahtenda_Bog" rel="noopener" target="_blank" title="Lahtenda Bog">Lahtenda Bog</a> of <a href="https://wiki.guildwars.com/wiki/Rinkhal_Monitor" rel="noopener" target="_blank" title="Rinkhal Monitor">rinkhal monitors</a>.</li>
+<li>You have [5...0] of 5 rinkhal monitors remaining.</li></ul></div>
+        </section>
+
+        <section class="panel walkthrough" id="walkthrough">
+          <h2 class="panel-title"><span class="icon icon-walk">→</span> Walkthrough</h2>
+          <div class="panel-scroll wiki-block"><p>Lahtenda Bog is a maze but <a href="https://wiki.guildwars.com/wiki/Captain_Besuz" rel="noopener" target="_blank" title="Captain Besuz">Captain Besuz</a> will show you the way once you find him. Turn right at the first opportunity to find  <a href="https://wiki.guildwars.com/wiki/Ironfist%27s_Envoy" rel="noopener" target="_blank" title="Ironfist's Envoy">Ironfist's Envoy</a> - kill the corsair group to take their clothes as a <a href="https://wiki.guildwars.com/wiki/Corsair_(disguise)" rel="noopener" target="_blank" title="Corsair (disguise)">disguise</a>. Head southeast until you find Captain Besuz's roadblock. Talk to the captain to continue, he will now lead you to the rendezvous point with <a href="https://wiki.guildwars.com/wiki/General_Kahyet" rel="noopener" target="_blank" title="General Kahyet">General Kahyet</a>. Follow him and defeat the various groups of <a href="https://wiki.guildwars.com/wiki/Skale" rel="noopener" target="_blank" title="Skale">Skale</a> on your path. You will soon see a camp and a narrow path where a stampede of Skale will run through, use it as a choke point. As you get closer to the ruins, a group of <a href="https://wiki.guildwars.com/wiki/Harpy" rel="noopener" target="_blank" title="Harpy">Harpies</a> will <a href="https://wiki.guildwars.com/wiki/Spawn" rel="noopener" target="_blank" title="Spawn">spawn</a> too. Once you reach the rendezvous, General Kahyet will arrive and trigger a brief conversation; kill her to complete the mission.
+</p></div>
+        </section>
+
+        <div class="row-bonus-hm">
+          <section class="panel bonus" id="bonus">
+            <h2 class="panel-title"><span class="icon icon-bonus">★</span> Bonus</h2>
+            <div class="panel-scroll wiki-block"><p>The bonus requires the party to kill 5 <a href="https://wiki.guildwars.com/wiki/Rinkhal_Monitor" rel="noopener" target="_blank" title="Rinkhal Monitor">Rinkhal Monitors</a>, a simple but time consuming task.
+</p><ol><li>The first is south of Ironfist's Envoy.</li>
+<li>The second is after Captain Besuz's roadblock and to the east, inside a natural cave with ancient relics.</li>
+<li>The third is very close to the second, just northeast of it.
+<dl><dd>Now return to Besuz who will wait for you to proceed. Follow him until you pass the three named corsairs and then when Besuz turns left, you turn right instead to find the last two Rinkhal Monitors.</dd></dl></li>
+<li>On the North side of the swamp.</li>
+<li>North from target 4 surrounded by Mandragor and Skale.</li></ol><p>Finally backtrack to rejoin Besuz and finish the mission.
+</p></div>
+          </section>
+          <section class="panel hard-mode" id="hard-mode">
+            <h2 class="panel-title"><span class="icon icon-hm">◆</span> Hard Mode</h2>
+            <div class="panel-scroll wiki-block"><p>When you reach the Corsair camp, use the top of the hill to flag heroes/henchmen before the Skale stampede begins, this provides height advantage. The Skale <a href="https://wiki.guildwars.com/wiki/Mob" rel="noopener" target="_blank" title="Mob">mob</a> partially separates making them easier to kill.
+</p><p>Alternatively it is possible to head northwest before encountering the Skale stampede, followed by heading south and carefully pulling the two separate groups apart with a long or flatbow.
+</p></div>
+          </section>
+        </div>
+
+        <div class="row-lower">
+          <section class="panel bosses" id="bosses">
+            <h2 class="panel-title"><span class="icon icon-boss">☠</span> Bosses &amp; Elites</h2>
+            <div class="panel-scroll"><div class='boss-grid'>
+<article class="boss-card">
+  <div class="boss-card-head"><a href="https://wiki.guildwars.com/wiki/General_Kahyet" target="_blank" rel="noopener"><strong>General Kahyet</strong></a></div>
+  <div class="boss-elite"><span class="elite-none">Elite: None / not listed</span></div>
+  <div class="boss-meta">18 (24)</div>
+</article>
+<article class="boss-card">
+  <div class="boss-card-head"><a href="https://wiki.guildwars.com/wiki/Boklon_Blackwater" target="_blank" rel="noopener"><strong>Boklon Blackwater</strong></a></div>
+  <div class="boss-elite"><span class="elite-none">Elite: None / not listed</span></div>
+  <div class="boss-meta">17 (28)</div>
+</article>
+<article class="boss-card">
+  <div class="boss-card-head"><a href="https://wiki.guildwars.com/wiki/Glug_Klugg" target="_blank" rel="noopener"><strong>Glug Klugg</strong></a></div>
+  <div class="boss-elite"><span class="elite-none">Elite: None / not listed</span></div>
+  <div class="boss-meta">17 (28)</div>
+</article>
+</div></div>
+          </section>
+          <section class="panel other" id="other">
+            <h2 class="panel-title"><span class="icon icon-other">✦</span> Tips &amp; Notes</h2>
+            <div class="panel-scroll"><h3 style='font-size:0.8rem;color:var(--accent);margin:0.3rem 0;'>Skill recommendations</h3><div class='wiki-block'><ul><li><a href="https://wiki.guildwars.com/wiki/Condition" rel="noopener" target="_blank" title="Condition">Condition</a>-removal skills since foes cause <a href="https://wiki.guildwars.com/wiki/Disease" rel="noopener" target="_blank" title="Disease">disease</a> frequently (e.g. <a href="https://wiki.guildwars.com/wiki/Extinguish" rel="noopener" target="_blank" title="Extinguish">Extinguish</a>). In Hard mode, the Motivation <a href="https://wiki.guildwars.com/wiki/Henchman" rel="noopener" target="_blank" title="Henchman">Henchman</a> <a href="https://wiki.guildwars.com/wiki/Sogolon" rel="noopener" target="_blank" title="Sogolon">Sogolon</a> has <a href="https://wiki.guildwars.com/wiki/Cautery_Signet" rel="noopener" target="_blank" title="Cautery Signet">Cautery Signet</a>.</li>
+<li><a href="https://wiki.guildwars.com/wiki/Area_of_effect" rel="noopener" target="_blank" title="Area of effect">Area of effect</a> damage is useful during the Skale stampede.</li></ul></div>
+<h3 style='font-size:0.8rem;color:var(--accent);margin:0.3rem 0;'>Notes</h3><div class='wiki-block'><ul><li>Non-human party members will not be <a href="https://wiki.guildwars.com/wiki/Corsair_(disguise)" rel="noopener" target="_blank" title="Corsair (disguise)">disguised</a> after killing Ironfist's Envoys, but this has no impact on mission progress.</li>
+<li>The Corsair disguise is actually a transformation as you will have another face and skin color than your own.</li>
+<li>If you talk to <a href="https://wiki.guildwars.com/wiki/One-Eyed_Rugger" rel="noopener" target="_blank" title="One-Eyed Rugger">One-Eyed Rugger</a> (one of the 3 corsair NPCs), you will become <a href="https://wiki.guildwars.com/wiki/Drunk" rel="noopener" target="_blank" title="Drunk">drunk</a>.
+<ul><li>The warped-screen effect persists until you complete the mission; it does <i>not</i> contribute to the <a href="https://wiki.guildwars.com/wiki/Drunkard" rel="noopener" target="_blank" title="Drunkard">Drunkard</a> <a href="https://wiki.guildwars.com/wiki/Title" rel="noopener" target="_blank" title="Title">title</a> nor contribute towards skills that benefit from being drunk.</li>
+<li>You can remove the screen-warping by disabling the "Enable post-process effects" in the <a class="mw-redirect" href="https://wiki.guildwars.com/wiki/Options_panel" rel="noopener" target="_blank" title="Options panel">options panel</a>.</li></ul></li>
+<li>Mapping the mission area (<a href="https://wiki.guildwars.com/wiki/Lahtenda_Bog" rel="noopener" target="_blank" title="Lahtenda Bog">Lahtenda Bog</a>) will contribute ~2.5% towards the Elona <a href="https://wiki.guildwars.com/wiki/Cartographer" rel="noopener" target="_blank" title="Cartographer">cartographer</a> title.</li>
+<li>At the completion of this mission, you could have up to eight party members in <a href="https://wiki.guildwars.com/wiki/Sunspear_Great_Hall" rel="noopener" target="_blank" title="Sunspear Great Hall">Sunspear Great Hall</a> (exceeding that outpost's normal party size); you can use this to <a class="mw-redirect" href="https://wiki.guildwars.com/wiki/Vanquish" rel="noopener" target="_blank" title="Vanquish">vanquish</a> the <a href="https://wiki.guildwars.com/wiki/Plains_of_Jarin" rel="noopener" target="_blank" title="Plains of Jarin">Plains of Jarin</a>.
+<ul><li>Your party will consist of its leader, the required hero (<a href="https://wiki.guildwars.com/wiki/Tahlkora" rel="noopener" target="_blank" title="Tahlkora">Tahlkora</a>), and up to six others: players, heroes (maximum of 3 per player will be <a href="https://wiki.guildwars.com/wiki/Teleport" rel="noopener" target="_blank" title="Teleport">teleported</a>), or henchmen (however, only Kihm, Herta, Sogolon, and Gehraz will show up; the other henchmen do not appear in the great hall).</li>
+<li>An easier solution is to ask <a href="https://wiki.guildwars.com/wiki/Dockmaster_Dimedeh" rel="noopener" target="_blank" title="Dockmaster Dimedeh">Dockmaster Dimedeh</a> to teleport your party of 8 from <a href="https://wiki.guildwars.com/wiki/Dajkah_Inlet_(outpost)" rel="noopener" target="_blank" title="Dajkah Inlet (outpost)">Dajkah Inlet</a> to <a href="https://wiki.guildwars.com/wiki/Kamadan,_Jewel_of_Istan" rel="noopener" target="_blank" title="Kamadan, Jewel of Istan">Kamadan, Jewel of Istan</a> and vanquish from there.</li></ul></li>
+<li>Completion of this mission in Hard Mode will fill in page #13 of the <a href="https://wiki.guildwars.com/wiki/Young_Heroes_of_Tyria" rel="noopener" target="_blank" title="Young Heroes of Tyria">Young Heroes of Tyria</a> <a href="https://wiki.guildwars.com/wiki/Storybook" rel="noopener" target="_blank" title="Storybook">storybook</a>.</li></ul><div style="margin: 1em; border: solid silver; border-width: 1px 0px; padding: 2px 1em 2px 5em;"><strong class="hiddenlinks" style="position: absolute; margin-left: -4.8em; color: #900;"><a class="image" href="https://wiki.guildwars.com/wiki/File:Bug.png" rel="noopener" target="_blank" title="Bug"><img alt="Bug" data-file-height="32" data-file-width="32" decoding="async" height="18" loading="lazy" src="https://wiki.guildwars.com/images/thumb/7/7d/Bug.png/18px-Bug.png" srcset="/images/thumb/7/7d/Bug.png/27px-Bug.png 1.5x, /images/7/7d/Bug.png 2x" width="18"/></a> <a href="https://wiki.guildwars.com/wiki/Bug" rel="noopener" target="_blank" title="Bug">Bug</a>.</strong>Mercenary Heroes will always transform into a male corsair even if they are female.</div><div style="margin: 1em; border: solid silver; border-width: 1px 0px; padding: 2px 1em 2px 5em;"><strong class="hiddenlinks" style="position: absolute; margin-left: -4.8em; color: #900;"><a class="image" href="https://wiki.guildwars.com/wiki/File:Bug.png" rel="noopener" target="_blank" title="Bug"><img alt="Bug" data-file-height="32" data-file-width="32" decoding="async" height="18" loading="lazy" src="https://wiki.guildwars.com/images/thumb/7/7d/Bug.png/18px-Bug.png" srcset="/images/thumb/7/7d/Bug.png/27px-Bug.png 1.5x, /images/7/7d/Bug.png 2x" width="18"/></a> <a href="https://wiki.guildwars.com/wiki/Bug" rel="noopener" target="_blank" title="Bug">Bug</a>.</strong> It is possible to pass through some of the <a href="https://wiki.guildwars.com/wiki/Kournan_Guard" rel="noopener" target="_blank" title="Kournan Guard">Kournan Guard</a> barriers before speaking to Captain Besuz. There is no benefit in doing so and requires more time than finishing the mission normally.</div><div style="margin: 1em; border: solid silver; border-width: 1px 0px; padding: 2px 1em 2px 5em;"><strong class="hiddenlinks" style="position: absolute; margin-left: -4.8em; color: #900;"><a class="image" href="https://wiki.guildwars.com/wiki/File:Bug.png" rel="noopener" target="_blank" title="Bug"><img alt="Bug" data-file-height="32" data-file-width="32" decoding="async" height="18" loading="lazy" src="https://wiki.guildwars.com/images/thumb/7/7d/Bug.png/18px-Bug.png" srcset="/images/thumb/7/7d/Bug.png/27px-Bug.png 1.5x, /images/7/7d/Bug.png 2x" width="18"/></a> <a href="https://wiki.guildwars.com/wiki/Bug" rel="noopener" target="_blank" title="Bug">Bug</a>.</strong> Occasionally, General Kahyet and her group will appear, but fail to turn hostile. There is no work-around; you must restart the mission.</div></div></div>
+          </section>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="lightbox" id="lightbox" role="dialog" aria-label="Enlarged map">
+    <img src="../maps/nightfall_03_Blacktide_Den_map.jpg" alt="Blacktide Den mission map (enlarged)" />
+  </div>
+  <script>
+    (function () {
+      var open = document.getElementById("mapOpen");
+      var box = document.getElementById("lightbox");
+      if (!open || !box) return;
+      open.addEventListener("click", function () { box.classList.add("open"); });
+      box.addEventListener("click", function () { box.classList.remove("open"); });
+      document.addEventListener("keydown", function (e) {
+        if (e.key === "Escape") box.classList.remove("open");
+      });
+    })();
+  </script>
+
+</body>
+</html>

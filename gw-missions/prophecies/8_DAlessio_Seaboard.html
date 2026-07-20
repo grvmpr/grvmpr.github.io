@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>D&#x27;Alessio Seaboard</title>
+  <style>
+:root {
+  --bg-deep: #070a0f;
+  --bg-panel: #101820;
+  --bg-panel-2: #15202c;
+  --border: #243044;
+  --border-glow: #2a4a6a;
+  --text: #dce6f0;
+  --text-muted: #8a9bb0;
+  --text-dim: #5c6f86;
+  --accent: #3ecfff;
+  --accent-soft: rgba(62, 207, 255, 0.12);
+  --gold: #e8c56a;
+  --gold-soft: rgba(232, 197, 106, 0.12);
+  --bonus: #7dffb3;
+  --bonus-soft: rgba(125, 255, 179, 0.1);
+  --danger: #ff6b6b;
+  --danger-soft: rgba(255, 107, 107, 0.1);
+  --hm: #c78bff;
+  --hm-soft: rgba(199, 139, 255, 0.12);
+  --radius: 10px;
+  --font: "Segoe UI", system-ui, -apple-system, sans-serif;
+  --chrome-h: 3.1rem;
+  --gap: 0.5rem;
+  --pad: 0.7rem;
+  /* Readable on 4K vertical (~2160×3840) */
+  --walk-size: clamp(1.05rem, 0.55vw + 0.55vh, 1.35rem);
+  --bonus-size: clamp(1.05rem, 0.55vw + 0.55vh, 1.35rem);
+  --body-size: clamp(0.95rem, 0.4vw + 0.4vh, 1.1rem);
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html {
+  scroll-behavior: smooth;
+  font-size: clamp(16px, 0.55vw + 0.45vh, 20px);
+  height: 100%;
+  scroll-padding-top: calc(var(--chrome-h) + 0.5rem);
+}
+body {
+  font-family: var(--font);
+  background: var(--bg-deep);
+  color: var(--text);
+  line-height: 1.45;
+  min-height: 100%;
+  height: 100%;
+  overflow: hidden;
+  background-image: radial-gradient(ellipse 70% 25% at 50% 0%, rgba(42, 100, 160, 0.14), transparent);
+}
+a { color: var(--accent); text-decoration: none; }
+a:hover { color: #7de0ff; text-decoration: underline; }
+.app {
+  display: grid;
+  grid-template-rows: var(--chrome-h) 1fr;
+  height: 100vh; height: 100dvh;
+  max-height: 100vh; max-height: 100dvh;
+}
+.top-chrome {
+  display: flex; align-items: center; gap: 0.65rem;
+  padding: 0 0.7rem;
+  background: rgba(8, 12, 18, 0.97);
+  border-bottom: 1px solid var(--border);
+  z-index: 100; min-height: var(--chrome-h);
+}
+.brand { display: flex; align-items: baseline; gap: 0.55rem; min-width: 0; flex-shrink: 0; }
+.brand-mission {
+  font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase;
+  color: var(--accent); font-weight: 700; white-space: nowrap;
+}
+.brand-name {
+  font-size: 1.1rem; font-weight: 750; color: var(--text);
+  white-space: nowrap; letter-spacing: -0.02em;
+}
+.brand-meta { font-size: 0.75rem; color: var(--text-dim); white-space: nowrap; }
+.chip-nav {
+  display: flex; flex: 1; gap: 0.3rem; overflow-x: auto;
+  scrollbar-width: none; min-width: 0; justify-content: center;
+}
+.chip-nav::-webkit-scrollbar { display: none; }
+.chip-nav a {
+  flex: 0 0 auto; padding: 0.3rem 0.65rem; border-radius: 999px;
+  font-size: 0.78rem; font-weight: 600; color: var(--text-muted);
+  background: var(--bg-panel); border: 1px solid var(--border);
+  text-decoration: none; white-space: nowrap;
+}
+.chip-nav a:hover {
+  color: var(--text); border-color: var(--border-glow);
+  background: #1a2836; text-decoration: none;
+}
+.chip-nav a[href="#map"] { color: var(--accent); border-color: rgba(62, 207, 255, 0.35); }
+.chip-nav a[href="#bonus"] { color: var(--bonus); border-color: rgba(125, 255, 179, 0.3); }
+.chip-nav a[href="#hard-mode"] { color: var(--hm); border-color: rgba(199, 139, 255, 0.3); }
+.chip-nav a[href="#bosses"] { color: #ff9a9a; border-color: rgba(255, 107, 107, 0.3); }
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 0.3rem;
+  padding: 0.42rem 0.85rem; border-radius: 8px; font-weight: 650; font-size: 0.8rem;
+  border: none; cursor: pointer; text-decoration: none; white-space: nowrap; flex-shrink: 0;
+}
+.btn:hover { text-decoration: none; }
+.btn-next {
+  background: linear-gradient(135deg, #1a6a9a, #1ab0e0); color: #fff;
+  box-shadow: 0 2px 12px rgba(26, 140, 200, 0.35);
+}
+.btn-next:hover { color: #fff; filter: brightness(1.08); }
+.btn-wiki, .btn-idx, .btn-prev {
+  background: var(--bg-panel); color: var(--text-muted);
+  border: 1px solid var(--border); padding: 0.42rem 0.65rem;
+}
+.btn-wiki:hover, .btn-idx:hover, .btn-prev:hover {
+  color: var(--accent); border-color: var(--border-glow);
+}
+.chrome-actions { display: flex; gap: 0.35rem; flex-shrink: 0; }
+
+/* Map-dominant workspace */
+.workspace {
+  display: grid;
+  grid-template-columns: minmax(480px, 1.15fr) minmax(0, 1fr);
+  grid-template-rows: 1fr;
+  gap: var(--gap); padding: var(--gap);
+  min-height: 0; height: 100%; overflow: hidden;
+}
+.col-map {
+  display: grid;
+  grid-template-rows: 1fr auto;
+  gap: var(--gap);
+  min-height: 0; min-width: 0;
+}
+.col-main {
+  display: grid;
+  /* objectives compact | walkthrough HUGE | bonus+hm | bosses+tips */
+  grid-template-rows: auto minmax(0, 1.6fr) minmax(0, 1.05fr) minmax(0, 0.75fr);
+  gap: var(--gap); min-height: 0; min-width: 0; overflow: hidden;
+}
+.row-obj { min-height: 0; }
+.row-bonus-hm {
+  display: grid; grid-template-columns: 1.15fr 0.85fr; gap: var(--gap); min-height: 0;
+}
+.row-lower {
+  display: grid; grid-template-columns: 1.15fr 0.85fr; gap: var(--gap); min-height: 0;
+}
+.panel {
+  background: var(--bg-panel); border: 1px solid var(--border); border-radius: var(--radius);
+  padding: var(--pad); display: flex; flex-direction: column; min-height: 0; overflow: hidden;
+}
+.panel-scroll {
+  overflow-y: auto; overflow-x: hidden; min-height: 0; flex: 1; padding-right: 0.3rem;
+  scrollbar-width: thin; scrollbar-color: var(--border) transparent;
+  font-size: var(--body-size);
+}
+.panel-scroll::-webkit-scrollbar { width: 8px; }
+.panel-scroll::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+.panel-title {
+  display: flex; align-items: center; gap: 0.4rem;
+  font-size: 0.82rem; font-weight: 750; letter-spacing: 0.05em; text-transform: uppercase;
+  color: var(--text); margin-bottom: 0.45rem; padding-bottom: 0.35rem;
+  border-bottom: 1px solid var(--border); flex-shrink: 0;
+}
+.panel-title .icon {
+  width: 1.3rem; height: 1.3rem; border-radius: 5px;
+  display: inline-flex; align-items: center; justify-content: center; font-size: 0.75rem;
+}
+.panel.map-panel {
+  border-color: var(--border-glow);
+  background: linear-gradient(180deg, #0e1620 0%, var(--bg-panel) 100%);
+  /* Map takes almost all left column */
+  min-height: 0;
+}
+.panel.objectives { border-top: 2px solid var(--accent); }
+.panel.walkthrough { border-top: 3px solid #5eb8e8; }
+.panel.bonus { border-top: 3px solid var(--bonus); }
+.panel.hard-mode { border-top: 2px solid var(--hm); }
+.panel.bosses { border-top: 2px solid var(--danger); }
+.panel.other { border-top: 2px solid var(--text-muted); }
+
+/* Emphasized reading panels */
+.panel.walkthrough .panel-scroll,
+.panel.walkthrough .wiki-block {
+  font-size: var(--walk-size) !important;
+  line-height: 1.55;
+}
+.panel.bonus .panel-scroll,
+.panel.bonus .wiki-block {
+  font-size: var(--bonus-size) !important;
+  line-height: 1.55;
+}
+.panel.walkthrough .panel-scroll li,
+.panel.bonus .panel-scroll li {
+  margin-bottom: 0.45rem;
+}
+.panel.walkthrough .panel-scroll p,
+.panel.bonus .panel-scroll p {
+  margin-bottom: 0.55rem;
+}
+
+.icon-map { background: var(--accent-soft); color: var(--accent); }
+.icon-obj { background: var(--accent-soft); color: var(--accent); }
+.icon-walk { background: rgba(94, 184, 232, 0.15); color: #5eb8e8; }
+.icon-bonus { background: var(--bonus-soft); color: var(--bonus); }
+.icon-hm { background: var(--hm-soft); color: var(--hm); }
+.icon-boss { background: var(--danger-soft); color: var(--danger); }
+.icon-other { background: rgba(138, 155, 176, 0.15); color: var(--text-muted); }
+
+.map-wrap {
+  flex: 1; min-height: 0; display: flex; flex-direction: column;
+  align-items: center; justify-content: center; gap: 0.4rem;
+}
+.map-frame {
+  flex: 1; min-height: 0; width: 100%;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: 10px; overflow: hidden;
+  border: 2px solid var(--border-glow);
+  box-shadow: 0 0 0 1px rgba(62, 207, 255, 0.1), 0 12px 40px rgba(0, 0, 0, 0.45);
+  background: #05080c; cursor: zoom-in;
+}
+.map-frame img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  image-rendering: auto;
+}
+.map-caption { font-size: 0.72rem; color: var(--text-dim); flex-shrink: 0; }
+.map-missing {
+  color: var(--text-dim); font-size: 1rem; text-align: center; padding: 2rem;
+}
+
+.wiki-block ul, .panel-scroll ul,
+.wiki-block ol, .panel-scroll ol { padding-left: 1.2rem; margin: 0.3rem 0 0.5rem; }
+.wiki-block li, .panel-scroll li { margin-bottom: 0.32rem; }
+.wiki-block p, .panel-scroll p { margin-bottom: 0.45rem; }
+.wiki-block img, .panel-scroll img { vertical-align: middle; max-height: 1.35em; width: auto; }
+.wiki-block table, .panel-scroll table {
+  width: 100%; border-collapse: collapse; font-size: 0.9em; margin: 0.4rem 0;
+}
+.wiki-block th, .wiki-block td, .panel-scroll th, .panel-scroll td {
+  border: 1px solid var(--border); padding: 0.3rem 0.45rem; text-align: left;
+}
+.lede { font-size: 0.92rem; color: var(--text-muted); margin-bottom: 0.35rem; }
+
+/* Collapsed summary */
+details.summary-details {
+  background: var(--bg-panel);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  border-top: 2px solid var(--gold);
+  padding: 0.35rem 0.65rem;
+  flex-shrink: 0;
+}
+details.summary-details summary {
+  cursor: pointer;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--gold);
+  padding: 0.35rem 0;
+  list-style: none;
+}
+details.summary-details summary::-webkit-details-marker { display: none; }
+details.summary-details summary::before {
+  content: "▸ ";
+  color: var(--text-dim);
+}
+details.summary-details[open] summary::before { content: "▾ "; }
+details.summary-details .summary-body {
+  padding: 0.35rem 0 0.55rem;
+  font-size: 0.88rem;
+  color: var(--text-muted);
+  max-height: 18vh;
+  overflow-y: auto;
+}
+
+.boss-note { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.4rem; }
+.boss-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.4rem; }
+.boss-card {
+  background: var(--bg-panel-2); border: 1px solid var(--border);
+  border-radius: 8px; padding: 0.5rem 0.6rem;
+}
+.boss-card-head { font-size: 0.95rem; margin-bottom: 0.2rem; }
+.boss-card-head a { color: #eef6fc; font-weight: 700; }
+.boss-card-head a:hover { color: var(--accent); }
+.boss-elite { font-size: 0.88rem; }
+.elite-label { color: var(--gold); font-weight: 650; margin-right: 0.25rem; }
+.elite-link { color: #ffd78a; font-weight: 650; }
+.elite-link:hover { color: #ffe9b5; }
+.elite-none { color: var(--text-dim); font-style: italic; font-size: 0.85rem; }
+.boss-meta { font-size: 0.78rem; color: var(--text-dim); margin-top: 0.15rem; }
+
+.callout {
+  margin-top: 0.4rem; padding: 0.45rem 0.6rem; border-radius: 6px;
+  font-size: 0.88rem; border-left: 3px solid; line-height: 1.4;
+}
+.callout.tip { background: var(--accent-soft); border-color: var(--accent); color: #b8eaff; }
+.callout.warn { background: var(--danger-soft); border-color: var(--danger); color: #ffb4b4; }
+
+.lightbox {
+  display: none; position: fixed; inset: 0; z-index: 1000; background: rgba(0,0,0,0.94);
+  align-items: center; justify-content: center; padding: 1.5rem; cursor: zoom-out;
+}
+.lightbox.open { display: flex; }
+.lightbox img {
+  max-width: 96vw; max-height: 96vh; border-radius: 8px;
+  border: 2px solid var(--border-glow); object-fit: contain;
+}
+
+@media (min-height: 2400px) {
+  :root {
+    --walk-size: clamp(1.15rem, 0.7vh + 0.3vw, 1.5rem);
+    --bonus-size: clamp(1.15rem, 0.7vh + 0.3vw, 1.5rem);
+    --gap: 0.65rem;
+    --pad: 0.85rem;
+  }
+  .workspace { grid-template-columns: minmax(560px, 1.2fr) minmax(0, 1fr); }
+}
+@media (min-width: 1800px) and (min-height: 2000px) {
+  .workspace { grid-template-columns: minmax(600px, 1.25fr) minmax(0, 1fr); }
+}
+@media (max-height: 1100px) {
+  body { overflow: auto; height: auto; }
+  .app { height: auto; max-height: none; min-height: 100vh; }
+  .workspace {
+    height: auto; overflow: visible; grid-template-columns: 1fr; grid-template-rows: auto;
+  }
+  .col-map { grid-template-rows: auto; }
+  .col-main { overflow: visible; grid-template-rows: auto; }
+  .row-bonus-hm, .row-lower { grid-template-columns: 1fr; }
+  .panel { max-height: none; overflow: visible; }
+  .panel-scroll { overflow: visible; }
+  .map-frame { min-height: 360px; max-height: 55vh; }
+}
+
+    :root { --accent: #3ecfff; --accent-soft: #3ecfff22; }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header class="top-chrome">
+      <div class="brand">
+        <span class="brand-mission">M8</span>
+        <span class="brand-name">D&#x27;Alessio Seaboard</span>
+        <span class="brand-meta">Prophecies · Kryta · Cooperative · Medium</span>
+      </div>
+      <nav class="chip-nav" aria-label="Sections">
+        <a href="#map">Map</a>
+        <a href="#walkthrough">Walkthrough</a>
+        <a href="#bonus">Bonus</a>
+        <a href="#objectives">Objectives</a>
+        <a href="#hard-mode">Hard Mode</a>
+        <a href="#bosses">Bosses</a>
+        <a href="#other">Tips</a>
+      </nav>
+      <div class="chrome-actions">
+        <a class="btn btn-idx" href="../prohecies.html">Index</a>
+        <a class="btn btn-prev" href="7_Gates_of_Kryta.html">← Prev</a>
+        <a class="btn btn-wiki" href="https://wiki.guildwars.com/wiki/D%27Alessio_Seaboard" target="_blank" rel="noopener">Wiki ↗</a>
+        <a class="btn btn-next" href="9_Divinity_Coast.html">Next: Divinity Coast →</a>
+      </div>
+    </header>
+
+    <div class="workspace">
+      <div class="col-map">
+        <section class="panel map-panel" id="map">
+          <h2 class="panel-title"><span class="icon icon-map">◉</span> Mission Map</h2>
+          <div class="map-wrap">
+            <div class="map-frame" id="mapOpen" title="Click to enlarge">
+              <img src="../maps/prophecies_08_DAlessio_Seaboard_map.jpg" alt="D&#x27;Alessio Seaboard mission map" />
+            </div>
+            <p class="map-caption">Click to enlarge · Local cache · <a href="https://wiki.guildwars.com/wiki/D%27Alessio_Seaboard" target="_blank" rel="noopener">Wiki</a></p>
+        </div>
+        </section>
+
+        <details class="summary-details" id="summary">
+          <summary>Summary (click to expand)</summary>
+          <div class="summary-body">
+            <p>The players rescue the village of Hakewood then the Temple of Tolerance from the undead threat, and obtain the Scepter of Orr for the White Mantle .</p>
+            <p style="margin-top:0.4rem;"><strong>Region:</strong> Kryta · <strong>Mission:</strong> 8 of 25 · <strong>Type:</strong> Cooperative</p>
+            <p style="margin-top:0.35rem;"><a href="https://wiki.guildwars.com/wiki/D%27Alessio_Seaboard" target="_blank" rel="noopener">Full wiki article ↗</a></p>
+          </div>
+        </details>
+      </div>
+
+      <div class="col-main">
+        <section class="panel objectives row-obj" id="objectives">
+          <h2 class="panel-title"><span class="icon icon-obj">✓</span> Objectives</h2>
+          <div class="panel-scroll wiki-block"><p>Lend aid to the White Mantle in their fight against the <a href="https://wiki.guildwars.com/wiki/Undead" rel="noopener" target="_blank" title="Undead">undead</a>.
+</p><ul><li>Hurry to the <a href="https://wiki.guildwars.com/wiki/Temple_of_Tolerance" rel="noopener" target="_blank" title="Temple of Tolerance">Temple of Tolerance</a>.</li>
+<li>Discuss the undead menace with <a href="https://wiki.guildwars.com/wiki/Confessor_Dorian" rel="noopener" target="_blank" title="Confessor Dorian">Confessor Dorian</a>.</li>
+<li>ADDED: Clear out the undead from the village of Hakewood.</li>
+<li>ADDED: Protect Confessor Dorian from the undead.</li>
+<li>ADDED: Head to the southwest. Locate <a href="https://wiki.guildwars.com/wiki/Dinas" rel="noopener" target="_blank" title="Dinas">Dinas</a> and the Scepter of Orr.</li>
+<li>*BONUS* Deliver the village's offering intact to the <a href="https://wiki.guildwars.com/wiki/Statue_of_Melandru" rel="noopener" target="_blank" title="Statue of Melandru">statue of Melandru</a>.</li></ul></div>
+        </section>
+
+        <section class="panel walkthrough" id="walkthrough">
+          <h2 class="panel-title"><span class="icon icon-walk">→</span> Walkthrough</h2>
+          <div class="panel-scroll wiki-block"><p>Follow the path until the nearby village (point 1 on the map) and eliminate all the undead there. You do not need to save any of the villagers, but a <a class="mw-redirect" href="https://wiki.guildwars.com/wiki/Morale_boost" rel="noopener" target="_blank" title="Morale boost">morale boost</a> is gained each time you do. If you wish to complete the bonus, <a href="https://wiki.guildwars.com/wiki/Benji_Makala" rel="noopener" target="_blank" title="Benji Makala">Benji Makala</a> must survive. 
+</p><p>If ignoring the bonus, simply speak to the <a href="https://wiki.guildwars.com/wiki/Gate_Guard" rel="noopener" target="_blank" title="Gate Guard">Gate Guard</a> then travel through the swamp to the west. 
+</p><p>If going for the bonus, you have to take the path north instead (yellow on the map), behind <a href="https://wiki.guildwars.com/wiki/Gate_Guard_Makala" rel="noopener" target="_blank" title="Gate Guard Makala">Gate Guard Makala</a>, and open the <a href="https://wiki.guildwars.com/wiki/Lever" rel="noopener" target="_blank" title="Lever">lever</a>-operated door at the end to catch up with the initial path to the Temple of Tolerance (point A).
+</p><p>Upon arrival, Confessor Dorian is added to your party and the battle will begin against several waves of <a href="https://wiki.guildwars.com/wiki/Undead" rel="noopener" target="_blank" title="Undead">undead</a>. There is a <a href="https://wiki.guildwars.com/wiki/Shrine_of_Mending" rel="noopener" target="_blank" title="Shrine of Mending">Shrine of Mending</a> that provides +3 <a href="https://wiki.guildwars.com/wiki/Health_regeneration" rel="noopener" target="_blank" title="Health regeneration">health regeneration</a> to living creatures in its <a href="https://wiki.guildwars.com/wiki/Area_of_effect" rel="noopener" target="_blank" title="Area of effect">area of effect</a>. After waves of <a href="https://wiki.guildwars.com/wiki/Skeleton" rel="noopener" target="_blank" title="Skeleton">skeletons</a> and <a class="mw-redirect" href="https://wiki.guildwars.com/wiki/Ghoul" rel="noopener" target="_blank" title="Ghoul">ghouls</a>, a quest marker appears above Dorian, and one final wave of enemies will spawn 3–4 minutes later. Dorian instructs the player to retrieve the Scepter of Orr from his scribe <a href="https://wiki.guildwars.com/wiki/Dinas" rel="noopener" target="_blank" title="Dinas">Dinas</a>, located further to the west. However, Dorian may still die if left alone, causing mission failure. It is highly recommended to stay and protect him from that final wave before heading to Dinas (and/or doing the bonus).
+</p><p>Follow the <a href="https://wiki.guildwars.com/wiki/Ettin" rel="noopener" target="_blank" title="Ettin">ettin</a> infested path to Dinas (who might be fighting a boss) and speak to him to end the mission.
+</p></div>
+        </section>
+
+        <div class="row-bonus-hm">
+          <section class="panel bonus" id="bonus">
+            <h2 class="panel-title"><span class="icon icon-bonus">★</span> Bonus</h2>
+            <div class="panel-scroll wiki-block"><p>The bonus involves carrying the <a href="https://wiki.guildwars.com/wiki/Offering_to_Melandru" rel="noopener" target="_blank" title="Offering to Melandru">Offering to Melandru</a> (point 3) to the offering stand (point 4). Since the bridge from the pick-up point to the drop-off point is broken, you have to go the long way around it, through the temple. 
+</p><p>First at the settlement, ensure Benji survives from the boss that spawns near him. Run straight towards him once he is added as ally to the party window. 
+</p><p>If having troubles, consider using a <a href="https://wiki.guildwars.com/wiki/Speed_boost" rel="noopener" target="_blank" title="Speed boost">speed boost</a> or alternatively <a href="https://wiki.guildwars.com/wiki/Hero_flag" rel="noopener" target="_blank" title="Hero flag">flag</a> heroes or henchmen ahead, as the boss will only start attacking the <a class="mw-redirect" href="https://wiki.guildwars.com/wiki/NPC" rel="noopener" target="_blank" title="NPC">NPC</a> when a player enters <a class="mw-redirect" href="https://wiki.guildwars.com/wiki/Compass_range" rel="noopener" target="_blank" title="Compass range">compass range</a>. Note that this technique can be used for the bonus in the following mission (Divinity Coast) as well. 
+</p><p>After the boss is killed, you can trigger the bonus from Benji immediately (a green marker appears above his head), however you still have to ensure he survives the entire assault, protecting him again on his way to the Shrine of Mending, as <a href="https://wiki.guildwars.com/wiki/Gate_Guard_Makala" rel="noopener" target="_blank" title="Gate Guard Makala">Gate Guard Makala</a> (point 2) will not let you pass through the north gate until the village is cleared and his brother safe. Be careful not to over<a href="https://wiki.guildwars.com/wiki/Aggro" rel="noopener" target="_blank" title="Aggro">aggro</a>, especially <a href="https://wiki.guildwars.com/wiki/Zombie_Warlock" rel="noopener" target="_blank" title="Zombie Warlock">Zombie Warlocks</a> and their minions.
+</p><p>At the end of the northern path (yellow on the map), a swamp populated by undead, you will reach the Offering and a door operated by a <a href="https://wiki.guildwars.com/wiki/Lever" rel="noopener" target="_blank" title="Lever">lever</a> that connects to the main path. 
+</p><p>The offering in itself is a <a href="https://wiki.guildwars.com/wiki/Bundle" rel="noopener" target="_blank" title="Bundle">bundle</a> item. As such, it will slow you down and prevent you from using your weapons while carried. If dropped, the offering will break, requiring you to return and retrieve another one.
+</p><p>At this point you have to make a choice. You can choose to take the offering first, ignoring its drawbacks, or proceed with the mission objectives first, clear the path and come back to the Offering later. The first choice is usually faster since you avoid backtracking, while the second choice is safer.
+</p></div>
+          </section>
+          <section class="panel hard-mode" id="hard-mode">
+            <h2 class="panel-title"><span class="icon icon-hm">◆</span> Hard Mode</h2>
+            <div class="panel-scroll wiki-block"><p>Many foes will gather around Dorian before you have time to reach him. It is recommended to proceed directly to the temple and protect him first (ignoring the Grasping Ghouls; they will stop to fight the White Mantle Guard).
+</p></div>
+          </section>
+        </div>
+
+        <div class="row-lower">
+          <section class="panel bosses" id="bosses">
+            <h2 class="panel-title"><span class="icon icon-boss">☠</span> Bosses &amp; Elites</h2>
+            <div class="panel-scroll"><div class='boss-grid'>
+<article class="boss-card">
+  <div class="boss-card-head"><a href="https://wiki.guildwars.com/wiki/Droog_Stoneclub" target="_blank" rel="noopener"><strong>Droog Stoneclub</strong></a></div>
+  <div class="boss-elite"><span class="elite-none">Elite: None / not listed</span></div>
+  <div class="boss-meta">17 (28)</div>
+</article>
+<article class="boss-card">
+  <div class="boss-card-head"><a href="https://wiki.guildwars.com/wiki/Muga_Riptide" target="_blank" rel="noopener"><strong>Muga Riptide</strong></a></div>
+  <div class="boss-elite"><span class="elite-none">Elite: None / not listed</span></div>
+  <div class="boss-meta">17 (28)</div>
+</article>
+<article class="boss-card">
+  <div class="boss-card-head"><a href="https://wiki.guildwars.com/wiki/Plook_Wavebreaker" target="_blank" rel="noopener"><strong>Plook Wavebreaker</strong></a></div>
+  <div class="boss-elite"><span class="elite-none">Elite: None / not listed</span></div>
+  <div class="boss-meta">17 (28)</div>
+</article>
+<article class="boss-card">
+  <div class="boss-card-head"><a href="https://wiki.guildwars.com/wiki/Tree_of_Renewal" target="_blank" rel="noopener"><strong>Tree of Renewal</strong></a></div>
+  <div class="boss-elite"><span class="elite-none">Elite: None / not listed</span></div>
+  <div class="boss-meta">17 (28)</div>
+</article>
+<article class="boss-card">
+  <div class="boss-card-head"><a href="https://wiki.guildwars.com/wiki/Skigg_the_Tongue" target="_blank" rel="noopener"><strong>Skigg the Tongue</strong></a></div>
+  <div class="boss-elite"><span class="elite-none">Elite: None / not listed</span></div>
+  <div class="boss-meta">17 (28)</div>
+</article>
+<article class="boss-card">
+  <div class="boss-card-head"><a href="https://wiki.guildwars.com/wiki/Rago_the_Scaled" target="_blank" rel="noopener"><strong>Rago the Scaled</strong></a></div>
+  <div class="boss-elite"><span class="elite-none">Elite: None / not listed</span></div>
+  <div class="boss-meta">17 (28)</div>
+</article>
+<article class="boss-card">
+  <div class="boss-card-head"><a href="https://wiki.guildwars.com/wiki/Abijah_the_Decayed" target="_blank" rel="noopener"><strong>Abijah the Decayed</strong></a></div>
+  <div class="boss-elite"><span class="elite-none">Elite: None / not listed</span></div>
+  <div class="boss-meta">16 (28)</div>
+</article>
+<article class="boss-card">
+  <div class="boss-card-head"><a href="https://wiki.guildwars.com/wiki/Kemal_the_Deadened" target="_blank" rel="noopener"><strong>Kemal the Deadened</strong></a></div>
+  <div class="boss-elite"><span class="elite-none">Elite: None / not listed</span></div>
+  <div class="boss-meta">16 (28)</div>
+</article>
+<article class="boss-card">
+  <div class="boss-card-head"><a href="https://wiki.guildwars.com/wiki/Ziyad_Soulreaper" target="_blank" rel="noopener"><strong>Ziyad Soulreaper</strong></a></div>
+  <div class="boss-elite"><span class="elite-none">Elite: None / not listed</span></div>
+  <div class="boss-meta">16 (28)</div>
+</article>
+<article class="boss-card">
+  <div class="boss-card-head"><a href="https://wiki.guildwars.com/wiki/Gezna_Shadowstalker" target="_blank" rel="noopener"><strong>Gezna Shadowstalker</strong></a></div>
+  <div class="boss-elite"><span class="elite-none">Elite: None / not listed</span></div>
+  <div class="boss-meta">16 (28)</div>
+</article>
+<article class="boss-card">
+  <div class="boss-card-head"><a href="https://wiki.guildwars.com/wiki/Nizza_the_Sickle" target="_blank" rel="noopener"><strong>Nizza the Sickle</strong></a></div>
+  <div class="boss-elite"><span class="elite-none">Elite: None / not listed</span></div>
+  <div class="boss-meta">16 (28)</div>
+</article>
+<article class="boss-card">
+  <div class="boss-card-head"><a href="https://wiki.guildwars.com/wiki/Bane_Darkfist" target="_blank" rel="noopener"><strong>Bane Darkfist</strong></a></div>
+  <div class="boss-elite"><span class="elite-none">Elite: None / not listed</span></div>
+  <div class="boss-meta">16 (28)</div>
+</article>
+</div></div>
+          </section>
+          <section class="panel other" id="other">
+            <h2 class="panel-title"><span class="icon icon-other">✦</span> Tips &amp; Notes</h2>
+            <div class="panel-scroll"><h3 style='font-size:0.8rem;color:var(--accent);margin:0.3rem 0;'>Skill recommendations</h3><div class='wiki-block'><ul><li><a href="https://wiki.guildwars.com/wiki/Holy_damage" rel="noopener" target="_blank" title="Holy damage">Holy damage</a> is doubled against undead.
+<ul><li><a href="https://wiki.guildwars.com/wiki/Smiting_Prayers" rel="noopener" target="_blank" title="Smiting Prayers">Smiting Prayers</a> skills dealing such damage, notably <a href="https://wiki.guildwars.com/wiki/Ray_of_Judgment" rel="noopener" target="_blank" title="Ray of Judgment">Ray of Judgment</a>, <a href="https://wiki.guildwars.com/wiki/Signet_of_Judgment" rel="noopener" target="_blank" title="Signet of Judgment">Signet of Judgment</a>, <a href="https://wiki.guildwars.com/wiki/Smite_Hex" rel="noopener" target="_blank" title="Smite Hex">Smite Hex</a> and <a href="https://wiki.guildwars.com/wiki/Smite_Condition" rel="noopener" target="_blank" title="Smite Condition">Smite Condition</a>, are effective.</li>
+<li><a href="https://wiki.guildwars.com/wiki/Judge%27s_Insight" rel="noopener" target="_blank" title="Judge's Insight">Judge's Insight</a> and <a href="https://wiki.guildwars.com/wiki/Heart_of_Holy_Flame" rel="noopener" target="_blank" title="Heart of Holy Flame">Heart of Holy Flame</a> can temporarily change <a href="https://wiki.guildwars.com/wiki/Attack" rel="noopener" target="_blank" title="Attack">attacks</a>' <a href="https://wiki.guildwars.com/wiki/Damage_type" rel="noopener" target="_blank" title="Damage type">damage type</a> to holy.</li></ul></li>
+<li>The undead's strategy revolves around <a href="https://wiki.guildwars.com/wiki/Condition" rel="noopener" target="_blank" title="Condition">conditions</a> to trigger <a href="https://wiki.guildwars.com/wiki/Fragility" rel="noopener" target="_blank" title="Fragility">Fragility</a> and <a class="mw-redirect" href="https://wiki.guildwars.com/wiki/%22Victory_is_Mine!%22" rel="noopener" target="_blank" title='"Victory is Mine!"'>"Victory is Mine!"</a>. <a href="https://wiki.guildwars.com/wiki/List_of_condition_removal_skills" rel="noopener" target="_blank" title="List of condition removal skills">Condition removal</a> is effective as well as <a href="https://wiki.guildwars.com/wiki/Condition#Skills_benefiting_from_conditions_on_allies" rel="noopener" target="_blank" title="Condition">skills that benefit from conditions</a>. Here are the details of conditions :
+<ul><li><a href="https://wiki.guildwars.com/wiki/Skeleton_Ranger" rel="noopener" target="_blank" title="Skeleton Ranger">Skeleton Rangers</a> can inflict <a href="https://wiki.guildwars.com/wiki/Bleeding" rel="noopener" target="_blank" title="Bleeding">bleeding</a> and <a href="https://wiki.guildwars.com/wiki/Poison" rel="noopener" target="_blank" title="Poison">poison</a>;</li>
+<li><a href="https://wiki.guildwars.com/wiki/Skeleton_Sorcerer" rel="noopener" target="_blank" title="Skeleton Sorcerer">Skeleton Sorcerers</a> can inflict blind and <a href="https://wiki.guildwars.com/wiki/Cracked_Armor" rel="noopener" target="_blank" title="Cracked Armor">cracked Armor</a>;</li>
+<li><a href="https://wiki.guildwars.com/wiki/Zombie_Warlock" rel="noopener" target="_blank" title="Zombie Warlock">Zombie Warlocks</a> can inflict poison;</li>
+<li><a href="https://wiki.guildwars.com/wiki/Skeleton_Mesmer" rel="noopener" target="_blank" title="Skeleton Mesmer">Skeleton Mesmers</a> can inflict <a class="mw-redirect" href="https://wiki.guildwars.com/wiki/Deep_wound" rel="noopener" target="_blank" title="Deep wound">deep wound</a> and blind (only in Hard Mode);</li>
+<li><a href="https://wiki.guildwars.com/wiki/Grasping_Ghoul" rel="noopener" target="_blank" title="Grasping Ghoul">Grasping Ghouls</a> can inflict <a href="https://wiki.guildwars.com/wiki/Crippled" rel="noopener" target="_blank" title="Crippled">crippled</a>.</li></ul></li>
+<li><a href="https://wiki.guildwars.com/wiki/Corpse_control" rel="noopener" target="_blank" title="Corpse control">Corpse control</a> is effective against Zombie Warlocks. <a href="https://wiki.guildwars.com/wiki/Well_of_Silence" rel="noopener" target="_blank" title="Well of Silence">Well of Silence</a> works well as it denies the use of <a class="mw-redirect" href="https://wiki.guildwars.com/wiki/%22Victory_is_Mine!%22" rel="noopener" target="_blank" title='"Victory is Mine!"'>"Victory is Mine!"</a>.</li>
+<li><a class="mw-redirect" href="https://wiki.guildwars.com/wiki/Well" rel="noopener" target="_blank" title="Well">Wells</a>, notably <a href="https://wiki.guildwars.com/wiki/Well_of_Power" rel="noopener" target="_blank" title="Well of Power">Well of Power</a> and <a href="https://wiki.guildwars.com/wiki/Well_of_Blood" rel="noopener" target="_blank" title="Well of Blood">Well of Blood</a>, and <a class="mw-redirect" href="https://wiki.guildwars.com/wiki/Ward" rel="noopener" target="_blank" title="Ward">Wards</a>, notably <a href="https://wiki.guildwars.com/wiki/Ward_Against_Elements" rel="noopener" target="_blank" title="Ward Against Elements">Ward Against Elements</a> and <a href="https://wiki.guildwars.com/wiki/Ward_Against_Harm" rel="noopener" target="_blank" title="Ward Against Harm">Ward Against Harm</a>, are helpful when defending Dorian.</li>
+<li>The Skeleton Sorcerers are the biggest threat with their ability to inflict blind, their high <a class="mw-redirect" href="https://wiki.guildwars.com/wiki/AoE" rel="noopener" target="_blank" title="AoE">AoE</a> damage and knockdown. In addition to the aforementioned wards, <a href="https://wiki.guildwars.com/wiki/Ward_of_Stability" rel="noopener" target="_blank" title="Ward of Stability">Ward of Stability</a> can be used to protect against <a href="https://wiki.guildwars.com/wiki/Earthquake" rel="noopener" target="_blank" title="Earthquake">Earthquake</a>, while <a href="https://wiki.guildwars.com/wiki/%22Can%27t_Touch_This!%22" rel="noopener" target="_blank" title="&quot;Can't Touch This!&quot;">"Can't Touch This!"</a> can be used against <a href="https://wiki.guildwars.com/wiki/Lightning_Touch" rel="noopener" target="_blank" title="Lightning Touch">Lightning Touch</a>. <a href="https://wiki.guildwars.com/wiki/Interrupt" rel="noopener" target="_blank" title="Interrupt">Interrupts</a> work well too.</li>
+<li><a class="mw-redirect" href="https://wiki.guildwars.com/wiki/Enchantment_removal" rel="noopener" target="_blank" title="Enchantment removal">Enchantment removal</a> can be effective to remove <a href="https://wiki.guildwars.com/wiki/Death_Nova" rel="noopener" target="_blank" title="Death Nova">Death Nova</a> and <a href="https://wiki.guildwars.com/wiki/Vengeance" rel="noopener" target="_blank" title="Vengeance">Vengeance</a>.</li>
+<li><a class="mw-redirect" href="https://wiki.guildwars.com/wiki/Hex_removal" rel="noopener" target="_blank" title="Hex removal">Hex removal</a> against the skeleton mesmers and skales.</li>
+<li><a class="mw-redirect" href="https://wiki.guildwars.com/wiki/Hex" rel="noopener" target="_blank" title="Hex">Hexes</a> are less effective as Skeleton Mesmers and <a href="https://wiki.guildwars.com/wiki/Skeleton_Monk" rel="noopener" target="_blank" title="Skeleton Monk">Monks</a> carry <a href="https://wiki.guildwars.com/wiki/Shatter_Hex" rel="noopener" target="_blank" title="Shatter Hex">Shatter Hex</a> and <a href="https://wiki.guildwars.com/wiki/Smite_Hex" rel="noopener" target="_blank" title="Smite Hex">Smite Hex</a> respectively. On the opposite, none of the foes carry <a class="mw-redirect" href="https://wiki.guildwars.com/wiki/Condition_removal" rel="noopener" target="_blank" title="Condition removal">condition removal</a>, so conditions are effective.</li></ul></div>
+<h3 style='font-size:0.8rem;color:var(--accent);margin:0.3rem 0;'>Notes</h3><div class='wiki-block'><ul><li>Complete exploration of this area contributes approximately 1.47%  to the Tyrian <a href="https://wiki.guildwars.com/wiki/Cartographer" rel="noopener" target="_blank" title="Cartographer">Cartographer</a> title. (This area can be explored without interference by <a href="https://wiki.guildwars.com/wiki/Foe" rel="noopener" target="_blank" title="Foe">foes</a> after completing the <a href="https://wiki.guildwars.com/wiki/War_in_Kryta" rel="noopener" target="_blank" title="War in Kryta">War in Kryta</a> and speaking to <a href="https://wiki.guildwars.com/wiki/Jiaju_Tai" rel="noopener" target="_blank" title="Jiaju Tai">Jiaju Tai</a> in <a href="https://wiki.guildwars.com/wiki/Lion%27s_Arch" rel="noopener" target="_blank" title="Lion's Arch">Lion's Arch</a>.  This only works if you have no <a class="mw-redirect" href="https://wiki.guildwars.com/wiki/Wanted" rel="noopener" target="_blank" title="Wanted">Wanted</a> quests in your quest log.)</li>
+<li>If you pull aggro to the Gate Guard and he dies, the gate will automatically open without needing to kill the undead. However, the enemies still need to be cleared if you want to complete the bonus.</li>
+<li>Unlike other <a href="https://wiki.guildwars.com/wiki/Statue_of_Melandru" rel="noopener" target="_blank" title="Statue of Melandru">statues of Melandru</a>, the statue of Melandru in this mission doesn't appear differently with <a class="mw-redirect" href="https://wiki.guildwars.com/wiki/Favor_of_the_Gods" rel="noopener" target="_blank" title="Favor of the Gods">Favor of the Gods</a> active.</li>
+<li>In rare cases, a Lynx can spawn on the broken bridge.</li>
+<li>Contrary to the mission objective, it is not necessary to speak to Confessor Dorian. Keeping him alive and speaking to Dinas is sufficient to complete the mission.</li>
+<li>Completion of this mission will fill in page #1 of <a href="https://wiki.guildwars.com/wiki/The_Flameseeker_Prophecies" rel="noopener" target="_blank" title="The Flameseeker Prophecies">The Flameseeker Prophecies</a> <a href="https://wiki.guildwars.com/wiki/Storybook" rel="noopener" target="_blank" title="Storybook">storybook</a>.</li>
+<li>After completing this mission, your party will be taken to <a href="https://wiki.guildwars.com/wiki/Divinity_Coast_(outpost)" rel="noopener" target="_blank" title="Divinity Coast (outpost)">Divinity Coast</a>.</li></ul></div></div>
+          </section>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="lightbox" id="lightbox" role="dialog" aria-label="Enlarged map">
+    <img src="../maps/prophecies_08_DAlessio_Seaboard_map.jpg" alt="D&#x27;Alessio Seaboard mission map (enlarged)" />
+  </div>
+  <script>
+    (function () {
+      var open = document.getElementById("mapOpen");
+      var box = document.getElementById("lightbox");
+      if (!open || !box) return;
+      open.addEventListener("click", function () { box.classList.add("open"); });
+      box.addEventListener("click", function () { box.classList.remove("open"); });
+      document.addEventListener("keydown", function (e) {
+        if (e.key === "Escape") box.classList.remove("open");
+      });
+    })();
+  </script>
+
+</body>
+</html>

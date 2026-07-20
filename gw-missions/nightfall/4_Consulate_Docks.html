@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Consulate Docks</title>
+  <style>
+:root {
+  --bg-deep: #070a0f;
+  --bg-panel: #101820;
+  --bg-panel-2: #15202c;
+  --border: #243044;
+  --border-glow: #2a4a6a;
+  --text: #dce6f0;
+  --text-muted: #8a9bb0;
+  --text-dim: #5c6f86;
+  --accent: #3ecfff;
+  --accent-soft: rgba(62, 207, 255, 0.12);
+  --gold: #e8c56a;
+  --gold-soft: rgba(232, 197, 106, 0.12);
+  --bonus: #7dffb3;
+  --bonus-soft: rgba(125, 255, 179, 0.1);
+  --danger: #ff6b6b;
+  --danger-soft: rgba(255, 107, 107, 0.1);
+  --hm: #c78bff;
+  --hm-soft: rgba(199, 139, 255, 0.12);
+  --radius: 10px;
+  --font: "Segoe UI", system-ui, -apple-system, sans-serif;
+  --chrome-h: 3.1rem;
+  --gap: 0.5rem;
+  --pad: 0.7rem;
+  /* Readable on 4K vertical (~2160×3840) */
+  --walk-size: clamp(1.05rem, 0.55vw + 0.55vh, 1.35rem);
+  --bonus-size: clamp(1.05rem, 0.55vw + 0.55vh, 1.35rem);
+  --body-size: clamp(0.95rem, 0.4vw + 0.4vh, 1.1rem);
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html {
+  scroll-behavior: smooth;
+  font-size: clamp(16px, 0.55vw + 0.45vh, 20px);
+  height: 100%;
+  scroll-padding-top: calc(var(--chrome-h) + 0.5rem);
+}
+body {
+  font-family: var(--font);
+  background: var(--bg-deep);
+  color: var(--text);
+  line-height: 1.45;
+  min-height: 100%;
+  height: 100%;
+  overflow: hidden;
+  background-image: radial-gradient(ellipse 70% 25% at 50% 0%, rgba(42, 100, 160, 0.14), transparent);
+}
+a { color: var(--accent); text-decoration: none; }
+a:hover { color: #7de0ff; text-decoration: underline; }
+.app {
+  display: grid;
+  grid-template-rows: var(--chrome-h) 1fr;
+  height: 100vh; height: 100dvh;
+  max-height: 100vh; max-height: 100dvh;
+}
+.top-chrome {
+  display: flex; align-items: center; gap: 0.65rem;
+  padding: 0 0.7rem;
+  background: rgba(8, 12, 18, 0.97);
+  border-bottom: 1px solid var(--border);
+  z-index: 100; min-height: var(--chrome-h);
+}
+.brand { display: flex; align-items: baseline; gap: 0.55rem; min-width: 0; flex-shrink: 0; }
+.brand-mission {
+  font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase;
+  color: var(--accent); font-weight: 700; white-space: nowrap;
+}
+.brand-name {
+  font-size: 1.1rem; font-weight: 750; color: var(--text);
+  white-space: nowrap; letter-spacing: -0.02em;
+}
+.brand-meta { font-size: 0.75rem; color: var(--text-dim); white-space: nowrap; }
+.chip-nav {
+  display: flex; flex: 1; gap: 0.3rem; overflow-x: auto;
+  scrollbar-width: none; min-width: 0; justify-content: center;
+}
+.chip-nav::-webkit-scrollbar { display: none; }
+.chip-nav a {
+  flex: 0 0 auto; padding: 0.3rem 0.65rem; border-radius: 999px;
+  font-size: 0.78rem; font-weight: 600; color: var(--text-muted);
+  background: var(--bg-panel); border: 1px solid var(--border);
+  text-decoration: none; white-space: nowrap;
+}
+.chip-nav a:hover {
+  color: var(--text); border-color: var(--border-glow);
+  background: #1a2836; text-decoration: none;
+}
+.chip-nav a[href="#map"] { color: var(--accent); border-color: rgba(62, 207, 255, 0.35); }
+.chip-nav a[href="#bonus"] { color: var(--bonus); border-color: rgba(125, 255, 179, 0.3); }
+.chip-nav a[href="#hard-mode"] { color: var(--hm); border-color: rgba(199, 139, 255, 0.3); }
+.chip-nav a[href="#bosses"] { color: #ff9a9a; border-color: rgba(255, 107, 107, 0.3); }
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 0.3rem;
+  padding: 0.42rem 0.85rem; border-radius: 8px; font-weight: 650; font-size: 0.8rem;
+  border: none; cursor: pointer; text-decoration: none; white-space: nowrap; flex-shrink: 0;
+}
+.btn:hover { text-decoration: none; }
+.btn-next {
+  background: linear-gradient(135deg, #1a6a9a, #1ab0e0); color: #fff;
+  box-shadow: 0 2px 12px rgba(26, 140, 200, 0.35);
+}
+.btn-next:hover { color: #fff; filter: brightness(1.08); }
+.btn-wiki, .btn-idx, .btn-prev {
+  background: var(--bg-panel); color: var(--text-muted);
+  border: 1px solid var(--border); padding: 0.42rem 0.65rem;
+}
+.btn-wiki:hover, .btn-idx:hover, .btn-prev:hover {
+  color: var(--accent); border-color: var(--border-glow);
+}
+.chrome-actions { display: flex; gap: 0.35rem; flex-shrink: 0; }
+
+/* Map-dominant workspace */
+.workspace {
+  display: grid;
+  grid-template-columns: minmax(480px, 1.15fr) minmax(0, 1fr);
+  grid-template-rows: 1fr;
+  gap: var(--gap); padding: var(--gap);
+  min-height: 0; height: 100%; overflow: hidden;
+}
+.col-map {
+  display: grid;
+  grid-template-rows: 1fr auto;
+  gap: var(--gap);
+  min-height: 0; min-width: 0;
+}
+.col-main {
+  display: grid;
+  /* objectives compact | walkthrough HUGE | bonus+hm | bosses+tips */
+  grid-template-rows: auto minmax(0, 1.6fr) minmax(0, 1.05fr) minmax(0, 0.75fr);
+  gap: var(--gap); min-height: 0; min-width: 0; overflow: hidden;
+}
+.row-obj { min-height: 0; }
+.row-bonus-hm {
+  display: grid; grid-template-columns: 1.15fr 0.85fr; gap: var(--gap); min-height: 0;
+}
+.row-lower {
+  display: grid; grid-template-columns: 1.15fr 0.85fr; gap: var(--gap); min-height: 0;
+}
+.panel {
+  background: var(--bg-panel); border: 1px solid var(--border); border-radius: var(--radius);
+  padding: var(--pad); display: flex; flex-direction: column; min-height: 0; overflow: hidden;
+}
+.panel-scroll {
+  overflow-y: auto; overflow-x: hidden; min-height: 0; flex: 1; padding-right: 0.3rem;
+  scrollbar-width: thin; scrollbar-color: var(--border) transparent;
+  font-size: var(--body-size);
+}
+.panel-scroll::-webkit-scrollbar { width: 8px; }
+.panel-scroll::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+.panel-title {
+  display: flex; align-items: center; gap: 0.4rem;
+  font-size: 0.82rem; font-weight: 750; letter-spacing: 0.05em; text-transform: uppercase;
+  color: var(--text); margin-bottom: 0.45rem; padding-bottom: 0.35rem;
+  border-bottom: 1px solid var(--border); flex-shrink: 0;
+}
+.panel-title .icon {
+  width: 1.3rem; height: 1.3rem; border-radius: 5px;
+  display: inline-flex; align-items: center; justify-content: center; font-size: 0.75rem;
+}
+.panel.map-panel {
+  border-color: var(--border-glow);
+  background: linear-gradient(180deg, #0e1620 0%, var(--bg-panel) 100%);
+  /* Map takes almost all left column */
+  min-height: 0;
+}
+.panel.objectives { border-top: 2px solid var(--accent); }
+.panel.walkthrough { border-top: 3px solid #5eb8e8; }
+.panel.bonus { border-top: 3px solid var(--bonus); }
+.panel.hard-mode { border-top: 2px solid var(--hm); }
+.panel.bosses { border-top: 2px solid var(--danger); }
+.panel.other { border-top: 2px solid var(--text-muted); }
+
+/* Emphasized reading panels */
+.panel.walkthrough .panel-scroll,
+.panel.walkthrough .wiki-block {
+  font-size: var(--walk-size) !important;
+  line-height: 1.55;
+}
+.panel.bonus .panel-scroll,
+.panel.bonus .wiki-block {
+  font-size: var(--bonus-size) !important;
+  line-height: 1.55;
+}
+.panel.walkthrough .panel-scroll li,
+.panel.bonus .panel-scroll li {
+  margin-bottom: 0.45rem;
+}
+.panel.walkthrough .panel-scroll p,
+.panel.bonus .panel-scroll p {
+  margin-bottom: 0.55rem;
+}
+
+.icon-map { background: var(--accent-soft); color: var(--accent); }
+.icon-obj { background: var(--accent-soft); color: var(--accent); }
+.icon-walk { background: rgba(94, 184, 232, 0.15); color: #5eb8e8; }
+.icon-bonus { background: var(--bonus-soft); color: var(--bonus); }
+.icon-hm { background: var(--hm-soft); color: var(--hm); }
+.icon-boss { background: var(--danger-soft); color: var(--danger); }
+.icon-other { background: rgba(138, 155, 176, 0.15); color: var(--text-muted); }
+
+.map-wrap {
+  flex: 1; min-height: 0; display: flex; flex-direction: column;
+  align-items: center; justify-content: center; gap: 0.4rem;
+}
+.map-frame {
+  flex: 1; min-height: 0; width: 100%;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: 10px; overflow: hidden;
+  border: 2px solid var(--border-glow);
+  box-shadow: 0 0 0 1px rgba(62, 207, 255, 0.1), 0 12px 40px rgba(0, 0, 0, 0.45);
+  background: #05080c; cursor: zoom-in;
+}
+.map-frame img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  image-rendering: auto;
+}
+.map-caption { font-size: 0.72rem; color: var(--text-dim); flex-shrink: 0; }
+.map-missing {
+  color: var(--text-dim); font-size: 1rem; text-align: center; padding: 2rem;
+}
+
+.wiki-block ul, .panel-scroll ul,
+.wiki-block ol, .panel-scroll ol { padding-left: 1.2rem; margin: 0.3rem 0 0.5rem; }
+.wiki-block li, .panel-scroll li { margin-bottom: 0.32rem; }
+.wiki-block p, .panel-scroll p { margin-bottom: 0.45rem; }
+.wiki-block img, .panel-scroll img { vertical-align: middle; max-height: 1.35em; width: auto; }
+.wiki-block table, .panel-scroll table {
+  width: 100%; border-collapse: collapse; font-size: 0.9em; margin: 0.4rem 0;
+}
+.wiki-block th, .wiki-block td, .panel-scroll th, .panel-scroll td {
+  border: 1px solid var(--border); padding: 0.3rem 0.45rem; text-align: left;
+}
+.lede { font-size: 0.92rem; color: var(--text-muted); margin-bottom: 0.35rem; }
+
+/* Collapsed summary */
+details.summary-details {
+  background: var(--bg-panel);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  border-top: 2px solid var(--gold);
+  padding: 0.35rem 0.65rem;
+  flex-shrink: 0;
+}
+details.summary-details summary {
+  cursor: pointer;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--gold);
+  padding: 0.35rem 0;
+  list-style: none;
+}
+details.summary-details summary::-webkit-details-marker { display: none; }
+details.summary-details summary::before {
+  content: "▸ ";
+  color: var(--text-dim);
+}
+details.summary-details[open] summary::before { content: "▾ "; }
+details.summary-details .summary-body {
+  padding: 0.35rem 0 0.55rem;
+  font-size: 0.88rem;
+  color: var(--text-muted);
+  max-height: 18vh;
+  overflow-y: auto;
+}
+
+.boss-note { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.4rem; }
+.boss-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.4rem; }
+.boss-card {
+  background: var(--bg-panel-2); border: 1px solid var(--border);
+  border-radius: 8px; padding: 0.5rem 0.6rem;
+}
+.boss-card-head { font-size: 0.95rem; margin-bottom: 0.2rem; }
+.boss-card-head a { color: #eef6fc; font-weight: 700; }
+.boss-card-head a:hover { color: var(--accent); }
+.boss-elite { font-size: 0.88rem; }
+.elite-label { color: var(--gold); font-weight: 650; margin-right: 0.25rem; }
+.elite-link { color: #ffd78a; font-weight: 650; }
+.elite-link:hover { color: #ffe9b5; }
+.elite-none { color: var(--text-dim); font-style: italic; font-size: 0.85rem; }
+.boss-meta { font-size: 0.78rem; color: var(--text-dim); margin-top: 0.15rem; }
+
+.callout {
+  margin-top: 0.4rem; padding: 0.45rem 0.6rem; border-radius: 6px;
+  font-size: 0.88rem; border-left: 3px solid; line-height: 1.4;
+}
+.callout.tip { background: var(--accent-soft); border-color: var(--accent); color: #b8eaff; }
+.callout.warn { background: var(--danger-soft); border-color: var(--danger); color: #ffb4b4; }
+
+.lightbox {
+  display: none; position: fixed; inset: 0; z-index: 1000; background: rgba(0,0,0,0.94);
+  align-items: center; justify-content: center; padding: 1.5rem; cursor: zoom-out;
+}
+.lightbox.open { display: flex; }
+.lightbox img {
+  max-width: 96vw; max-height: 96vh; border-radius: 8px;
+  border: 2px solid var(--border-glow); object-fit: contain;
+}
+
+@media (min-height: 2400px) {
+  :root {
+    --walk-size: clamp(1.15rem, 0.7vh + 0.3vw, 1.5rem);
+    --bonus-size: clamp(1.15rem, 0.7vh + 0.3vw, 1.5rem);
+    --gap: 0.65rem;
+    --pad: 0.85rem;
+  }
+  .workspace { grid-template-columns: minmax(560px, 1.2fr) minmax(0, 1fr); }
+}
+@media (min-width: 1800px) and (min-height: 2000px) {
+  .workspace { grid-template-columns: minmax(600px, 1.25fr) minmax(0, 1fr); }
+}
+@media (max-height: 1100px) {
+  body { overflow: auto; height: auto; }
+  .app { height: auto; max-height: none; min-height: 100vh; }
+  .workspace {
+    height: auto; overflow: visible; grid-template-columns: 1fr; grid-template-rows: auto;
+  }
+  .col-map { grid-template-rows: auto; }
+  .col-main { overflow: visible; grid-template-rows: auto; }
+  .row-bonus-hm, .row-lower { grid-template-columns: 1fr; }
+  .panel { max-height: none; overflow: visible; }
+  .panel-scroll { overflow: visible; }
+  .map-frame { min-height: 360px; max-height: 55vh; }
+}
+
+    :root { --accent: #c78bff; --accent-soft: #c78bff22; }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header class="top-chrome">
+      <div class="brand">
+        <span class="brand-mission">M4</span>
+        <span class="brand-name">Consulate Docks</span>
+        <span class="brand-meta">Nightfall · Kourna · Cooperative · —</span>
+      </div>
+      <nav class="chip-nav" aria-label="Sections">
+        <a href="#map">Map</a>
+        <a href="#walkthrough">Walkthrough</a>
+        <a href="#bonus">Bonus</a>
+        <a href="#objectives">Objectives</a>
+        <a href="#hard-mode">Hard Mode</a>
+        <a href="#bosses">Bosses</a>
+        <a href="#other">Tips</a>
+      </nav>
+      <div class="chrome-actions">
+        <a class="btn btn-idx" href="../nightfall.html">Index</a>
+        <a class="btn btn-prev" href="3_Blacktide_Den.html">← Prev</a>
+        <a class="btn btn-wiki" href="https://wiki.guildwars.com/wiki/Consulate_Docks" target="_blank" rel="noopener">Wiki ↗</a>
+        <a class="btn btn-next" href="5_Venta_Cemetery.html">Next: Venta Cemetery →</a>
+      </div>
+    </header>
+
+    <div class="workspace">
+      <div class="col-map">
+        <section class="panel map-panel" id="map">
+          <h2 class="panel-title"><span class="icon icon-map">◉</span> Mission Map</h2>
+          <div class="map-wrap">
+            <div class="map-frame" id="mapOpen" title="Click to enlarge">
+              <img src="../maps/nightfall_04_Consulate_Docks_map.jpg" alt="Consulate Docks mission map" />
+            </div>
+            <p class="map-caption">Click to enlarge · Local cache · <a href="https://wiki.guildwars.com/wiki/Consulate_Docks" target="_blank" rel="noopener">Wiki</a></p>
+        </div>
+        </section>
+
+        <details class="summary-details" id="summary">
+          <summary>Summary (click to expand)</summary>
+          <div class="summary-body">
+            <p>Consulate Docks is the first mission in the Nightfall campaign for characters from other campaigns . You join the Sunspears as they assault Gandara, the Moon Fortress in an attempt to depose Varesh and end her threat to Elona . Make sure you have Dunkoro in your party to enter.</p>
+            <p style="margin-top:0.4rem;"><strong>Region:</strong> Kourna · <strong>Mission:</strong> 4 of 20 · <strong>Type:</strong> Cooperative<br/><strong>Required hero:</strong> Dunkoro</p>
+            <p style="margin-top:0.35rem;"><a href="https://wiki.guildwars.com/wiki/Consulate_Docks" target="_blank" rel="noopener">Full wiki article ↗</a></p>
+          </div>
+        </details>
+      </div>
+
+      <div class="col-main">
+        <section class="panel objectives row-obj" id="objectives">
+          <h2 class="panel-title"><span class="icon icon-obj">✓</span> Objectives</h2>
+          <div class="panel-scroll wiki-block"><p>Assault Gandara.
+</p><ul><li>Unite the western and southern attack fronts.</li>
+<li>Capture the forward wall!</li>
+<li>ADDED: Defeat the <a href="https://wiki.guildwars.com/wiki/Captain_Lumanda" rel="noopener" target="_blank" title="Captain Lumanda">Kournan Gate Captain</a> to prevent him from summoning Kournan troops.</li>
+<li>ADDED: Kill the siege engineers manning the <a href="https://wiki.guildwars.com/wiki/Firespitter" rel="noopener" target="_blank" title="Firespitter">firespitters</a> to clear the way for the southern attack front.</li>
+<li>ADDED: Capture the <a href="https://wiki.guildwars.com/wiki/Bombard_(Kournan)" rel="noopener" target="_blank" title="Bombard (Kournan)">Kournan bombard</a> to gain entrance to the heart of Gandara.</li>
+<li>ADDED: Rally the attack force outside the <a href="https://wiki.guildwars.com/wiki/Plaza_of_the_Five_Gods" rel="noopener" target="_blank" title="Plaza of the Five Gods">Plaza of the Five Gods</a>.</li>
+<li>*<a class="mw-redirect" href="https://wiki.guildwars.com/wiki/Bonus" rel="noopener" target="_blank" title="Bonus">BONUS</a>* Eliminate the <a href="https://wiki.guildwars.com/wiki/Kournan_Field_Commander" rel="noopener" target="_blank" title="Kournan Field Commander">Kournan field marshal</a> groups.</li>
+<li>You have [3...0] of 3 Kournan field marshal groups remaining.</li></ul></div>
+        </section>
+
+        <section class="panel walkthrough" id="walkthrough">
+          <h2 class="panel-title"><span class="icon icon-walk">→</span> Walkthrough</h2>
+          <div class="panel-scroll wiki-block"><p>For this mission only, all <a href="https://wiki.guildwars.com/wiki/Party" rel="noopener" target="_blank" title="Party">party</a> members will be <a href="https://wiki.guildwars.com/wiki/Buff" rel="noopener" target="_blank" title="Buff">buffed</a> with <a href="https://wiki.guildwars.com/wiki/Sunspear_Battle_Call" rel="noopener" target="_blank" title="Sunspear Battle Call">Sunspear Battle Call</a>, which increases maximum health and armor (but not attribute points) to the equivalent of a level 20 <a href="https://wiki.guildwars.com/wiki/Character" rel="noopener" target="_blank" title="Character">character</a>. An effect that helps low level characters/<a href="https://wiki.guildwars.com/wiki/Hero" rel="noopener" target="_blank" title="Hero">heroes</a> to get through the mission more easily.
+</p><p>Leave the boat and start to attack. You will encounter several <a href="https://wiki.guildwars.com/wiki/Kournan_Bowman" rel="noopener" target="_blank" title="Kournan Bowman">Kournan Bowmen</a>, who tend to focus their arrows on one single <a href="https://wiki.guildwars.com/wiki/Target" rel="noopener" target="_blank" title="Target">target</a>, making them deadly to unprepared players. <a href="https://wiki.guildwars.com/wiki/Spellcaster" rel="noopener" target="_blank" title="Spellcaster">Spellcaster</a> characters should try to attack them from behind walls to <a href="https://wiki.guildwars.com/wiki/Line_of_sight" rel="noopener" target="_blank" title="Line of sight">cover</a> from their projectiles.
+</p><p>Once you've killed the archers, go down to the western gate guarded by <a href="https://wiki.guildwars.com/wiki/Captain_Lumanda" rel="noopener" target="_blank" title="Captain Lumanda">Captain Lumanda</a> who is able to call in reinforcements and get rid of him to prevent additional Kournan soldier spawns.
+</p><p>In the next area, your reinforcements will be obstructed by two <a href="https://wiki.guildwars.com/wiki/Firespitter" rel="noopener" target="_blank" title="Firespitter">firespitters</a>. Kill the Kournan Engineers and their groups to turn them off and reform the army by speaking to <a href="https://wiki.guildwars.com/wiki/Nerashi" rel="noopener" target="_blank" title="Nerashi">Nerashi</a>. Make sure your allies do not remain stuck behind ground obstacles (or you will lose offense). 
+</p><p>Continue forward, killing Kournans to capture the bombard which can be used to breach the fortress. <a href="https://wiki.guildwars.com/wiki/Captain_Mwende" rel="noopener" target="_blank" title="Captain Mwende">Captain Mwende</a> and four Elite Kournans will be stationed behind the gate.
+</p><p>Climb the stairs to reach the Plaza of the Five Gods, where Varesh is trapped by the invasion to finish the mission.
+</p></div>
+        </section>
+
+        <div class="row-bonus-hm">
+          <section class="panel bonus" id="bonus">
+            <h2 class="panel-title"><span class="icon icon-bonus">★</span> Bonus</h2>
+            <div class="panel-scroll wiki-block"><p>To gain the bonus rewards, your party has to kill three additional <a href="https://wiki.guildwars.com/wiki/Kournan_Field_Commander" rel="noopener" target="_blank" title="Kournan Field Commander">Kournan Field Commanders</a> and their groups. These Commanders make use of a skill called <a href="https://wiki.guildwars.com/wiki/Kournan_Siege" rel="noopener" target="_blank" title="Kournan Siege">Kournan Siege</a>, which deals massive damage and also interrupts actions.
+</p><ol><li>The first is near mission start, at the top left stairs and before Captain Lumanda.</li>
+<li>The second is situated past the Kournan bombard weapon and can be found after the cinematic but before Captain Mwende.</li>
+<li>The third and final is after Captain Mwende but before the Plaza of the Five Gods. Do not proceed to engage Varesh; instead, detour northeast to find them, otherwise you might accidentally finish the mission before you're able to complete the bonus.</li></ol><div style="margin: 1em; border: solid silver; border-width: 1px 0px; padding: 2px 1em 2px 5em;"><strong class="hiddenlinks" style="position: absolute; margin-left: -4.8em; color: #900;"><a class="image" href="https://wiki.guildwars.com/wiki/File:Bug.png" rel="noopener" target="_blank" title="Bug"><img alt="Bug" data-file-height="32" data-file-width="32" decoding="async" height="18" loading="lazy" src="https://wiki.guildwars.com/images/thumb/7/7d/Bug.png/18px-Bug.png" srcset="/images/thumb/7/7d/Bug.png/27px-Bug.png 1.5x, /images/7/7d/Bug.png 2x" width="18"/></a> <a href="https://wiki.guildwars.com/wiki/Bug" rel="noopener" target="_blank" title="Bug">Bug</a>.</strong>The first Field Commander may sometimes spawn beyond the closed gate. If you do not have any ranged spell attacks, you may need to restart the mission to get the Master's reward.</div></div>
+          </section>
+          <section class="panel hard-mode" id="hard-mode">
+            <h2 class="panel-title"><span class="icon icon-hm">◆</span> Hard Mode</h2>
+            <div class="panel-scroll wiki-block"><p>Avoid over-<a href="https://wiki.guildwars.com/wiki/Aggro" rel="noopener" target="_blank" title="Aggro">aggro</a> especially around the main gate and third Field Commander.
+</p></div>
+          </section>
+        </div>
+
+        <div class="row-lower">
+          <section class="panel bosses" id="bosses">
+            <h2 class="panel-title"><span class="icon icon-boss">☠</span> Bosses &amp; Elites</h2>
+            <div class="panel-scroll"><div class='boss-grid'>
+<article class="boss-card">
+  <div class="boss-card-head"><a href="https://wiki.guildwars.com/wiki/Captain_Kavaka" target="_blank" rel="noopener"><strong>Captain Kavaka</strong></a></div>
+  <div class="boss-elite"><span class="elite-label">Elite:</span> <a class="elite-link" href="https://wiki.guildwars.com/wiki/Magehunter_Strike" target="_blank" rel="noopener">Magehunter Strike</a></div>
+  <div class="boss-meta">24 (30)</div>
+</article>
+<article class="boss-card">
+  <div class="boss-card-head"><a href="https://wiki.guildwars.com/wiki/Captain_Mwende" target="_blank" rel="noopener"><strong>Captain Mwende</strong></a></div>
+  <div class="boss-elite"><span class="elite-label">Elite:</span> <a class="elite-link" href="https://wiki.guildwars.com/wiki/Master_of_Magic" target="_blank" rel="noopener">Master of Magic</a></div>
+  <div class="boss-meta">24 (30)</div>
+</article>
+<article class="boss-card">
+  <div class="boss-card-head"><a href="https://wiki.guildwars.com/wiki/Captain_Lumanda" target="_blank" rel="noopener"><strong>Captain Lumanda</strong></a></div>
+  <div class="boss-elite"><span class="elite-label">Elite:</span> <a class="elite-link" href="https://wiki.guildwars.com/wiki/Cautery_Signet" target="_blank" rel="noopener">Cautery Signet</a></div>
+  <div class="boss-meta">24 (30)</div>
+</article>
+<article class="boss-card">
+  <div class="boss-card-head"><a href="https://wiki.guildwars.com/wiki/Captain_Denduru" target="_blank" rel="noopener"><strong>Captain Denduru</strong></a></div>
+  <div class="boss-elite"><span class="elite-label">Elite:</span> <a class="elite-link" href="https://wiki.guildwars.com/wiki/Pious_Renewal" target="_blank" rel="noopener">Pious Renewal</a></div>
+  <div class="boss-meta">24 (30)</div>
+</article>
+</div></div>
+          </section>
+          <section class="panel other" id="other">
+            <h2 class="panel-title"><span class="icon icon-other">✦</span> Tips &amp; Notes</h2>
+            <div class="panel-scroll"><h3 style='font-size:0.8rem;color:var(--accent);margin:0.3rem 0;'>Skill recommendations</h3><div class='wiki-block'><ul><li>Skills that <a href="https://wiki.guildwars.com/wiki/Stance#Skills_countering_stances" rel="noopener" target="_blank" title="Stance">remove stances</a>, <a class="mw-redirect" href="https://wiki.guildwars.com/wiki/List_of_skills_which_bypass_blocking" rel="noopener" target="_blank" title="List of skills which bypass blocking">bypass blocking</a> or <a href="https://wiki.guildwars.com/wiki/List_of_blocking_punishment_skills" rel="noopener" target="_blank" title="List of blocking punishment skills">punish blocking</a> to counter the <a href="https://wiki.guildwars.com/wiki/Whirling_Defense" rel="noopener" target="_blank" title="Whirling Defense">Whirling Defense</a> skill used by the <a href="https://wiki.guildwars.com/wiki/Kournan_Bowman" rel="noopener" target="_blank" title="Kournan Bowman">Kournan Bowmen</a>.</li>
+<li>Skills which <a href="https://wiki.guildwars.com/wiki/Ranged_attack#Skills_that_affect_ranged_attacks" rel="noopener" target="_blank" title="Ranged attack">defend against ranged attacks</a> (e.g., <a href="https://wiki.guildwars.com/wiki/%22Shields_Up!%22" rel="noopener" target="_blank" title='"Shields Up!"'>"Shields Up!"</a>), or provide <a href="https://wiki.guildwars.com/wiki/Damage_reduction" rel="noopener" target="_blank" title="Damage reduction">damage reduction</a> over time (e.g., <a href="https://wiki.guildwars.com/wiki/Shielding_Hands" rel="noopener" target="_blank" title="Shielding Hands">Shielding Hands</a>).</li>
+<li>All foes are <a href="https://wiki.guildwars.com/wiki/Fleshy" rel="noopener" target="_blank" title="Fleshy">fleshy</a>, so there will be many <a href="https://wiki.guildwars.com/wiki/Corpse" rel="noopener" target="_blank" title="Corpse">corpses</a> for <a href="https://wiki.guildwars.com/wiki/Minion_master" rel="noopener" target="_blank" title="Minion master">minion masters</a>; Lonai is also a minion master.</li>
+<li><a class="mw-redirect" href="https://wiki.guildwars.com/wiki/Enchantment" rel="noopener" target="_blank" title="Enchantment">Enchantment</a>-based <a href="https://wiki.guildwars.com/wiki/Build" rel="noopener" target="_blank" title="Build">builds</a> are vulnerable to enchantment removal by <a href="https://wiki.guildwars.com/wiki/Kournan_Oppressor" rel="noopener" target="_blank" title="Kournan Oppressor">Kournan Oppressors</a> and <a href="https://wiki.guildwars.com/wiki/Kournan_Seer" rel="noopener" target="_blank" title="Kournan Seer">Seers</a>.</li>
+<li><a href="https://wiki.guildwars.com/wiki/List_of_hex_removal_skills" rel="noopener" target="_blank" title="List of hex removal skills">Hex removal skills</a> could be unnecessary; the only <a href="https://wiki.guildwars.com/wiki/Hex_spell" rel="noopener" target="_blank" title="Hex spell">hex spells</a> your party will encounter are <a href="https://wiki.guildwars.com/wiki/Enchanter%27s_Conundrum" rel="noopener" target="_blank" title="Enchanter's Conundrum">Enchanter's Conundrum</a> (the hex that is applied has no impact if your party does not use enchantments) and <a href="https://wiki.guildwars.com/wiki/Life_Siphon" rel="noopener" target="_blank" title="Life Siphon">Life Siphon</a> (ends when its caster dies).</li></ul></div>
+<h3 style='font-size:0.8rem;color:var(--accent);margin:0.3rem 0;'>Notes</h3><div class='wiki-block'><div class="thumb tright"><div class="thumbinner" style="width:302px;"><a class="image" href="https://wiki.guildwars.com/wiki/File:Consulate_Docks_Demons.jpg" rel="noopener" target="_blank"><img alt="" class="thumbimage" data-file-height="103" data-file-width="313" decoding="async" height="99" loading="lazy" src="https://wiki.guildwars.com/images/thumb/c/cd/Consulate_Docks_Demons.jpg/300px-Consulate_Docks_Demons.jpg" srcset="/images/c/cd/Consulate_Docks_Demons.jpg 1.5x" width="300"/></a> <div class="thumbcaption"><div class="magnify"><a class="internal" href="https://wiki.guildwars.com/wiki/File:Consulate_Docks_Demons.jpg" rel="noopener" target="_blank" title="Enlarge"></a></div>The "Demon" group just before the cinematic.</div></div></div><ul><li>Kormir follows the <a href="https://wiki.guildwars.com/wiki/Party" rel="noopener" target="_blank" title="Party">party</a> leader, never <a class="mw-redirect" href="https://wiki.guildwars.com/wiki/Attacks" rel="noopener" target="_blank" title="Attacks">attacks</a> and rarely uses <a class="mw-redirect" href="https://wiki.guildwars.com/wiki/Skills" rel="noopener" target="_blank" title="Skills">skills</a> except for <a href="https://wiki.guildwars.com/wiki/%22Incoming!%22" rel="noopener" target="_blank" title='"Incoming!"'>"Incoming!"</a>. Foes cannot <a href="https://wiki.guildwars.com/wiki/Target" rel="noopener" target="_blank" title="Target">target</a> her but she does take damage from <a href="https://wiki.guildwars.com/wiki/Area_of_effect" rel="noopener" target="_blank" title="Area of effect">area of effect</a> skills.</li>
+<li><a href="https://wiki.guildwars.com/wiki/Firespitter" rel="noopener" target="_blank" title="Firespitter">Firespitters</a> will kill allies immediately, but it does not count as a <a href="https://wiki.guildwars.com/wiki/Death" rel="noopener" target="_blank" title="Death">death</a>.</li>
+<li>As mentioned in the walkthrough, if you attempt to take the narrow passage between the firespitters and the wall, Nerashi, Rojis, and Lonai can become stuck and not follow you. This can be indicated by their names becoming gray in your Party Members list when you've run too far away. If this is the case, go back, regroup with them, and take the path around the wall.</li>
+<li>After this mission, nearly every single enemy has an <a href="https://wiki.guildwars.com/wiki/Elite_skill" rel="noopener" target="_blank" title="Elite skill">elite skill</a>.</li>
+<li>After the completion of this mission for the first time, <a href="https://wiki.guildwars.com/wiki/Koss" rel="noopener" target="_blank" title="Koss">Koss</a> will become unavailable until the completion of <a href="https://wiki.guildwars.com/wiki/The_Great_Escape" rel="noopener" target="_blank" title="The Great Escape">The Great Escape</a> quest.</li>
+<li>After completing this mission, your party will be taken to <a href="https://wiki.guildwars.com/wiki/Yohlon_Haven" rel="noopener" target="_blank" title="Yohlon Haven">Yohlon Haven</a>.</li>
+<li>Completion of this mission will fill in page #1 in the <a href="https://wiki.guildwars.com/wiki/Night_Falls" rel="noopener" target="_blank" title="Night Falls">Night Falls</a> <a href="https://wiki.guildwars.com/wiki/Storybook" rel="noopener" target="_blank" title="Storybook">storybook</a>.</li></ul><table class="stdt" style="margin: 5px auto; border: 1px solid #C0C0C0; font-size: 90%; width: 80%; text-align: center;">
+<tbody><tr>
+<th style="background: #7BC; font-size: 110%;"><a href="https://wiki.guildwars.com/wiki/List_of_Nightfall_missions_and_primary_quests" rel="noopener" target="_blank" title="List of Nightfall missions and primary quests">Nightfall missions</a>
+</th></tr>
+<tr>
+<td><a href="https://wiki.guildwars.com/wiki/Chahbek_Village" rel="noopener" target="_blank" title="Chahbek Village">Chahbek Village</a> » <a href="https://wiki.guildwars.com/wiki/Jokanur_Diggings" rel="noopener" target="_blank" title="Jokanur Diggings">Jokanur Diggings</a> » <a href="https://wiki.guildwars.com/wiki/Blacktide_Den" rel="noopener" target="_blank" title="Blacktide Den">Blacktide Den</a> » <a class="mw-selflink selflink">Consulate Docks</a> » <a href="https://wiki.guildwars.com/wiki/Venta_Cemetery" rel="noopener" target="_blank" title="Venta Cemetery">Venta Cemetery </a> » <a href="https://wiki.guildwars.com/wiki/Kodonur_Crossroads" rel="noopener" target="_blank" title="Kodonur Crossroads">Kodonur Crossroads</a> » <a href="https://wiki.guildwars.com/wiki/Pogahn_Passage" rel="noopener" target="_blank" title="Pogahn Passage">Pogahn Passage</a> <i>or</i> <a href="https://wiki.guildwars.com/wiki/Rilohn_Refuge" rel="noopener" target="_blank" title="Rilohn Refuge">Rilohn Refuge</a> » <a href="https://wiki.guildwars.com/wiki/Moddok_Crevice" rel="noopener" target="_blank" title="Moddok Crevice">Moddok Crevice</a> » <a href="https://wiki.guildwars.com/wiki/Tihark_Orchard" rel="noopener" target="_blank" title="Tihark Orchard">Tihark Orchard</a> » <a href="https://wiki.guildwars.com/wiki/Dasha_Vestibule" rel="noopener" target="_blank" title="Dasha Vestibule">Dasha Vestibule</a> <i>or</i> <a href="https://wiki.guildwars.com/wiki/Dzagonur_Bastion" rel="noopener" target="_blank" title="Dzagonur Bastion">Dzagonur Bastion</a> » <a href="https://wiki.guildwars.com/wiki/Grand_Court_of_Sebelkeh" rel="noopener" target="_blank" title="Grand Court of Sebelkeh">Grand Court of Sebelkeh</a> » <a href="https://wiki.guildwars.com/wiki/Jennur%27s_Horde" rel="noopener" target="_blank" title="Jennur's Horde">Jennur's Horde</a> <i>or</i> <a href="https://wiki.guildwars.com/wiki/Nundu_Bay" rel="noopener" target="_blank" title="Nundu Bay">Nundu Bay</a> » <a href="https://wiki.guildwars.com/wiki/Gate_of_Desolation" rel="noopener" target="_blank" title="Gate of Desolation">Gate of Desolation</a> » <a href="https://wiki.guildwars.com/wiki/Ruins_of_Morah" rel="noopener" target="_blank" title="Ruins of Morah">Ruins of Morah</a> » <a href="https://wiki.guildwars.com/wiki/Gate_of_Pain" rel="noopener" target="_blank" title="Gate of Pain">Gate of Pain</a> » <a href="https://wiki.guildwars.com/wiki/Gate_of_Madness" rel="noopener" target="_blank" title="Gate of Madness">Gate of Madness</a> » <a href="https://wiki.guildwars.com/wiki/Abaddon%27s_Gate" rel="noopener" target="_blank" title="Abaddon's Gate">Abaddon's Gate</a>
+</td></tr>
+<tr>
+<td><i><b><a class="mw-redirect" href="https://wiki.guildwars.com/wiki/Challenge_mission" rel="noopener" target="_blank" title="Challenge mission">Challenge</a></b></i><br/><a href="https://wiki.guildwars.com/wiki/Dajkah_Inlet" rel="noopener" target="_blank" title="Dajkah Inlet">Dajkah Inlet</a> <span style="margin: 0em 0.3em;">•</span> <a href="https://wiki.guildwars.com/wiki/Remains_of_Sahlahja" rel="noopener" target="_blank" title="Remains of Sahlahja">Remains of Sahlahja</a> <span style="margin: 0em 0.3em;">•</span> <a href="https://wiki.guildwars.com/wiki/The_Shadow_Nexus" rel="noopener" target="_blank" title="The Shadow Nexus">The Shadow Nexus</a>
+</td></tr>
+<tr>
+<td><i><b><a class="mw-redirect" href="https://wiki.guildwars.com/wiki/Elite_mission" rel="noopener" target="_blank" title="Elite mission">Elite</a></b></i><br/><a href="https://wiki.guildwars.com/wiki/The_Ebony_Citadel_of_Mallyx" rel="noopener" target="_blank" title="The Ebony Citadel of Mallyx">The Ebony Citadel of Mallyx</a>
+</td></tr></tbody></table> 
+NewPP limit report
+Cached time: 20260720091534
+Cache expiry: 3600
+Reduced expiry: true
+Complications: [show‐toc]
+CPU time usage: 0.105 seconds
+Real time usage: 0.147 seconds
+Preprocessor visited node count: 1190/1000000
+Post‐expand include size: 13071/2097152 bytes
+Template argument size: 1069/2097152 bytes
+Highest expansion depth: 10/100
+Expensive parser function count: 0/100
+Unstrip recursion depth: 0/20
+Unstrip post‐expand size: 2/5000000 bytes
+ExtLoops count: 0/1000
+
+Transclusion expansion time report (%,ms,calls,template)
+100.00%   79.506      1 -total
+ 42.63%   33.895      1 Template:Location_disambiguation_2
+ 21.94%   17.445      8 Template:Ifexists
+ 12.30%    9.777      1 Template:Mission_rewards
+  9.19%    7.303      1 Template:Mission_infobox
+  6.39%    5.078      6 Template:Cost
+  4.47%    3.556      1 Template:Nightfall_missions
+  4.34%    3.453      5 Template:R
+  3.08%    2.445      1 Template:Infobox_campaign_row
+  3.04%    2.417      8 Template:Profession_icon_sizes
+ Saved in parser cache with key en_wiki:pcache:idhash:5209-0!canonical and timestamp 20260720091534 and revision id 2697813.</div></div>
+          </section>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="lightbox" id="lightbox" role="dialog" aria-label="Enlarged map">
+    <img src="../maps/nightfall_04_Consulate_Docks_map.jpg" alt="Consulate Docks mission map (enlarged)" />
+  </div>
+  <script>
+    (function () {
+      var open = document.getElementById("mapOpen");
+      var box = document.getElementById("lightbox");
+      if (!open || !box) return;
+      open.addEventListener("click", function () { box.classList.add("open"); });
+      box.addEventListener("click", function () { box.classList.remove("open"); });
+      document.addEventListener("keydown", function (e) {
+        if (e.key === "Escape") box.classList.remove("open");
+      });
+    })();
+  </script>
+
+</body>
+</html>

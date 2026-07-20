@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Gate of Desolation</title>
+  <style>
+:root {
+  --bg-deep: #070a0f;
+  --bg-panel: #101820;
+  --bg-panel-2: #15202c;
+  --border: #243044;
+  --border-glow: #2a4a6a;
+  --text: #dce6f0;
+  --text-muted: #8a9bb0;
+  --text-dim: #5c6f86;
+  --accent: #3ecfff;
+  --accent-soft: rgba(62, 207, 255, 0.12);
+  --gold: #e8c56a;
+  --gold-soft: rgba(232, 197, 106, 0.12);
+  --bonus: #7dffb3;
+  --bonus-soft: rgba(125, 255, 179, 0.1);
+  --danger: #ff6b6b;
+  --danger-soft: rgba(255, 107, 107, 0.1);
+  --hm: #c78bff;
+  --hm-soft: rgba(199, 139, 255, 0.12);
+  --radius: 10px;
+  --font: "Segoe UI", system-ui, -apple-system, sans-serif;
+  --chrome-h: 3.1rem;
+  --gap: 0.5rem;
+  --pad: 0.7rem;
+  /* Readable on 4K vertical (~2160×3840) */
+  --walk-size: clamp(1.05rem, 0.55vw + 0.55vh, 1.35rem);
+  --bonus-size: clamp(1.05rem, 0.55vw + 0.55vh, 1.35rem);
+  --body-size: clamp(0.95rem, 0.4vw + 0.4vh, 1.1rem);
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html {
+  scroll-behavior: smooth;
+  font-size: clamp(16px, 0.55vw + 0.45vh, 20px);
+  height: 100%;
+  scroll-padding-top: calc(var(--chrome-h) + 0.5rem);
+}
+body {
+  font-family: var(--font);
+  background: var(--bg-deep);
+  color: var(--text);
+  line-height: 1.45;
+  min-height: 100%;
+  height: 100%;
+  overflow: hidden;
+  background-image: radial-gradient(ellipse 70% 25% at 50% 0%, rgba(42, 100, 160, 0.14), transparent);
+}
+a { color: var(--accent); text-decoration: none; }
+a:hover { color: #7de0ff; text-decoration: underline; }
+.app {
+  display: grid;
+  grid-template-rows: var(--chrome-h) 1fr;
+  height: 100vh; height: 100dvh;
+  max-height: 100vh; max-height: 100dvh;
+}
+.top-chrome {
+  display: flex; align-items: center; gap: 0.65rem;
+  padding: 0 0.7rem;
+  background: rgba(8, 12, 18, 0.97);
+  border-bottom: 1px solid var(--border);
+  z-index: 100; min-height: var(--chrome-h);
+}
+.brand { display: flex; align-items: baseline; gap: 0.55rem; min-width: 0; flex-shrink: 0; }
+.brand-mission {
+  font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase;
+  color: var(--accent); font-weight: 700; white-space: nowrap;
+}
+.brand-name {
+  font-size: 1.1rem; font-weight: 750; color: var(--text);
+  white-space: nowrap; letter-spacing: -0.02em;
+}
+.brand-meta { font-size: 0.75rem; color: var(--text-dim); white-space: nowrap; }
+.chip-nav {
+  display: flex; flex: 1; gap: 0.3rem; overflow-x: auto;
+  scrollbar-width: none; min-width: 0; justify-content: center;
+}
+.chip-nav::-webkit-scrollbar { display: none; }
+.chip-nav a {
+  flex: 0 0 auto; padding: 0.3rem 0.65rem; border-radius: 999px;
+  font-size: 0.78rem; font-weight: 600; color: var(--text-muted);
+  background: var(--bg-panel); border: 1px solid var(--border);
+  text-decoration: none; white-space: nowrap;
+}
+.chip-nav a:hover {
+  color: var(--text); border-color: var(--border-glow);
+  background: #1a2836; text-decoration: none;
+}
+.chip-nav a[href="#map"] { color: var(--accent); border-color: rgba(62, 207, 255, 0.35); }
+.chip-nav a[href="#bonus"] { color: var(--bonus); border-color: rgba(125, 255, 179, 0.3); }
+.chip-nav a[href="#hard-mode"] { color: var(--hm); border-color: rgba(199, 139, 255, 0.3); }
+.chip-nav a[href="#bosses"] { color: #ff9a9a; border-color: rgba(255, 107, 107, 0.3); }
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 0.3rem;
+  padding: 0.42rem 0.85rem; border-radius: 8px; font-weight: 650; font-size: 0.8rem;
+  border: none; cursor: pointer; text-decoration: none; white-space: nowrap; flex-shrink: 0;
+}
+.btn:hover { text-decoration: none; }
+.btn-next {
+  background: linear-gradient(135deg, #1a6a9a, #1ab0e0); color: #fff;
+  box-shadow: 0 2px 12px rgba(26, 140, 200, 0.35);
+}
+.btn-next:hover { color: #fff; filter: brightness(1.08); }
+.btn-wiki, .btn-idx, .btn-prev {
+  background: var(--bg-panel); color: var(--text-muted);
+  border: 1px solid var(--border); padding: 0.42rem 0.65rem;
+}
+.btn-wiki:hover, .btn-idx:hover, .btn-prev:hover {
+  color: var(--accent); border-color: var(--border-glow);
+}
+.chrome-actions { display: flex; gap: 0.35rem; flex-shrink: 0; }
+
+/* Map-dominant workspace */
+.workspace {
+  display: grid;
+  grid-template-columns: minmax(480px, 1.15fr) minmax(0, 1fr);
+  grid-template-rows: 1fr;
+  gap: var(--gap); padding: var(--gap);
+  min-height: 0; height: 100%; overflow: hidden;
+}
+.col-map {
+  display: grid;
+  grid-template-rows: 1fr auto;
+  gap: var(--gap);
+  min-height: 0; min-width: 0;
+}
+.col-main {
+  display: grid;
+  /* objectives compact | walkthrough HUGE | bonus+hm | bosses+tips */
+  grid-template-rows: auto minmax(0, 1.6fr) minmax(0, 1.05fr) minmax(0, 0.75fr);
+  gap: var(--gap); min-height: 0; min-width: 0; overflow: hidden;
+}
+.row-obj { min-height: 0; }
+.row-bonus-hm {
+  display: grid; grid-template-columns: 1.15fr 0.85fr; gap: var(--gap); min-height: 0;
+}
+.row-lower {
+  display: grid; grid-template-columns: 1.15fr 0.85fr; gap: var(--gap); min-height: 0;
+}
+.panel {
+  background: var(--bg-panel); border: 1px solid var(--border); border-radius: var(--radius);
+  padding: var(--pad); display: flex; flex-direction: column; min-height: 0; overflow: hidden;
+}
+.panel-scroll {
+  overflow-y: auto; overflow-x: hidden; min-height: 0; flex: 1; padding-right: 0.3rem;
+  scrollbar-width: thin; scrollbar-color: var(--border) transparent;
+  font-size: var(--body-size);
+}
+.panel-scroll::-webkit-scrollbar { width: 8px; }
+.panel-scroll::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+.panel-title {
+  display: flex; align-items: center; gap: 0.4rem;
+  font-size: 0.82rem; font-weight: 750; letter-spacing: 0.05em; text-transform: uppercase;
+  color: var(--text); margin-bottom: 0.45rem; padding-bottom: 0.35rem;
+  border-bottom: 1px solid var(--border); flex-shrink: 0;
+}
+.panel-title .icon {
+  width: 1.3rem; height: 1.3rem; border-radius: 5px;
+  display: inline-flex; align-items: center; justify-content: center; font-size: 0.75rem;
+}
+.panel.map-panel {
+  border-color: var(--border-glow);
+  background: linear-gradient(180deg, #0e1620 0%, var(--bg-panel) 100%);
+  /* Map takes almost all left column */
+  min-height: 0;
+}
+.panel.objectives { border-top: 2px solid var(--accent); }
+.panel.walkthrough { border-top: 3px solid #5eb8e8; }
+.panel.bonus { border-top: 3px solid var(--bonus); }
+.panel.hard-mode { border-top: 2px solid var(--hm); }
+.panel.bosses { border-top: 2px solid var(--danger); }
+.panel.other { border-top: 2px solid var(--text-muted); }
+
+/* Emphasized reading panels */
+.panel.walkthrough .panel-scroll,
+.panel.walkthrough .wiki-block {
+  font-size: var(--walk-size) !important;
+  line-height: 1.55;
+}
+.panel.bonus .panel-scroll,
+.panel.bonus .wiki-block {
+  font-size: var(--bonus-size) !important;
+  line-height: 1.55;
+}
+.panel.walkthrough .panel-scroll li,
+.panel.bonus .panel-scroll li {
+  margin-bottom: 0.45rem;
+}
+.panel.walkthrough .panel-scroll p,
+.panel.bonus .panel-scroll p {
+  margin-bottom: 0.55rem;
+}
+
+.icon-map { background: var(--accent-soft); color: var(--accent); }
+.icon-obj { background: var(--accent-soft); color: var(--accent); }
+.icon-walk { background: rgba(94, 184, 232, 0.15); color: #5eb8e8; }
+.icon-bonus { background: var(--bonus-soft); color: var(--bonus); }
+.icon-hm { background: var(--hm-soft); color: var(--hm); }
+.icon-boss { background: var(--danger-soft); color: var(--danger); }
+.icon-other { background: rgba(138, 155, 176, 0.15); color: var(--text-muted); }
+
+.map-wrap {
+  flex: 1; min-height: 0; display: flex; flex-direction: column;
+  align-items: center; justify-content: center; gap: 0.4rem;
+}
+.map-frame {
+  flex: 1; min-height: 0; width: 100%;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: 10px; overflow: hidden;
+  border: 2px solid var(--border-glow);
+  box-shadow: 0 0 0 1px rgba(62, 207, 255, 0.1), 0 12px 40px rgba(0, 0, 0, 0.45);
+  background: #05080c; cursor: zoom-in;
+}
+.map-frame img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  image-rendering: auto;
+}
+.map-caption { font-size: 0.72rem; color: var(--text-dim); flex-shrink: 0; }
+.map-missing {
+  color: var(--text-dim); font-size: 1rem; text-align: center; padding: 2rem;
+}
+
+.wiki-block ul, .panel-scroll ul,
+.wiki-block ol, .panel-scroll ol { padding-left: 1.2rem; margin: 0.3rem 0 0.5rem; }
+.wiki-block li, .panel-scroll li { margin-bottom: 0.32rem; }
+.wiki-block p, .panel-scroll p { margin-bottom: 0.45rem; }
+.wiki-block img, .panel-scroll img { vertical-align: middle; max-height: 1.35em; width: auto; }
+.wiki-block table, .panel-scroll table {
+  width: 100%; border-collapse: collapse; font-size: 0.9em; margin: 0.4rem 0;
+}
+.wiki-block th, .wiki-block td, .panel-scroll th, .panel-scroll td {
+  border: 1px solid var(--border); padding: 0.3rem 0.45rem; text-align: left;
+}
+.lede { font-size: 0.92rem; color: var(--text-muted); margin-bottom: 0.35rem; }
+
+/* Collapsed summary */
+details.summary-details {
+  background: var(--bg-panel);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  border-top: 2px solid var(--gold);
+  padding: 0.35rem 0.65rem;
+  flex-shrink: 0;
+}
+details.summary-details summary {
+  cursor: pointer;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--gold);
+  padding: 0.35rem 0;
+  list-style: none;
+}
+details.summary-details summary::-webkit-details-marker { display: none; }
+details.summary-details summary::before {
+  content: "▸ ";
+  color: var(--text-dim);
+}
+details.summary-details[open] summary::before { content: "▾ "; }
+details.summary-details .summary-body {
+  padding: 0.35rem 0 0.55rem;
+  font-size: 0.88rem;
+  color: var(--text-muted);
+  max-height: 18vh;
+  overflow-y: auto;
+}
+
+.boss-note { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.4rem; }
+.boss-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.4rem; }
+.boss-card {
+  background: var(--bg-panel-2); border: 1px solid var(--border);
+  border-radius: 8px; padding: 0.5rem 0.6rem;
+}
+.boss-card-head { font-size: 0.95rem; margin-bottom: 0.2rem; }
+.boss-card-head a { color: #eef6fc; font-weight: 700; }
+.boss-card-head a:hover { color: var(--accent); }
+.boss-elite { font-size: 0.88rem; }
+.elite-label { color: var(--gold); font-weight: 650; margin-right: 0.25rem; }
+.elite-link { color: #ffd78a; font-weight: 650; }
+.elite-link:hover { color: #ffe9b5; }
+.elite-none { color: var(--text-dim); font-style: italic; font-size: 0.85rem; }
+.boss-meta { font-size: 0.78rem; color: var(--text-dim); margin-top: 0.15rem; }
+
+.callout {
+  margin-top: 0.4rem; padding: 0.45rem 0.6rem; border-radius: 6px;
+  font-size: 0.88rem; border-left: 3px solid; line-height: 1.4;
+}
+.callout.tip { background: var(--accent-soft); border-color: var(--accent); color: #b8eaff; }
+.callout.warn { background: var(--danger-soft); border-color: var(--danger); color: #ffb4b4; }
+
+.lightbox {
+  display: none; position: fixed; inset: 0; z-index: 1000; background: rgba(0,0,0,0.94);
+  align-items: center; justify-content: center; padding: 1.5rem; cursor: zoom-out;
+}
+.lightbox.open { display: flex; }
+.lightbox img {
+  max-width: 96vw; max-height: 96vh; border-radius: 8px;
+  border: 2px solid var(--border-glow); object-fit: contain;
+}
+
+@media (min-height: 2400px) {
+  :root {
+    --walk-size: clamp(1.15rem, 0.7vh + 0.3vw, 1.5rem);
+    --bonus-size: clamp(1.15rem, 0.7vh + 0.3vw, 1.5rem);
+    --gap: 0.65rem;
+    --pad: 0.85rem;
+  }
+  .workspace { grid-template-columns: minmax(560px, 1.2fr) minmax(0, 1fr); }
+}
+@media (min-width: 1800px) and (min-height: 2000px) {
+  .workspace { grid-template-columns: minmax(600px, 1.25fr) minmax(0, 1fr); }
+}
+@media (max-height: 1100px) {
+  body { overflow: auto; height: auto; }
+  .app { height: auto; max-height: none; min-height: 100vh; }
+  .workspace {
+    height: auto; overflow: visible; grid-template-columns: 1fr; grid-template-rows: auto;
+  }
+  .col-map { grid-template-rows: auto; }
+  .col-main { overflow: visible; grid-template-rows: auto; }
+  .row-bonus-hm, .row-lower { grid-template-columns: 1fr; }
+  .panel { max-height: none; overflow: visible; }
+  .panel-scroll { overflow: visible; }
+  .map-frame { min-height: 360px; max-height: 55vh; }
+}
+
+    :root { --accent: #c78bff; --accent-soft: #c78bff22; }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header class="top-chrome">
+      <div class="brand">
+        <span class="brand-mission">M13</span>
+        <span class="brand-name">Gate of Desolation</span>
+        <span class="brand-meta">Nightfall · The Desolation · Cooperative · —</span>
+      </div>
+      <nav class="chip-nav" aria-label="Sections">
+        <a href="#map">Map</a>
+        <a href="#walkthrough">Walkthrough</a>
+        <a href="#bonus">Bonus</a>
+        <a href="#objectives">Objectives</a>
+        <a href="#hard-mode">Hard Mode</a>
+        <a href="#bosses">Bosses</a>
+        <a href="#other">Tips</a>
+      </nav>
+      <div class="chrome-actions">
+        <a class="btn btn-idx" href="../nightfall.html">Index</a>
+        <a class="btn btn-prev" href="15_Nundu_Bay.html">← Prev</a>
+        <a class="btn btn-wiki" href="https://wiki.guildwars.com/wiki/Gate_of_Desolation" target="_blank" rel="noopener">Wiki ↗</a>
+        <a class="btn btn-next" href="17_Ruins_of_Morah.html">Next: Ruins of Morah →</a>
+      </div>
+    </header>
+
+    <div class="workspace">
+      <div class="col-map">
+        <section class="panel map-panel" id="map">
+          <h2 class="panel-title"><span class="icon icon-map">◉</span> Mission Map</h2>
+          <div class="map-wrap">
+            <div class="map-frame" id="mapOpen" title="Click to enlarge">
+              <img src="../maps/nightfall_16_Gate_of_Desolation_map.jpg" alt="Gate of Desolation mission map" />
+            </div>
+            <p class="map-caption">Click to enlarge · Local cache · <a href="https://wiki.guildwars.com/wiki/Gate_of_Desolation" target="_blank" rel="noopener">Wiki</a></p>
+        </div>
+        </section>
+
+        <details class="summary-details" id="summary">
+          <summary>Summary (click to expand)</summary>
+          <div class="summary-body">
+            <p>This is a lengthy mission where you tame the Junundu to gain the ability to travel the Desolation .</p>
+            <p style="margin-top:0.4rem;"><strong>Region:</strong> The Desolation · <strong>Mission:</strong> 13 of 20 · <strong>Type:</strong> Cooperative<br/><strong>Required hero:</strong> Zhed Shadowhoof</p>
+            <p style="margin-top:0.35rem;"><a href="https://wiki.guildwars.com/wiki/Gate_of_Desolation" target="_blank" rel="noopener">Full wiki article ↗</a></p>
+          </div>
+        </details>
+      </div>
+
+      <div class="col-main">
+        <section class="panel objectives row-obj" id="objectives">
+          <h2 class="panel-title"><span class="icon icon-obj">✓</span> Objectives</h2>
+          <div class="panel-scroll wiki-block"><p>Tame Queen Aijundu and gain control of the junundu wurms.
+</p><ul><li>ADDED: Defeat Queen Aijundu and her undead minions.</li>
+<li>ADDED: Call forth a junundu so you may ride it through the sulfur.</li>
+<li>ADDED: Guide the junundu to the <a href="https://wiki.guildwars.com/wiki/Remains_of_Sahlahja_(outpost)" rel="noopener" target="_blank" title="Remains of Sahlahja (outpost)">Remains of Sahlahja</a>.</li>
+<li>*<a class="mw-redirect" href="https://wiki.guildwars.com/wiki/Bonus" rel="noopener" target="_blank" title="Bonus">Bonus</a>* Protect the <a href="https://wiki.guildwars.com/wiki/Junundu_Young" rel="noopener" target="_blank" title="Junundu Young">junundu young</a> from the <a href="https://wiki.guildwars.com/wiki/Demon" rel="noopener" target="_blank" title="Demon">demon</a> hordes.</li>
+<li>You have saved [0...3] of 3 junundu young.</li></ul></div>
+        </section>
+
+        <section class="panel walkthrough" id="walkthrough">
+          <h2 class="panel-title"><span class="icon icon-walk">→</span> Walkthrough</h2>
+          <div class="panel-scroll wiki-block"><p>As you enter the mission <a href="https://wiki.guildwars.com/wiki/Palawa_Joko" rel="noopener" target="_blank" title="Palawa Joko">Palawa Joko</a> starts to talk and will lead you to a <a href="https://wiki.guildwars.com/wiki/Wurm_Spoor" rel="noopener" target="_blank" title="Wurm Spoor">Wurm Spoor</a> to the left of the entrance. The Wurm Spoor is situated in a hole beyond which the yellow <a href="https://wiki.guildwars.com/wiki/Sulfurous_Haze" rel="noopener" target="_blank" title="Sulfurous Haze">Sulfurous Haze</a> begin. To walk in human form on the areas which show as bright yellow on the map means near immediate death. Stay clear.
+</p><p>It is at this Wurm Spoor (1 on the map) that you will tame <a href="https://wiki.guildwars.com/wiki/Queen_Aijundu" rel="noopener" target="_blank" title="Queen Aijundu">Queen Aijundu</a>, so set up for the fight. You should stage the fight from the hill over looking the Wurm Spoor which will give you a height advantage and keeps you away from the sulfur.  If you are using <a href="https://wiki.guildwars.com/wiki/Hero" rel="noopener" target="_blank" title="Hero">heroes</a> and <a class="mw-redirect" href="https://wiki.guildwars.com/wiki/Henchmen" rel="noopener" target="_blank" title="Henchmen">henchmen</a>, they should be pinned at the top of the hill at the point furthest from the sulfur and set to defensive mode. For a better idea, when Palawa Joko runs to the Wurm Spoor, he will stop before reaching it, then move to the other side, and then remain in that spot until you tame Aijundu. Flag your heroes and henchmen at the point he stops at before moving to his final position. If there is a <a href="https://wiki.guildwars.com/wiki/Minion_master" rel="noopener" target="_blank" title="Minion master">minion master</a> in your <a href="https://wiki.guildwars.com/wiki/Party" rel="noopener" target="_blank" title="Party">party</a>, avoid fighting near Palawa Joko, since he will use <a href="https://wiki.guildwars.com/wiki/Well_of_Darkness" rel="noopener" target="_blank" title="Well of Darkness">Well of Darkness</a> on recharge, exploiting the corpses that the minion master could have used; however, if your party doesn't have a minion master, it is recommended to fight near Palawa Joko, so he will create Wells of Darkness that will hinder <a class="mw-redirect" href="https://wiki.guildwars.com/wiki/Hex" rel="noopener" target="_blank" title="Hex">hexed</a> undead <a href="https://wiki.guildwars.com/wiki/Physical_attack" rel="noopener" target="_blank" title="Physical attack">physical attackers</a> and at the same time prevent <a href="https://wiki.guildwars.com/wiki/Awakened_Defiler" rel="noopener" target="_blank" title="Awakened Defiler">Awakened Defilers</a> from using those corpses to create Wells of Darkness that will hinder your party.
+</p><p>After a few groups of undead have attacked and been defeated, Queen Aijundu will approach and attack. Once her health has been reduced a bit she will retreat and further undead will attack.  There are quite a few bosses who spawn in the undead groups - keep an eye out for them. Aijundu will attack again when all the undead are killed, this time when you've damaged her enough she will allow you to use the wurms to cross the Desolation. Look out for enemies with <a class="mw-redirect" href="https://wiki.guildwars.com/wiki/Hard_res" rel="noopener" target="_blank" title="Hard res">hard resses</a>: <a href="https://wiki.guildwars.com/wiki/Awakened_Acolyte" rel="noopener" target="_blank" title="Awakened Acolyte">Awakened Acolytes</a>, <a href="https://wiki.guildwars.com/wiki/Awakened_Cavalier" rel="noopener" target="_blank" title="Awakened Cavalier">Awakened Cavaliers</a> and especially the boss <a href="https://wiki.guildwars.com/wiki/Chakeh_the_Lonely" rel="noopener" target="_blank" title="Chakeh the Lonely">Chakeh the Lonely</a>. Left alone these will resurrect fallen enemies on top of the new groups approaching you, which might overwhelm the party. <b>Tip:</b> If you feel your party is overwhelmed with attacking foes try running away from the Wurm Spoor. Not all enemies will follow you all the way to your new destination. This smaller group of enemies will be easier to individually target and take down. This also gives your party a chance to regroup, heal, and target the remaining foes left guarding the Wurm Spoor. Also it's not necessary to fight next to the Wurm Spoor.  You can flag your party a fair distance away at the start and simply <a href="https://wiki.guildwars.com/wiki/Pull" rel="noopener" target="_blank" title="Pull">pull</a> the successive groups of enemies. 
+</p><p>The order of appearance of the bosses is as follows: first Chakeh the Lonely (Paragon); second Avah the Crafty (Warrior); third Chundu the Meek (Dervish); fourth and fifth appear together, Nehmak the Unpleasant (Necromancer) and Amind the Bitter (Mesmer).
+</p><p>Click on the Wurm Spoor. This will summon wurms to transport you and the party. You now have control of the wurm and will use <a href="https://wiki.guildwars.com/wiki/Junundu" rel="noopener" target="_blank" title="Junundu">Junundu</a> skills rather than those you have equipped on your character. You can now travel on the sulfur areas without dying.
+</p><p>Follow Palawa Joko as he leads you to the <a href="https://wiki.guildwars.com/wiki/Remains_of_Sahlahja_(outpost)" rel="noopener" target="_blank" title="Remains of Sahlahja (outpost)">Remains of Sahlahja</a>. Along the way you will fight groups of <a href="https://wiki.guildwars.com/wiki/Margonite" rel="noopener" target="_blank" title="Margonite">Margonites</a> and <a href="https://wiki.guildwars.com/wiki/Elemental" rel="noopener" target="_blank" title="Elemental">Elementals</a>. Margonites are easy to take down in the <a href="https://wiki.guildwars.com/wiki/Desert_Wurm_(disguise)" rel="noopener" target="_blank" title="Desert Wurm (disguise)">Desert Wurm disguise</a>, but take care with the Elementals, especially the <a href="https://wiki.guildwars.com/wiki/Sandstorm_Crag" rel="noopener" target="_blank" title="Sandstorm Crag">Sandstorm Crags</a> whose earth damage attacks prove dangerous to the wurms. Mind that both these and Cracked Mesas cannot be knocked down for healing through <a href="https://wiki.guildwars.com/wiki/Junundu_Bite" rel="noopener" target="_blank" title="Junundu Bite">Junundu Bite</a> nor leave corpses for <a href="https://wiki.guildwars.com/wiki/Junundu_Feast" rel="noopener" target="_blank" title="Junundu Feast">Junundu Feast</a>. Remember to use <a href="https://wiki.guildwars.com/wiki/Junundu_Wail" rel="noopener" target="_blank" title="Junundu Wail">Junundu Wail</a> to resurrect fallen party members and heal once a fight is over.
+</p><p>During the journey you will encounter rocky ground which the wurms cannot travel through. You will have to abandon the wurm until you find another Wurm Spoor which will allow you to travel on the sulfur again.  By timing your movement, you can avoid the Margonite group nearby and proceed to the next Wurm Spoor. You complete the mission when you reach the Remains of Sahlahja.
+</p></div>
+        </section>
+
+        <div class="row-bonus-hm">
+          <section class="panel bonus" id="bonus">
+            <h2 class="panel-title"><span class="icon icon-bonus">★</span> Bonus</h2>
+            <div class="panel-scroll wiki-block"><p>The bonus is not difficult, but it detours from Joko's direct route in order to rescue 3 <a href="https://wiki.guildwars.com/wiki/Junundu_Young" rel="noopener" target="_blank" title="Junundu Young">Junundu Young</a>. There is no need to exit Junundu to reach them. 
+</p><p>Each Junundu Young is surrounded by a group of a half-dozen Margonites. Follow the bonus route on the map and kill each group in turn. As you do, an <i>advice box</i> appears stating that the young has been saved and you can move on to the next objective along the path. You still receive credit for a rescue even if the young dies <i>after</i> you have disposed of the foes that threatened it.
+</p><p>Although the Margonites do not attack the young directly, these wurms can be hurt by <a href="https://wiki.guildwars.com/wiki/Area_of_effect" rel="noopener" target="_blank" title="Area of effect">area of effect</a> skills, including your own — most notably, the young can be damaged by <a href="https://wiki.guildwars.com/wiki/Junundu_Smash" rel="noopener" target="_blank" title="Junundu Smash">Junundu Smash</a>. To guarantee the bonus, <a href="https://wiki.guildwars.com/wiki/Pull" rel="noopener" target="_blank" title="Pull">pull</a> the Margonites away from the young before engaging them in combat. 
+</p></div>
+          </section>
+          <section class="panel hard-mode" id="hard-mode">
+            <h2 class="panel-title"><span class="icon icon-hm">◆</span> Hard Mode</h2>
+            <div class="panel-scroll wiki-block"><p class='lede'>No dedicated Hard Mode section on the wiki — expect tougher foes and adjusted mechanics. See walkthrough notes.</p></div>
+          </section>
+        </div>
+
+        <div class="row-lower">
+          <section class="panel bosses" id="bosses">
+            <h2 class="panel-title"><span class="icon icon-boss">☠</span> Bosses &amp; Elites</h2>
+            <div class="panel-scroll"><div class='boss-grid'>
+<article class="boss-card">
+  <div class="boss-card-head"><a href="https://wiki.guildwars.com/wiki/Avah_the_Crafty" target="_blank" rel="noopener"><strong>Avah the Crafty</strong></a></div>
+  <div class="boss-elite"><span class="elite-label">Elite:</span> <a class="elite-link" href="https://wiki.guildwars.com/wiki/Soldier%27s_Stance" target="_blank" rel="noopener">Soldier&#x27;s Stance</a></div>
+  <div class="boss-meta">28 (30)</div>
+</article>
+<article class="boss-card">
+  <div class="boss-card-head"><a href="https://wiki.guildwars.com/wiki/Nehmak_the_Unpleasant" target="_blank" rel="noopener"><strong>Nehmak the Unpleasant</strong></a></div>
+  <div class="boss-elite"><span class="elite-label">Elite:</span> <a class="elite-link" href="https://wiki.guildwars.com/wiki/Signet_of_Suffering" target="_blank" rel="noopener">Signet of Suffering</a></div>
+  <div class="boss-meta">28 (30)</div>
+</article>
+<article class="boss-card">
+  <div class="boss-card-head"><a href="https://wiki.guildwars.com/wiki/Amind_the_Bitter" target="_blank" rel="noopener"><strong>Amind the Bitter</strong></a></div>
+  <div class="boss-elite"><span class="elite-label">Elite:</span> <a class="elite-link" href="https://wiki.guildwars.com/wiki/Hex_Eater_Vortex" target="_blank" rel="noopener">Hex Eater Vortex</a></div>
+  <div class="boss-meta">28 (30)</div>
+</article>
+<article class="boss-card">
+  <div class="boss-card-head"><a href="https://wiki.guildwars.com/wiki/Chakeh_the_Lonely" target="_blank" rel="noopener"><strong>Chakeh the Lonely</strong></a></div>
+  <div class="boss-elite"><span class="elite-label">Elite:</span> <a class="elite-link" href="https://wiki.guildwars.com/wiki/Soldier%27s_Fury" target="_blank" rel="noopener">Soldier&#x27;s Fury</a></div>
+  <div class="boss-meta">28 (30)</div>
+</article>
+<article class="boss-card">
+  <div class="boss-card-head"><a href="https://wiki.guildwars.com/wiki/Chundu_the_Meek" target="_blank" rel="noopener"><strong>Chundu the Meek</strong></a></div>
+  <div class="boss-elite"><span class="elite-label">Elite:</span> <a class="elite-link" href="https://wiki.guildwars.com/wiki/Vow_of_Silence" target="_blank" rel="noopener">Vow of Silence</a></div>
+  <div class="boss-meta">28 (30)</div>
+</article>
+<article class="boss-card">
+  <div class="boss-card-head"><a href="https://wiki.guildwars.com/wiki/Queen_Aijundu" target="_blank" rel="noopener"><strong>Queen Aijundu</strong></a></div>
+  <div class="boss-elite"><span class="elite-none">Elite: None / not listed</span></div>
+  
+</article>
+</div></div>
+          </section>
+          <section class="panel other" id="other">
+            <h2 class="panel-title"><span class="icon icon-other">✦</span> Tips &amp; Notes</h2>
+            <div class="panel-scroll"><h3 style='font-size:0.8rem;color:var(--accent);margin:0.3rem 0;'>Skill recommendations</h3><div class='wiki-block'><dl><dt>Damage</dt></dl><ul><li><a href="https://wiki.guildwars.com/wiki/Holy_damage" rel="noopener" target="_blank" title="Holy damage">Holy damage</a> does double damage to undead.</li>
+<li><a href="https://wiki.guildwars.com/wiki/Area_of_effect" rel="noopener" target="_blank" title="Area of effect">Area of effect</a> spells, non-spell skills, and <a href="https://wiki.guildwars.com/wiki/List_of_enchantment_removal_skills#Skills_that_can_remove_enchantments_that_prevent_spell_targeting" rel="noopener" target="_blank" title="List of enchantment removal skills">certain enchantment removal skills</a> can help to overcome <a href="https://wiki.guildwars.com/wiki/Obsidian_Flesh" rel="noopener" target="_blank" title="Obsidian Flesh">Obsidian Flesh</a> and <a href="https://wiki.guildwars.com/wiki/Vow_of_Silence" rel="noopener" target="_blank" title="Vow of Silence">Vow of Silence</a>, used by the <a href="https://wiki.guildwars.com/wiki/Carven_Effigy" rel="noopener" target="_blank" title="Carven Effigy">Carven Effigies</a> and <a href="https://wiki.guildwars.com/wiki/Awakened_Dune_Carver" rel="noopener" target="_blank" title="Awakened Dune Carver">Awakened Dune Carvers</a> respectively.</li></ul><dl><dt>Support</dt></dl><ul><li><a href="https://wiki.guildwars.com/wiki/Minion" rel="noopener" target="_blank" title="Minion">Minions</a> created outside the wurms can run through the Sulfurous Haze; however, while in the Desert Wurm disguise, the party will not be able to heal or create new minions.</li>
+<li>Bring plenty of <a href="https://wiki.guildwars.com/wiki/Party_healing" rel="noopener" target="_blank" title="Party healing">party-wide heals</a>, protective <a class="mw-redirect" href="https://wiki.guildwars.com/wiki/Ward" rel="noopener" target="_blank" title="Ward">wards</a>, and/or <a class="mw-redirect" href="https://wiki.guildwars.com/wiki/Melee_counter" rel="noopener" target="_blank" title="Melee counter">anti-melee</a> and <a class="mw-redirect" href="https://wiki.guildwars.com/wiki/Anti-caster" rel="noopener" target="_blank" title="Anti-caster">anti-caster</a> skills — the undead at the start can be overwhelming to an unprepared party.</li>
+<li><a href="https://wiki.guildwars.com/wiki/Comfort_Animal" rel="noopener" target="_blank" title="Comfort Animal">Comfort Animal</a>/<a href="https://wiki.guildwars.com/wiki/Heal_as_One" rel="noopener" target="_blank" title="Heal as One">Heal as One</a> or a <a href="https://wiki.guildwars.com/wiki/Beast_master" rel="noopener" target="_blank" title="Beast master">beast master</a> build, since <a href="https://wiki.guildwars.com/wiki/Animal_companion" rel="noopener" target="_blank" title="Animal companion">animal companions</a> each enter a Junundu in this mission (unlike other locations with Wurm Spoors), which results in your party having more than eight Junundu wurms. They deal damage with attacks; however, they will not use Junundu skills and will not be resurrected by Junundu Wail (but will reappear, alive, beside their owner when they leave the Junundu).</li></ul><dl><dt>Utility</dt></dl><ul><li><a href="https://wiki.guildwars.com/wiki/Rebirth" rel="noopener" target="_blank" title="Rebirth">Rebirth</a> or <a href="https://wiki.guildwars.com/wiki/Sunspear_Rebirth_Signet" rel="noopener" target="_blank" title="Sunspear Rebirth Signet">Sunspear Rebirth Signet</a> for <a href="https://wiki.guildwars.com/wiki/Resurrection" rel="noopener" target="_blank" title="Resurrection">resurrection</a>, since they are more convenient for any party members who die on the sulfur.</li>
+<li><a class="mw-redirect" href="https://wiki.guildwars.com/wiki/List_of_Lightbringer_skills" rel="noopener" target="_blank" title="List of Lightbringer skills">Lightbringer skills</a> are not very useful, since your party will encounter the majority of Margonites while inside the Junundu and the other foes in this mission are not affected by those skills.</li></ul></div>
+<h3 style='font-size:0.8rem;color:var(--accent);margin:0.3rem 0;'>Notes</h3><div class='wiki-block'><ul><li>When crossing the desolation, Palawa Joko does not need to be with you to complete the mission - you may as well rush forward without his guidance.</li>
+<li>The mission does not progress past the fifth boss, unless you return to Joko, who will say his remaining lines and then you'll become able to use the Wurm Spoor.
+<ul><li>If Joko is missing, retrace your steps back towards the start of the mission; he may have gone a different way and stopped once you became separated.</li></ul></li>
+<li>When riding junundu, remember to switch heroes from <a href="https://wiki.guildwars.com/wiki/Hero_behavior" rel="noopener" target="_blank" title="Hero behavior">Avoid Combat to <i>Guard</i> or <i>Fight</i> mode</a>, otherwise they will be ineffective during battle.</li>
+<li>It is fairly easy to die while in a junundu since your team members cannot heal you. The death resets progress toward the <a href="https://wiki.guildwars.com/wiki/Survivor" rel="noopener" target="_blank" title="Survivor">Survivor</a> title. Flagging heroes can be done to avoid that.</li>
+<li>Bringing a <a href="https://wiki.guildwars.com/wiki/Signet_of_Capture" rel="noopener" target="_blank" title="Signet of Capture">Signet of Capture</a> overrides one of the <a href="https://wiki.guildwars.com/wiki/Desert_Wurm_(disguise)#Skills" rel="noopener" target="_blank" title="Desert Wurm (disguise)">Junundu skills</a>.  The position of the Signet of Capture on the <a class="mw-redirect" href="https://wiki.guildwars.com/wiki/Skill_bar" rel="noopener" target="_blank" title="Skill bar">skill bar</a> will correspond to the Junundu skill that is removed.
+<ul><li>It is recommended to place it at the fourth position before using a <a href="https://wiki.guildwars.com/wiki/Wurm_Spoor" rel="noopener" target="_blank" title="Wurm Spoor">Wurm Spoor</a>, since <a href="https://wiki.guildwars.com/wiki/Unknown_Junundu_Ability" rel="noopener" target="_blank" title="Unknown Junundu Ability">Unknown Junundu Ability</a> is an unusable skill that usually takes that slot.</li></ul></li>
+<li>It is not necessary to be inside the junundu to rescue the young.  All three of the young are in sandy areas that you can traverse without being in the wurms.  Consider dismounting from the junundu and fighting outside the wurms if you prefer to use your build over the Junundu skills.</li>
+<li>You no longer have to keep the young worms alive to get credit for the bonus, just approach them and the bonus note will update.</li>
+<li>After completing this mission, your party will be sent to the <a href="https://wiki.guildwars.com/wiki/Remains_of_Sahlahja_(outpost)" rel="noopener" target="_blank" title="Remains of Sahlahja (outpost)">Remains of Sahlahja</a>.</li>
+<li>Completion of this mission will fill in page #13 in the <a href="https://wiki.guildwars.com/wiki/Night_Falls" rel="noopener" target="_blank" title="Night Falls">Night Falls</a> <a href="https://wiki.guildwars.com/wiki/Storybook" rel="noopener" target="_blank" title="Storybook">storybook</a>.</li></ul><div style="margin: 1em; border: solid silver; border-width: 1px 0px; padding: 2px 1em 2px 7.5em;"><strong class="hiddenlinks" style="position: absolute; margin-left: -7.3em; color: #900;"><a class="image" href="https://wiki.guildwars.com/wiki/File:Anomaly.png" rel="noopener" target="_blank" title="Anomaly"><img alt="Anomaly" data-file-height="32" data-file-width="32" decoding="async" height="18" loading="lazy" src="https://wiki.guildwars.com/images/thumb/a/a6/Anomaly.png/18px-Anomaly.png" srcset="/images/thumb/a/a6/Anomaly.png/27px-Anomaly.png 1.5x, /images/a/a6/Anomaly.png 2x" width="18"/></a> <a class="mw-redirect" href="https://wiki.guildwars.com/wiki/Anomaly" rel="noopener" target="_blank" title="Anomaly">Anomaly</a>.</strong>The Junundu Young will travel through the rocky terrain that your party must cross in human form.</div><div style="margin: 1em; border: solid silver; border-width: 1px 0px; padding: 2px 1em 2px 7.5em;"><strong class="hiddenlinks" style="position: absolute; margin-left: -7.3em; color: #900;"><a class="image" href="https://wiki.guildwars.com/wiki/File:Anomaly.png" rel="noopener" target="_blank" title="Anomaly"><img alt="Anomaly" data-file-height="32" data-file-width="32" decoding="async" height="18" loading="lazy" src="https://wiki.guildwars.com/images/thumb/a/a6/Anomaly.png/18px-Anomaly.png" srcset="/images/thumb/a/a6/Anomaly.png/27px-Anomaly.png 1.5x, /images/a/a6/Anomaly.png 2x" width="18"/></a> <a class="mw-redirect" href="https://wiki.guildwars.com/wiki/Anomaly" rel="noopener" target="_blank" title="Anomaly">Anomaly</a>.</strong>If you save all of the young before talking to Aijundu, when you do, it will say you have saved 0 of 3 junundu young, but you will still get the Master's reward when the mission is complete.</div><div id="Spoiler_tag" style="background: #F99; padding: 2px; margin: 3px 0px; border: 1px solid #F00; text-align: center">
+<b><a href="https://wiki.guildwars.com/wiki/Template:Spoiler" rel="noopener" target="_blank" title="Template:Spoiler">Spoiler alert</a>:</b> The following text contains spoilers relating to the story of <a href="https://wiki.guildwars.com/wiki/Guild_Wars_Nightfall" rel="noopener" target="_blank" title="Guild Wars Nightfall">Guild Wars Nightfall</a> regarding events leading up to the next mission.</div><p><br/>
+<cite id="note_1" style="font-style: normal;"><a href="#noteref_1" rel="noopener" target="_blank">↑</a></cite> : <a href="https://wiki.guildwars.com/wiki/Junundu_Siege" rel="noopener" target="_blank" title="Junundu Siege">Junundu Siege</a> will not be available during this mission even for players who already unlocked it through learning it during <a href="https://wiki.guildwars.com/wiki/Horde_of_Darkness" rel="noopener" target="_blank" title="Horde of Darkness">Horde of Darkness</a> by consuming an <a href="https://wiki.guildwars.com/wiki/Elder_Siege_Wurm" rel="noopener" target="_blank" title="Elder Siege Wurm">Elder Siege Wurm</a>).
+</p><table class="stdt" style="margin: 5px auto; border: 1px solid #C0C0C0; font-size: 90%; width: 80%; text-align: center;">
+<tbody><tr>
+<th style="background: #7BC; font-size: 110%;"><a href="https://wiki.guildwars.com/wiki/List_of_Nightfall_missions_and_primary_quests" rel="noopener" target="_blank" title="List of Nightfall missions and primary quests">Nightfall missions</a>
+</th></tr>
+<tr>
+<td><a href="https://wiki.guildwars.com/wiki/Chahbek_Village" rel="noopener" target="_blank" title="Chahbek Village">Chahbek Village</a> » <a href="https://wiki.guildwars.com/wiki/Jokanur_Diggings" rel="noopener" target="_blank" title="Jokanur Diggings">Jokanur Diggings</a> » <a href="https://wiki.guildwars.com/wiki/Blacktide_Den" rel="noopener" target="_blank" title="Blacktide Den">Blacktide Den</a> » <a href="https://wiki.guildwars.com/wiki/Consulate_Docks" rel="noopener" target="_blank" title="Consulate Docks">Consulate Docks</a> » <a href="https://wiki.guildwars.com/wiki/Venta_Cemetery" rel="noopener" target="_blank" title="Venta Cemetery">Venta Cemetery </a> » <a href="https://wiki.guildwars.com/wiki/Kodonur_Crossroads" rel="noopener" target="_blank" title="Kodonur Crossroads">Kodonur Crossroads</a> » <a href="https://wiki.guildwars.com/wiki/Pogahn_Passage" rel="noopener" target="_blank" title="Pogahn Passage">Pogahn Passage</a> <i>or</i> <a href="https://wiki.guildwars.com/wiki/Rilohn_Refuge" rel="noopener" target="_blank" title="Rilohn Refuge">Rilohn Refuge</a> » <a href="https://wiki.guildwars.com/wiki/Moddok_Crevice" rel="noopener" target="_blank" title="Moddok Crevice">Moddok Crevice</a> » <a href="https://wiki.guildwars.com/wiki/Tihark_Orchard" rel="noopener" target="_blank" title="Tihark Orchard">Tihark Orchard</a> » <a href="https://wiki.guildwars.com/wiki/Dasha_Vestibule" rel="noopener" target="_blank" title="Dasha Vestibule">Dasha Vestibule</a> <i>or</i> <a href="https://wiki.guildwars.com/wiki/Dzagonur_Bastion" rel="noopener" target="_blank" title="Dzagonur Bastion">Dzagonur Bastion</a> » <a href="https://wiki.guildwars.com/wiki/Grand_Court_of_Sebelkeh" rel="noopener" target="_blank" title="Grand Court of Sebelkeh">Grand Court of Sebelkeh</a> » <a href="https://wiki.guildwars.com/wiki/Jennur%27s_Horde" rel="noopener" target="_blank" title="Jennur's Horde">Jennur's Horde</a> <i>or</i> <a href="https://wiki.guildwars.com/wiki/Nundu_Bay" rel="noopener" target="_blank" title="Nundu Bay">Nundu Bay</a> » <a class="mw-selflink selflink">Gate of Desolation</a> » <a href="https://wiki.guildwars.com/wiki/Ruins_of_Morah" rel="noopener" target="_blank" title="Ruins of Morah">Ruins of Morah</a> » <a href="https://wiki.guildwars.com/wiki/Gate_of_Pain" rel="noopener" target="_blank" title="Gate of Pain">Gate of Pain</a> » <a href="https://wiki.guildwars.com/wiki/Gate_of_Madness" rel="noopener" target="_blank" title="Gate of Madness">Gate of Madness</a> » <a href="https://wiki.guildwars.com/wiki/Abaddon%27s_Gate" rel="noopener" target="_blank" title="Abaddon's Gate">Abaddon's Gate</a>
+</td></tr>
+<tr>
+<td><i><b><a class="mw-redirect" href="https://wiki.guildwars.com/wiki/Challenge_mission" rel="noopener" target="_blank" title="Challenge mission">Challenge</a></b></i><br/><a href="https://wiki.guildwars.com/wiki/Dajkah_Inlet" rel="noopener" target="_blank" title="Dajkah Inlet">Dajkah Inlet</a> <span style="margin: 0em 0.3em;">•</span> <a href="https://wiki.guildwars.com/wiki/Remains_of_Sahlahja" rel="noopener" target="_blank" title="Remains of Sahlahja">Remains of Sahlahja</a> <span style="margin: 0em 0.3em;">•</span> <a href="https://wiki.guildwars.com/wiki/The_Shadow_Nexus" rel="noopener" target="_blank" title="The Shadow Nexus">The Shadow Nexus</a>
+</td></tr>
+<tr>
+<td><i><b><a class="mw-redirect" href="https://wiki.guildwars.com/wiki/Elite_mission" rel="noopener" target="_blank" title="Elite mission">Elite</a></b></i><br/><a href="https://wiki.guildwars.com/wiki/The_Ebony_Citadel_of_Mallyx" rel="noopener" target="_blank" title="The Ebony Citadel of Mallyx">The Ebony Citadel of Mallyx</a>
+</td></tr></tbody></table> 
+NewPP limit report
+Cached time: 20260720092154
+Cache expiry: 3600
+Reduced expiry: true
+Complications: [show‐toc]
+CPU time usage: 0.106 seconds
+Real time usage: 0.147 seconds
+Preprocessor visited node count: 1206/1000000
+Post‐expand include size: 13778/2097152 bytes
+Template argument size: 1344/2097152 bytes
+Highest expansion depth: 10/100
+Expensive parser function count: 0/100
+Unstrip recursion depth: 0/20
+Unstrip post‐expand size: 0/5000000 bytes
+ExtLoops count: 0/1000
+
+Transclusion expansion time report (%,ms,calls,template)
+100.00%   79.186      1 -total
+ 40.91%   32.397      1 Template:Location_disambiguation_2
+ 20.74%   16.420      8 Template:Ifexists
+ 11.71%    9.271      1 Template:Mission_rewards
+  9.13%    7.227      1 Template:Mission_infobox
+  6.13%    4.853      6 Template:Cost
+  4.45%    3.527      1 Template:Nightfall_missions
+  3.96%    3.138      4 Template:N
+  2.99%    2.365      1 Template:Infobox_campaign_row
+  2.97%    2.352      8 Template:Profession_icon_sizes
+ Saved in parser cache with key en_wiki:pcache:idhash:2801-0!canonical and timestamp 20260720092153 and revision id 2717145.</div></div>
+          </section>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="lightbox" id="lightbox" role="dialog" aria-label="Enlarged map">
+    <img src="../maps/nightfall_16_Gate_of_Desolation_map.jpg" alt="Gate of Desolation mission map (enlarged)" />
+  </div>
+  <script>
+    (function () {
+      var open = document.getElementById("mapOpen");
+      var box = document.getElementById("lightbox");
+      if (!open || !box) return;
+      open.addEventListener("click", function () { box.classList.add("open"); });
+      box.addEventListener("click", function () { box.classList.remove("open"); });
+      document.addEventListener("keydown", function (e) {
+        if (e.key === "Escape") box.classList.remove("open");
+      });
+    })();
+  </script>
+
+</body>
+</html>

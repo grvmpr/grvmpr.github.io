@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>The Wilds</title>
+  <style>
+:root {
+  --bg-deep: #070a0f;
+  --bg-panel: #101820;
+  --bg-panel-2: #15202c;
+  --border: #243044;
+  --border-glow: #2a4a6a;
+  --text: #dce6f0;
+  --text-muted: #8a9bb0;
+  --text-dim: #5c6f86;
+  --accent: #3ecfff;
+  --accent-soft: rgba(62, 207, 255, 0.12);
+  --gold: #e8c56a;
+  --gold-soft: rgba(232, 197, 106, 0.12);
+  --bonus: #7dffb3;
+  --bonus-soft: rgba(125, 255, 179, 0.1);
+  --danger: #ff6b6b;
+  --danger-soft: rgba(255, 107, 107, 0.1);
+  --hm: #c78bff;
+  --hm-soft: rgba(199, 139, 255, 0.12);
+  --radius: 10px;
+  --font: "Segoe UI", system-ui, -apple-system, sans-serif;
+  --chrome-h: 3.1rem;
+  --gap: 0.5rem;
+  --pad: 0.7rem;
+  /* Readable on 4K vertical (~2160×3840) */
+  --walk-size: clamp(1.05rem, 0.55vw + 0.55vh, 1.35rem);
+  --bonus-size: clamp(1.05rem, 0.55vw + 0.55vh, 1.35rem);
+  --body-size: clamp(0.95rem, 0.4vw + 0.4vh, 1.1rem);
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html {
+  scroll-behavior: smooth;
+  font-size: clamp(16px, 0.55vw + 0.45vh, 20px);
+  height: 100%;
+  scroll-padding-top: calc(var(--chrome-h) + 0.5rem);
+}
+body {
+  font-family: var(--font);
+  background: var(--bg-deep);
+  color: var(--text);
+  line-height: 1.45;
+  min-height: 100%;
+  height: 100%;
+  overflow: hidden;
+  background-image: radial-gradient(ellipse 70% 25% at 50% 0%, rgba(42, 100, 160, 0.14), transparent);
+}
+a { color: var(--accent); text-decoration: none; }
+a:hover { color: #7de0ff; text-decoration: underline; }
+.app {
+  display: grid;
+  grid-template-rows: var(--chrome-h) 1fr;
+  height: 100vh; height: 100dvh;
+  max-height: 100vh; max-height: 100dvh;
+}
+.top-chrome {
+  display: flex; align-items: center; gap: 0.65rem;
+  padding: 0 0.7rem;
+  background: rgba(8, 12, 18, 0.97);
+  border-bottom: 1px solid var(--border);
+  z-index: 100; min-height: var(--chrome-h);
+}
+.brand { display: flex; align-items: baseline; gap: 0.55rem; min-width: 0; flex-shrink: 0; }
+.brand-mission {
+  font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase;
+  color: var(--accent); font-weight: 700; white-space: nowrap;
+}
+.brand-name {
+  font-size: 1.1rem; font-weight: 750; color: var(--text);
+  white-space: nowrap; letter-spacing: -0.02em;
+}
+.brand-meta { font-size: 0.75rem; color: var(--text-dim); white-space: nowrap; }
+.chip-nav {
+  display: flex; flex: 1; gap: 0.3rem; overflow-x: auto;
+  scrollbar-width: none; min-width: 0; justify-content: center;
+}
+.chip-nav::-webkit-scrollbar { display: none; }
+.chip-nav a {
+  flex: 0 0 auto; padding: 0.3rem 0.65rem; border-radius: 999px;
+  font-size: 0.78rem; font-weight: 600; color: var(--text-muted);
+  background: var(--bg-panel); border: 1px solid var(--border);
+  text-decoration: none; white-space: nowrap;
+}
+.chip-nav a:hover {
+  color: var(--text); border-color: var(--border-glow);
+  background: #1a2836; text-decoration: none;
+}
+.chip-nav a[href="#map"] { color: var(--accent); border-color: rgba(62, 207, 255, 0.35); }
+.chip-nav a[href="#bonus"] { color: var(--bonus); border-color: rgba(125, 255, 179, 0.3); }
+.chip-nav a[href="#hard-mode"] { color: var(--hm); border-color: rgba(199, 139, 255, 0.3); }
+.chip-nav a[href="#bosses"] { color: #ff9a9a; border-color: rgba(255, 107, 107, 0.3); }
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 0.3rem;
+  padding: 0.42rem 0.85rem; border-radius: 8px; font-weight: 650; font-size: 0.8rem;
+  border: none; cursor: pointer; text-decoration: none; white-space: nowrap; flex-shrink: 0;
+}
+.btn:hover { text-decoration: none; }
+.btn-next {
+  background: linear-gradient(135deg, #1a6a9a, #1ab0e0); color: #fff;
+  box-shadow: 0 2px 12px rgba(26, 140, 200, 0.35);
+}
+.btn-next:hover { color: #fff; filter: brightness(1.08); }
+.btn-wiki, .btn-idx, .btn-prev {
+  background: var(--bg-panel); color: var(--text-muted);
+  border: 1px solid var(--border); padding: 0.42rem 0.65rem;
+}
+.btn-wiki:hover, .btn-idx:hover, .btn-prev:hover {
+  color: var(--accent); border-color: var(--border-glow);
+}
+.chrome-actions { display: flex; gap: 0.35rem; flex-shrink: 0; }
+
+/* Map-dominant workspace */
+.workspace {
+  display: grid;
+  grid-template-columns: minmax(480px, 1.15fr) minmax(0, 1fr);
+  grid-template-rows: 1fr;
+  gap: var(--gap); padding: var(--gap);
+  min-height: 0; height: 100%; overflow: hidden;
+}
+.col-map {
+  display: grid;
+  grid-template-rows: 1fr auto;
+  gap: var(--gap);
+  min-height: 0; min-width: 0;
+}
+.col-main {
+  display: grid;
+  /* objectives compact | walkthrough HUGE | bonus+hm | bosses+tips */
+  grid-template-rows: auto minmax(0, 1.6fr) minmax(0, 1.05fr) minmax(0, 0.75fr);
+  gap: var(--gap); min-height: 0; min-width: 0; overflow: hidden;
+}
+.row-obj { min-height: 0; }
+.row-bonus-hm {
+  display: grid; grid-template-columns: 1.15fr 0.85fr; gap: var(--gap); min-height: 0;
+}
+.row-lower {
+  display: grid; grid-template-columns: 1.15fr 0.85fr; gap: var(--gap); min-height: 0;
+}
+.panel {
+  background: var(--bg-panel); border: 1px solid var(--border); border-radius: var(--radius);
+  padding: var(--pad); display: flex; flex-direction: column; min-height: 0; overflow: hidden;
+}
+.panel-scroll {
+  overflow-y: auto; overflow-x: hidden; min-height: 0; flex: 1; padding-right: 0.3rem;
+  scrollbar-width: thin; scrollbar-color: var(--border) transparent;
+  font-size: var(--body-size);
+}
+.panel-scroll::-webkit-scrollbar { width: 8px; }
+.panel-scroll::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+.panel-title {
+  display: flex; align-items: center; gap: 0.4rem;
+  font-size: 0.82rem; font-weight: 750; letter-spacing: 0.05em; text-transform: uppercase;
+  color: var(--text); margin-bottom: 0.45rem; padding-bottom: 0.35rem;
+  border-bottom: 1px solid var(--border); flex-shrink: 0;
+}
+.panel-title .icon {
+  width: 1.3rem; height: 1.3rem; border-radius: 5px;
+  display: inline-flex; align-items: center; justify-content: center; font-size: 0.75rem;
+}
+.panel.map-panel {
+  border-color: var(--border-glow);
+  background: linear-gradient(180deg, #0e1620 0%, var(--bg-panel) 100%);
+  /* Map takes almost all left column */
+  min-height: 0;
+}
+.panel.objectives { border-top: 2px solid var(--accent); }
+.panel.walkthrough { border-top: 3px solid #5eb8e8; }
+.panel.bonus { border-top: 3px solid var(--bonus); }
+.panel.hard-mode { border-top: 2px solid var(--hm); }
+.panel.bosses { border-top: 2px solid var(--danger); }
+.panel.other { border-top: 2px solid var(--text-muted); }
+
+/* Emphasized reading panels */
+.panel.walkthrough .panel-scroll,
+.panel.walkthrough .wiki-block {
+  font-size: var(--walk-size) !important;
+  line-height: 1.55;
+}
+.panel.bonus .panel-scroll,
+.panel.bonus .wiki-block {
+  font-size: var(--bonus-size) !important;
+  line-height: 1.55;
+}
+.panel.walkthrough .panel-scroll li,
+.panel.bonus .panel-scroll li {
+  margin-bottom: 0.45rem;
+}
+.panel.walkthrough .panel-scroll p,
+.panel.bonus .panel-scroll p {
+  margin-bottom: 0.55rem;
+}
+
+.icon-map { background: var(--accent-soft); color: var(--accent); }
+.icon-obj { background: var(--accent-soft); color: var(--accent); }
+.icon-walk { background: rgba(94, 184, 232, 0.15); color: #5eb8e8; }
+.icon-bonus { background: var(--bonus-soft); color: var(--bonus); }
+.icon-hm { background: var(--hm-soft); color: var(--hm); }
+.icon-boss { background: var(--danger-soft); color: var(--danger); }
+.icon-other { background: rgba(138, 155, 176, 0.15); color: var(--text-muted); }
+
+.map-wrap {
+  flex: 1; min-height: 0; display: flex; flex-direction: column;
+  align-items: center; justify-content: center; gap: 0.4rem;
+}
+.map-frame {
+  flex: 1; min-height: 0; width: 100%;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: 10px; overflow: hidden;
+  border: 2px solid var(--border-glow);
+  box-shadow: 0 0 0 1px rgba(62, 207, 255, 0.1), 0 12px 40px rgba(0, 0, 0, 0.45);
+  background: #05080c; cursor: zoom-in;
+}
+.map-frame img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  image-rendering: auto;
+}
+.map-caption { font-size: 0.72rem; color: var(--text-dim); flex-shrink: 0; }
+.map-missing {
+  color: var(--text-dim); font-size: 1rem; text-align: center; padding: 2rem;
+}
+
+.wiki-block ul, .panel-scroll ul,
+.wiki-block ol, .panel-scroll ol { padding-left: 1.2rem; margin: 0.3rem 0 0.5rem; }
+.wiki-block li, .panel-scroll li { margin-bottom: 0.32rem; }
+.wiki-block p, .panel-scroll p { margin-bottom: 0.45rem; }
+.wiki-block img, .panel-scroll img { vertical-align: middle; max-height: 1.35em; width: auto; }
+.wiki-block table, .panel-scroll table {
+  width: 100%; border-collapse: collapse; font-size: 0.9em; margin: 0.4rem 0;
+}
+.wiki-block th, .wiki-block td, .panel-scroll th, .panel-scroll td {
+  border: 1px solid var(--border); padding: 0.3rem 0.45rem; text-align: left;
+}
+.lede { font-size: 0.92rem; color: var(--text-muted); margin-bottom: 0.35rem; }
+
+/* Collapsed summary */
+details.summary-details {
+  background: var(--bg-panel);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  border-top: 2px solid var(--gold);
+  padding: 0.35rem 0.65rem;
+  flex-shrink: 0;
+}
+details.summary-details summary {
+  cursor: pointer;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--gold);
+  padding: 0.35rem 0;
+  list-style: none;
+}
+details.summary-details summary::-webkit-details-marker { display: none; }
+details.summary-details summary::before {
+  content: "▸ ";
+  color: var(--text-dim);
+}
+details.summary-details[open] summary::before { content: "▾ "; }
+details.summary-details .summary-body {
+  padding: 0.35rem 0 0.55rem;
+  font-size: 0.88rem;
+  color: var(--text-muted);
+  max-height: 18vh;
+  overflow-y: auto;
+}
+
+.boss-note { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.4rem; }
+.boss-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.4rem; }
+.boss-card {
+  background: var(--bg-panel-2); border: 1px solid var(--border);
+  border-radius: 8px; padding: 0.5rem 0.6rem;
+}
+.boss-card-head { font-size: 0.95rem; margin-bottom: 0.2rem; }
+.boss-card-head a { color: #eef6fc; font-weight: 700; }
+.boss-card-head a:hover { color: var(--accent); }
+.boss-elite { font-size: 0.88rem; }
+.elite-label { color: var(--gold); font-weight: 650; margin-right: 0.25rem; }
+.elite-link { color: #ffd78a; font-weight: 650; }
+.elite-link:hover { color: #ffe9b5; }
+.elite-none { color: var(--text-dim); font-style: italic; font-size: 0.85rem; }
+.boss-meta { font-size: 0.78rem; color: var(--text-dim); margin-top: 0.15rem; }
+
+.callout {
+  margin-top: 0.4rem; padding: 0.45rem 0.6rem; border-radius: 6px;
+  font-size: 0.88rem; border-left: 3px solid; line-height: 1.4;
+}
+.callout.tip { background: var(--accent-soft); border-color: var(--accent); color: #b8eaff; }
+.callout.warn { background: var(--danger-soft); border-color: var(--danger); color: #ffb4b4; }
+
+.lightbox {
+  display: none; position: fixed; inset: 0; z-index: 1000; background: rgba(0,0,0,0.94);
+  align-items: center; justify-content: center; padding: 1.5rem; cursor: zoom-out;
+}
+.lightbox.open { display: flex; }
+.lightbox img {
+  max-width: 96vw; max-height: 96vh; border-radius: 8px;
+  border: 2px solid var(--border-glow); object-fit: contain;
+}
+
+@media (min-height: 2400px) {
+  :root {
+    --walk-size: clamp(1.15rem, 0.7vh + 0.3vw, 1.5rem);
+    --bonus-size: clamp(1.15rem, 0.7vh + 0.3vw, 1.5rem);
+    --gap: 0.65rem;
+    --pad: 0.85rem;
+  }
+  .workspace { grid-template-columns: minmax(560px, 1.2fr) minmax(0, 1fr); }
+}
+@media (min-width: 1800px) and (min-height: 2000px) {
+  .workspace { grid-template-columns: minmax(600px, 1.25fr) minmax(0, 1fr); }
+}
+@media (max-height: 1100px) {
+  body { overflow: auto; height: auto; }
+  .app { height: auto; max-height: none; min-height: 100vh; }
+  .workspace {
+    height: auto; overflow: visible; grid-template-columns: 1fr; grid-template-rows: auto;
+  }
+  .col-map { grid-template-rows: auto; }
+  .col-main { overflow: visible; grid-template-rows: auto; }
+  .row-bonus-hm, .row-lower { grid-template-columns: 1fr; }
+  .panel { max-height: none; overflow: visible; }
+  .panel-scroll { overflow: visible; }
+  .map-frame { min-height: 360px; max-height: 55vh; }
+}
+
+    :root { --accent: #3ecfff; --accent-soft: #3ecfff22; }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header class="top-chrome">
+      <div class="brand">
+        <span class="brand-mission">M10</span>
+        <span class="brand-name">The Wilds</span>
+        <span class="brand-meta">Prophecies · Maguuma Jungle · Cooperative · —</span>
+      </div>
+      <nav class="chip-nav" aria-label="Sections">
+        <a href="#map">Map</a>
+        <a href="#walkthrough">Walkthrough</a>
+        <a href="#bonus">Bonus</a>
+        <a href="#objectives">Objectives</a>
+        <a href="#hard-mode">Hard Mode</a>
+        <a href="#bosses">Bosses</a>
+        <a href="#other">Tips</a>
+      </nav>
+      <div class="chrome-actions">
+        <a class="btn btn-idx" href="../prohecies.html">Index</a>
+        <a class="btn btn-prev" href="9_Divinity_Coast.html">← Prev</a>
+        <a class="btn btn-wiki" href="https://wiki.guildwars.com/wiki/The_Wilds" target="_blank" rel="noopener">Wiki ↗</a>
+        <a class="btn btn-next" href="11_Bloodstone_Fen.html">Next: Bloodstone Fen →</a>
+      </div>
+    </header>
+
+    <div class="workspace">
+      <div class="col-map">
+        <section class="panel map-panel" id="map">
+          <h2 class="panel-title"><span class="icon icon-map">◉</span> Mission Map</h2>
+          <div class="map-wrap">
+            <div class="map-frame" id="mapOpen" title="Click to enlarge">
+              <img src="../maps/prophecies_10_The_Wilds_map.jpg" alt="The Wilds mission map" />
+            </div>
+            <p class="map-caption">Click to enlarge · Local cache · <a href="https://wiki.guildwars.com/wiki/The_Wilds" target="_blank" rel="noopener">Wiki</a></p>
+        </div>
+        </section>
+
+        <details class="summary-details" id="summary">
+          <summary>Summary (click to expand)</summary>
+          <div class="summary-body">
+            <p>After a long hunt for the Shining Blade in order to rescue the Chosen , the heroes are in for a surprise ending.</p>
+            <p style="margin-top:0.4rem;"><strong>Region:</strong> Maguuma Jungle · <strong>Mission:</strong> 10 of 25 · <strong>Type:</strong> Cooperative</p>
+            <p style="margin-top:0.35rem;"><a href="https://wiki.guildwars.com/wiki/The_Wilds" target="_blank" rel="noopener">Full wiki article ↗</a></p>
+          </div>
+        </details>
+      </div>
+
+      <div class="col-main">
+        <section class="panel objectives row-obj" id="objectives">
+          <h2 class="panel-title"><span class="icon icon-obj">✓</span> Objectives</h2>
+          <div class="panel-scroll wiki-block"><p>Hunt down the <a href="https://wiki.guildwars.com/wiki/Shining_Blade" rel="noopener" target="_blank" title="Shining Blade">Shining Blade</a> kidnappers, and rescue the <a href="https://wiki.guildwars.com/wiki/Chosen" rel="noopener" target="_blank" title="Chosen">Chosen</a> they have taken hostage.
+</p><ul><li>Chase the fleeing Shining Blade.</li>
+<li>Rescue the Chosen.</li>
+<li>Discover how the Shining Blade navigates the jungle.</li>
+<li>*BONUS* Defeat the two <a href="https://wiki.guildwars.com/wiki/Centaur" rel="noopener" target="_blank" title="Centaur">Centaur</a> chieftains.</li></ul></div>
+        </section>
+
+        <section class="panel walkthrough" id="walkthrough">
+          <h2 class="panel-title"><span class="icon icon-walk">→</span> Walkthrough</h2>
+          <div class="panel-scroll wiki-block"><p>This mission is one long trek through the jungle, with confusing branching paths and a wide variety of enemies along the way. Start out heading north and join a pair of <a href="https://wiki.guildwars.com/wiki/White_Mantle_Knight" rel="noopener" target="_blank" title="White Mantle Knight">White Mantle Knights</a> heading into a clearing. Here you will meet the first of several <a href="https://wiki.guildwars.com/wiki/Entangling_Roots" rel="noopener" target="_blank" title="Entangling Roots">Entangling Roots</a>. When approached, these creatures will trigger the appearance of a gate of vines at each entrance to the clearing, cutting off your retreat and potentially stranding party members outside. They are also surrounded by hidden spawns including multiple <a href="https://wiki.guildwars.com/wiki/Life_Pod" rel="noopener" target="_blank" title="Life Pod">Life Pods</a>, which can make killing them a chore even with the White Mantle's help. Consider keeping back any <a href="https://wiki.guildwars.com/wiki/Warrior" rel="noopener" target="_blank" title="Warrior">warriors</a> in the group to avoid triggering all of the <a href="https://wiki.guildwars.com/wiki/Popup" rel="noopener" target="_blank" title="Popup">popups</a> at once. The vine gate does not block line of sight, and is not triggered by <a class="mw-redirect" href="https://wiki.guildwars.com/wiki/Pet" rel="noopener" target="_blank" title="Pet">pets</a>, <a href="https://wiki.guildwars.com/wiki/Minion" rel="noopener" target="_blank" title="Minion">minions</a>, or your White Mantle allies. All gates disappear as soon as the Entangling Roots is killed.
+</p><p>As soon as everything is dead, the White Mantle will continue into the next clearing to the west, where there are multiple exits and converging <a href="https://wiki.guildwars.com/wiki/Patrol" rel="noopener" target="_blank" title="Patrol">patrols</a> of <a href="https://wiki.guildwars.com/wiki/Moss_Scarab" rel="noopener" target="_blank" title="Moss Scarab">Moss Scarabs</a>. You might notice a <a href="https://wiki.guildwars.com/wiki/Shining_Blade_Scout" rel="noopener" target="_blank" title="Shining Blade Scout">Shining Blade Scout</a> shouting and running deeper into the jungle; you do not have to catch these scouts, but take note of them, as they will always indicate the correct route to take. When in doubt, follow the map. Take the middle westward road along with any surviving White Mantle Knights; all three paths lead to an Entangling Roots, but on the correct path you will also see a <a href="https://wiki.guildwars.com/wiki/Boss" rel="noopener" target="_blank" title="Boss">boss</a> ahead on the far side, which also has some hidden scarabs around it. Past the boss, you will come to an overlook where a cutscene will trigger, showing a Shining Blade Scout on another path creating a vine bridge to cross the gorge.
+</p><p>The White Mantle Knights will give up here, but continue north and you will find numerous <a href="https://wiki.guildwars.com/wiki/Centaur" rel="noopener" target="_blank" title="Centaur">Centaurs</a> ahead. The Shining Blade Scouts will indicate a path to the left, and you can cut across here, but pay attention to the Centaur patrols, some of which move quite fast and can easily catch your party from behind. Their rangers also leave <a href="https://wiki.guildwars.com/wiki/Flame_Trap" rel="noopener" target="_blank" title="Flame Trap">Flame Traps</a> and spirits of <a href="https://wiki.guildwars.com/wiki/Symbiosis" rel="noopener" target="_blank" title="Symbiosis">Symbiosis</a> while moving; triggering the traps or attacking the spirit will aggro the group. It may be safer and easier to continue northeast a way before turning back to the west, especially if you are attempting the bonus.
+</p><p>You will reach the bridge created by the Shining Blade before, and on the far side the enemies will change again, with <a href="https://wiki.guildwars.com/wiki/Wind_Rider" rel="noopener" target="_blank" title="Wind Rider">Wind Riders</a> and <a href="https://wiki.guildwars.com/wiki/Jungle_Troll" rel="noopener" target="_blank" title="Jungle Troll">Jungle Trolls</a> becoming prevalent. The path forks ahead, with two paths in front and a bridge behind; take the right path ahead, and it will lead you to the last Entangling Roots. This time there are no hidden foes, but numerous visible ones which should be pulled out of the clearing before you engage. Turn sharply northeast and you will soon reach the water. From here on, you will be encountering hidden <a href="https://wiki.guildwars.com/wiki/Maguuma_Spider" rel="noopener" target="_blank" title="Maguuma Spider">Maguuma Spiders</a> frequently. Follow the Shining Blade Scouts down the southward turn of the stream, and when you encounter one last random boss, turn to the west.
+</p><p>After a short journey, you will see the Chosen under attack by spiders, so move in and fight through several spider waves culminating in the boss <a href="https://wiki.guildwars.com/wiki/Kezra_Spindleweb" rel="noopener" target="_blank" title="Kezra Spindleweb">Kezra Spindleweb</a>. They are not very threatening, and <a href="https://wiki.guildwars.com/wiki/Evennia" rel="noopener" target="_blank" title="Evennia">Evennia</a> will be healing you from the overlook, so you should have little trouble. As soon as the spiders are all dead, the mission is complete.
+</p></div>
+        </section>
+
+        <div class="row-bonus-hm">
+          <section class="panel bonus" id="bonus">
+            <h2 class="panel-title"><span class="icon icon-bonus">★</span> Bonus</h2>
+            <div class="panel-scroll wiki-block"><p>The bonus requires that you defeat two <a href="https://wiki.guildwars.com/wiki/Centaur" rel="noopener" target="_blank" title="Centaur">Centaur</a> <a href="https://wiki.guildwars.com/wiki/Boss" rel="noopener" target="_blank" title="Boss">bosses</a>. Instead of following the White Mantle, head south after proceeding past the first Entangling Root. You will find two Centaurs talking to each other (point 1), <i>do not attack them yet; doing so will cause the bonus objective to be incompletable</i>. To initiate the bonus, you have to eavesdrop on their conversation. After their dialogue finishes with the line <i>"I will guard Ramtha Brokenhoof and Horm Frostrider with my life."</i>, kill them. Pick up the <a href="https://wiki.guildwars.com/wiki/Vine_Seed" rel="noopener" target="_blank" title="Vine Seed">Vine Seed</a> that eventually appears by the glowing plants, which is needed to reach the two Centaur chieftains. You can drop the Vine Seed during combat; it will grow branches, knocking down adjacent foes and dealing 20 damage, and finally it will return to bundle form. Carry this item and backtrack to the middle road again.
+</p><p>After fighting the roaming Centaurs, take a detour again to the east (point 2). Place the Vine Seed over the round mark to form a bridge. Head South to where you will find the two Centaur chieftains (point 3): <a href="https://wiki.guildwars.com/wiki/Ramtha_Brokenhoof" rel="noopener" target="_blank" title="Ramtha Brokenhoof">Ramtha Brokenhoof</a> and <a href="https://wiki.guildwars.com/wiki/Horm_Frostrider" rel="noopener" target="_blank" title="Horm Frostrider">Horm Frostrider</a>. You can use the high-ground advantage of the entry slope to pull separate groups of Centaurs. Two other centaur bosses will spawn close to your objective bosses, so be careful not to mix them up. After killing Ramtha and Horm, the bonus completion message will display.
+</p></div>
+          </section>
+          <section class="panel hard-mode" id="hard-mode">
+            <h2 class="panel-title"><span class="icon icon-hm">◆</span> Hard Mode</h2>
+            <div class="panel-scroll wiki-block"><ul><li>Early in the mission, <a href="https://wiki.guildwars.com/wiki/Moss_Scarab" rel="noopener" target="_blank" title="Moss Scarab">Moss Scarabs</a> with <a href="https://wiki.guildwars.com/wiki/Verata%27s_Gaze" rel="noopener" target="_blank" title="Verata's Gaze">Verata's Gaze</a> present difficulty to a <a href="https://wiki.guildwars.com/wiki/Minion_master" rel="noopener" target="_blank" title="Minion master">minion master</a>, but you will not encounter any more after the first bridge. <a href="https://wiki.guildwars.com/wiki/Maguuma_Enchanter" rel="noopener" target="_blank" title="Maguuma Enchanter">Maguuma Enchanters</a> with <a href="https://wiki.guildwars.com/wiki/Blackout" rel="noopener" target="_blank" title="Blackout">Blackout</a>, <a href="https://wiki.guildwars.com/wiki/Wind_Rider" rel="noopener" target="_blank" title="Wind Rider">Wind Riders</a> with <a href="https://wiki.guildwars.com/wiki/Arcane_Conundrum" rel="noopener" target="_blank" title="Arcane Conundrum">Arcane Conundrum</a>, and <a href="https://wiki.guildwars.com/wiki/Maguuma_Spider" rel="noopener" target="_blank" title="Maguuma Spider">Maguuma Spiders</a> with <a href="https://wiki.guildwars.com/wiki/Punishing_Shot" rel="noopener" target="_blank" title="Punishing Shot">Punishing Shot</a> threaten <a href="https://wiki.guildwars.com/wiki/Healer" rel="noopener" target="_blank" title="Healer">healers</a>.</li></ul></div>
+          </section>
+        </div>
+
+        <div class="row-lower">
+          <section class="panel bosses" id="bosses">
+            <h2 class="panel-title"><span class="icon icon-boss">☠</span> Bosses &amp; Elites</h2>
+            <div class="panel-scroll"><div class='boss-grid'>
+<article class="boss-card">
+  <div class="boss-card-head"><a href="https://wiki.guildwars.com/wiki/Kezra_Spindleweb" target="_blank" rel="noopener"><strong>Kezra Spindleweb</strong></a></div>
+  <div class="boss-elite"><span class="elite-none">Elite: None / not listed</span></div>
+  <div class="boss-meta">18 (28)</div>
+</article>
+<article class="boss-card">
+  <div class="boss-card-head"><a href="https://wiki.guildwars.com/wiki/Rapa_Ironhaunch" target="_blank" rel="noopener"><strong>Rapa Ironhaunch</strong></a></div>
+  <div class="boss-elite"><span class="elite-none">Elite: None / not listed</span></div>
+  <div class="boss-meta">19 (29)</div>
+</article>
+<article class="boss-card">
+  <div class="boss-card-head"><a href="https://wiki.guildwars.com/wiki/Malla_Arrowmane" target="_blank" rel="noopener"><strong>Malla Arrowmane</strong></a></div>
+  <div class="boss-elite"><span class="elite-none">Elite: None / not listed</span></div>
+  <div class="boss-meta">19 (29)</div>
+</article>
+<article class="boss-card">
+  <div class="boss-card-head"><a href="https://wiki.guildwars.com/wiki/Tama_Blessedhoof" target="_blank" rel="noopener"><strong>Tama Blessedhoof</strong></a></div>
+  <div class="boss-elite"><span class="elite-none">Elite: None / not listed</span></div>
+  <div class="boss-meta">19 (29)</div>
+</article>
+<article class="boss-card">
+  <div class="boss-card-head"><a href="https://wiki.guildwars.com/wiki/Kara_Bloodtail" target="_blank" rel="noopener"><strong>Kara Bloodtail</strong></a></div>
+  <div class="boss-elite"><span class="elite-none">Elite: None / not listed</span></div>
+  <div class="boss-meta">19 (29)</div>
+</article>
+<article class="boss-card">
+  <div class="boss-card-head"><a href="https://wiki.guildwars.com/wiki/Paka_Blackhoof" target="_blank" rel="noopener"><strong>Paka Blackhoof</strong></a></div>
+  <div class="boss-elite"><span class="elite-none">Elite: None / not listed</span></div>
+  <div class="boss-meta">19 (29)</div>
+</article>
+<article class="boss-card">
+  <div class="boss-card-head"><a href="https://wiki.guildwars.com/wiki/Fawa_Torncalf" target="_blank" rel="noopener"><strong>Fawa Torncalf</strong></a></div>
+  <div class="boss-elite"><span class="elite-none">Elite: None / not listed</span></div>
+  <div class="boss-meta">19 (29)</div>
+</article>
+<article class="boss-card">
+  <div class="boss-card-head"><a href="https://wiki.guildwars.com/wiki/Horm_Frostrider" target="_blank" rel="noopener"><strong>Horm Frostrider</strong></a></div>
+  <div class="boss-elite"><span class="elite-none">Elite: None / not listed</span></div>
+  <div class="boss-meta">19 (29)</div>
+</article>
+<article class="boss-card">
+  <div class="boss-card-head"><a href="https://wiki.guildwars.com/wiki/Ramtha_Brokenhoof" target="_blank" rel="noopener"><strong>Ramtha Brokenhoof</strong></a></div>
+  <div class="boss-elite"><span class="elite-none">Elite: None / not listed</span></div>
+  <div class="boss-meta">19 (29)</div>
+</article>
+<article class="boss-card">
+  <div class="boss-card-head"><a href="https://wiki.guildwars.com/wiki/Tree_of_Vitality" target="_blank" rel="noopener"><strong>Tree of Vitality</strong></a></div>
+  <div class="boss-elite"><span class="elite-none">Elite: None / not listed</span></div>
+  <div class="boss-meta">18 (28)</div>
+</article>
+<article class="boss-card">
+  <div class="boss-card-head"><a href="https://wiki.guildwars.com/wiki/Chott_Stormsinger" target="_blank" rel="noopener"><strong>Chott Stormsinger</strong></a></div>
+  <div class="boss-elite"><span class="elite-none">Elite: None / not listed</span></div>
+  <div class="boss-meta">18 (28)</div>
+</article>
+<article class="boss-card">
+  <div class="boss-card-head"><a href="https://wiki.guildwars.com/wiki/Wydd_Kindlerun" target="_blank" rel="noopener"><strong>Wydd Kindlerun</strong></a></div>
+  <div class="boss-elite"><span class="elite-none">Elite: None / not listed</span></div>
+  <div class="boss-meta">18 (28)</div>
+</article>
+<article class="boss-card">
+  <div class="boss-card-head"><a href="https://wiki.guildwars.com/wiki/Grech_Trundle" target="_blank" rel="noopener"><strong>Grech Trundle</strong></a></div>
+  <div class="boss-elite"><span class="elite-none">Elite: None / not listed</span></div>
+  <div class="boss-meta">18 (28)</div>
+</article>
+<article class="boss-card">
+  <div class="boss-card-head"><a href="https://wiki.guildwars.com/wiki/Grook_Plugalug" target="_blank" rel="noopener"><strong>Grook Plugalug</strong></a></div>
+  <div class="boss-elite"><span class="elite-none">Elite: None / not listed</span></div>
+  <div class="boss-meta">18 (28)</div>
+</article>
+</div></div>
+          </section>
+          <section class="panel other" id="other">
+            <h2 class="panel-title"><span class="icon icon-other">✦</span> Tips &amp; Notes</h2>
+            <div class="panel-scroll"><h3 style='font-size:0.8rem;color:var(--accent);margin:0.3rem 0;'>Skill recommendations</h3><div class='wiki-block'><ul><li><a href="https://wiki.guildwars.com/wiki/Moss_Scarab" rel="noopener" target="_blank" title="Moss Scarab">Moss Scarabs</a> use <a href="https://wiki.guildwars.com/wiki/Vampiric_Touch" rel="noopener" target="_blank" title="Vampiric Touch">Vampiric Touch</a>, take skills that protect against <a href="https://wiki.guildwars.com/wiki/Life_stealing" rel="noopener" target="_blank" title="Life stealing">life stealing</a> (e. g. <a href="https://wiki.guildwars.com/wiki/Shielding_Hands" rel="noopener" target="_blank" title="Shielding Hands">Shielding Hands</a>).</li>
+<li><a href="https://wiki.guildwars.com/wiki/Life_Pod" rel="noopener" target="_blank" title="Life Pod">Life Pods</a> spawn together and heal each other, use <a class="mw-redirect" href="https://wiki.guildwars.com/wiki/Anti-caster" rel="noopener" target="_blank" title="Anti-caster">anti-caster</a> skills (e. g. <a href="https://wiki.guildwars.com/wiki/Backfire" rel="noopener" target="_blank" title="Backfire">Backfire</a>).</li>
+<li><a class="mw-redirect" href="https://wiki.guildwars.com/wiki/Enchantment" rel="noopener" target="_blank" title="Enchantment">Enchantment</a>-heavy parties will benefit from the Centaurs' <a href="https://wiki.guildwars.com/wiki/Symbiosis" rel="noopener" target="_blank" title="Symbiosis">Symbiosis</a>, but be aware that <a href="https://wiki.guildwars.com/wiki/Wind_Rider" rel="noopener" target="_blank" title="Wind Rider">Wind Riders</a> have <a href="https://wiki.guildwars.com/wiki/Shatter_Enchantment" rel="noopener" target="_blank" title="Shatter Enchantment">Shatter Enchantment</a>.</li>
+<li>Favor <a class="mw-redirect" href="https://wiki.guildwars.com/wiki/Slashing" rel="noopener" target="_blank" title="Slashing">slashing</a> and <a href="https://wiki.guildwars.com/wiki/Fire_damage" rel="noopener" target="_blank" title="Fire damage">fire damage</a>, since <a href="https://wiki.guildwars.com/wiki/Plant" rel="noopener" target="_blank" title="Plant">Plants</a> (Life Pods and Entangling Roots) are weak to it, and avoid <a href="https://wiki.guildwars.com/wiki/Cold_damage" rel="noopener" target="_blank" title="Cold damage">cold damage</a>, as Centaurs have bonus resistance against it.</li></ul></div>
+<h3 style='font-size:0.8rem;color:var(--accent);margin:0.3rem 0;'>Notes</h3><div class='wiki-block'><div class="thumb tright"><div class="thumbinner" style="width:282px;"><a class="image" href="https://wiki.guildwars.com/wiki/File:Runic_stones_in_the_Wilds.jpg" rel="noopener" target="_blank"><img alt="" class="thumbimage" data-file-height="614" data-file-width="606" decoding="async" height="284" loading="lazy" src="https://wiki.guildwars.com/images/thumb/2/20/Runic_stones_in_the_Wilds.jpg/280px-Runic_stones_in_the_Wilds.jpg" srcset="/images/thumb/2/20/Runic_stones_in_the_Wilds.jpg/420px-Runic_stones_in_the_Wilds.jpg 1.5x, /images/thumb/2/20/Runic_stones_in_the_Wilds.jpg/560px-Runic_stones_in_the_Wilds.jpg 2x" width="280"/></a> <div class="thumbcaption"><div class="magnify"><a class="internal" href="https://wiki.guildwars.com/wiki/File:Runic_stones_in_the_Wilds.jpg" rel="noopener" target="_blank" title="Enlarge"></a></div>Runic stones</div></div></div><ul><li>Runic stones are found around the north-east lake.</li>
+<li>Complete exploration of this mission contributes approximately 1.4% to the Tyrian <a href="https://wiki.guildwars.com/wiki/Cartographer" rel="noopener" target="_blank" title="Cartographer">Cartographer</a> title.</li>
+<li>Completion of this mission will fill in page #3 of <a href="https://wiki.guildwars.com/wiki/The_Flameseeker_Prophecies" rel="noopener" target="_blank" title="The Flameseeker Prophecies">The Flameseeker Prophecies</a> <a href="https://wiki.guildwars.com/wiki/Storybook" rel="noopener" target="_blank" title="Storybook">storybook</a>.</li>
+<li>After completing this mission, your party will be taken to <a href="https://wiki.guildwars.com/wiki/Bloodstone_Fen_(outpost)" rel="noopener" target="_blank" title="Bloodstone Fen (outpost)">Bloodstone Fen</a>.</li></ul><div style="margin: 1em; border: solid silver; border-width: 1px 0px; padding: 2px 1em 2px 7.5em;"><strong class="hiddenlinks" style="position: absolute; margin-left: -7.3em; color: #900;"><a class="image" href="https://wiki.guildwars.com/wiki/File:Anomaly.png" rel="noopener" target="_blank" title="Anomaly"><img alt="Anomaly" data-file-height="32" data-file-width="32" decoding="async" height="18" loading="lazy" src="https://wiki.guildwars.com/images/thumb/a/a6/Anomaly.png/18px-Anomaly.png" srcset="/images/thumb/a/a6/Anomaly.png/27px-Anomaly.png 1.5x, /images/a/a6/Anomaly.png 2x" width="18"/></a> <a class="mw-redirect" href="https://wiki.guildwars.com/wiki/Anomaly" rel="noopener" target="_blank" title="Anomaly">Anomaly</a>.</strong>In the line "The leaders of the two strongest Centaur tribes are on the verge of an agreement." the word "verge" is sometimes censored by the game's chat filter.</div><div style="margin: 1em; border: solid silver; border-width: 1px 0px; padding: 2px 1em 2px 5em;"><strong class="hiddenlinks" style="position: absolute; margin-left: -4.8em; color: #900;"><a class="image" href="https://wiki.guildwars.com/wiki/File:Bug.png" rel="noopener" target="_blank" title="Bug"><img alt="Bug" data-file-height="32" data-file-width="32" decoding="async" height="18" loading="lazy" src="https://wiki.guildwars.com/images/thumb/7/7d/Bug.png/18px-Bug.png" srcset="/images/thumb/7/7d/Bug.png/27px-Bug.png 1.5x, /images/7/7d/Bug.png 2x" width="18"/></a> <a href="https://wiki.guildwars.com/wiki/Bug" rel="noopener" target="_blank" title="Bug">Bug</a>.</strong>It is possible that after destroying an Entangling Roots, the vine wall will vanish but still be impassable, preventing you from progressing with the mission. It is suspected this happens when the Entangling Roots is killed (by other creatures or from a distance) before the wall appears.</div><div style="margin: 1em; border: solid silver; border-width: 1px 0px; padding: 2px 1em 2px 5em;"><strong class="hiddenlinks" style="position: absolute; margin-left: -4.8em; color: #900;"><a class="image" href="https://wiki.guildwars.com/wiki/File:Bug.png" rel="noopener" target="_blank" title="Bug"><img alt="Bug" data-file-height="32" data-file-width="32" decoding="async" height="18" loading="lazy" src="https://wiki.guildwars.com/images/thumb/7/7d/Bug.png/18px-Bug.png" srcset="/images/thumb/7/7d/Bug.png/27px-Bug.png 1.5x, /images/7/7d/Bug.png 2x" width="18"/></a> <a href="https://wiki.guildwars.com/wiki/Bug" rel="noopener" target="_blank" title="Bug">Bug</a>.</strong>It is possible that killing both Centaur chieftains will not give credit for completion of the bonus objective. The bonus will have to be repeated in this case, although the mission can still be completed as normal.</div></div></div>
+          </section>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="lightbox" id="lightbox" role="dialog" aria-label="Enlarged map">
+    <img src="../maps/prophecies_10_The_Wilds_map.jpg" alt="The Wilds mission map (enlarged)" />
+  </div>
+  <script>
+    (function () {
+      var open = document.getElementById("mapOpen");
+      var box = document.getElementById("lightbox");
+      if (!open || !box) return;
+      open.addEventListener("click", function () { box.classList.add("open"); });
+      box.addEventListener("click", function () { box.classList.remove("open"); });
+      document.addEventListener("keydown", function (e) {
+        if (e.key === "Escape") box.classList.remove("open");
+      });
+    })();
+  </script>
+
+</body>
+</html>

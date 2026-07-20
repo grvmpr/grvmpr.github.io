@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>The Dragon&#x27;s Lair</title>
+  <style>
+:root {
+  --bg-deep: #070a0f;
+  --bg-panel: #101820;
+  --bg-panel-2: #15202c;
+  --border: #243044;
+  --border-glow: #2a4a6a;
+  --text: #dce6f0;
+  --text-muted: #8a9bb0;
+  --text-dim: #5c6f86;
+  --accent: #3ecfff;
+  --accent-soft: rgba(62, 207, 255, 0.12);
+  --gold: #e8c56a;
+  --gold-soft: rgba(232, 197, 106, 0.12);
+  --bonus: #7dffb3;
+  --bonus-soft: rgba(125, 255, 179, 0.1);
+  --danger: #ff6b6b;
+  --danger-soft: rgba(255, 107, 107, 0.1);
+  --hm: #c78bff;
+  --hm-soft: rgba(199, 139, 255, 0.12);
+  --radius: 10px;
+  --font: "Segoe UI", system-ui, -apple-system, sans-serif;
+  --chrome-h: 3.1rem;
+  --gap: 0.5rem;
+  --pad: 0.7rem;
+  /* Readable on 4K vertical (~2160×3840) */
+  --walk-size: clamp(1.05rem, 0.55vw + 0.55vh, 1.35rem);
+  --bonus-size: clamp(1.05rem, 0.55vw + 0.55vh, 1.35rem);
+  --body-size: clamp(0.95rem, 0.4vw + 0.4vh, 1.1rem);
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html {
+  scroll-behavior: smooth;
+  font-size: clamp(16px, 0.55vw + 0.45vh, 20px);
+  height: 100%;
+  scroll-padding-top: calc(var(--chrome-h) + 0.5rem);
+}
+body {
+  font-family: var(--font);
+  background: var(--bg-deep);
+  color: var(--text);
+  line-height: 1.45;
+  min-height: 100%;
+  height: 100%;
+  overflow: hidden;
+  background-image: radial-gradient(ellipse 70% 25% at 50% 0%, rgba(42, 100, 160, 0.14), transparent);
+}
+a { color: var(--accent); text-decoration: none; }
+a:hover { color: #7de0ff; text-decoration: underline; }
+.app {
+  display: grid;
+  grid-template-rows: var(--chrome-h) 1fr;
+  height: 100vh; height: 100dvh;
+  max-height: 100vh; max-height: 100dvh;
+}
+.top-chrome {
+  display: flex; align-items: center; gap: 0.65rem;
+  padding: 0 0.7rem;
+  background: rgba(8, 12, 18, 0.97);
+  border-bottom: 1px solid var(--border);
+  z-index: 100; min-height: var(--chrome-h);
+}
+.brand { display: flex; align-items: baseline; gap: 0.55rem; min-width: 0; flex-shrink: 0; }
+.brand-mission {
+  font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase;
+  color: var(--accent); font-weight: 700; white-space: nowrap;
+}
+.brand-name {
+  font-size: 1.1rem; font-weight: 750; color: var(--text);
+  white-space: nowrap; letter-spacing: -0.02em;
+}
+.brand-meta { font-size: 0.75rem; color: var(--text-dim); white-space: nowrap; }
+.chip-nav {
+  display: flex; flex: 1; gap: 0.3rem; overflow-x: auto;
+  scrollbar-width: none; min-width: 0; justify-content: center;
+}
+.chip-nav::-webkit-scrollbar { display: none; }
+.chip-nav a {
+  flex: 0 0 auto; padding: 0.3rem 0.65rem; border-radius: 999px;
+  font-size: 0.78rem; font-weight: 600; color: var(--text-muted);
+  background: var(--bg-panel); border: 1px solid var(--border);
+  text-decoration: none; white-space: nowrap;
+}
+.chip-nav a:hover {
+  color: var(--text); border-color: var(--border-glow);
+  background: #1a2836; text-decoration: none;
+}
+.chip-nav a[href="#map"] { color: var(--accent); border-color: rgba(62, 207, 255, 0.35); }
+.chip-nav a[href="#bonus"] { color: var(--bonus); border-color: rgba(125, 255, 179, 0.3); }
+.chip-nav a[href="#hard-mode"] { color: var(--hm); border-color: rgba(199, 139, 255, 0.3); }
+.chip-nav a[href="#bosses"] { color: #ff9a9a; border-color: rgba(255, 107, 107, 0.3); }
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 0.3rem;
+  padding: 0.42rem 0.85rem; border-radius: 8px; font-weight: 650; font-size: 0.8rem;
+  border: none; cursor: pointer; text-decoration: none; white-space: nowrap; flex-shrink: 0;
+}
+.btn:hover { text-decoration: none; }
+.btn-next {
+  background: linear-gradient(135deg, #1a6a9a, #1ab0e0); color: #fff;
+  box-shadow: 0 2px 12px rgba(26, 140, 200, 0.35);
+}
+.btn-next:hover { color: #fff; filter: brightness(1.08); }
+.btn-wiki, .btn-idx, .btn-prev {
+  background: var(--bg-panel); color: var(--text-muted);
+  border: 1px solid var(--border); padding: 0.42rem 0.65rem;
+}
+.btn-wiki:hover, .btn-idx:hover, .btn-prev:hover {
+  color: var(--accent); border-color: var(--border-glow);
+}
+.chrome-actions { display: flex; gap: 0.35rem; flex-shrink: 0; }
+
+/* Map-dominant workspace */
+.workspace {
+  display: grid;
+  grid-template-columns: minmax(480px, 1.15fr) minmax(0, 1fr);
+  grid-template-rows: 1fr;
+  gap: var(--gap); padding: var(--gap);
+  min-height: 0; height: 100%; overflow: hidden;
+}
+.col-map {
+  display: grid;
+  grid-template-rows: 1fr auto;
+  gap: var(--gap);
+  min-height: 0; min-width: 0;
+}
+.col-main {
+  display: grid;
+  /* objectives compact | walkthrough HUGE | bonus+hm | bosses+tips */
+  grid-template-rows: auto minmax(0, 1.6fr) minmax(0, 1.05fr) minmax(0, 0.75fr);
+  gap: var(--gap); min-height: 0; min-width: 0; overflow: hidden;
+}
+.row-obj { min-height: 0; }
+.row-bonus-hm {
+  display: grid; grid-template-columns: 1.15fr 0.85fr; gap: var(--gap); min-height: 0;
+}
+.row-lower {
+  display: grid; grid-template-columns: 1.15fr 0.85fr; gap: var(--gap); min-height: 0;
+}
+.panel {
+  background: var(--bg-panel); border: 1px solid var(--border); border-radius: var(--radius);
+  padding: var(--pad); display: flex; flex-direction: column; min-height: 0; overflow: hidden;
+}
+.panel-scroll {
+  overflow-y: auto; overflow-x: hidden; min-height: 0; flex: 1; padding-right: 0.3rem;
+  scrollbar-width: thin; scrollbar-color: var(--border) transparent;
+  font-size: var(--body-size);
+}
+.panel-scroll::-webkit-scrollbar { width: 8px; }
+.panel-scroll::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+.panel-title {
+  display: flex; align-items: center; gap: 0.4rem;
+  font-size: 0.82rem; font-weight: 750; letter-spacing: 0.05em; text-transform: uppercase;
+  color: var(--text); margin-bottom: 0.45rem; padding-bottom: 0.35rem;
+  border-bottom: 1px solid var(--border); flex-shrink: 0;
+}
+.panel-title .icon {
+  width: 1.3rem; height: 1.3rem; border-radius: 5px;
+  display: inline-flex; align-items: center; justify-content: center; font-size: 0.75rem;
+}
+.panel.map-panel {
+  border-color: var(--border-glow);
+  background: linear-gradient(180deg, #0e1620 0%, var(--bg-panel) 100%);
+  /* Map takes almost all left column */
+  min-height: 0;
+}
+.panel.objectives { border-top: 2px solid var(--accent); }
+.panel.walkthrough { border-top: 3px solid #5eb8e8; }
+.panel.bonus { border-top: 3px solid var(--bonus); }
+.panel.hard-mode { border-top: 2px solid var(--hm); }
+.panel.bosses { border-top: 2px solid var(--danger); }
+.panel.other { border-top: 2px solid var(--text-muted); }
+
+/* Emphasized reading panels */
+.panel.walkthrough .panel-scroll,
+.panel.walkthrough .wiki-block {
+  font-size: var(--walk-size) !important;
+  line-height: 1.55;
+}
+.panel.bonus .panel-scroll,
+.panel.bonus .wiki-block {
+  font-size: var(--bonus-size) !important;
+  line-height: 1.55;
+}
+.panel.walkthrough .panel-scroll li,
+.panel.bonus .panel-scroll li {
+  margin-bottom: 0.45rem;
+}
+.panel.walkthrough .panel-scroll p,
+.panel.bonus .panel-scroll p {
+  margin-bottom: 0.55rem;
+}
+
+.icon-map { background: var(--accent-soft); color: var(--accent); }
+.icon-obj { background: var(--accent-soft); color: var(--accent); }
+.icon-walk { background: rgba(94, 184, 232, 0.15); color: #5eb8e8; }
+.icon-bonus { background: var(--bonus-soft); color: var(--bonus); }
+.icon-hm { background: var(--hm-soft); color: var(--hm); }
+.icon-boss { background: var(--danger-soft); color: var(--danger); }
+.icon-other { background: rgba(138, 155, 176, 0.15); color: var(--text-muted); }
+
+.map-wrap {
+  flex: 1; min-height: 0; display: flex; flex-direction: column;
+  align-items: center; justify-content: center; gap: 0.4rem;
+}
+.map-frame {
+  flex: 1; min-height: 0; width: 100%;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: 10px; overflow: hidden;
+  border: 2px solid var(--border-glow);
+  box-shadow: 0 0 0 1px rgba(62, 207, 255, 0.1), 0 12px 40px rgba(0, 0, 0, 0.45);
+  background: #05080c; cursor: zoom-in;
+}
+.map-frame img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  image-rendering: auto;
+}
+.map-caption { font-size: 0.72rem; color: var(--text-dim); flex-shrink: 0; }
+.map-missing {
+  color: var(--text-dim); font-size: 1rem; text-align: center; padding: 2rem;
+}
+
+.wiki-block ul, .panel-scroll ul,
+.wiki-block ol, .panel-scroll ol { padding-left: 1.2rem; margin: 0.3rem 0 0.5rem; }
+.wiki-block li, .panel-scroll li { margin-bottom: 0.32rem; }
+.wiki-block p, .panel-scroll p { margin-bottom: 0.45rem; }
+.wiki-block img, .panel-scroll img { vertical-align: middle; max-height: 1.35em; width: auto; }
+.wiki-block table, .panel-scroll table {
+  width: 100%; border-collapse: collapse; font-size: 0.9em; margin: 0.4rem 0;
+}
+.wiki-block th, .wiki-block td, .panel-scroll th, .panel-scroll td {
+  border: 1px solid var(--border); padding: 0.3rem 0.45rem; text-align: left;
+}
+.lede { font-size: 0.92rem; color: var(--text-muted); margin-bottom: 0.35rem; }
+
+/* Collapsed summary */
+details.summary-details {
+  background: var(--bg-panel);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  border-top: 2px solid var(--gold);
+  padding: 0.35rem 0.65rem;
+  flex-shrink: 0;
+}
+details.summary-details summary {
+  cursor: pointer;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--gold);
+  padding: 0.35rem 0;
+  list-style: none;
+}
+details.summary-details summary::-webkit-details-marker { display: none; }
+details.summary-details summary::before {
+  content: "▸ ";
+  color: var(--text-dim);
+}
+details.summary-details[open] summary::before { content: "▾ "; }
+details.summary-details .summary-body {
+  padding: 0.35rem 0 0.55rem;
+  font-size: 0.88rem;
+  color: var(--text-muted);
+  max-height: 18vh;
+  overflow-y: auto;
+}
+
+.boss-note { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.4rem; }
+.boss-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.4rem; }
+.boss-card {
+  background: var(--bg-panel-2); border: 1px solid var(--border);
+  border-radius: 8px; padding: 0.5rem 0.6rem;
+}
+.boss-card-head { font-size: 0.95rem; margin-bottom: 0.2rem; }
+.boss-card-head a { color: #eef6fc; font-weight: 700; }
+.boss-card-head a:hover { color: var(--accent); }
+.boss-elite { font-size: 0.88rem; }
+.elite-label { color: var(--gold); font-weight: 650; margin-right: 0.25rem; }
+.elite-link { color: #ffd78a; font-weight: 650; }
+.elite-link:hover { color: #ffe9b5; }
+.elite-none { color: var(--text-dim); font-style: italic; font-size: 0.85rem; }
+.boss-meta { font-size: 0.78rem; color: var(--text-dim); margin-top: 0.15rem; }
+
+.callout {
+  margin-top: 0.4rem; padding: 0.45rem 0.6rem; border-radius: 6px;
+  font-size: 0.88rem; border-left: 3px solid; line-height: 1.4;
+}
+.callout.tip { background: var(--accent-soft); border-color: var(--accent); color: #b8eaff; }
+.callout.warn { background: var(--danger-soft); border-color: var(--danger); color: #ffb4b4; }
+
+.lightbox {
+  display: none; position: fixed; inset: 0; z-index: 1000; background: rgba(0,0,0,0.94);
+  align-items: center; justify-content: center; padding: 1.5rem; cursor: zoom-out;
+}
+.lightbox.open { display: flex; }
+.lightbox img {
+  max-width: 96vw; max-height: 96vh; border-radius: 8px;
+  border: 2px solid var(--border-glow); object-fit: contain;
+}
+
+@media (min-height: 2400px) {
+  :root {
+    --walk-size: clamp(1.15rem, 0.7vh + 0.3vw, 1.5rem);
+    --bonus-size: clamp(1.15rem, 0.7vh + 0.3vw, 1.5rem);
+    --gap: 0.65rem;
+    --pad: 0.85rem;
+  }
+  .workspace { grid-template-columns: minmax(560px, 1.2fr) minmax(0, 1fr); }
+}
+@media (min-width: 1800px) and (min-height: 2000px) {
+  .workspace { grid-template-columns: minmax(600px, 1.25fr) minmax(0, 1fr); }
+}
+@media (max-height: 1100px) {
+  body { overflow: auto; height: auto; }
+  .app { height: auto; max-height: none; min-height: 100vh; }
+  .workspace {
+    height: auto; overflow: visible; grid-template-columns: 1fr; grid-template-rows: auto;
+  }
+  .col-map { grid-template-rows: auto; }
+  .col-main { overflow: visible; grid-template-rows: auto; }
+  .row-bonus-hm, .row-lower { grid-template-columns: 1fr; }
+  .panel { max-height: none; overflow: visible; }
+  .panel-scroll { overflow: visible; }
+  .map-frame { min-height: 360px; max-height: 55vh; }
+}
+
+    :root { --accent: #3ecfff; --accent-soft: #3ecfff22; }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header class="top-chrome">
+      <div class="brand">
+        <span class="brand-mission">M19</span>
+        <span class="brand-name">The Dragon&#x27;s Lair</span>
+        <span class="brand-meta">Prophecies · Crystal Desert · Cooperative · Medium</span>
+      </div>
+      <nav class="chip-nav" aria-label="Sections">
+        <a href="#map">Map</a>
+        <a href="#walkthrough">Walkthrough</a>
+        <a href="#bonus">Bonus</a>
+        <a href="#objectives">Objectives</a>
+        <a href="#hard-mode">Hard Mode</a>
+        <a href="#bosses">Bosses</a>
+        <a href="#other">Tips</a>
+      </nav>
+      <div class="chrome-actions">
+        <a class="btn btn-idx" href="../prohecies.html">Index</a>
+        <a class="btn btn-prev" href="18_Augury_Rock.html">← Prev</a>
+        <a class="btn btn-wiki" href="https://wiki.guildwars.com/wiki/The_Dragon%27s_Lair" target="_blank" rel="noopener">Wiki ↗</a>
+        <a class="btn btn-next" href="20_Ice_Caves_of_Sorrow.html">Next: Ice Caves of Sorrow →</a>
+      </div>
+    </header>
+
+    <div class="workspace">
+      <div class="col-map">
+        <section class="panel map-panel" id="map">
+          <h2 class="panel-title"><span class="icon icon-map">◉</span> Mission Map</h2>
+          <div class="map-wrap">
+            <div class="map-frame" id="mapOpen" title="Click to enlarge">
+              <img src="../maps/prophecies_19_The_Dragons_Lair_map.jpg" alt="The Dragon&#x27;s Lair mission map" />
+            </div>
+            <p class="map-caption">Click to enlarge · Local cache · <a href="https://wiki.guildwars.com/wiki/The_Dragon%27s_Lair" target="_blank" rel="noopener">Wiki</a></p>
+        </div>
+        </section>
+
+        <details class="summary-details" id="summary">
+          <summary>Summary (click to expand)</summary>
+          <div class="summary-body">
+            <p>Having completed the trials for Ascension , you must now seek out the ancient dragon , Glint . She will tell you how to strike back at the White Mantle as well as tell you who their masters really are.</p>
+            <p style="margin-top:0.4rem;"><strong>Region:</strong> Crystal Desert · <strong>Mission:</strong> 19 of 25 · <strong>Type:</strong> Cooperative</p>
+            <p style="margin-top:0.35rem;"><a href="https://wiki.guildwars.com/wiki/The_Dragon%27s_Lair" target="_blank" rel="noopener">Full wiki article ↗</a></p>
+          </div>
+        </details>
+      </div>
+
+      <div class="col-main">
+        <section class="panel objectives row-obj" id="objectives">
+          <h2 class="panel-title"><span class="icon icon-obj">✓</span> Objectives</h2>
+          <div class="panel-scroll wiki-block"><p>Gain audience with the prophet Glint.
+</p><ul><li>Defeat the <a href="https://wiki.guildwars.com/wiki/Facet_of_Light" rel="noopener" target="_blank" title="Facet of Light">Facet of Light</a>.</li>
+<li>Defeat the <a href="https://wiki.guildwars.com/wiki/Facet_of_Nature" rel="noopener" target="_blank" title="Facet of Nature">Facet of Nature</a>.</li>
+<li>Defeat the <a href="https://wiki.guildwars.com/wiki/Facet_of_Chaos" rel="noopener" target="_blank" title="Facet of Chaos">Facet of Chaos</a>.</li>
+<li>Defeat the <a href="https://wiki.guildwars.com/wiki/Facet_of_Darkness" rel="noopener" target="_blank" title="Facet of Darkness">Facet of Darkness</a>.</li>
+<li>Defeat the <a href="https://wiki.guildwars.com/wiki/Facet_of_Elements" rel="noopener" target="_blank" title="Facet of Elements">Facet of Elements</a>.</li>
+<li>Defeat the <a href="https://wiki.guildwars.com/wiki/Facet_of_Strength" rel="noopener" target="_blank" title="Facet of Strength">Facet of Strength</a>.</li>
+<li>*<a class="mw-redirect" href="https://wiki.guildwars.com/wiki/Bonus" rel="noopener" target="_blank" title="Bonus">BONUS</a>* Defeat Glint.</li></ul></div>
+        </section>
+
+        <section class="panel walkthrough" id="walkthrough">
+          <h2 class="panel-title"><span class="icon icon-walk">→</span> Walkthrough</h2>
+          <div class="panel-scroll wiki-block"><p>To reach Glint, you must pass through six chambers, each representing one of the <a class="mw-redirect" href="https://wiki.guildwars.com/wiki/Core" rel="noopener" target="_blank" title="Core">core</a> <a class="mw-redirect" href="https://wiki.guildwars.com/wiki/Professions" rel="noopener" target="_blank" title="Professions">professions</a>. Four of these rooms have a global <a class="mw-redirect" href="https://wiki.guildwars.com/wiki/Environment_Effect" rel="noopener" target="_blank" title="Environment Effect">environmental effects</a> to hinder players from reaching the <a href="https://wiki.guildwars.com/wiki/Facet" rel="noopener" target="_blank" title="Facet">Facet</a> at the opposite end of the chamber. Each Facet represents one profession, and when defeated  opens a <a href="https://wiki.guildwars.com/wiki/Portal" rel="noopener" target="_blank" title="Portal">portal</a> to the next chamber. The order of the chambers is always the same. The portal to the first Facet's chamber is opened after a player talks with the <a href="https://wiki.guildwars.com/wiki/Forgotten_Gate_Keeper" rel="noopener" target="_blank" title="Forgotten Gate Keeper">Forgotten Gate Keeper</a>.
+</p><p>Note: Each gate has a brief <a href="https://wiki.guildwars.com/wiki/Cinematic" rel="noopener" target="_blank" title="Cinematic">cinematic</a> that shows your <a href="https://wiki.guildwars.com/wiki/Party" rel="noopener" target="_blank" title="Party">party</a> being teleported.  Most people skip these, but be warned: the last cinematic also contains your conversation with Glint. If you wish to see this conversation do not skip the teleportation cinematic after the Facet of Strength.
+</p><dl><dt>Facet of Light</dt>
+<dd><span style="white-space: nowrap;"><a href="https://wiki.guildwars.com/wiki/Domain_of_Health_Draining" rel="noopener" target="_blank" title="Domain of Health Draining"><img alt="Domain of Health Draining" data-file-height="64" data-file-width="64" decoding="async" height="25" loading="lazy" src="https://wiki.guildwars.com/images/thumb/0/0c/Domain_of_Health_Draining.jpg/25px-Domain_of_Health_Draining.jpg" srcset="/images/thumb/0/0c/Domain_of_Health_Draining.jpg/38px-Domain_of_Health_Draining.jpg 1.5x, /images/thumb/0/0c/Domain_of_Health_Draining.jpg/50px-Domain_of_Health_Draining.jpg 2x" width="25"/></a> <a href="https://wiki.guildwars.com/wiki/Domain_of_Health_Draining" rel="noopener" target="_blank" title="Domain of Health Draining">Domain of Health Draining</a></span> - <i>While you are in this area you suffer from -3 <a href="https://wiki.guildwars.com/wiki/Health_degeneration" rel="noopener" target="_blank" title="Health degeneration">Health degeneration</a>.</i></dd></dl><p>As a result of the environmental effect healers will be constantly active, and group-healing spells such as <a href="https://wiki.guildwars.com/wiki/Heal_Party" rel="noopener" target="_blank" title="Heal Party">Heal Party</a> are helpful to combat the effect. Luckily, the foes you face in this room are not difficult. As with the desert missions, <a href="https://wiki.guildwars.com/wiki/Forgotten_Sage" rel="noopener" target="_blank" title="Forgotten Sage">Forgotten Sages</a> should be the priority target. You'll also fight <a href="https://wiki.guildwars.com/wiki/Enchanted_Sword_(Prophecies)" rel="noopener" target="_blank" title="Enchanted Sword (Prophecies)">Enchanted Sword</a> and <a href="https://wiki.guildwars.com/wiki/Enchanted_Hammer_(Prophecies)" rel="noopener" target="_blank" title="Enchanted Hammer (Prophecies)">Hammer</a> pairs. Typically, players follow the western edge of the room, sometimes avoiding a few foes. Try to kill off the groups before engaging the <a href="https://wiki.guildwars.com/wiki/Facet_of_Light" rel="noopener" target="_blank" title="Facet of Light">Facet of Light</a> boss. It uses <a href="https://wiki.guildwars.com/wiki/Shield_of_Regeneration" rel="noopener" target="_blank" title="Shield of Regeneration">Shield of Regeneration</a> and <a href="https://wiki.guildwars.com/wiki/Guardian" rel="noopener" target="_blank" title="Guardian">Guardian</a> as its primary defense. Enchantment removal, <a href="https://wiki.guildwars.com/wiki/Knock_down" rel="noopener" target="_blank" title="Knock down">knock down</a> or simply overwhelming <a href="https://wiki.guildwars.com/wiki/Damage_per_second" rel="noopener" target="_blank" title="Damage per second">damage per second</a> should kill it quickly, opening the portal to the next room.
+</p><div style="margin: 1em; border: solid silver; border-width: 1px 0px; padding: 2px 1em 2px 7.5em;"><strong class="hiddenlinks" style="position: absolute; margin-left: -7.3em; color: #900;"><a class="image" href="https://wiki.guildwars.com/wiki/File:Anomaly.png" rel="noopener" target="_blank" title="Anomaly"><img alt="Anomaly" data-file-height="32" data-file-width="32" decoding="async" height="18" loading="lazy" src="https://wiki.guildwars.com/images/thumb/a/a6/Anomaly.png/18px-Anomaly.png" srcset="/images/thumb/a/a6/Anomaly.png/27px-Anomaly.png 1.5x, /images/a/a6/Anomaly.png 2x" width="18"/></a> <a class="mw-redirect" href="https://wiki.guildwars.com/wiki/Anomaly" rel="noopener" target="_blank" title="Anomaly">Anomaly</a>.</strong>Before the slope down towards the Facet's chamber, there is a small area where the <a href="https://wiki.guildwars.com/wiki/Domain_of_Health_Draining" rel="noopener" target="_blank" title="Domain of Health Draining">Domain of Health Draining</a> does not work. This might be used to prepare and regenerate.</div><dl><dt>Facet of Nature</dt>
+<dd><span style="white-space: nowrap;"><a href="https://wiki.guildwars.com/wiki/Domain_of_Slow" rel="noopener" target="_blank" title="Domain of Slow"><img alt="Domain of Slow" data-file-height="64" data-file-width="64" decoding="async" height="25" loading="lazy" src="https://wiki.guildwars.com/images/thumb/1/16/Domain_of_Slow.jpg/25px-Domain_of_Slow.jpg" srcset="/images/thumb/1/16/Domain_of_Slow.jpg/38px-Domain_of_Slow.jpg 1.5x, /images/thumb/1/16/Domain_of_Slow.jpg/50px-Domain_of_Slow.jpg 2x" width="25"/></a> <a href="https://wiki.guildwars.com/wiki/Domain_of_Slow" rel="noopener" target="_blank" title="Domain of Slow">Domain of Slow</a></span> - <i>While you are in this area your movement is slowed.</i></dd></dl><p>In this room, you'll fight numerous <a href="https://wiki.guildwars.com/wiki/Enchanted_Bow_(Prophecies)" rel="noopener" target="_blank" title="Enchanted Bow (Prophecies)">Enchanted Bows</a>, many of which start up on ledges. However, a <a href="https://wiki.guildwars.com/wiki/Longbow" rel="noopener" target="_blank" title="Longbow">long</a>/<a href="https://wiki.guildwars.com/wiki/Flatbow" rel="noopener" target="_blank" title="Flatbow">flatbow</a> shot usually will cause them to run around to lower ground. Again, it is common for players to hug the left wall when going through this room to attempt to avoid a group or two. The <a href="https://wiki.guildwars.com/wiki/Facet_of_Nature" rel="noopener" target="_blank" title="Facet of Nature">Facet of Nature</a> uses <a href="https://wiki.guildwars.com/wiki/Melandru%27s_Resilience" rel="noopener" target="_blank" title="Melandru's Resilience">Melandru's Resilience</a>, so either avoid using weak <a class="mw-redirect" href="https://wiki.guildwars.com/wiki/Hex" rel="noopener" target="_blank" title="Hex">hexes</a>/<a href="https://wiki.guildwars.com/wiki/Condition" rel="noopener" target="_blank" title="Condition">conditions</a> or have a player prepared with a <a href="https://wiki.guildwars.com/wiki/Stance#Skills_countering_stances" rel="noopener" target="_blank" title="Stance">stance removing skill</a> (which is useful to bring along for the bonus anyway).
+</p><dl><dt>Facet of Chaos</dt></dl><p>This room has no environmental effect. Instead, you'll fight swarms of <a href="https://wiki.guildwars.com/wiki/Crystal_Spider" rel="noopener" target="_blank" title="Crystal Spider">Crystal Spiders</a>, with <a href="https://wiki.guildwars.com/wiki/Forgotten_Illusionist" rel="noopener" target="_blank" title="Forgotten Illusionist">Forgotten Illusionists</a> backing them up. The spiders spam <a href="https://wiki.guildwars.com/wiki/Shatter_Enchantment" rel="noopener" target="_blank" title="Shatter Enchantment">Shatter Enchantment</a> and <a href="https://wiki.guildwars.com/wiki/Hex_Breaker" rel="noopener" target="_blank" title="Hex Breaker">Hex Breaker</a>, so be wary of hex and <a class="mw-redirect" href="https://wiki.guildwars.com/wiki/Enchantment" rel="noopener" target="_blank" title="Enchantment">enchantment</a> usage. Some of the Illusionists hide behind solid crystal walls that do not hinder their indirect spells, but which shield them from melee and projectile assault. As such, a few strong indirect spells of your own are useful here, but be sure to watch out for their <a href="https://wiki.guildwars.com/wiki/Chaos_Storm" rel="noopener" target="_blank" title="Chaos Storm">Chaos Storm</a>. It's worth taking the time to destroy them with spells before engaging new groups of spiders, because together these opponents can present a tough battle, especially in <a href="https://wiki.guildwars.com/wiki/Hard_mode" rel="noopener" target="_blank" title="Hard mode">hard mode</a>. The back of the room has a twisted path leading to the <a href="https://wiki.guildwars.com/wiki/Facet_of_Chaos" rel="noopener" target="_blank" title="Facet of Chaos">Facet of Chaos</a>. Pairs of Illusionists will cast across the low walls of the path, but projectile attacks can reach them.
+</p><dl><dt>Facet of Darkness</dt>
+<dd><span style="white-space: nowrap;"><a href="https://wiki.guildwars.com/wiki/Domain_of_Energy_Draining" rel="noopener" target="_blank" title="Domain of Energy Draining"><img alt="Domain of Energy Draining" data-file-height="64" data-file-width="64" decoding="async" height="25" loading="lazy" src="https://wiki.guildwars.com/images/thumb/9/90/Domain_of_Energy_Draining.jpg/25px-Domain_of_Energy_Draining.jpg" srcset="/images/thumb/9/90/Domain_of_Energy_Draining.jpg/38px-Domain_of_Energy_Draining.jpg 1.5x, /images/thumb/9/90/Domain_of_Energy_Draining.jpg/50px-Domain_of_Energy_Draining.jpg 2x" width="25"/></a> <a href="https://wiki.guildwars.com/wiki/Domain_of_Energy_Draining" rel="noopener" target="_blank" title="Domain of Energy Draining">Domain of Energy Draining</a></span> - <i>While you are in this area you suffer from -1 <a class="mw-redirect" href="https://wiki.guildwars.com/wiki/Energy_degeneration" rel="noopener" target="_blank" title="Energy degeneration">Energy degeneration</a>. </i></dd></dl><p>In addition to the environmental effect, both allies and foes alike are kept enchanted under a low powered <a href="https://wiki.guildwars.com/wiki/Death_Nova" rel="noopener" target="_blank" title="Death Nova">Death Nova</a> that deals 26 damage and <a href="https://wiki.guildwars.com/wiki/Poison" rel="noopener" target="_blank" title="Poison">poisons</a> for 15 seconds. The <a href="https://wiki.guildwars.com/wiki/Rock-Eater_Scarab" rel="noopener" target="_blank" title="Rock-Eater Scarab">Rock-Eater Scarabs</a> like to use <a href="https://wiki.guildwars.com/wiki/Frenzy" rel="noopener" target="_blank" title="Frenzy">Frenzy</a>, and die easily because of it. If many die at once, the damage from the Death Novas can add up quickly. Also, <a href="https://wiki.guildwars.com/wiki/Forgotten_Cursebearer" rel="noopener" target="_blank" title="Forgotten Cursebearer">Forgotten Cursebearers</a> will use the corpses to heal, but they shouldn't pose much of a threat. Thanks to the constant Death Nova, <a href="https://wiki.guildwars.com/wiki/Minion" rel="noopener" target="_blank" title="Minion">minion</a> armies can make this room very quick. The <a href="https://wiki.guildwars.com/wiki/Facet_of_Darkness" rel="noopener" target="_blank" title="Facet of Darkness">Facet of Darkness</a> at the back is quite easy.
+</p><dl><dt>Facet of Elements</dt>
+<dd><span style="white-space: nowrap;"><a href="https://wiki.guildwars.com/wiki/Domain_of_Elements" rel="noopener" target="_blank" title="Domain of Elements"><img alt="Domain of Elements" data-file-height="64" data-file-width="64" decoding="async" height="25" loading="lazy" src="https://wiki.guildwars.com/images/thumb/1/1d/Domain_of_Elements.jpg/25px-Domain_of_Elements.jpg" srcset="/images/thumb/1/1d/Domain_of_Elements.jpg/38px-Domain_of_Elements.jpg 1.5x, /images/thumb/1/1d/Domain_of_Elements.jpg/50px-Domain_of_Elements.jpg 2x" width="25"/></a> <a href="https://wiki.guildwars.com/wiki/Domain_of_Elements" rel="noopener" target="_blank" title="Domain of Elements">Domain of Elements</a></span> - <i>While you are in this area you are the target of chaotic natural forces, specifically environmental versions of <a href="https://wiki.guildwars.com/wiki/Fire_Storm_(environment)" rel="noopener" target="_blank" title="Fire Storm (environment)">Fire Storm</a>, <a href="https://wiki.guildwars.com/wiki/Maelstrom_(environment)" rel="noopener" target="_blank" title="Maelstrom (environment)">Maelstrom</a>, <a href="https://wiki.guildwars.com/wiki/Chain_Lightning_(environment)" rel="noopener" target="_blank" title="Chain Lightning (environment)">Chain Lightning</a> and <a href="https://wiki.guildwars.com/wiki/Eruption_(environment)" rel="noopener" target="_blank" title="Eruption (environment)">Eruption</a></i></dd></dl><p>The environmental effects in this room are limited to inside the <a class="mw-redirect" href="https://wiki.guildwars.com/wiki/Ward" rel="noopener" target="_blank" title="Ward">wards</a> throughout the area. Try not to stand in these wards while fighting. <a href="https://wiki.guildwars.com/wiki/Crystal_Guardian" rel="noopener" target="_blank" title="Crystal Guardian">Crystal Guardians</a> guard the halls here and carry a nasty <a href="https://wiki.guildwars.com/wiki/Shock" rel="noopener" target="_blank" title="Shock">Shock</a>/<a href="https://wiki.guildwars.com/wiki/Aftershock" rel="noopener" target="_blank" title="Aftershock">Aftershock</a> combo. Luckily, they rarely use the combo in the correct sequence. <a href="https://wiki.guildwars.com/wiki/Forgotten_Arcanist" rel="noopener" target="_blank" title="Forgotten Arcanist">Forgotten Arcanists</a> will often be in side rooms, intercepting players in the main corridor as they pass by. Defeat the <a href="https://wiki.guildwars.com/wiki/Facet_of_Elements" rel="noopener" target="_blank" title="Facet of Elements">Facet of Elements</a> at the back to proceed to the last Facet.
+</p><dl><dt>Facet of Strength</dt></dl><p>Every 25 seconds, all players are <a href="https://wiki.guildwars.com/wiki/Knock_down" rel="noopener" target="_blank" title="Knock down">knocked down</a> for 5 seconds. Skills such as <a href="https://wiki.guildwars.com/wiki/%22I_Am_Unstoppable!%22" rel="noopener" target="_blank" title='"I Am Unstoppable!"'>"I Am Unstoppable!"</a>, <a href="https://wiki.guildwars.com/wiki/%22Don%27t_Trip!%22" rel="noopener" target="_blank" title="&quot;Don't Trip!&quot;">"Don't Trip!"</a>, <a href="https://wiki.guildwars.com/wiki/Ward_of_Stability" rel="noopener" target="_blank" title="Ward of Stability">Ward of Stability</a>, <a href="https://wiki.guildwars.com/wiki/Balanced_Stance" rel="noopener" target="_blank" title="Balanced Stance">Balanced Stance</a> and <a href="https://wiki.guildwars.com/wiki/Dolyak_Signet" rel="noopener" target="_blank" title="Dolyak Signet">Dolyak Signet</a> will prevent the knock down. Your foes are mostly Sword/Hammer pairs, although you may run into groups with a Crystal Spider and Crystal Guardian. Kill the Guardians first, as Aftershock is more likely to deal its extra damage while the healers are helpless on the ground; this is especially true in Hard Mode. Defeat the <a href="https://wiki.guildwars.com/wiki/Facet_of_Strength" rel="noopener" target="_blank" title="Facet of Strength">Facet of Strength</a> to finally meet Glint.
+</p></div>
+        </section>
+
+        <div class="row-bonus-hm">
+          <section class="panel bonus" id="bonus">
+            <h2 class="panel-title"><span class="icon icon-bonus">★</span> Bonus</h2>
+            <div class="panel-scroll wiki-block"><div class="thumb tright"><div class="thumbinner" style="width:227px;"><a class="image" href="https://wiki.guildwars.com/wiki/File:The_Dragon%27s_Lair_2_cinematic_still.jpg" rel="noopener" target="_blank"><img alt="" class="thumbimage" data-file-height="551" data-file-width="1023" decoding="async" height="121" loading="lazy" src="https://wiki.guildwars.com/images/thumb/e/e6/The_Dragon%27s_Lair_2_cinematic_still.jpg/225px-The_Dragon%27s_Lair_2_cinematic_still.jpg" srcset="/images/thumb/e/e6/The_Dragon%27s_Lair_2_cinematic_still.jpg/338px-The_Dragon%27s_Lair_2_cinematic_still.jpg 1.5x, /images/thumb/e/e6/The_Dragon%27s_Lair_2_cinematic_still.jpg/450px-The_Dragon%27s_Lair_2_cinematic_still.jpg 2x" width="225"/></a> <div class="thumbcaption"><div class="magnify"><a class="internal" href="https://wiki.guildwars.com/wiki/File:The_Dragon%27s_Lair_2_cinematic_still.jpg" rel="noopener" target="_blank" title="Enlarge"></a></div>Glint awaits you in her lair.</div></div></div><div class="thumb tright"><div class="thumbinner" style="width:227px;"><a class="image" href="https://wiki.guildwars.com/wiki/File:Glint_vs_MOX.jpg" rel="noopener" target="_blank"><img alt="" class="thumbimage" data-file-height="1002" data-file-width="1904" decoding="async" height="118" loading="lazy" src="https://wiki.guildwars.com/images/thumb/c/c7/Glint_vs_MOX.jpg/225px-Glint_vs_MOX.jpg" srcset="/images/thumb/c/c7/Glint_vs_MOX.jpg/338px-Glint_vs_MOX.jpg 1.5x, /images/thumb/c/c7/Glint_vs_MOX.jpg/450px-Glint_vs_MOX.jpg 2x" width="225"/></a> <div class="thumbcaption"><div class="magnify"><a class="internal" href="https://wiki.guildwars.com/wiki/File:Glint_vs_MOX.jpg" rel="noopener" target="_blank" title="Enlarge"></a></div>Glint defends her eggs.</div></div></div><div class="thumb tright"><div class="thumbinner" style="width:227px;"><a class="image" href="https://wiki.guildwars.com/wiki/File:The_Dragon%27s_Lair_4_cinematic_still.jpg" rel="noopener" target="_blank"><img alt="" class="thumbimage" data-file-height="432" data-file-width="800" decoding="async" height="122" loading="lazy" src="https://wiki.guildwars.com/images/thumb/d/dd/The_Dragon%27s_Lair_4_cinematic_still.jpg/225px-The_Dragon%27s_Lair_4_cinematic_still.jpg" srcset="/images/thumb/d/dd/The_Dragon%27s_Lair_4_cinematic_still.jpg/338px-The_Dragon%27s_Lair_4_cinematic_still.jpg 1.5x, /images/thumb/d/dd/The_Dragon%27s_Lair_4_cinematic_still.jpg/450px-The_Dragon%27s_Lair_4_cinematic_still.jpg 2x" width="225"/></a> <div class="thumbcaption"><div class="magnify"><a class="internal" href="https://wiki.guildwars.com/wiki/File:The_Dragon%27s_Lair_4_cinematic_still.jpg" rel="noopener" target="_blank" title="Enlarge"></a></div>Now away with you.</div></div></div><p>To gain the bonus you need to defeat Glint. Instead of using the portal opened during the <a href="https://wiki.guildwars.com/wiki/Cinematic" rel="noopener" target="_blank" title="Cinematic">cinematic</a>, pick up one of her <a href="https://wiki.guildwars.com/wiki/Dragon_Egg" rel="noopener" target="_blank" title="Dragon Egg">Dragon Eggs</a> and she will turn hostile. This bonus is unique in that even if the entire party <a href="https://wiki.guildwars.com/wiki/Wipe" rel="noopener" target="_blank" title="Wipe">wipes</a> while attempting it, they will still receive credit for the mission and continue to <a href="https://wiki.guildwars.com/wiki/Droknar%27s_Forge" rel="noopener" target="_blank" title="Droknar's Forge">Droknar's Forge</a>. 
+</p><p>Since Glint is friendly until the eggs are touched, set up <a href="https://wiki.guildwars.com/wiki/Trap" rel="noopener" target="_blank" title="Trap">traps</a> and <a href="https://wiki.guildwars.com/wiki/Spirit" rel="noopener" target="_blank" title="Spirit">spirits</a> before she turns hostile.
+</p><p>Glint uses four skills:
+</p><ul><li><span style="white-space: nowrap;"><a href="https://wiki.guildwars.com/wiki/Crystal_Haze" rel="noopener" target="_blank" title="Crystal Haze"><img alt="Crystal Haze" data-file-height="64" data-file-width="64" decoding="async" height="25" loading="lazy" src="https://wiki.guildwars.com/images/thumb/f/f9/Crystal_Haze.jpg/25px-Crystal_Haze.jpg" srcset="/images/thumb/f/f9/Crystal_Haze.jpg/38px-Crystal_Haze.jpg 1.5x, /images/thumb/f/f9/Crystal_Haze.jpg/50px-Crystal_Haze.jpg 2x" width="25"/></a> <a href="https://wiki.guildwars.com/wiki/Crystal_Haze" rel="noopener" target="_blank" title="Crystal Haze">Crystal Haze</a></span> - An AoE hex that can render casters useless, spread before the battle. <a href="https://wiki.guildwars.com/wiki/Revealed_Hex" rel="noopener" target="_blank" title="Revealed Hex">Revealed Hex</a>/<a href="https://wiki.guildwars.com/wiki/Inspired_Hex" rel="noopener" target="_blank" title="Inspired Hex">Inspired Hex</a> are optimal counters as with all monster skill hexes, they are not replaced and recharge instantly. For those using <a class="mw-redirect" href="https://wiki.guildwars.com/wiki/Henchmen" rel="noopener" target="_blank" title="Henchmen">henchmen</a>/<a href="https://wiki.guildwars.com/wiki/Hero" rel="noopener" target="_blank" title="Hero">heroes</a>, set the heroes to avoid combat and block healing skills for the duration of this dangerous hex.</li></ul><ul><li><span style="white-space: nowrap;"><a href="https://wiki.guildwars.com/wiki/Jagged_Crystal_Skin" rel="noopener" target="_blank" title="Jagged Crystal Skin"><img alt="Jagged Crystal Skin" data-file-height="64" data-file-width="64" decoding="async" height="25" loading="lazy" src="https://wiki.guildwars.com/images/thumb/4/44/Jagged_Crystal_Skin.jpg/25px-Jagged_Crystal_Skin.jpg" srcset="/images/thumb/4/44/Jagged_Crystal_Skin.jpg/38px-Jagged_Crystal_Skin.jpg 1.5x, /images/thumb/4/44/Jagged_Crystal_Skin.jpg/50px-Jagged_Crystal_Skin.jpg 2x" width="25"/></a> <a href="https://wiki.guildwars.com/wiki/Jagged_Crystal_Skin" rel="noopener" target="_blank" title="Jagged Crystal Skin">Jagged Crystal Skin</a></span> - A stance that causes massive damage to <a href="https://wiki.guildwars.com/wiki/Melee_attack" rel="noopener" target="_blank" title="Melee attack">melee attackers</a> since it triggers on physical damage. Use elemental weapons, or skills that convert your damage types e.g.: <a href="https://wiki.guildwars.com/wiki/Judge%27s_Insight" rel="noopener" target="_blank" title="Judge's Insight">Judge's Insight</a>, <a href="https://wiki.guildwars.com/wiki/Heart_of_Holy_Flame" rel="noopener" target="_blank" title="Heart of Holy Flame">Heart of Holy Flame</a> and/or <a href="https://wiki.guildwars.com/wiki/Greater_Conflagration" rel="noopener" target="_blank" title="Greater Conflagration">Greater Conflagration</a> to negate its effects.</li></ul><ul><li><span style="white-space: nowrap;"><a href="https://wiki.guildwars.com/wiki/Crystal_Bonds" rel="noopener" target="_blank" title="Crystal Bonds"><img alt="Crystal Bonds" data-file-height="64" data-file-width="64" decoding="async" height="25" loading="lazy" src="https://wiki.guildwars.com/images/thumb/a/a2/Crystal_Bonds.jpg/25px-Crystal_Bonds.jpg" srcset="/images/thumb/a/a2/Crystal_Bonds.jpg/38px-Crystal_Bonds.jpg 1.5x, /images/thumb/a/a2/Crystal_Bonds.jpg/50px-Crystal_Bonds.jpg 2x" width="25"/></a> <a href="https://wiki.guildwars.com/wiki/Crystal_Bonds" rel="noopener" target="_blank" title="Crystal Bonds">Crystal Bonds</a></span> - A hex spell that removes and prevents enchantments to target but doesn't apply to self-enchantments (dervish) nor party wide spells e.g. <a href="https://wiki.guildwars.com/wiki/Aegis" rel="noopener" target="_blank" title="Aegis">Aegis</a>. It only inhibits protection monks.</li></ul><ul><li><span style="white-space: nowrap;"><a href="https://wiki.guildwars.com/wiki/Crystal_Hibernation" rel="noopener" target="_blank" title="Crystal Hibernation"><img alt="Crystal Hibernation" data-file-height="64" data-file-width="64" decoding="async" height="25" loading="lazy" src="https://wiki.guildwars.com/images/thumb/e/e9/Crystal_Hibernation.jpg/25px-Crystal_Hibernation.jpg" srcset="/images/thumb/e/e9/Crystal_Hibernation.jpg/38px-Crystal_Hibernation.jpg 1.5x, /images/thumb/e/e9/Crystal_Hibernation.jpg/50px-Crystal_Hibernation.jpg 2x" width="25"/></a> <a href="https://wiki.guildwars.com/wiki/Crystal_Hibernation" rel="noopener" target="_blank" title="Crystal Hibernation">Crystal Hibernation</a></span> - Used at half way through the battle. Grants her health regeneration and converts taken damage to heals. But takes five second to activate, leaving it vulnerable to <a href="https://wiki.guildwars.com/wiki/Interrupt" rel="noopener" target="_blank" title="Interrupt">interrupts</a>.</li></ul><p>If using henchmen/heroes, avoid melee characters since they tend to die very fast under the effects of <a href="https://wiki.guildwars.com/wiki/Jagged_Crystal_Skin" rel="noopener" target="_blank" title="Jagged Crystal Skin">Jagged Crystal Skin</a>. Ranged attacks put less stress on your healers. Flag the non-melee away from the dragon to avoid Jagged Crystal Skin.
+</p></div>
+          </section>
+          <section class="panel hard-mode" id="hard-mode">
+            <h2 class="panel-title"><span class="icon icon-hm">◆</span> Hard Mode</h2>
+            <div class="panel-scroll wiki-block"><p class='lede'>No dedicated Hard Mode section on the wiki — expect tougher foes and adjusted mechanics. See walkthrough notes.</p></div>
+          </section>
+        </div>
+
+        <div class="row-lower">
+          <section class="panel bosses" id="bosses">
+            <h2 class="panel-title"><span class="icon icon-boss">☠</span> Bosses &amp; Elites</h2>
+            <div class="panel-scroll"><div class='boss-grid'>
+<article class="boss-card">
+  <div class="boss-card-head"><a href="https://wiki.guildwars.com/wiki/Facet_of_Strength" target="_blank" rel="noopener"><strong>Facet of Strength</strong></a></div>
+  <div class="boss-elite"><span class="elite-label">Elite:</span> <a class="elite-link" href="https://wiki.guildwars.com/wiki/Gladiator%27s_Defense" target="_blank" rel="noopener">Gladiator&#x27;s Defense</a></div>
+  <div class="boss-meta">26 (30)</div>
+</article>
+<article class="boss-card">
+  <div class="boss-card-head"><a href="https://wiki.guildwars.com/wiki/Facet_of_Nature" target="_blank" rel="noopener"><strong>Facet of Nature</strong></a></div>
+  <div class="boss-elite"><span class="elite-label">Elite:</span> <a class="elite-link" href="https://wiki.guildwars.com/wiki/Melandru%27s_Resilience" target="_blank" rel="noopener">Melandru&#x27;s Resilience</a></div>
+  <div class="boss-meta">26 (30)</div>
+</article>
+<article class="boss-card">
+  <div class="boss-card-head"><a href="https://wiki.guildwars.com/wiki/Facet_of_Light" target="_blank" rel="noopener"><strong>Facet of Light</strong></a></div>
+  <div class="boss-elite"><span class="elite-label">Elite:</span> <a class="elite-link" href="https://wiki.guildwars.com/wiki/Shield_of_Regeneration" target="_blank" rel="noopener">Shield of Regeneration</a></div>
+  <div class="boss-meta">26 (30)</div>
+</article>
+<article class="boss-card">
+  <div class="boss-card-head"><a href="https://wiki.guildwars.com/wiki/Facet_of_Darkness" target="_blank" rel="noopener"><strong>Facet of Darkness</strong></a></div>
+  <div class="boss-elite"><span class="elite-label">Elite:</span> <a class="elite-link" href="https://wiki.guildwars.com/wiki/Grenth%27s_Balance" target="_blank" rel="noopener">Grenth&#x27;s Balance</a></div>
+  <div class="boss-meta">26 (30)</div>
+</article>
+<article class="boss-card">
+  <div class="boss-card-head"><a href="https://wiki.guildwars.com/wiki/Facet_of_Chaos" target="_blank" rel="noopener"><strong>Facet of Chaos</strong></a></div>
+  <div class="boss-elite"><span class="elite-label">Elite:</span> <a class="elite-link" href="https://wiki.guildwars.com/wiki/Mantra_of_Recall" target="_blank" rel="noopener">Mantra of Recall</a></div>
+  <div class="boss-meta">26 (30)</div>
+</article>
+<article class="boss-card">
+  <div class="boss-card-head"><a href="https://wiki.guildwars.com/wiki/Facet_of_Elements" target="_blank" rel="noopener"><strong>Facet of Elements</strong></a></div>
+  <div class="boss-elite"><span class="elite-label">Elite:</span> <a class="elite-link" href="https://wiki.guildwars.com/wiki/Lightning_Surge" target="_blank" rel="noopener">Lightning Surge</a></div>
+  <div class="boss-meta">26 (30)</div>
+</article>
+</div></div>
+          </section>
+          <section class="panel other" id="other">
+            <h2 class="panel-title"><span class="icon icon-other">✦</span> Tips &amp; Notes</h2>
+            <div class="panel-scroll"><h3 style='font-size:0.8rem;color:var(--accent);margin:0.3rem 0;'>Skill recommendations</h3><div class='wiki-block'><ul><li><a href="https://wiki.guildwars.com/wiki/Party" rel="noopener" target="_blank" title="Party">Party</a> wide healing skills such as <a href="https://wiki.guildwars.com/wiki/Heal_Party" rel="noopener" target="_blank" title="Heal Party">Heal Party</a>, <a href="https://wiki.guildwars.com/wiki/Protective_Was_Kaolai" rel="noopener" target="_blank" title="Protective Was Kaolai">Protective Was Kaolai</a> or <a href="https://wiki.guildwars.com/wiki/Heaven%27s_Delight" rel="noopener" target="_blank" title="Heaven's Delight">Heaven's Delight</a>.</li>
+<li>Anti-knock down.</li>
+<li><a href="https://wiki.guildwars.com/wiki/List_of_enchantment_removal_skills" rel="noopener" target="_blank" title="List of enchantment removal skills">Enchantment removal</a>.</li></ul><dl><dt>For Glint</dt>
+<dd></dd></dl><ul><li>Skill interrupts such as <a href="https://wiki.guildwars.com/wiki/Cry_of_Frustration" rel="noopener" target="_blank" title="Cry of Frustration">Cry of Frustration</a>, <a href="https://wiki.guildwars.com/wiki/Cry_of_Pain" rel="noopener" target="_blank" title="Cry of Pain">Cry of Pain</a> or <a href="https://wiki.guildwars.com/wiki/Leech_Signet" rel="noopener" target="_blank" title="Leech Signet">Leech Signet</a>.</li>
+<li><a href="https://wiki.guildwars.com/wiki/Stance#Skills_countering_stances" rel="noopener" target="_blank" title="Stance">Stance removal</a>. It is also useful versus the Facets of Nature and Strength as well as removing Jagged Crystal Skin on Glint.</li>
+<li><a href="https://wiki.guildwars.com/wiki/Spoil_Victor" rel="noopener" target="_blank" title="Spoil Victor">Spoil Victor</a> - effective due to her high health.</li>
+<li><a href="https://wiki.guildwars.com/wiki/Wastrel%27s_Worry" rel="noopener" target="_blank" title="Wastrel's Worry">Wastrel's Worry</a> - effective because hexes expire twice as fast, leading to a very high damage rate.</li>
+<li><a href="https://wiki.guildwars.com/wiki/Pain_Inverter" rel="noopener" target="_blank" title="Pain Inverter">Pain Inverter</a> - particularly effective versus Jagged Crystal Skin. Also useful against Crystal Guardians due to their AoE damage.</li>
+<li>Hex removal such as <a href="https://wiki.guildwars.com/wiki/Inspired_Hex" rel="noopener" target="_blank" title="Inspired Hex">Inspired Hex</a> or <a href="https://wiki.guildwars.com/wiki/Revealed_Hex" rel="noopener" target="_blank" title="Revealed Hex">Revealed Hex</a> to counter <a href="https://wiki.guildwars.com/wiki/Crystal_Haze" rel="noopener" target="_blank" title="Crystal Haze">Crystal Haze</a>. The overcast this hex causes will quickly shut down spellcasters if it is not removed.</li></ul></div>
+<h3 style='font-size:0.8rem;color:var(--accent);margin:0.3rem 0;'>Notes</h3><div class='wiki-block'><table cellspacing="3" style="float: right; border: 1px solid #D16E5A; width: 250px; margin: 0 0 1em 1em; line-height: 1.4em; font-size: 0.9em; background: #F9F9F9;">
+<tbody><tr>
+<td><a href="https://wiki.guildwars2.com/wiki/Main_Page" rel="noopener" target="_blank" title="gw2:Main Page"><img alt="Gw2logo.png" data-file-height="479" data-file-width="692" decoding="async" height="28" loading="lazy" src="https://wiki.guildwars.com/images/thumb/b/b1/Gw2logo.png/41px-Gw2logo.png" srcset="/images/thumb/b/b1/Gw2logo.png/61px-Gw2logo.png 1.5x, /images/thumb/b/b1/Gw2logo.png/81px-Gw2logo.png 2x" width="41"/></a>
+</td>
+<td>The <a class="extiw" href="https://wiki.guildwars2.com/wiki/Main_Page" rel="noopener" target="_blank" title="gw2:Main Page">Guild Wars 2 Wiki</a>  has an article on <i><b><a class="extiw" href="https://wiki.guildwars2.com/wiki/Glint%27s_Lair" rel="noopener" target="_blank" title="gw2:Glint's Lair">Glint's Lair</a></b></i>.
+</td></tr></tbody></table><ul><li>Two of the Facets have elite skills that cannot be <a class="mw-redirect" href="https://wiki.guildwars.com/wiki/Capture" rel="noopener" target="_blank" title="Capture">captured</a> anywhere else in <a class="mw-redirect" href="https://wiki.guildwars.com/wiki/Prophecies" rel="noopener" target="_blank" title="Prophecies">Prophecies</a>: <a href="https://wiki.guildwars.com/wiki/Gladiator%27s_Defense" rel="noopener" target="_blank" title="Gladiator's Defense">Gladiator's Defense</a> and <a href="https://wiki.guildwars.com/wiki/Shield_of_Regeneration" rel="noopener" target="_blank" title="Shield of Regeneration">Shield of Regeneration</a>.</li>
+<li>After killing each Facet, a player must cross a portal-like gate that triggers a <a href="https://wiki.guildwars.com/wiki/Cinematic" rel="noopener" target="_blank" title="Cinematic">cinematic</a>. When it concludes, party members are <a href="https://wiki.guildwars.com/wiki/Teleport" rel="noopener" target="_blank" title="Teleport">teleported</a> to another enclosed domain within the area, leaving behind  <a href="https://wiki.guildwars.com/wiki/Miniature" rel="noopener" target="_blank" title="Miniature">miniatures</a>, <a href="https://wiki.guildwars.com/wiki/Spirit" rel="noopener" target="_blank" title="Spirit">spirits</a>, allies from <a href="https://wiki.guildwars.com/wiki/Summoning_stone" rel="noopener" target="_blank" title="Summoning stone">summoning stones</a>, and <a href="https://wiki.guildwars.com/wiki/Hero" rel="noopener" target="_blank" title="Hero">Heroes</a> of players that have left the area or disconnected. <a class="mw-redirect" href="https://wiki.guildwars.com/wiki/Minions" rel="noopener" target="_blank" title="Minions">Minions</a> are brought along with the party however.</li>
+<li>This mission will be completed after reaching Glint. A final portal will appear, and going through it will take the entire party to <a href="https://wiki.guildwars.com/wiki/Droknar%27s_Forge" rel="noopener" target="_blank" title="Droknar's Forge">Droknar's Forge</a>. Make sure you warn other party members <i>not</i> to cross that portal, if you want to attempt the bonus objective.</li>
+<li>Looking up in the sky towards the center of the area, players will see a crystal pillar with 6 crystal rings around it. They show the progress in the area by changing from crystal rings to rings of light.</li>
+<li>Completion of this mission will fill in page #12 of <a href="https://wiki.guildwars.com/wiki/The_Flameseeker_Prophecies" rel="noopener" target="_blank" title="The Flameseeker Prophecies">The Flameseeker Prophecies</a> <a href="https://wiki.guildwars.com/wiki/Storybook" rel="noopener" target="_blank" title="Storybook">storybook</a>.</li></ul><table class="stdt" style="margin: 5px auto; border: 1px solid #C0C0C0; font-size: 90%; width: 80%; text-align: center;">
+<tbody><tr>
+<th style="background: #7BC; font-size: 110%;"><a class="mw-redirect" href="https://wiki.guildwars.com/wiki/List_of_Prophecies_missions" rel="noopener" target="_blank" title="List of Prophecies missions">Prophecies missions</a>
+</th></tr>
+<tr>
+<td><a href="https://wiki.guildwars.com/wiki/The_Great_Northern_Wall" rel="noopener" target="_blank" title="The Great Northern Wall">The Great Northern Wall</a> » <a href="https://wiki.guildwars.com/wiki/Fort_Ranik" rel="noopener" target="_blank" title="Fort Ranik">Fort Ranik</a> » <a href="https://wiki.guildwars.com/wiki/Ruins_of_Surmia" rel="noopener" target="_blank" title="Ruins of Surmia">Ruins of Surmia</a> » <a href="https://wiki.guildwars.com/wiki/Nolani_Academy" rel="noopener" target="_blank" title="Nolani Academy">Nolani Academy</a> » <a href="https://wiki.guildwars.com/wiki/Borlis_Pass" rel="noopener" target="_blank" title="Borlis Pass">Borlis Pass</a> » <a href="https://wiki.guildwars.com/wiki/The_Frost_Gate" rel="noopener" target="_blank" title="The Frost Gate">The Frost Gate</a> » <a href="https://wiki.guildwars.com/wiki/Gates_of_Kryta" rel="noopener" target="_blank" title="Gates of Kryta">Gates of Kryta</a> » <a href="https://wiki.guildwars.com/wiki/D%27Alessio_Seaboard" rel="noopener" target="_blank" title="D'Alessio Seaboard">D'Alessio Seaboard</a> » <a href="https://wiki.guildwars.com/wiki/Divinity_Coast" rel="noopener" target="_blank" title="Divinity Coast">Divinity Coast</a> » <a href="https://wiki.guildwars.com/wiki/The_Wilds" rel="noopener" target="_blank" title="The Wilds">The Wilds</a> » <a href="https://wiki.guildwars.com/wiki/Bloodstone_Fen" rel="noopener" target="_blank" title="Bloodstone Fen">Bloodstone Fen</a> » <a href="https://wiki.guildwars.com/wiki/Aurora_Glade" rel="noopener" target="_blank" title="Aurora Glade">Aurora Glade</a> » <a href="https://wiki.guildwars.com/wiki/Riverside_Province" rel="noopener" target="_blank" title="Riverside Province">Riverside Province</a> » <a href="https://wiki.guildwars.com/wiki/Sanctum_Cay" rel="noopener" target="_blank" title="Sanctum Cay">Sanctum Cay</a> » <a href="https://wiki.guildwars.com/wiki/Dunes_of_Despair" rel="noopener" target="_blank" title="Dunes of Despair">Dunes of Despair</a> <i>and</i> <a href="https://wiki.guildwars.com/wiki/Thirsty_River" rel="noopener" target="_blank" title="Thirsty River">Thirsty River</a> <i>and</i> <a href="https://wiki.guildwars.com/wiki/Elona_Reach" rel="noopener" target="_blank" title="Elona Reach">Elona Reach</a> » <a href="https://wiki.guildwars.com/wiki/Augury_Rock" rel="noopener" target="_blank" title="Augury Rock">Augury Rock</a> » <a class="mw-selflink selflink">The Dragon's Lair</a> » <a href="https://wiki.guildwars.com/wiki/Ice_Caves_of_Sorrow" rel="noopener" target="_blank" title="Ice Caves of Sorrow">Ice Caves of Sorrow</a> » <a href="https://wiki.guildwars.com/wiki/Iron_Mines_of_Moladune" rel="noopener" target="_blank" title="Iron Mines of Moladune">Iron Mines of Moladune</a> » <a href="https://wiki.guildwars.com/wiki/Thunderhead_Keep" rel="noopener" target="_blank" title="Thunderhead Keep">Thunderhead Keep</a> » <a href="https://wiki.guildwars.com/wiki/Ring_of_Fire" rel="noopener" target="_blank" title="Ring of Fire">Ring of Fire</a> » <a href="https://wiki.guildwars.com/wiki/Abaddon%27s_Mouth" rel="noopener" target="_blank" title="Abaddon's Mouth">Abaddon's Mouth</a> » <a href="https://wiki.guildwars.com/wiki/Hell%27s_Precipice" rel="noopener" target="_blank" title="Hell's Precipice">Hell's Precipice</a>
+</td></tr></tbody></table> 
+NewPP limit report
+Cached time: 20260720085848
+Cache expiry: 3600
+Reduced expiry: true
+Complications: [show‐toc]
+CPU time usage: 0.111 seconds
+Real time usage: 0.155 seconds
+Preprocessor visited node count: 1178/1000000
+Post‐expand include size: 13441/2097152 bytes
+Template argument size: 1684/2097152 bytes
+Highest expansion depth: 10/100
+Expensive parser function count: 0/100
+Unstrip recursion depth: 0/20
+Unstrip post‐expand size: 2/5000000 bytes
+ExtLoops count: 0/1000
+
+Transclusion expansion time report (%,ms,calls,template)
+100.00%   74.407      1 -total
+ 41.44%   30.833      1 Template:Location_disambiguation_2
+ 21.22%   15.787      8 Template:Ifexists
+ 13.25%    9.856      1 Template:Mission_rewards
+  9.38%    6.976      1 Template:Mission_infobox
+  4.37%    3.255      4 Template:E
+  3.25%    2.415      8 Template:Skill_icon
+  3.15%    2.345      1 Template:Infobox_campaign_row
+  3.07%    2.283      2 Template:Cost
+  2.94%    2.186      1 Template:More
+ Saved in parser cache with key en_wiki:pcache:idhash:7350-0!canonical and timestamp 20260720085848 and revision id 2728086.</div></div>
+          </section>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="lightbox" id="lightbox" role="dialog" aria-label="Enlarged map">
+    <img src="../maps/prophecies_19_The_Dragons_Lair_map.jpg" alt="The Dragon&#x27;s Lair mission map (enlarged)" />
+  </div>
+  <script>
+    (function () {
+      var open = document.getElementById("mapOpen");
+      var box = document.getElementById("lightbox");
+      if (!open || !box) return;
+      open.addEventListener("click", function () { box.classList.add("open"); });
+      box.addEventListener("click", function () { box.classList.remove("open"); });
+      document.addEventListener("keydown", function (e) {
+        if (e.key === "Escape") box.classList.remove("open");
+      });
+    })();
+  </script>
+
+</body>
+</html>

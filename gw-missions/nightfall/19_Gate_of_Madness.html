@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Gate of Madness</title>
+  <style>
+:root {
+  --bg-deep: #070a0f;
+  --bg-panel: #101820;
+  --bg-panel-2: #15202c;
+  --border: #243044;
+  --border-glow: #2a4a6a;
+  --text: #dce6f0;
+  --text-muted: #8a9bb0;
+  --text-dim: #5c6f86;
+  --accent: #3ecfff;
+  --accent-soft: rgba(62, 207, 255, 0.12);
+  --gold: #e8c56a;
+  --gold-soft: rgba(232, 197, 106, 0.12);
+  --bonus: #7dffb3;
+  --bonus-soft: rgba(125, 255, 179, 0.1);
+  --danger: #ff6b6b;
+  --danger-soft: rgba(255, 107, 107, 0.1);
+  --hm: #c78bff;
+  --hm-soft: rgba(199, 139, 255, 0.12);
+  --radius: 10px;
+  --font: "Segoe UI", system-ui, -apple-system, sans-serif;
+  --chrome-h: 3.1rem;
+  --gap: 0.5rem;
+  --pad: 0.7rem;
+  /* Readable on 4K vertical (~2160×3840) */
+  --walk-size: clamp(1.05rem, 0.55vw + 0.55vh, 1.35rem);
+  --bonus-size: clamp(1.05rem, 0.55vw + 0.55vh, 1.35rem);
+  --body-size: clamp(0.95rem, 0.4vw + 0.4vh, 1.1rem);
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html {
+  scroll-behavior: smooth;
+  font-size: clamp(16px, 0.55vw + 0.45vh, 20px);
+  height: 100%;
+  scroll-padding-top: calc(var(--chrome-h) + 0.5rem);
+}
+body {
+  font-family: var(--font);
+  background: var(--bg-deep);
+  color: var(--text);
+  line-height: 1.45;
+  min-height: 100%;
+  height: 100%;
+  overflow: hidden;
+  background-image: radial-gradient(ellipse 70% 25% at 50% 0%, rgba(42, 100, 160, 0.14), transparent);
+}
+a { color: var(--accent); text-decoration: none; }
+a:hover { color: #7de0ff; text-decoration: underline; }
+.app {
+  display: grid;
+  grid-template-rows: var(--chrome-h) 1fr;
+  height: 100vh; height: 100dvh;
+  max-height: 100vh; max-height: 100dvh;
+}
+.top-chrome {
+  display: flex; align-items: center; gap: 0.65rem;
+  padding: 0 0.7rem;
+  background: rgba(8, 12, 18, 0.97);
+  border-bottom: 1px solid var(--border);
+  z-index: 100; min-height: var(--chrome-h);
+}
+.brand { display: flex; align-items: baseline; gap: 0.55rem; min-width: 0; flex-shrink: 0; }
+.brand-mission {
+  font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase;
+  color: var(--accent); font-weight: 700; white-space: nowrap;
+}
+.brand-name {
+  font-size: 1.1rem; font-weight: 750; color: var(--text);
+  white-space: nowrap; letter-spacing: -0.02em;
+}
+.brand-meta { font-size: 0.75rem; color: var(--text-dim); white-space: nowrap; }
+.chip-nav {
+  display: flex; flex: 1; gap: 0.3rem; overflow-x: auto;
+  scrollbar-width: none; min-width: 0; justify-content: center;
+}
+.chip-nav::-webkit-scrollbar { display: none; }
+.chip-nav a {
+  flex: 0 0 auto; padding: 0.3rem 0.65rem; border-radius: 999px;
+  font-size: 0.78rem; font-weight: 600; color: var(--text-muted);
+  background: var(--bg-panel); border: 1px solid var(--border);
+  text-decoration: none; white-space: nowrap;
+}
+.chip-nav a:hover {
+  color: var(--text); border-color: var(--border-glow);
+  background: #1a2836; text-decoration: none;
+}
+.chip-nav a[href="#map"] { color: var(--accent); border-color: rgba(62, 207, 255, 0.35); }
+.chip-nav a[href="#bonus"] { color: var(--bonus); border-color: rgba(125, 255, 179, 0.3); }
+.chip-nav a[href="#hard-mode"] { color: var(--hm); border-color: rgba(199, 139, 255, 0.3); }
+.chip-nav a[href="#bosses"] { color: #ff9a9a; border-color: rgba(255, 107, 107, 0.3); }
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 0.3rem;
+  padding: 0.42rem 0.85rem; border-radius: 8px; font-weight: 650; font-size: 0.8rem;
+  border: none; cursor: pointer; text-decoration: none; white-space: nowrap; flex-shrink: 0;
+}
+.btn:hover { text-decoration: none; }
+.btn-next {
+  background: linear-gradient(135deg, #1a6a9a, #1ab0e0); color: #fff;
+  box-shadow: 0 2px 12px rgba(26, 140, 200, 0.35);
+}
+.btn-next:hover { color: #fff; filter: brightness(1.08); }
+.btn-wiki, .btn-idx, .btn-prev {
+  background: var(--bg-panel); color: var(--text-muted);
+  border: 1px solid var(--border); padding: 0.42rem 0.65rem;
+}
+.btn-wiki:hover, .btn-idx:hover, .btn-prev:hover {
+  color: var(--accent); border-color: var(--border-glow);
+}
+.chrome-actions { display: flex; gap: 0.35rem; flex-shrink: 0; }
+
+/* Map-dominant workspace */
+.workspace {
+  display: grid;
+  grid-template-columns: minmax(480px, 1.15fr) minmax(0, 1fr);
+  grid-template-rows: 1fr;
+  gap: var(--gap); padding: var(--gap);
+  min-height: 0; height: 100%; overflow: hidden;
+}
+.col-map {
+  display: grid;
+  grid-template-rows: 1fr auto;
+  gap: var(--gap);
+  min-height: 0; min-width: 0;
+}
+.col-main {
+  display: grid;
+  /* objectives compact | walkthrough HUGE | bonus+hm | bosses+tips */
+  grid-template-rows: auto minmax(0, 1.6fr) minmax(0, 1.05fr) minmax(0, 0.75fr);
+  gap: var(--gap); min-height: 0; min-width: 0; overflow: hidden;
+}
+.row-obj { min-height: 0; }
+.row-bonus-hm {
+  display: grid; grid-template-columns: 1.15fr 0.85fr; gap: var(--gap); min-height: 0;
+}
+.row-lower {
+  display: grid; grid-template-columns: 1.15fr 0.85fr; gap: var(--gap); min-height: 0;
+}
+.panel {
+  background: var(--bg-panel); border: 1px solid var(--border); border-radius: var(--radius);
+  padding: var(--pad); display: flex; flex-direction: column; min-height: 0; overflow: hidden;
+}
+.panel-scroll {
+  overflow-y: auto; overflow-x: hidden; min-height: 0; flex: 1; padding-right: 0.3rem;
+  scrollbar-width: thin; scrollbar-color: var(--border) transparent;
+  font-size: var(--body-size);
+}
+.panel-scroll::-webkit-scrollbar { width: 8px; }
+.panel-scroll::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+.panel-title {
+  display: flex; align-items: center; gap: 0.4rem;
+  font-size: 0.82rem; font-weight: 750; letter-spacing: 0.05em; text-transform: uppercase;
+  color: var(--text); margin-bottom: 0.45rem; padding-bottom: 0.35rem;
+  border-bottom: 1px solid var(--border); flex-shrink: 0;
+}
+.panel-title .icon {
+  width: 1.3rem; height: 1.3rem; border-radius: 5px;
+  display: inline-flex; align-items: center; justify-content: center; font-size: 0.75rem;
+}
+.panel.map-panel {
+  border-color: var(--border-glow);
+  background: linear-gradient(180deg, #0e1620 0%, var(--bg-panel) 100%);
+  /* Map takes almost all left column */
+  min-height: 0;
+}
+.panel.objectives { border-top: 2px solid var(--accent); }
+.panel.walkthrough { border-top: 3px solid #5eb8e8; }
+.panel.bonus { border-top: 3px solid var(--bonus); }
+.panel.hard-mode { border-top: 2px solid var(--hm); }
+.panel.bosses { border-top: 2px solid var(--danger); }
+.panel.other { border-top: 2px solid var(--text-muted); }
+
+/* Emphasized reading panels */
+.panel.walkthrough .panel-scroll,
+.panel.walkthrough .wiki-block {
+  font-size: var(--walk-size) !important;
+  line-height: 1.55;
+}
+.panel.bonus .panel-scroll,
+.panel.bonus .wiki-block {
+  font-size: var(--bonus-size) !important;
+  line-height: 1.55;
+}
+.panel.walkthrough .panel-scroll li,
+.panel.bonus .panel-scroll li {
+  margin-bottom: 0.45rem;
+}
+.panel.walkthrough .panel-scroll p,
+.panel.bonus .panel-scroll p {
+  margin-bottom: 0.55rem;
+}
+
+.icon-map { background: var(--accent-soft); color: var(--accent); }
+.icon-obj { background: var(--accent-soft); color: var(--accent); }
+.icon-walk { background: rgba(94, 184, 232, 0.15); color: #5eb8e8; }
+.icon-bonus { background: var(--bonus-soft); color: var(--bonus); }
+.icon-hm { background: var(--hm-soft); color: var(--hm); }
+.icon-boss { background: var(--danger-soft); color: var(--danger); }
+.icon-other { background: rgba(138, 155, 176, 0.15); color: var(--text-muted); }
+
+.map-wrap {
+  flex: 1; min-height: 0; display: flex; flex-direction: column;
+  align-items: center; justify-content: center; gap: 0.4rem;
+}
+.map-frame {
+  flex: 1; min-height: 0; width: 100%;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: 10px; overflow: hidden;
+  border: 2px solid var(--border-glow);
+  box-shadow: 0 0 0 1px rgba(62, 207, 255, 0.1), 0 12px 40px rgba(0, 0, 0, 0.45);
+  background: #05080c; cursor: zoom-in;
+}
+.map-frame img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  image-rendering: auto;
+}
+.map-caption { font-size: 0.72rem; color: var(--text-dim); flex-shrink: 0; }
+.map-missing {
+  color: var(--text-dim); font-size: 1rem; text-align: center; padding: 2rem;
+}
+
+.wiki-block ul, .panel-scroll ul,
+.wiki-block ol, .panel-scroll ol { padding-left: 1.2rem; margin: 0.3rem 0 0.5rem; }
+.wiki-block li, .panel-scroll li { margin-bottom: 0.32rem; }
+.wiki-block p, .panel-scroll p { margin-bottom: 0.45rem; }
+.wiki-block img, .panel-scroll img { vertical-align: middle; max-height: 1.35em; width: auto; }
+.wiki-block table, .panel-scroll table {
+  width: 100%; border-collapse: collapse; font-size: 0.9em; margin: 0.4rem 0;
+}
+.wiki-block th, .wiki-block td, .panel-scroll th, .panel-scroll td {
+  border: 1px solid var(--border); padding: 0.3rem 0.45rem; text-align: left;
+}
+.lede { font-size: 0.92rem; color: var(--text-muted); margin-bottom: 0.35rem; }
+
+/* Collapsed summary */
+details.summary-details {
+  background: var(--bg-panel);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  border-top: 2px solid var(--gold);
+  padding: 0.35rem 0.65rem;
+  flex-shrink: 0;
+}
+details.summary-details summary {
+  cursor: pointer;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--gold);
+  padding: 0.35rem 0;
+  list-style: none;
+}
+details.summary-details summary::-webkit-details-marker { display: none; }
+details.summary-details summary::before {
+  content: "▸ ";
+  color: var(--text-dim);
+}
+details.summary-details[open] summary::before { content: "▾ "; }
+details.summary-details .summary-body {
+  padding: 0.35rem 0 0.55rem;
+  font-size: 0.88rem;
+  color: var(--text-muted);
+  max-height: 18vh;
+  overflow-y: auto;
+}
+
+.boss-note { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.4rem; }
+.boss-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.4rem; }
+.boss-card {
+  background: var(--bg-panel-2); border: 1px solid var(--border);
+  border-radius: 8px; padding: 0.5rem 0.6rem;
+}
+.boss-card-head { font-size: 0.95rem; margin-bottom: 0.2rem; }
+.boss-card-head a { color: #eef6fc; font-weight: 700; }
+.boss-card-head a:hover { color: var(--accent); }
+.boss-elite { font-size: 0.88rem; }
+.elite-label { color: var(--gold); font-weight: 650; margin-right: 0.25rem; }
+.elite-link { color: #ffd78a; font-weight: 650; }
+.elite-link:hover { color: #ffe9b5; }
+.elite-none { color: var(--text-dim); font-style: italic; font-size: 0.85rem; }
+.boss-meta { font-size: 0.78rem; color: var(--text-dim); margin-top: 0.15rem; }
+
+.callout {
+  margin-top: 0.4rem; padding: 0.45rem 0.6rem; border-radius: 6px;
+  font-size: 0.88rem; border-left: 3px solid; line-height: 1.4;
+}
+.callout.tip { background: var(--accent-soft); border-color: var(--accent); color: #b8eaff; }
+.callout.warn { background: var(--danger-soft); border-color: var(--danger); color: #ffb4b4; }
+
+.lightbox {
+  display: none; position: fixed; inset: 0; z-index: 1000; background: rgba(0,0,0,0.94);
+  align-items: center; justify-content: center; padding: 1.5rem; cursor: zoom-out;
+}
+.lightbox.open { display: flex; }
+.lightbox img {
+  max-width: 96vw; max-height: 96vh; border-radius: 8px;
+  border: 2px solid var(--border-glow); object-fit: contain;
+}
+
+@media (min-height: 2400px) {
+  :root {
+    --walk-size: clamp(1.15rem, 0.7vh + 0.3vw, 1.5rem);
+    --bonus-size: clamp(1.15rem, 0.7vh + 0.3vw, 1.5rem);
+    --gap: 0.65rem;
+    --pad: 0.85rem;
+  }
+  .workspace { grid-template-columns: minmax(560px, 1.2fr) minmax(0, 1fr); }
+}
+@media (min-width: 1800px) and (min-height: 2000px) {
+  .workspace { grid-template-columns: minmax(600px, 1.25fr) minmax(0, 1fr); }
+}
+@media (max-height: 1100px) {
+  body { overflow: auto; height: auto; }
+  .app { height: auto; max-height: none; min-height: 100vh; }
+  .workspace {
+    height: auto; overflow: visible; grid-template-columns: 1fr; grid-template-rows: auto;
+  }
+  .col-map { grid-template-rows: auto; }
+  .col-main { overflow: visible; grid-template-rows: auto; }
+  .row-bonus-hm, .row-lower { grid-template-columns: 1fr; }
+  .panel { max-height: none; overflow: visible; }
+  .panel-scroll { overflow: visible; }
+  .map-frame { min-height: 360px; max-height: 55vh; }
+}
+
+    :root { --accent: #c78bff; --accent-soft: #c78bff22; }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header class="top-chrome">
+      <div class="brand">
+        <span class="brand-mission">M16</span>
+        <span class="brand-name">Gate of Madness</span>
+        <span class="brand-meta">Nightfall · Realm of Torment · Cooperative · —</span>
+      </div>
+      <nav class="chip-nav" aria-label="Sections">
+        <a href="#map">Map</a>
+        <a href="#walkthrough">Walkthrough</a>
+        <a href="#bonus">Bonus</a>
+        <a href="#objectives">Objectives</a>
+        <a href="#hard-mode">Hard Mode</a>
+        <a href="#bosses">Bosses</a>
+        <a href="#other">Tips</a>
+      </nav>
+      <div class="chrome-actions">
+        <a class="btn btn-idx" href="../nightfall.html">Index</a>
+        <a class="btn btn-prev" href="18_Gate_of_Pain.html">← Prev</a>
+        <a class="btn btn-wiki" href="https://wiki.guildwars.com/wiki/Gate_of_Madness" target="_blank" rel="noopener">Wiki ↗</a>
+        <a class="btn btn-next" href="20_Abaddons_Gate.html">Next: Abaddon&#x27;s Gate →</a>
+      </div>
+    </header>
+
+    <div class="workspace">
+      <div class="col-map">
+        <section class="panel map-panel" id="map">
+          <h2 class="panel-title"><span class="icon icon-map">◉</span> Mission Map</h2>
+          <div class="map-wrap">
+            <div class="map-frame" id="mapOpen" title="Click to enlarge">
+              <img src="../maps/nightfall_19_Gate_of_Madness_map.jpg" alt="Gate of Madness mission map" />
+            </div>
+            <p class="map-caption">Click to enlarge · Local cache · <a href="https://wiki.guildwars.com/wiki/Gate_of_Madness" target="_blank" rel="noopener">Wiki</a></p>
+        </div>
+        </section>
+
+        <details class="summary-details" id="summary">
+          <summary>Summary (click to expand)</summary>
+          <div class="summary-body">
+            <p>You and Kormir have traveled to the Gate of Madness , seeking the Temple of the Six Gods , and in it, a way to beseech the Gods for assistance in defeating Abaddon . Unfortunately, the way is heavily guarded by Torment creatures and Margonites , as well as some old enemies from Prophecies and Factions .</p>
+            <p style="margin-top:0.4rem;"><strong>Region:</strong> Realm of Torment · <strong>Mission:</strong> 16 of 20 · <strong>Type:</strong> Cooperative</p>
+            <p style="margin-top:0.35rem;"><a href="https://wiki.guildwars.com/wiki/Gate_of_Madness" target="_blank" rel="noopener">Full wiki article ↗</a></p>
+          </div>
+        </details>
+      </div>
+
+      <div class="col-main">
+        <section class="panel objectives row-obj" id="objectives">
+          <h2 class="panel-title"><span class="icon icon-obj">✓</span> Objectives</h2>
+          <div class="panel-scroll wiki-block"><ul><li>Travel to the Temple of the Six Gods.</li>
+<li>Close the torment rifts by slaying the portal wraiths. [5...0] of 5 rifts remain open.</li>
+<li>Activate the shrines to the Five Gods to aid you in battle.</li>
+<li>Destroy the <a href="https://wiki.guildwars.com/wiki/Undead_Lich" rel="noopener" target="_blank" title="Undead Lich">Undead Lich</a> and <a href="https://wiki.guildwars.com/wiki/Shiro_Tagachi" rel="noopener" target="_blank" title="Shiro Tagachi">Shiro Tagachi</a>.</li>
+<li>*<a class="mw-redirect" href="https://wiki.guildwars.com/wiki/Bonus" rel="noopener" target="_blank" title="Bonus">Bonus</a>* Rally the god avatars.</li>
+<li>You have rallied [0...5] of 5 god avatars.</li></ul></div>
+        </section>
+
+        <section class="panel walkthrough" id="walkthrough">
+          <h2 class="panel-title"><span class="icon icon-walk">→</span> Walkthrough</h2>
+          <div class="panel-scroll wiki-block"><p>The mission can be divided into three parts plus the bonus:
+</p><ol><li><a href="#Crossing_the_ravine" rel="noopener" target="_blank">Crossing the ravine</a>.</li>
+<li><a href="#Closing_the_Chaos_Rifts" rel="noopener" target="_blank">Closing the Chaos Rifts</a>.</li>
+<li><a href="#Defeating_Shiro_and_the_Undead_Lich" rel="noopener" target="_blank">Defeating Shiro and the Undead Lich</a>.</li>
+<li><a href="#Bonus_(Capping_the_shrines)" rel="noopener" target="_blank">Capping the shrines (for the bonus)</a>.</li></ol><p>While in this area, your <a href="https://wiki.guildwars.com/wiki/Party" rel="noopener" target="_blank" title="Party">party</a> members suffers from <a href="https://wiki.guildwars.com/wiki/Depths_of_Madness_(environment_effect)" rel="noopener" target="_blank" title="Depths of Madness (environment effect)">Depths of Madness</a> <a href="https://wiki.guildwars.com/wiki/Environment_effect" rel="noopener" target="_blank" title="Environment effect">environment effect</a> (causes -15% healing). Non-party members (<a href="https://wiki.guildwars.com/wiki/Summoned_creature" rel="noopener" target="_blank" title="Summoned creature">summoned creatures</a>, <a class="mw-redirect" href="https://wiki.guildwars.com/wiki/Pet" rel="noopener" target="_blank" title="Pet">pets</a>, <a href="https://wiki.guildwars.com/wiki/Summoning_stone" rel="noopener" target="_blank" title="Summoning stone">summoning stone</a> NPCs) are not affected.
+</p><h3><span class="mw-headline" id="Crossing_the_ravine">Crossing the ravine</span></h3><p>Cross the ravine by using either of two routes. The shortest route is a bridge across the chasm occupied by Titans, and the other option is to walk around the chasm along the path occupied by the <a href="https://wiki.guildwars.com/wiki/Margonite" rel="noopener" target="_blank" title="Margonite">Margonites</a> (including the boss <a href="https://wiki.guildwars.com/wiki/Champion_Puran" rel="noopener" target="_blank" title="Champion Puran">Champion Puran</a>) and the <a href="https://wiki.guildwars.com/wiki/Torment_creature" rel="noopener" target="_blank" title="Torment creature">Torment creatures</a>.
+</p><p>You will then arrive at a gate (point 1 on the map) where Shiro will summon four groups of <a href="https://wiki.guildwars.com/wiki/Shiro%27ken" rel="noopener" target="_blank" title="Shiro'ken">Shiro'kens</a>. You can avoid two late groups by running through the open gate immediately. Alternatively, retrace your steps to only engage single groups, or simply run back to the base of the hill, watch the Shiro'ken run atop and then sweep through the gate at the bottom of the hill used by the Shiro'ken.
+</p><h3><span class="mw-headline" id="Closing_the_Chaos_Rifts">Closing the Chaos Rifts</span></h3><p>After the Shiro'ken, the <a href="https://wiki.guildwars.com/wiki/Undead_Lich" rel="noopener" target="_blank" title="Undead Lich">Undead Lich</a> will open five <a href="https://wiki.guildwars.com/wiki/Chaos_Rift" rel="noopener" target="_blank" title="Chaos Rift">Chaos Rifts</a>, which will spawn a variety of enemies (Prophecies Titans, Margonites and Torment Claws) continuously as long as they remain open. These portals are guarded by three <a href="https://wiki.guildwars.com/wiki/Portal_Wraith" rel="noopener" target="_blank" title="Portal Wraith">Portal Wraiths</a> each, which must be defeated to close them. The Wraiths themselves are not servants of Abaddon and so the <a href="https://wiki.guildwars.com/wiki/Lightbringer" rel="noopener" target="_blank" title="Lightbringer">Lightbringer</a> title and skills are ineffective.
+</p><p>Progressively destroy the rifts one by one, pulling roving enemies to the recently closed portals. Foes only respawn if their entire group is killed, so consider leaving one alive before defeating the wraiths of the portal (Titans other than the continually spawning group do not respawn). There is also an <a href="https://wiki.guildwars.com/wiki/Armageddon_Lord" rel="noopener" target="_blank" title="Armageddon Lord">Armageddon Lord</a> at the northern rift.
+</p><p>After all portals are closed, the <a href="https://wiki.guildwars.com/wiki/Temple_of_the_Six_Gods" rel="noopener" target="_blank" title="Temple of the Six Gods">Temple of the Six Gods</a>'s gate opens. This instance is often used to take a break. Margonite groups, Shiro and the Undead Lich are awaiting inside the temple.
+</p><p>If you are completing the mission with heroes and henchmen, now is the time to read and carry out the <a href="https://wiki.guildwars.com/wiki/Gate_of_Madness#Bonus_.28Capping_the_shrines.29" rel="noopener" target="_blank" title="Gate of Madness">bonus objectives</a>.
+</p><h3><span class="mw-headline" id="Defeating_Shiro_and_the_Undead_Lich">Defeating Shiro and the Undead Lich</span></h3><p>Most groups encounter some difficulty defeating one or both of these foes. The most important step is to pull them apart and it is almost always easier to have Shiro chase you. Set up your party just outside of the temple gate; if you have them, you can use spirits and/or minions and/or <a href="https://wiki.guildwars.com/wiki/Tank" rel="noopener" target="_blank" title="Tank">tanks</a> to block each boss from reaching your backline.
+</p><dl><dt>Shiro</dt></dl><p>Initially, Shiro is not difficult; he starts by dishing out manageable amounts of damage and seems to lose health quickly enough. However, once he is reduced to 25% of his health, he will use <a href="https://wiki.guildwars.com/wiki/Impossible_Odds" rel="noopener" target="_blank" title="Impossible Odds">Impossible Odds</a>, which can do large amounts of damage, remove any hexes, and transfer conditions to any opponent he hits. There are several strategies that work well:
+</p><ul><li>Use <a href="https://wiki.guildwars.com/wiki/Pain_Inverter" rel="noopener" target="_blank" title="Pain Inverter">Pain Inverter</a> at this point</li>
+<li>Use a tank to draw <a href="https://wiki.guildwars.com/wiki/Aggro" rel="noopener" target="_blank" title="Aggro">aggro</a> and keep it protected using <a class="mw-redirect" href="https://wiki.guildwars.com/wiki/Ward" rel="noopener" target="_blank" title="Ward">wards</a>, protection spells, and/or maintained enchantments. Keep your backline away from him and, as long as you have enough damage, he will not survive long enough to do any significant harm.</li>
+<li>As suggested above, use a spirit wall and/or minions to prevent Shiro from reaching most of the party.</li>
+<li>Bring stance-removal skills to cancel Shiro's <a href="https://wiki.guildwars.com/wiki/Battle_Scars" rel="noopener" target="_blank" title="Battle Scars">Battle Scars</a> and bring interrupts to prevent <a href="https://wiki.guildwars.com/wiki/Impossible_Odds" rel="noopener" target="_blank" title="Impossible Odds">Impossible Odds</a>.</li></ul><dl><dt>The Undead Lich</dt></dl><p>The two biggest threats from the lich are his high damage output and his ability to turn enchantments against the enchanted. You can counter him easily using party-wide heal, healing spirits, and/or non-enchantment protections (such as stances or non-typed skills).
+</p></div>
+        </section>
+
+        <div class="row-bonus-hm">
+          <section class="panel bonus" id="bonus">
+            <h2 class="panel-title"><span class="icon icon-bonus">★</span> Bonus</h2>
+            <div class="panel-scroll wiki-block"><p>To complete the bonus, you have to rally the five deity shrines in the temple before killing Shiro and the Lich (killing them would end the mission early, eliminating any chances at the bonus). You <a class="mw-redirect" href="https://wiki.guildwars.com/wiki/Capture" rel="noopener" target="_blank" title="Capture">capture</a> them the same way as you have seen in other missions (e.g. <a href="https://wiki.guildwars.com/wiki/Grand_Court_of_Sebelkeh" rel="noopener" target="_blank" title="Grand Court of Sebelkeh">Grand Court of Sebelkeh</a>): as each party member stands near the shrine, the <i>ownership</i> transfers to the party; the rate goes up with each new character present and goes down with each foe. You can capture the shrines in any order. 
+</p><p>Each shrine is devoted to a particular god and is defended by 2-4 corresponding Margonites (e.g. Mesmers at Lyssa's shrine). For each shrine you have captured, the shrine will grant the party with <a href="https://wiki.guildwars.com/wiki/Blessing#Prophecies_.2F_Factions_.28avatar_blessings.29" rel="noopener" target="_blank" title="Blessing">all the blessings</a> of that god (the generic blessings that can be applied to all professions, and also blessings for your primary profession). If you lose a shrine, you lose the blessings but will still get credit for the bonus; you do not have to retain control to obtain the Master's level reward. For each shrine that is captured the first time, your party gains a 2% <a href="https://wiki.guildwars.com/wiki/Morale_Boost" rel="noopener" target="_blank" title="Morale Boost">Morale Boost</a>.
+</p><dl><dt>Capturing via exploit</dt></dl><div class="thumb tright"><div class="thumbinner" style="width:302px;"><a class="image" href="https://wiki.guildwars.com/wiki/File:Gate_of_Madness_stucked_Shiro.jpg" rel="noopener" target="_blank"><img alt="" class="thumbimage" data-file-height="768" data-file-width="1024" decoding="async" height="225" loading="lazy" src="https://wiki.guildwars.com/images/thumb/a/ae/Gate_of_Madness_stucked_Shiro.jpg/300px-Gate_of_Madness_stucked_Shiro.jpg" srcset="/images/thumb/a/ae/Gate_of_Madness_stucked_Shiro.jpg/450px-Gate_of_Madness_stucked_Shiro.jpg 1.5x, /images/thumb/a/ae/Gate_of_Madness_stucked_Shiro.jpg/600px-Gate_of_Madness_stucked_Shiro.jpg 2x" width="300"/></a> <div class="thumbcaption"><div class="magnify"><a class="internal" href="https://wiki.guildwars.com/wiki/File:Gate_of_Madness_stucked_Shiro.jpg" rel="noopener" target="_blank" title="Enlarge"></a></div>Shiro stuck in a shrine</div></div></div><p>The easiest way to get the bonus is to exploit a hole in the game mechanics, using heroes and henchmen to capture the shrines. You must do this <i>after</i> closing the rifts, but <i>before</i> entering the corridor to the shrine area. The guards of each shrine will not attack your heroes and henchmen unless you have entered compass range of the shrine (i.e. don't go too close to the portals near the temple when capturing them).
+</p><p>Open the mission map (<b>U</b>), and zoom in towards the shrines, which will be marked on the map. Flag all of your heroes and henchmen to a shrine, and then wait for the color of the icon to change from red to grey to blue. When the icon changes to blue, your party will receive the god bonus, and the objectives will update. Repeat this for the other four shrines on the map (not the Abaddon shrine). To keep them from losing their way, consider flagging your heroes back to the center of the temple after capturing each shrine. If you have trouble with flagging heroes, consider sacrificing yourself with vampiric weapons or skills, and then clicking on a hero/henchman's name to view from their perspective and then move the flag appropriately.
+</p><p>Another exploit is to take advantage of Shiro's AI: he has a preference to pick low health targets (e.g. spirits), so leave them at the back of either shrine and near the column. This structure prevents Shiro from returning to the center of the temple. Since there are a total of five rooms to cap, you have four chances to get him out of the way while you complete the bonus.
+</p><dl><dt>Capturing without exploit</dt></dl><p>If you are in a group primarily composed of players (or if you do not wish to use the exploit), take on the bosses one at a time; which you choose is a matter of taste:
+</p><ul><li>The Undead Lich deals heavy damage with his wand that can be painful to a moving party. However, he also walks very slowly, and breaks off pursuit more quickly. Running in and out of his aggro radius or using walls/captured shrines to block him can keep him busy without the party enduring his damage output.</li>
+<li>Shiro is easier and safer to pull: he deals relatively minor damage <i>until</i> his health runs low and he is a dogged pursuer with a very large aggro radius.</li></ul><p>Whichever you target first, as you capture each shrine, kill its attending guards (so that they do not pester you during the boss battles and so you maintain the bonus from holding the shrines).
+</p></div>
+          </section>
+          <section class="panel hard-mode" id="hard-mode">
+            <h2 class="panel-title"><span class="icon icon-hm">◆</span> Hard Mode</h2>
+            <div class="panel-scroll wiki-block"><p class='lede'>No dedicated Hard Mode section on the wiki — expect tougher foes and adjusted mechanics. See walkthrough notes.</p></div>
+          </section>
+        </div>
+
+        <div class="row-lower">
+          <section class="panel bosses" id="bosses">
+            <h2 class="panel-title"><span class="icon icon-boss">☠</span> Bosses &amp; Elites</h2>
+            <div class="panel-scroll"><div class='boss-grid'>
+<article class="boss-card">
+  <div class="boss-card-head"><a href="https://wiki.guildwars.com/wiki/Champion_Puran" target="_blank" rel="noopener"><strong>Champion Puran</strong></a></div>
+  <div class="boss-elite"><span class="elite-label">Elite:</span> <a class="elite-link" href="https://wiki.guildwars.com/wiki/Magehunter%27s_Smash" target="_blank" rel="noopener">Magehunter&#x27;s Smash</a></div>
+  <div class="boss-meta">28 (30)</div>
+</article>
+<article class="boss-card">
+  <div class="boss-card-head"><a href="https://wiki.guildwars.com/wiki/Curator_Kali" target="_blank" rel="noopener"><strong>Curator Kali</strong></a></div>
+  <div class="boss-elite"><span class="elite-label">Elite:</span> <a class="elite-link" href="https://wiki.guildwars.com/wiki/Invoke_Lightning" target="_blank" rel="noopener">Invoke Lightning</a></div>
+  <div class="boss-meta">28 (30)</div>
+</article>
+</div></div>
+          </section>
+          <section class="panel other" id="other">
+            <h2 class="panel-title"><span class="icon icon-other">✦</span> Tips &amp; Notes</h2>
+            <div class="panel-scroll"><h3 style='font-size:0.8rem;color:var(--accent);margin:0.3rem 0;'>Skill recommendations</h3><div class='wiki-block'><dl><dt>Generally useful</dt></dl><ul><li>The <a href="https://wiki.guildwars.com/wiki/Lightbringer" rel="noopener" target="_blank" title="Lightbringer">Lightbringer</a> title helps immensely against nearly all the foes in the mission. Also consider <a href="https://wiki.guildwars.com/wiki/Lightbringer%27s_Gaze" rel="noopener" target="_blank" title="Lightbringer's Gaze">Lightbringer's Gaze</a> and <a href="https://wiki.guildwars.com/wiki/Lightbringer_Signet" rel="noopener" target="_blank" title="Lightbringer Signet">Lightbringer Signet</a>, as appropriate substitutes for other interrupt or energy/adrenaline management skills.</li>
+<li><a href="https://wiki.guildwars.com/wiki/Punish" rel="noopener" target="_blank" title="Punish">Punishment</a> hexes are always useful and especially against Shiro, e.g. <a href="https://wiki.guildwars.com/wiki/Pain_Inverter" rel="noopener" target="_blank" title="Pain Inverter">Pain Inverter</a>, <a href="https://wiki.guildwars.com/wiki/Empathy" rel="noopener" target="_blank" title="Empathy">Empathy</a>, <a href="https://wiki.guildwars.com/wiki/Price_of_Failure" rel="noopener" target="_blank" title="Price of Failure">Price of Failure</a>, <a href="https://wiki.guildwars.com/wiki/Insidious_Parasite" rel="noopener" target="_blank" title="Insidious Parasite">Insidious Parasite</a>, <a href="https://wiki.guildwars.com/wiki/Spiteful_Spirit" rel="noopener" target="_blank" title="Spiteful Spirit">Spiteful Spirit</a>, and <a href="https://wiki.guildwars.com/wiki/Spoil_Victor" rel="noopener" target="_blank" title="Spoil Victor">Spoil Victor</a>.</li>
+<li><a href="https://wiki.guildwars.com/wiki/Interrupt" rel="noopener" target="_blank" title="Interrupt">Interrupts</a> work well against the Undead Lich and are generally useful throughout.</li>
+<li>Bring <a href="https://wiki.guildwars.com/wiki/Resurrection" rel="noopener" target="_blank" title="Resurrection">resurrection</a> skills:
+<ul><li><a href="https://wiki.guildwars.com/wiki/Rebirth" rel="noopener" target="_blank" title="Rebirth">Rebirth</a> or <a href="https://wiki.guildwars.com/wiki/Unyielding_Aura" rel="noopener" target="_blank" title="Unyielding Aura">Unyielding Aura</a> for recovering from near-<a href="https://wiki.guildwars.com/wiki/Wipe" rel="noopener" target="_blank" title="Wipe">wipes</a>.</li>
+<li><a href="https://wiki.guildwars.com/wiki/%22We_Shall_Return!%22" rel="noopener" target="_blank" title='"We Shall Return!"'>"We Shall Return!"</a> for party-wide recovery.</li>
+<li><a href="https://wiki.guildwars.com/wiki/Sunspear_Rebirth_Signet" rel="noopener" target="_blank" title="Sunspear Rebirth Signet">Sunspear Rebirth Signet</a> (or <a href="https://wiki.guildwars.com/wiki/Resurrection_Signet" rel="noopener" target="_blank" title="Resurrection Signet">Resurrection Signet</a> for heroes): there are plenty of morale boosts that will recharge these fast-activating skills.</li></ul></li>
+<li><a class="mw-redirect" href="https://wiki.guildwars.com/wiki/Enchantment" rel="noopener" target="_blank" title="Enchantment">Enchantment</a> heavy <a href="https://wiki.guildwars.com/wiki/Build" rel="noopener" target="_blank" title="Build">builds</a> are vulnerable to one or more foes from each group and especially to the Undead Lich's <a href="https://wiki.guildwars.com/wiki/Hunger_of_the_Lich" rel="noopener" target="_blank" title="Hunger of the Lich">Hunger of the Lich</a></li></ul><dl><dt>Specifically useful against Shiro</dt></dl><ul><li><a href="https://wiki.guildwars.com/wiki/Stance#Skills_countering_stances" rel="noopener" target="_blank" title="Stance">Stance removing skills</a>, such as <a href="https://wiki.guildwars.com/wiki/Wild_Blow" rel="noopener" target="_blank" title="Wild Blow">Wild Blow</a> or <a href="https://wiki.guildwars.com/wiki/Wild_Throw" rel="noopener" target="_blank" title="Wild Throw">Wild Throw</a>, to end <a href="https://wiki.guildwars.com/wiki/Battle_Scars" rel="noopener" target="_blank" title="Battle Scars">Battle Scars</a>.</li>
+<li><a href="https://wiki.guildwars.com/wiki/Block" rel="noopener" target="_blank" title="Block">Blocking</a> skills, especially <a href="https://wiki.guildwars.com/wiki/Critical_Defenses" rel="noopener" target="_blank" title="Critical Defenses">Critical Defenses</a> (which can be maintained indefinitely when <a href="https://wiki.guildwars.com/wiki/Tank" rel="noopener" target="_blank" title="Tank">tanking</a> Shiro).</li>
+<li><a href="https://wiki.guildwars.com/wiki/Condition" rel="noopener" target="_blank" title="Condition">Conditions</a> can be dangerous against Shiro, since he can spread them using <a href="https://wiki.guildwars.com/wiki/Impossible_Odds" rel="noopener" target="_blank" title="Impossible Odds">Impossible Odds</a>.
+<ul><li><a href="https://wiki.guildwars.com/wiki/Blind" rel="noopener" target="_blank" title="Blind">Blind</a> is great when bringing <a href="https://wiki.guildwars.com/wiki/Spellcaster" rel="noopener" target="_blank" title="Spellcaster">spellcaster</a>-heavy parties, e.g. from <a href="https://wiki.guildwars.com/wiki/Blinding_Flash" rel="noopener" target="_blank" title="Blinding Flash">Blinding Flash</a>, <a href="https://wiki.guildwars.com/wiki/Eruption" rel="noopener" target="_blank" title="Eruption">Eruption</a>, <a href="https://wiki.guildwars.com/wiki/Ebon_Dust_Aura" rel="noopener" target="_blank" title="Ebon Dust Aura">Ebon Dust Aura</a>, <a href="https://wiki.guildwars.com/wiki/Shadowsong" rel="noopener" target="_blank" title="Shadowsong">Shadowsong</a>, or <a href="https://wiki.guildwars.com/wiki/Sneak_Attack" rel="noopener" target="_blank" title="Sneak Attack">Sneak Attack</a>.</li>
+<li><a href="https://wiki.guildwars.com/wiki/Deep_Wound" rel="noopener" target="_blank" title="Deep Wound">Deep Wound</a> can be very useful if managed carefully.</li></ul></li>
+<li><a href="https://wiki.guildwars.com/wiki/Shadowsong" rel="noopener" target="_blank" title="Shadowsong">Shadowsong</a> plus <a href="https://wiki.guildwars.com/wiki/Displacement" rel="noopener" target="_blank" title="Displacement">Displacement</a> can render Shiro harmless; he will either miss (due to blindness) or get blocked (preventing him from removing blindness).</li>
+<li>Shiro cannot be <a href="https://wiki.guildwars.com/wiki/Knock_down" rel="noopener" target="_blank" title="Knock down">knocked down</a>, unless the knock down lasts at least three seconds.
+<ul><li><a href="https://wiki.guildwars.com/wiki/Shield_of_Judgment" rel="noopener" target="_blank" title="Shield of Judgment">Shield of Judgment</a> will activate continually.</li>
+<li><a href="https://wiki.guildwars.com/wiki/Earthbind" rel="noopener" target="_blank" title="Earthbind">Earthbind</a> can cause him to be vulnerable to knock down.</li></ul></li></ul></div>
+<h3 style='font-size:0.8rem;color:var(--accent);margin:0.3rem 0;'>Notes</h3><div class='wiki-block'><ul><li>Kormir follows the <a href="https://wiki.guildwars.com/wiki/Party" rel="noopener" target="_blank" title="Party">party</a> leader during this mission. She doesn't use any <a href="https://wiki.guildwars.com/wiki/Skill" rel="noopener" target="_blank" title="Skill">skills</a> unless <a href="https://wiki.guildwars.com/wiki/Damage" rel="noopener" target="_blank" title="Damage">damaged</a>, and never <a href="https://wiki.guildwars.com/wiki/Attack" rel="noopener" target="_blank" title="Attack">attacks</a>. However, she can only be harmed by <a href="https://wiki.guildwars.com/wiki/Area_of_effect" rel="noopener" target="_blank" title="Area of effect">area of effect</a> skills because foes can't directly <a href="https://wiki.guildwars.com/wiki/Target" rel="noopener" target="_blank" title="Target">target</a> her.</li>
+<li><a href="https://wiki.guildwars.com/wiki/Torment_creature" rel="noopener" target="_blank" title="Torment creature">Torment creatures</a> will <a href="https://wiki.guildwars.com/wiki/Popup" rel="noopener" target="_blank" title="Popup">popup</a> in some points.</li>
+<li>After completing this mission, your party will be taken to <a href="https://wiki.guildwars.com/wiki/Abaddon%27s_Gate_(outpost)" rel="noopener" target="_blank" title="Abaddon's Gate (outpost)">Abaddon's Gate</a>.</li>
+<li>Completion of this mission will fill in page #16 in the <a href="https://wiki.guildwars.com/wiki/Night_Falls" rel="noopener" target="_blank" title="Night Falls">Night Falls</a> <a href="https://wiki.guildwars.com/wiki/Storybook" rel="noopener" target="_blank" title="Storybook">storybook</a>.</li>
+<li>The respawn mechanic of the <a href="https://wiki.guildwars.com/wiki/Titan_Abomination" rel="noopener" target="_blank" title="Titan Abomination">Titan Abominations</a> from the portals seems to be tied to their aggro. Once they are aggroed, it takes roughly 15 seconds for the next two to spawn at the portal.</li></ul><div style="margin: 1em; border: solid silver; border-width: 1px 0px; padding: 2px 1em 2px 7.5em;"><strong class="hiddenlinks" style="position: absolute; margin-left: -7.3em; color: #900;"><a class="image" href="https://wiki.guildwars.com/wiki/File:Anomaly.png" rel="noopener" target="_blank" title="Anomaly"><img alt="Anomaly" data-file-height="32" data-file-width="32" decoding="async" height="18" loading="lazy" src="https://wiki.guildwars.com/images/thumb/a/a6/Anomaly.png/18px-Anomaly.png" srcset="/images/thumb/a/a6/Anomaly.png/27px-Anomaly.png 1.5x, /images/a/a6/Anomaly.png 2x" width="18"/></a> <a class="mw-redirect" href="https://wiki.guildwars.com/wiki/Anomaly" rel="noopener" target="_blank" title="Anomaly">Anomaly</a>.</strong>When fighting <a href="https://wiki.guildwars.com/wiki/Shiro_Tagachi" rel="noopener" target="_blank" title="Shiro Tagachi">Shiro Tagachi</a> and the <a href="https://wiki.guildwars.com/wiki/Undead_Lich" rel="noopener" target="_blank" title="Undead Lich">Undead Lich</a> don't back too far away from the temple or your whole party will die.</div><div style="margin: 1em; border: solid silver; border-width: 1px 0px; padding: 2px 1em 2px 5em;"><strong class="hiddenlinks" style="position: absolute; margin-left: -4.8em; color: #900;"><a class="image" href="https://wiki.guildwars.com/wiki/File:Bug.png" rel="noopener" target="_blank" title="Bug"><img alt="Bug" data-file-height="32" data-file-width="32" decoding="async" height="18" loading="lazy" src="https://wiki.guildwars.com/images/thumb/7/7d/Bug.png/18px-Bug.png" srcset="/images/thumb/7/7d/Bug.png/27px-Bug.png 1.5x, /images/7/7d/Bug.png 2x" width="18"/></a> <a href="https://wiki.guildwars.com/wiki/Bug" rel="noopener" target="_blank" title="Bug">Bug</a>.</strong>Undead Lich occasionally stays an ally.</div><div style="margin: 1em; border: solid silver; border-width: 1px 0px; padding: 2px 1em 2px 5em;"><strong class="hiddenlinks" style="position: absolute; margin-left: -4.8em; color: #900;"><a class="image" href="https://wiki.guildwars.com/wiki/File:Bug.png" rel="noopener" target="_blank" title="Bug"><img alt="Bug" data-file-height="32" data-file-width="32" decoding="async" height="18" loading="lazy" src="https://wiki.guildwars.com/images/thumb/7/7d/Bug.png/18px-Bug.png" srcset="/images/thumb/7/7d/Bug.png/27px-Bug.png 1.5x, /images/7/7d/Bug.png 2x" width="18"/></a> <a href="https://wiki.guildwars.com/wiki/Bug" rel="noopener" target="_blank" title="Bug">Bug</a>.</strong>Lyssa's Muse in the end cinematic says "You must make a choice a mortal can make" While the text reads "Only a mortal can make".</div><div style="margin: 1em; border: solid silver; border-width: 1px 0px; padding: 2px 1em 2px 5em;"><strong class="hiddenlinks" style="position: absolute; margin-left: -4.8em; color: #900;"><a class="image" href="https://wiki.guildwars.com/wiki/File:Bug.png" rel="noopener" target="_blank" title="Bug"><img alt="Bug" data-file-height="32" data-file-width="32" decoding="async" height="18" loading="lazy" src="https://wiki.guildwars.com/images/thumb/7/7d/Bug.png/18px-Bug.png" srcset="/images/thumb/7/7d/Bug.png/27px-Bug.png 1.5x, /images/7/7d/Bug.png 2x" width="18"/></a> <a href="https://wiki.guildwars.com/wiki/Bug" rel="noopener" target="_blank" title="Bug">Bug</a>.</strong>Sometimes, despite having killed the Lich, Shiro and all Margonites in the shrine area, the mission will not end. This forces you to redo the entire mission, despite having completed all requirements.  This can happen when sending heroes/henchmen ahead to capture the shrines and aggroing Shiro or the Lich before the dialogue begins. Breaking aggro and waiting for the dialogue may be enough to avoid this. The way to avoid this is to recall all of your heroes/henchmen back to you, outside of the Temple, then run in as a group. Running into the Temple while your heroes/henchmen are already inside will result in the dialogue not triggering, which may result in the bug.</div><div style="margin: 1em; border: solid silver; border-width: 1px 0px; padding: 2px 1em 2px 5em;"><strong class="hiddenlinks" style="position: absolute; margin-left: -4.8em; color: #900;"><a class="image" href="https://wiki.guildwars.com/wiki/File:Bug.png" rel="noopener" target="_blank" title="Bug"><img alt="Bug" data-file-height="32" data-file-width="32" decoding="async" height="18" loading="lazy" src="https://wiki.guildwars.com/images/thumb/7/7d/Bug.png/18px-Bug.png" srcset="/images/thumb/7/7d/Bug.png/27px-Bug.png 1.5x, /images/7/7d/Bug.png 2x" width="18"/></a> <a href="https://wiki.guildwars.com/wiki/Bug" rel="noopener" target="_blank" title="Bug">Bug</a>.</strong>Sometimes, the gates will not open, you will have to restart the mission if this happens.</div><table class="stdt" style="margin: 5px auto; border: 1px solid #C0C0C0; font-size: 90%; width: 80%; text-align: center;">
+<tbody><tr>
+<th style="background: #7BC; font-size: 110%;"><a href="https://wiki.guildwars.com/wiki/List_of_Nightfall_missions_and_primary_quests" rel="noopener" target="_blank" title="List of Nightfall missions and primary quests">Nightfall missions</a>
+</th></tr>
+<tr>
+<td><a href="https://wiki.guildwars.com/wiki/Chahbek_Village" rel="noopener" target="_blank" title="Chahbek Village">Chahbek Village</a> » <a href="https://wiki.guildwars.com/wiki/Jokanur_Diggings" rel="noopener" target="_blank" title="Jokanur Diggings">Jokanur Diggings</a> » <a href="https://wiki.guildwars.com/wiki/Blacktide_Den" rel="noopener" target="_blank" title="Blacktide Den">Blacktide Den</a> » <a href="https://wiki.guildwars.com/wiki/Consulate_Docks" rel="noopener" target="_blank" title="Consulate Docks">Consulate Docks</a> » <a href="https://wiki.guildwars.com/wiki/Venta_Cemetery" rel="noopener" target="_blank" title="Venta Cemetery">Venta Cemetery </a> » <a href="https://wiki.guildwars.com/wiki/Kodonur_Crossroads" rel="noopener" target="_blank" title="Kodonur Crossroads">Kodonur Crossroads</a> » <a href="https://wiki.guildwars.com/wiki/Pogahn_Passage" rel="noopener" target="_blank" title="Pogahn Passage">Pogahn Passage</a> <i>or</i> <a href="https://wiki.guildwars.com/wiki/Rilohn_Refuge" rel="noopener" target="_blank" title="Rilohn Refuge">Rilohn Refuge</a> » <a href="https://wiki.guildwars.com/wiki/Moddok_Crevice" rel="noopener" target="_blank" title="Moddok Crevice">Moddok Crevice</a> » <a href="https://wiki.guildwars.com/wiki/Tihark_Orchard" rel="noopener" target="_blank" title="Tihark Orchard">Tihark Orchard</a> » <a href="https://wiki.guildwars.com/wiki/Dasha_Vestibule" rel="noopener" target="_blank" title="Dasha Vestibule">Dasha Vestibule</a> <i>or</i> <a href="https://wiki.guildwars.com/wiki/Dzagonur_Bastion" rel="noopener" target="_blank" title="Dzagonur Bastion">Dzagonur Bastion</a> » <a href="https://wiki.guildwars.com/wiki/Grand_Court_of_Sebelkeh" rel="noopener" target="_blank" title="Grand Court of Sebelkeh">Grand Court of Sebelkeh</a> » <a href="https://wiki.guildwars.com/wiki/Jennur%27s_Horde" rel="noopener" target="_blank" title="Jennur's Horde">Jennur's Horde</a> <i>or</i> <a href="https://wiki.guildwars.com/wiki/Nundu_Bay" rel="noopener" target="_blank" title="Nundu Bay">Nundu Bay</a> » <a href="https://wiki.guildwars.com/wiki/Gate_of_Desolation" rel="noopener" target="_blank" title="Gate of Desolation">Gate of Desolation</a> » <a href="https://wiki.guildwars.com/wiki/Ruins_of_Morah" rel="noopener" target="_blank" title="Ruins of Morah">Ruins of Morah</a> » <a href="https://wiki.guildwars.com/wiki/Gate_of_Pain" rel="noopener" target="_blank" title="Gate of Pain">Gate of Pain</a> » <a class="mw-selflink selflink">Gate of Madness</a> » <a href="https://wiki.guildwars.com/wiki/Abaddon%27s_Gate" rel="noopener" target="_blank" title="Abaddon's Gate">Abaddon's Gate</a>
+</td></tr>
+<tr>
+<td><i><b><a class="mw-redirect" href="https://wiki.guildwars.com/wiki/Challenge_mission" rel="noopener" target="_blank" title="Challenge mission">Challenge</a></b></i><br/><a href="https://wiki.guildwars.com/wiki/Dajkah_Inlet" rel="noopener" target="_blank" title="Dajkah Inlet">Dajkah Inlet</a> <span style="margin: 0em 0.3em;">•</span> <a href="https://wiki.guildwars.com/wiki/Remains_of_Sahlahja" rel="noopener" target="_blank" title="Remains of Sahlahja">Remains of Sahlahja</a> <span style="margin: 0em 0.3em;">•</span> <a href="https://wiki.guildwars.com/wiki/The_Shadow_Nexus" rel="noopener" target="_blank" title="The Shadow Nexus">The Shadow Nexus</a>
+</td></tr>
+<tr>
+<td><i><b><a class="mw-redirect" href="https://wiki.guildwars.com/wiki/Elite_mission" rel="noopener" target="_blank" title="Elite mission">Elite</a></b></i><br/><a href="https://wiki.guildwars.com/wiki/The_Ebony_Citadel_of_Mallyx" rel="noopener" target="_blank" title="The Ebony Citadel of Mallyx">The Ebony Citadel of Mallyx</a>
+</td></tr></tbody></table> 
+NewPP limit report
+Cached time: 20260720092200
+Cache expiry: 3600
+Reduced expiry: true
+Complications: [show‐toc]
+CPU time usage: 0.121 seconds
+Real time usage: 0.164 seconds
+Preprocessor visited node count: 1322/1000000
+Post‐expand include size: 15118/2097152 bytes
+Template argument size: 1978/2097152 bytes
+Highest expansion depth: 10/100
+Expensive parser function count: 0/100
+Unstrip recursion depth: 0/20
+Unstrip post‐expand size: 0/5000000 bytes
+ExtLoops count: 0/1000
+
+Transclusion expansion time report (%,ms,calls,template)
+100.00%   79.669      1 -total
+ 42.63%   33.967      1 Template:Location_disambiguation_2
+ 21.68%   17.274      8 Template:Ifexists
+ 12.36%    9.847      1 Template:Mission_rewards
+  8.86%    7.059      1 Template:Mission_infobox
+  6.19%    4.933      6 Template:Cost
+  4.36%    3.471      1 Template:Nightfall_missions
+  4.09%    3.262      4 Template:P
+  3.22%    2.567     10 Template:Profession_icon_sizes
+  3.12%    2.485      1 Template:Infobox_campaign_row
+ Saved in parser cache with key en_wiki:pcache:idhash:1253-0!canonical and timestamp 20260720092200 and revision id 2734870.</div></div>
+          </section>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="lightbox" id="lightbox" role="dialog" aria-label="Enlarged map">
+    <img src="../maps/nightfall_19_Gate_of_Madness_map.jpg" alt="Gate of Madness mission map (enlarged)" />
+  </div>
+  <script>
+    (function () {
+      var open = document.getElementById("mapOpen");
+      var box = document.getElementById("lightbox");
+      if (!open || !box) return;
+      open.addEventListener("click", function () { box.classList.add("open"); });
+      box.addEventListener("click", function () { box.classList.remove("open"); });
+      document.addEventListener("keydown", function (e) {
+        if (e.key === "Escape") box.classList.remove("open");
+      });
+    })();
+  </script>
+
+</body>
+</html>

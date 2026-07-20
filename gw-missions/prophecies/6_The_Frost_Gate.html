@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>The Frost Gate</title>
+  <style>
+:root {
+  --bg-deep: #070a0f;
+  --bg-panel: #101820;
+  --bg-panel-2: #15202c;
+  --border: #243044;
+  --border-glow: #2a4a6a;
+  --text: #dce6f0;
+  --text-muted: #8a9bb0;
+  --text-dim: #5c6f86;
+  --accent: #3ecfff;
+  --accent-soft: rgba(62, 207, 255, 0.12);
+  --gold: #e8c56a;
+  --gold-soft: rgba(232, 197, 106, 0.12);
+  --bonus: #7dffb3;
+  --bonus-soft: rgba(125, 255, 179, 0.1);
+  --danger: #ff6b6b;
+  --danger-soft: rgba(255, 107, 107, 0.1);
+  --hm: #c78bff;
+  --hm-soft: rgba(199, 139, 255, 0.12);
+  --radius: 10px;
+  --font: "Segoe UI", system-ui, -apple-system, sans-serif;
+  --chrome-h: 3.1rem;
+  --gap: 0.5rem;
+  --pad: 0.7rem;
+  /* Readable on 4K vertical (~2160×3840) */
+  --walk-size: clamp(1.05rem, 0.55vw + 0.55vh, 1.35rem);
+  --bonus-size: clamp(1.05rem, 0.55vw + 0.55vh, 1.35rem);
+  --body-size: clamp(0.95rem, 0.4vw + 0.4vh, 1.1rem);
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html {
+  scroll-behavior: smooth;
+  font-size: clamp(16px, 0.55vw + 0.45vh, 20px);
+  height: 100%;
+  scroll-padding-top: calc(var(--chrome-h) + 0.5rem);
+}
+body {
+  font-family: var(--font);
+  background: var(--bg-deep);
+  color: var(--text);
+  line-height: 1.45;
+  min-height: 100%;
+  height: 100%;
+  overflow: hidden;
+  background-image: radial-gradient(ellipse 70% 25% at 50% 0%, rgba(42, 100, 160, 0.14), transparent);
+}
+a { color: var(--accent); text-decoration: none; }
+a:hover { color: #7de0ff; text-decoration: underline; }
+.app {
+  display: grid;
+  grid-template-rows: var(--chrome-h) 1fr;
+  height: 100vh; height: 100dvh;
+  max-height: 100vh; max-height: 100dvh;
+}
+.top-chrome {
+  display: flex; align-items: center; gap: 0.65rem;
+  padding: 0 0.7rem;
+  background: rgba(8, 12, 18, 0.97);
+  border-bottom: 1px solid var(--border);
+  z-index: 100; min-height: var(--chrome-h);
+}
+.brand { display: flex; align-items: baseline; gap: 0.55rem; min-width: 0; flex-shrink: 0; }
+.brand-mission {
+  font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase;
+  color: var(--accent); font-weight: 700; white-space: nowrap;
+}
+.brand-name {
+  font-size: 1.1rem; font-weight: 750; color: var(--text);
+  white-space: nowrap; letter-spacing: -0.02em;
+}
+.brand-meta { font-size: 0.75rem; color: var(--text-dim); white-space: nowrap; }
+.chip-nav {
+  display: flex; flex: 1; gap: 0.3rem; overflow-x: auto;
+  scrollbar-width: none; min-width: 0; justify-content: center;
+}
+.chip-nav::-webkit-scrollbar { display: none; }
+.chip-nav a {
+  flex: 0 0 auto; padding: 0.3rem 0.65rem; border-radius: 999px;
+  font-size: 0.78rem; font-weight: 600; color: var(--text-muted);
+  background: var(--bg-panel); border: 1px solid var(--border);
+  text-decoration: none; white-space: nowrap;
+}
+.chip-nav a:hover {
+  color: var(--text); border-color: var(--border-glow);
+  background: #1a2836; text-decoration: none;
+}
+.chip-nav a[href="#map"] { color: var(--accent); border-color: rgba(62, 207, 255, 0.35); }
+.chip-nav a[href="#bonus"] { color: var(--bonus); border-color: rgba(125, 255, 179, 0.3); }
+.chip-nav a[href="#hard-mode"] { color: var(--hm); border-color: rgba(199, 139, 255, 0.3); }
+.chip-nav a[href="#bosses"] { color: #ff9a9a; border-color: rgba(255, 107, 107, 0.3); }
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 0.3rem;
+  padding: 0.42rem 0.85rem; border-radius: 8px; font-weight: 650; font-size: 0.8rem;
+  border: none; cursor: pointer; text-decoration: none; white-space: nowrap; flex-shrink: 0;
+}
+.btn:hover { text-decoration: none; }
+.btn-next {
+  background: linear-gradient(135deg, #1a6a9a, #1ab0e0); color: #fff;
+  box-shadow: 0 2px 12px rgba(26, 140, 200, 0.35);
+}
+.btn-next:hover { color: #fff; filter: brightness(1.08); }
+.btn-wiki, .btn-idx, .btn-prev {
+  background: var(--bg-panel); color: var(--text-muted);
+  border: 1px solid var(--border); padding: 0.42rem 0.65rem;
+}
+.btn-wiki:hover, .btn-idx:hover, .btn-prev:hover {
+  color: var(--accent); border-color: var(--border-glow);
+}
+.chrome-actions { display: flex; gap: 0.35rem; flex-shrink: 0; }
+
+/* Map-dominant workspace */
+.workspace {
+  display: grid;
+  grid-template-columns: minmax(480px, 1.15fr) minmax(0, 1fr);
+  grid-template-rows: 1fr;
+  gap: var(--gap); padding: var(--gap);
+  min-height: 0; height: 100%; overflow: hidden;
+}
+.col-map {
+  display: grid;
+  grid-template-rows: 1fr auto;
+  gap: var(--gap);
+  min-height: 0; min-width: 0;
+}
+.col-main {
+  display: grid;
+  /* objectives compact | walkthrough HUGE | bonus+hm | bosses+tips */
+  grid-template-rows: auto minmax(0, 1.6fr) minmax(0, 1.05fr) minmax(0, 0.75fr);
+  gap: var(--gap); min-height: 0; min-width: 0; overflow: hidden;
+}
+.row-obj { min-height: 0; }
+.row-bonus-hm {
+  display: grid; grid-template-columns: 1.15fr 0.85fr; gap: var(--gap); min-height: 0;
+}
+.row-lower {
+  display: grid; grid-template-columns: 1.15fr 0.85fr; gap: var(--gap); min-height: 0;
+}
+.panel {
+  background: var(--bg-panel); border: 1px solid var(--border); border-radius: var(--radius);
+  padding: var(--pad); display: flex; flex-direction: column; min-height: 0; overflow: hidden;
+}
+.panel-scroll {
+  overflow-y: auto; overflow-x: hidden; min-height: 0; flex: 1; padding-right: 0.3rem;
+  scrollbar-width: thin; scrollbar-color: var(--border) transparent;
+  font-size: var(--body-size);
+}
+.panel-scroll::-webkit-scrollbar { width: 8px; }
+.panel-scroll::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+.panel-title {
+  display: flex; align-items: center; gap: 0.4rem;
+  font-size: 0.82rem; font-weight: 750; letter-spacing: 0.05em; text-transform: uppercase;
+  color: var(--text); margin-bottom: 0.45rem; padding-bottom: 0.35rem;
+  border-bottom: 1px solid var(--border); flex-shrink: 0;
+}
+.panel-title .icon {
+  width: 1.3rem; height: 1.3rem; border-radius: 5px;
+  display: inline-flex; align-items: center; justify-content: center; font-size: 0.75rem;
+}
+.panel.map-panel {
+  border-color: var(--border-glow);
+  background: linear-gradient(180deg, #0e1620 0%, var(--bg-panel) 100%);
+  /* Map takes almost all left column */
+  min-height: 0;
+}
+.panel.objectives { border-top: 2px solid var(--accent); }
+.panel.walkthrough { border-top: 3px solid #5eb8e8; }
+.panel.bonus { border-top: 3px solid var(--bonus); }
+.panel.hard-mode { border-top: 2px solid var(--hm); }
+.panel.bosses { border-top: 2px solid var(--danger); }
+.panel.other { border-top: 2px solid var(--text-muted); }
+
+/* Emphasized reading panels */
+.panel.walkthrough .panel-scroll,
+.panel.walkthrough .wiki-block {
+  font-size: var(--walk-size) !important;
+  line-height: 1.55;
+}
+.panel.bonus .panel-scroll,
+.panel.bonus .wiki-block {
+  font-size: var(--bonus-size) !important;
+  line-height: 1.55;
+}
+.panel.walkthrough .panel-scroll li,
+.panel.bonus .panel-scroll li {
+  margin-bottom: 0.45rem;
+}
+.panel.walkthrough .panel-scroll p,
+.panel.bonus .panel-scroll p {
+  margin-bottom: 0.55rem;
+}
+
+.icon-map { background: var(--accent-soft); color: var(--accent); }
+.icon-obj { background: var(--accent-soft); color: var(--accent); }
+.icon-walk { background: rgba(94, 184, 232, 0.15); color: #5eb8e8; }
+.icon-bonus { background: var(--bonus-soft); color: var(--bonus); }
+.icon-hm { background: var(--hm-soft); color: var(--hm); }
+.icon-boss { background: var(--danger-soft); color: var(--danger); }
+.icon-other { background: rgba(138, 155, 176, 0.15); color: var(--text-muted); }
+
+.map-wrap {
+  flex: 1; min-height: 0; display: flex; flex-direction: column;
+  align-items: center; justify-content: center; gap: 0.4rem;
+}
+.map-frame {
+  flex: 1; min-height: 0; width: 100%;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: 10px; overflow: hidden;
+  border: 2px solid var(--border-glow);
+  box-shadow: 0 0 0 1px rgba(62, 207, 255, 0.1), 0 12px 40px rgba(0, 0, 0, 0.45);
+  background: #05080c; cursor: zoom-in;
+}
+.map-frame img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  image-rendering: auto;
+}
+.map-caption { font-size: 0.72rem; color: var(--text-dim); flex-shrink: 0; }
+.map-missing {
+  color: var(--text-dim); font-size: 1rem; text-align: center; padding: 2rem;
+}
+
+.wiki-block ul, .panel-scroll ul,
+.wiki-block ol, .panel-scroll ol { padding-left: 1.2rem; margin: 0.3rem 0 0.5rem; }
+.wiki-block li, .panel-scroll li { margin-bottom: 0.32rem; }
+.wiki-block p, .panel-scroll p { margin-bottom: 0.45rem; }
+.wiki-block img, .panel-scroll img { vertical-align: middle; max-height: 1.35em; width: auto; }
+.wiki-block table, .panel-scroll table {
+  width: 100%; border-collapse: collapse; font-size: 0.9em; margin: 0.4rem 0;
+}
+.wiki-block th, .wiki-block td, .panel-scroll th, .panel-scroll td {
+  border: 1px solid var(--border); padding: 0.3rem 0.45rem; text-align: left;
+}
+.lede { font-size: 0.92rem; color: var(--text-muted); margin-bottom: 0.35rem; }
+
+/* Collapsed summary */
+details.summary-details {
+  background: var(--bg-panel);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  border-top: 2px solid var(--gold);
+  padding: 0.35rem 0.65rem;
+  flex-shrink: 0;
+}
+details.summary-details summary {
+  cursor: pointer;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--gold);
+  padding: 0.35rem 0;
+  list-style: none;
+}
+details.summary-details summary::-webkit-details-marker { display: none; }
+details.summary-details summary::before {
+  content: "▸ ";
+  color: var(--text-dim);
+}
+details.summary-details[open] summary::before { content: "▾ "; }
+details.summary-details .summary-body {
+  padding: 0.35rem 0 0.55rem;
+  font-size: 0.88rem;
+  color: var(--text-muted);
+  max-height: 18vh;
+  overflow-y: auto;
+}
+
+.boss-note { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.4rem; }
+.boss-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.4rem; }
+.boss-card {
+  background: var(--bg-panel-2); border: 1px solid var(--border);
+  border-radius: 8px; padding: 0.5rem 0.6rem;
+}
+.boss-card-head { font-size: 0.95rem; margin-bottom: 0.2rem; }
+.boss-card-head a { color: #eef6fc; font-weight: 700; }
+.boss-card-head a:hover { color: var(--accent); }
+.boss-elite { font-size: 0.88rem; }
+.elite-label { color: var(--gold); font-weight: 650; margin-right: 0.25rem; }
+.elite-link { color: #ffd78a; font-weight: 650; }
+.elite-link:hover { color: #ffe9b5; }
+.elite-none { color: var(--text-dim); font-style: italic; font-size: 0.85rem; }
+.boss-meta { font-size: 0.78rem; color: var(--text-dim); margin-top: 0.15rem; }
+
+.callout {
+  margin-top: 0.4rem; padding: 0.45rem 0.6rem; border-radius: 6px;
+  font-size: 0.88rem; border-left: 3px solid; line-height: 1.4;
+}
+.callout.tip { background: var(--accent-soft); border-color: var(--accent); color: #b8eaff; }
+.callout.warn { background: var(--danger-soft); border-color: var(--danger); color: #ffb4b4; }
+
+.lightbox {
+  display: none; position: fixed; inset: 0; z-index: 1000; background: rgba(0,0,0,0.94);
+  align-items: center; justify-content: center; padding: 1.5rem; cursor: zoom-out;
+}
+.lightbox.open { display: flex; }
+.lightbox img {
+  max-width: 96vw; max-height: 96vh; border-radius: 8px;
+  border: 2px solid var(--border-glow); object-fit: contain;
+}
+
+@media (min-height: 2400px) {
+  :root {
+    --walk-size: clamp(1.15rem, 0.7vh + 0.3vw, 1.5rem);
+    --bonus-size: clamp(1.15rem, 0.7vh + 0.3vw, 1.5rem);
+    --gap: 0.65rem;
+    --pad: 0.85rem;
+  }
+  .workspace { grid-template-columns: minmax(560px, 1.2fr) minmax(0, 1fr); }
+}
+@media (min-width: 1800px) and (min-height: 2000px) {
+  .workspace { grid-template-columns: minmax(600px, 1.25fr) minmax(0, 1fr); }
+}
+@media (max-height: 1100px) {
+  body { overflow: auto; height: auto; }
+  .app { height: auto; max-height: none; min-height: 100vh; }
+  .workspace {
+    height: auto; overflow: visible; grid-template-columns: 1fr; grid-template-rows: auto;
+  }
+  .col-map { grid-template-rows: auto; }
+  .col-main { overflow: visible; grid-template-rows: auto; }
+  .row-bonus-hm, .row-lower { grid-template-columns: 1fr; }
+  .panel { max-height: none; overflow: visible; }
+  .panel-scroll { overflow: visible; }
+  .map-frame { min-height: 360px; max-height: 55vh; }
+}
+
+    :root { --accent: #3ecfff; --accent-soft: #3ecfff22; }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header class="top-chrome">
+      <div class="brand">
+        <span class="brand-mission">M6</span>
+        <span class="brand-name">The Frost Gate</span>
+        <span class="brand-meta">Prophecies · Northern Shiverpeaks · Cooperative · —</span>
+      </div>
+      <nav class="chip-nav" aria-label="Sections">
+        <a href="#map">Map</a>
+        <a href="#walkthrough">Walkthrough</a>
+        <a href="#bonus">Bonus</a>
+        <a href="#objectives">Objectives</a>
+        <a href="#hard-mode">Hard Mode</a>
+        <a href="#bosses">Bosses</a>
+        <a href="#other">Tips</a>
+      </nav>
+      <div class="chrome-actions">
+        <a class="btn btn-idx" href="../prohecies.html">Index</a>
+        <a class="btn btn-prev" href="5_Borlis_Pass.html">← Prev</a>
+        <a class="btn btn-wiki" href="https://wiki.guildwars.com/wiki/The_Frost_Gate" target="_blank" rel="noopener">Wiki ↗</a>
+        <a class="btn btn-next" href="7_Gates_of_Kryta.html">Next: Gates of Kryta →</a>
+      </div>
+    </header>
+
+    <div class="workspace">
+      <div class="col-map">
+        <section class="panel map-panel" id="map">
+          <h2 class="panel-title"><span class="icon icon-map">◉</span> Mission Map</h2>
+          <div class="map-wrap">
+            <div class="map-frame" id="mapOpen" title="Click to enlarge">
+              <img src="../maps/prophecies_06_The_Frost_Gate_map.jpg" alt="The Frost Gate mission map" />
+            </div>
+            <p class="map-caption">Click to enlarge · Local cache · <a href="https://wiki.guildwars.com/wiki/The_Frost_Gate" target="_blank" rel="noopener">Wiki</a></p>
+        </div>
+        </section>
+
+        <details class="summary-details" id="summary">
+          <summary>Summary (click to expand)</summary>
+          <div class="summary-body">
+            <p>As the Ascalon refugees make their way across the frozen Shiverpeaks into Kryta, the Stone Summit have blocked their path and closed The Frost Gate . It is up to the heroes to re-open the gate and lead their people safely through the pass.</p>
+            <p style="margin-top:0.4rem;"><strong>Region:</strong> Northern Shiverpeaks · <strong>Mission:</strong> 6 of 25 · <strong>Type:</strong> Cooperative</p>
+            <p style="margin-top:0.35rem;"><a href="https://wiki.guildwars.com/wiki/The_Frost_Gate" target="_blank" rel="noopener">Full wiki article ↗</a></p>
+          </div>
+        </details>
+      </div>
+
+      <div class="col-main">
+        <section class="panel objectives row-obj" id="objectives">
+          <h2 class="panel-title"><span class="icon icon-obj">✓</span> Objectives</h2>
+          <div class="panel-scroll wiki-block"><p>Open the Frost Gate.
+</p><ul><li>Destroy the <a href="https://wiki.guildwars.com/wiki/Ballista" rel="noopener" target="_blank" title="Ballista">ballistae</a> to secure safe passage for <a href="https://wiki.guildwars.com/wiki/Prince_Rurik" rel="noopener" target="_blank" title="Prince Rurik">Rurik</a> and the Ascalon refugees.</li>
+<li>Retrieve the <a href="https://wiki.guildwars.com/wiki/Gear_Lever" rel="noopener" target="_blank" title="Gear Lever">Gear Lever</a> from the <a href="https://wiki.guildwars.com/wiki/Dwarf" rel="noopener" target="_blank" title="Dwarf">Dwarven</a> fort to open the Frost Gate.</li>
+<li>ADDED: Use the Gear Lever on the <a href="https://wiki.guildwars.com/wiki/Lever_Mechanism" rel="noopener" target="_blank" title="Lever Mechanism">Lever Mechanism</a> to reach the Frost Gate.</li>
+<li>*BONUS* Steal the <a href="https://wiki.guildwars.com/wiki/Stone_Summit" rel="noopener" target="_blank" title="Stone Summit">Stone Summit</a>'s <a href="https://wiki.guildwars.com/wiki/Secret_Siege_Weapon_Plans" rel="noopener" target="_blank" title="Secret Siege Weapon Plans">secret plans</a> for a powerful siege weapon.</li>
+<li>ADDED: Activate the three Frost Gate Lever Mechanisms before the Stone Summit overwhelms Rurik.</li></ul></div>
+        </section>
+
+        <section class="panel walkthrough" id="walkthrough">
+          <h2 class="panel-title"><span class="icon icon-walk">→</span> Walkthrough</h2>
+          <div class="panel-scroll wiki-block"><p>Your party is taking the higher path clearing obstacles so Rurik and refugees can make progress on the lower path. The party cannot reach the lower path nor interact with Rurik.
+</p><p>Follow the pass in a general southerly direction while searching for the <a href="https://wiki.guildwars.com/wiki/Ballista" rel="noopener" target="_blank" title="Ballista">ballistae</a> (marked in green on the wiki map). Two can be found somewhat west of the normal path. Kill the <a href="https://wiki.guildwars.com/wiki/Stone_Summit_Engineer" rel="noopener" target="_blank" title="Stone Summit Engineer">Stone Summit Engineers</a> next to them. Continue on, following the red path on the wiki map. After destroying all four ballistae, a cinematic will play, a gate will open and your party can head down a hill to pick up the gear lever.  Use it on the nearby gear mechanism (blue point 1 on the wiki map) to open the gate just beyond. The mechanism will cause the lever to drop after several seconds. Pick it back up and wait patiently for the gate to open.
+</p><p>Next, enter the area behind the gate. From here you can see two of the three additional mechanisms needed to be triggered by the lever. The third one is below and in front of the other two. Using the gear lever on any of the three mechanisms causes a nearby gate to open, allowing additional enemies to spill out and attack your party. It is recommended to completely clear the area of foes before activating any of these gates, thus lessening the impact of the extra enemies. Shortly (but not immediately) after having used the gear lever on the third mechanism (in that grouping, fourth mechanism overall), the final <a href="https://wiki.guildwars.com/wiki/Cinematic" rel="noopener" target="_blank" title="Cinematic">cinematic</a> is shown, ending the mission.
+</p><h3><span class="mw-headline" id="Alternative_end_strategy">Alternative end strategy</span></h3><p>In <a href="https://wiki.guildwars.com/wiki/Hard_mode" rel="noopener" target="_blank" title="Hard mode">Hard mode</a>, the end part can be overwhelming. An alternative strategy to completing this mission is to first kill the two <a href="https://wiki.guildwars.com/wiki/Mob" rel="noopener" target="_blank" title="Mob">mobs</a> at the mechanisms, then trigger the mechanism at blue point 2 and defeat the two mobs that will run into the mechanism area. This next part can be done with one player character, to prevent a party <a href="https://wiki.guildwars.com/wiki/Wipe" rel="noopener" target="_blank" title="Wipe">wipe</a>, while the rest of the party waits in the safety of the area where the Gear Lever originally appeared (blue point 1): trigger the mechanism at blue point 3 and, as soon as the Gear Lever is available again, go trigger the mechanism at blue point 4, which can be done before the mob that was triggered by the mechanism at blue point 3 arrives. This strategy is quicker and prevents the chance of a party wipe, since your party can avoid <a href="https://wiki.guildwars.com/wiki/Aggro" rel="noopener" target="_blank" title="Aggro">aggroing</a> and having to fight the mobs that appear after triggering the last 2 mechanisms.
+</p><p>With heroes and henchmen, you can use a speed boost so that you can start both mechanisms, then run to blue point 1 and let your team aggro the remaining foes. Generally, the Summit mobs will not follow you outside the gate; even if they do, you can run away, let your heroes and henchmen absorb damage, and wait out the clock.
+</p><h3><span class="mw-headline" id="Simplistic_end_strategy">Simplistic end strategy</span></h3><p>This strategy is especially useful for additional <a class="mw-redirect" href="https://wiki.guildwars.com/wiki/XP" rel="noopener" target="_blank" title="XP">XP</a> and <a href="https://wiki.guildwars.com/wiki/Cartographer" rel="noopener" target="_blank" title="Cartographer">Cartographer</a>. If the other strategies are too stressful, it is possible to simply skip the intermediate cutscene towards the beginning by clicking the "Skip" button. This tactic ultimately leaves Rurik on the other side of the inaccessible area but unable to move, which prevents the timer from functioning. This will allow you to explore the other portions of the map that are otherwise difficult to reach within the allotted time frame. Upon entering the final section, you will notice that, on the path that Rurik would normally take, the <a href="https://wiki.guildwars.com/wiki/Ascalon_Refugee" rel="noopener" target="_blank" title="Ascalon Refugee">Ascalon Refugees</a> and <a class="mw-redirect" href="https://wiki.guildwars.com/wiki/Ascalon_Soldier" rel="noopener" target="_blank" title="Ascalon Soldier">Ascalon Soldiers</a> that spawn will still be killed, but there will be no mission failure as a result. In order to access the hostile areas, you must first use the Gear Lever on two of three Lever Mechanisms. From there, simply <a href="https://wiki.guildwars.com/wiki/Pull" rel="noopener" target="_blank" title="Pull">pull</a> the enemies to make exploration simpler. To end the mission, use the Gear Lever on the third and final Lever Mechanism as you normally would.
+</p></div>
+        </section>
+
+        <div class="row-bonus-hm">
+          <section class="panel bonus" id="bonus">
+            <h2 class="panel-title"><span class="icon icon-bonus">★</span> Bonus</h2>
+            <div class="panel-scroll wiki-block"><p>To finish the bonus:
+</p><ul><li>You need to free <a href="https://wiki.guildwars.com/wiki/Rornak_Stonesledge" rel="noopener" target="_blank" title="Rornak Stonesledge">Rornak Stonesledge</a> at yellow point 1 on the wiki map</li>
+<li>Lead him to the <a href="https://wiki.guildwars.com/wiki/Ballista" rel="noopener" target="_blank" title="Ballista">ballista</a> at yellow point 2</li>
+<li>Use the ballista to blast open the door that leads to yellow point 3</li>
+<li>Obtain the <a href="https://wiki.guildwars.com/wiki/Secret_Siege_Weapon_Plans" rel="noopener" target="_blank" title="Secret Siege Weapon Plans">Secret Siege Weapon Plans</a> from a chest at yellow point 3 and deliver them back to Rornak at the ballista (yellow point 2)</li></ul><p><i>Since Rornak must survive to complete the bonus, consider first clearing the path to yellow point 2 before leading him there</i>. Yellow point 2 houses two <a href="https://wiki.guildwars.com/wiki/Mob" rel="noopener" target="_blank" title="Mob">mobs</a> of two <a href="https://wiki.guildwars.com/wiki/Dolyak_Rider" rel="noopener" target="_blank" title="Dolyak Rider">Dolyak Riders</a> and several Stone Summit. Luring some of these foes away from the Riders and their considerable healing potential may prove a worthy tactic. Be cautious in your attempts to lure the enemies, especially in <a href="https://wiki.guildwars.com/wiki/Hard_mode" rel="noopener" target="_blank" title="Hard mode">Hard mode</a> or with henchmen, as the Dolyak Riders will follow as soon as you attack any member of the mob. Consider spreading the enemy lines to accomplish this task with the use of <a class="mw-redirect" href="https://wiki.guildwars.com/wiki/Bodyblock" rel="noopener" target="_blank" title="Bodyblock">bodyblocking</a> on the road nearby the start of the yellow line that leads to yellow point 2. With the party correctly positioned, pull the enemies into your waiting ambush and crush them with impunity. 
+</p><p>Another difficult fight with a random Stone Summit boss awaits the party just beyond the place where the path to yellow point 3 departs from the usual mission route. Another Dolyak Rider in the mob presents an ample challenge in Hard mode; however, be aware that killing the boss and the mob will trigger a cinematic, moving the party forward. Although it is still possible to complete the bonus after the cinematic by backtracking, it is advisable to leave this mob until the bonus is done.
+</p></div>
+          </section>
+          <section class="panel hard-mode" id="hard-mode">
+            <h2 class="panel-title"><span class="icon icon-hm">◆</span> Hard Mode</h2>
+            <div class="panel-scroll wiki-block"><p class='lede'>No dedicated Hard Mode section on the wiki — expect tougher foes and adjusted mechanics. See walkthrough notes.</p></div>
+          </section>
+        </div>
+
+        <div class="row-lower">
+          <section class="panel bosses" id="bosses">
+            <h2 class="panel-title"><span class="icon icon-boss">☠</span> Bosses &amp; Elites</h2>
+            <div class="panel-scroll"><div class='boss-grid'>
+<article class="boss-card">
+  <div class="boss-card-head"><a href="https://wiki.guildwars.com/wiki/Garris_Nightwatch" target="_blank" rel="noopener"><strong>Garris Nightwatch</strong></a></div>
+  <div class="boss-elite"><span class="elite-none">Elite: None / not listed</span></div>
+  <div class="boss-meta">13 (27)</div>
+</article>
+<article class="boss-card">
+  <div class="boss-card-head"><a href="https://wiki.guildwars.com/wiki/Shalis_Ironmantle" target="_blank" rel="noopener"><strong>Shalis Ironmantle</strong></a></div>
+  <div class="boss-elite"><span class="elite-none">Elite: None / not listed</span></div>
+  <div class="boss-meta">13 (27)</div>
+</article>
+<article class="boss-card">
+  <div class="boss-card-head"><a href="https://wiki.guildwars.com/wiki/Durnar_Skullcracker" target="_blank" rel="noopener"><strong>Durnar Skullcracker</strong></a></div>
+  <div class="boss-elite"><span class="elite-none">Elite: None / not listed</span></div>
+  <div class="boss-meta">13 (27)</div>
+</article>
+<article class="boss-card">
+  <div class="boss-card-head"><a href="https://wiki.guildwars.com/wiki/Cronis_Bonebreaker" target="_blank" rel="noopener"><strong>Cronis Bonebreaker</strong></a></div>
+  <div class="boss-elite"><span class="elite-none">Elite: None / not listed</span></div>
+  <div class="boss-meta">13 (27)</div>
+</article>
+<article class="boss-card">
+  <div class="boss-card-head"><a href="https://wiki.guildwars.com/wiki/Dagnar_Stonepate" target="_blank" rel="noopener"><strong>Dagnar</strong></a></div>
+  <div class="boss-elite"><span class="elite-none">Elite: None / not listed</span></div>
+  <div class="boss-meta">28 (30) ( only)</div>
+</article>
+<article class="boss-card">
+  <div class="boss-card-head"><a href="https://wiki.guildwars.com/wiki/Bucknar_Runeguard" target="_blank" rel="noopener"><strong>Bucknar Runeguard</strong></a></div>
+  <div class="boss-elite"><span class="elite-none">Elite: None / not listed</span></div>
+  <div class="boss-meta">13 (27)</div>
+</article>
+<article class="boss-card">
+  <div class="boss-card-head"><a href="https://wiki.guildwars.com/wiki/Minotaur_(boss)" target="_blank" rel="noopener"><strong>Minotaur</strong></a></div>
+  <div class="boss-elite"><span class="elite-none">Elite: None / not listed</span></div>
+  <div class="boss-meta">13 (27)</div>
+</article>
+</div></div>
+          </section>
+          <section class="panel other" id="other">
+            <h2 class="panel-title"><span class="icon icon-other">✦</span> Tips &amp; Notes</h2>
+            <div class="panel-scroll"><h3 style='font-size:0.8rem;color:var(--accent);margin:0.3rem 0;'>Skill recommendations</h3><div class='wiki-block'><ul><li><a href="https://wiki.guildwars.com/wiki/Dolyak_Rider" rel="noopener" target="_blank" title="Dolyak Rider">Dolyak Riders</a> can remove <a class="mw-redirect" href="https://wiki.guildwars.com/wiki/Hex" rel="noopener" target="_blank" title="Hex">hexes</a>, but not <a href="https://wiki.guildwars.com/wiki/Condition" rel="noopener" target="_blank" title="Condition">conditions</a>; however, <a href="https://wiki.guildwars.com/wiki/Stone_Summit_Howler" rel="noopener" target="_blank" title="Stone Summit Howler">Stone Summit Howlers</a> have <a href="https://wiki.guildwars.com/wiki/Plague_Touch" rel="noopener" target="_blank" title="Plague Touch">Plague Touch</a>, so avoid inflicting conditions on the Howlers.</li>
+<li>In <a href="https://wiki.guildwars.com/wiki/Hard_mode" rel="noopener" target="_blank" title="Hard mode">Hard mode</a>, <a href="https://wiki.guildwars.com/wiki/List_of_enchantment_removal_skills" rel="noopener" target="_blank" title="List of enchantment removal skills">enchantment removal skills</a> should prove invaluable by stripping the Dolyak Riders of their <a href="https://wiki.guildwars.com/wiki/Mark_of_Protection" rel="noopener" target="_blank" title="Mark of Protection">Mark of Protection</a> <a class="mw-redirect" href="https://wiki.guildwars.com/wiki/Enchantment" rel="noopener" target="_blank" title="Enchantment">enchantment</a>. Skills that inflict the <a href="https://wiki.guildwars.com/wiki/Dazed" rel="noopener" target="_blank" title="Dazed">dazed</a> condition will help in interrupting and preventing the Dolyak Riders from casting Mark of Protection.</li>
+<li><a class="mw-redirect" href="https://wiki.guildwars.com/wiki/Enchantment" rel="noopener" target="_blank" title="Enchantment">Enchantment</a>-based <a href="https://wiki.guildwars.com/wiki/Build" rel="noopener" target="_blank" title="Build">builds</a> are vulnerable to enchantment removal by <a href="https://wiki.guildwars.com/wiki/Stone_Summit_Howler" rel="noopener" target="_blank" title="Stone Summit Howler">Stone Summit Howlers</a> and <a href="https://wiki.guildwars.com/wiki/Stone_Summit_Sage" rel="noopener" target="_blank" title="Stone Summit Sage">Sages</a>.</li></ul></div>
+<h3 style='font-size:0.8rem;color:var(--accent);margin:0.3rem 0;'>Notes</h3><div class='wiki-block'><ul><li><a href="https://wiki.guildwars.com/wiki/Hero" rel="noopener" target="_blank" title="Hero">Heroes</a> and <a class="mw-redirect" href="https://wiki.guildwars.com/wiki/Henchmen" rel="noopener" target="_blank" title="Henchmen">henchmen</a> sometimes get stuck on the Lever Mechanisms. To avoid this, flag them away so they don't follow you when you go to use a Gear Lever on a Lever Mechanism.</li>
+<li>The two Snow Ettins will sometimes attack the Stone Summit Engineers near the third and fourth ballistae.</li>
+<li>After completing this mission, your party will be <a href="https://wiki.guildwars.com/wiki/Teleport" rel="noopener" target="_blank" title="Teleport">teleported</a> to <a href="https://wiki.guildwars.com/wiki/Beacon%27s_Perch" rel="noopener" target="_blank" title="Beacon's Perch">Beacon's Perch</a>.</li>
+<li>Complete exploration of the mission area adds approximately 1.4% to the Tyrian <a href="https://wiki.guildwars.com/wiki/Cartographer" rel="noopener" target="_blank" title="Cartographer">Cartographer</a> title.</li>
+<li>Completion of this mission in Hard Mode will fill in page #7 of the <a href="https://wiki.guildwars.com/wiki/Young_Heroes_of_Tyria" rel="noopener" target="_blank" title="Young Heroes of Tyria">Young Heroes of Tyria</a> <a href="https://wiki.guildwars.com/wiki/Storybook" rel="noopener" target="_blank" title="Storybook">storybook</a>.</li></ul><div style="margin: 1em; border: solid silver; border-width: 1px 0px; padding: 2px 1em 2px 7.5em;"><strong class="hiddenlinks" style="position: absolute; margin-left: -7.3em; color: #900;"><a class="image" href="https://wiki.guildwars.com/wiki/File:Anomaly.png" rel="noopener" target="_blank" title="Anomaly"><img alt="Anomaly" data-file-height="32" data-file-width="32" decoding="async" height="18" loading="lazy" src="https://wiki.guildwars.com/images/thumb/a/a6/Anomaly.png/18px-Anomaly.png" srcset="/images/thumb/a/a6/Anomaly.png/27px-Anomaly.png 1.5x, /images/a/a6/Anomaly.png 2x" width="18"/></a> <a class="mw-redirect" href="https://wiki.guildwars.com/wiki/Anomaly" rel="noopener" target="_blank" title="Anomaly">Anomaly</a>.</strong> Contrary to the mission objective, the mission will continue even if Prince Rurik dies before all 3 Lever Mechanisms have been activated.</div><div style="margin: 1em; border: solid silver; border-width: 1px 0px; padding: 2px 1em 2px 7.5em;"><strong class="hiddenlinks" style="position: absolute; margin-left: -7.3em; color: #900;"><a class="image" href="https://wiki.guildwars.com/wiki/File:Anomaly.png" rel="noopener" target="_blank" title="Anomaly"><img alt="Anomaly" data-file-height="32" data-file-width="32" decoding="async" height="18" loading="lazy" src="https://wiki.guildwars.com/images/thumb/a/a6/Anomaly.png/18px-Anomaly.png" srcset="/images/thumb/a/a6/Anomaly.png/27px-Anomaly.png 1.5x, /images/a/a6/Anomaly.png 2x" width="18"/></a> <a class="mw-redirect" href="https://wiki.guildwars.com/wiki/Anomaly" rel="noopener" target="_blank" title="Anomaly">Anomaly</a>.</strong> Sometimes a <a href="https://wiki.guildwars.com/wiki/Chest" rel="noopener" target="_blank" title="Chest">Chest</a>/<a href="https://wiki.guildwars.com/wiki/Locked_Chest" rel="noopener" target="_blank" title="Locked Chest">Locked Chest</a> will <a href="https://wiki.guildwars.com/wiki/Spawn" rel="noopener" target="_blank" title="Spawn">spawn</a> on the path (that cannot be reached by players) taken by Prince Rurik and the Ascalon Soldiers.</div></div></div>
+          </section>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="lightbox" id="lightbox" role="dialog" aria-label="Enlarged map">
+    <img src="../maps/prophecies_06_The_Frost_Gate_map.jpg" alt="The Frost Gate mission map (enlarged)" />
+  </div>
+  <script>
+    (function () {
+      var open = document.getElementById("mapOpen");
+      var box = document.getElementById("lightbox");
+      if (!open || !box) return;
+      open.addEventListener("click", function () { box.classList.add("open"); });
+      box.addEventListener("click", function () { box.classList.remove("open"); });
+      document.addEventListener("keydown", function (e) {
+        if (e.key === "Escape") box.classList.remove("open");
+      });
+    })();
+  </script>
+
+</body>
+</html>

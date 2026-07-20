@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Sunjiang District</title>
+  <style>
+:root {
+  --bg-deep: #070a0f;
+  --bg-panel: #101820;
+  --bg-panel-2: #15202c;
+  --border: #243044;
+  --border-glow: #2a4a6a;
+  --text: #dce6f0;
+  --text-muted: #8a9bb0;
+  --text-dim: #5c6f86;
+  --accent: #3ecfff;
+  --accent-soft: rgba(62, 207, 255, 0.12);
+  --gold: #e8c56a;
+  --gold-soft: rgba(232, 197, 106, 0.12);
+  --bonus: #7dffb3;
+  --bonus-soft: rgba(125, 255, 179, 0.1);
+  --danger: #ff6b6b;
+  --danger-soft: rgba(255, 107, 107, 0.1);
+  --hm: #c78bff;
+  --hm-soft: rgba(199, 139, 255, 0.12);
+  --radius: 10px;
+  --font: "Segoe UI", system-ui, -apple-system, sans-serif;
+  --chrome-h: 3.1rem;
+  --gap: 0.5rem;
+  --pad: 0.7rem;
+  /* Readable on 4K vertical (~2160×3840) */
+  --walk-size: clamp(1.05rem, 0.55vw + 0.55vh, 1.35rem);
+  --bonus-size: clamp(1.05rem, 0.55vw + 0.55vh, 1.35rem);
+  --body-size: clamp(0.95rem, 0.4vw + 0.4vh, 1.1rem);
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html {
+  scroll-behavior: smooth;
+  font-size: clamp(16px, 0.55vw + 0.45vh, 20px);
+  height: 100%;
+  scroll-padding-top: calc(var(--chrome-h) + 0.5rem);
+}
+body {
+  font-family: var(--font);
+  background: var(--bg-deep);
+  color: var(--text);
+  line-height: 1.45;
+  min-height: 100%;
+  height: 100%;
+  overflow: hidden;
+  background-image: radial-gradient(ellipse 70% 25% at 50% 0%, rgba(42, 100, 160, 0.14), transparent);
+}
+a { color: var(--accent); text-decoration: none; }
+a:hover { color: #7de0ff; text-decoration: underline; }
+.app {
+  display: grid;
+  grid-template-rows: var(--chrome-h) 1fr;
+  height: 100vh; height: 100dvh;
+  max-height: 100vh; max-height: 100dvh;
+}
+.top-chrome {
+  display: flex; align-items: center; gap: 0.65rem;
+  padding: 0 0.7rem;
+  background: rgba(8, 12, 18, 0.97);
+  border-bottom: 1px solid var(--border);
+  z-index: 100; min-height: var(--chrome-h);
+}
+.brand { display: flex; align-items: baseline; gap: 0.55rem; min-width: 0; flex-shrink: 0; }
+.brand-mission {
+  font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase;
+  color: var(--accent); font-weight: 700; white-space: nowrap;
+}
+.brand-name {
+  font-size: 1.1rem; font-weight: 750; color: var(--text);
+  white-space: nowrap; letter-spacing: -0.02em;
+}
+.brand-meta { font-size: 0.75rem; color: var(--text-dim); white-space: nowrap; }
+.chip-nav {
+  display: flex; flex: 1; gap: 0.3rem; overflow-x: auto;
+  scrollbar-width: none; min-width: 0; justify-content: center;
+}
+.chip-nav::-webkit-scrollbar { display: none; }
+.chip-nav a {
+  flex: 0 0 auto; padding: 0.3rem 0.65rem; border-radius: 999px;
+  font-size: 0.78rem; font-weight: 600; color: var(--text-muted);
+  background: var(--bg-panel); border: 1px solid var(--border);
+  text-decoration: none; white-space: nowrap;
+}
+.chip-nav a:hover {
+  color: var(--text); border-color: var(--border-glow);
+  background: #1a2836; text-decoration: none;
+}
+.chip-nav a[href="#map"] { color: var(--accent); border-color: rgba(62, 207, 255, 0.35); }
+.chip-nav a[href="#bonus"] { color: var(--bonus); border-color: rgba(125, 255, 179, 0.3); }
+.chip-nav a[href="#hard-mode"] { color: var(--hm); border-color: rgba(199, 139, 255, 0.3); }
+.chip-nav a[href="#bosses"] { color: #ff9a9a; border-color: rgba(255, 107, 107, 0.3); }
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 0.3rem;
+  padding: 0.42rem 0.85rem; border-radius: 8px; font-weight: 650; font-size: 0.8rem;
+  border: none; cursor: pointer; text-decoration: none; white-space: nowrap; flex-shrink: 0;
+}
+.btn:hover { text-decoration: none; }
+.btn-next {
+  background: linear-gradient(135deg, #1a6a9a, #1ab0e0); color: #fff;
+  box-shadow: 0 2px 12px rgba(26, 140, 200, 0.35);
+}
+.btn-next:hover { color: #fff; filter: brightness(1.08); }
+.btn-wiki, .btn-idx, .btn-prev {
+  background: var(--bg-panel); color: var(--text-muted);
+  border: 1px solid var(--border); padding: 0.42rem 0.65rem;
+}
+.btn-wiki:hover, .btn-idx:hover, .btn-prev:hover {
+  color: var(--accent); border-color: var(--border-glow);
+}
+.chrome-actions { display: flex; gap: 0.35rem; flex-shrink: 0; }
+
+/* Map-dominant workspace */
+.workspace {
+  display: grid;
+  grid-template-columns: minmax(480px, 1.15fr) minmax(0, 1fr);
+  grid-template-rows: 1fr;
+  gap: var(--gap); padding: var(--gap);
+  min-height: 0; height: 100%; overflow: hidden;
+}
+.col-map {
+  display: grid;
+  grid-template-rows: 1fr auto;
+  gap: var(--gap);
+  min-height: 0; min-width: 0;
+}
+.col-main {
+  display: grid;
+  /* objectives compact | walkthrough HUGE | bonus+hm | bosses+tips */
+  grid-template-rows: auto minmax(0, 1.6fr) minmax(0, 1.05fr) minmax(0, 0.75fr);
+  gap: var(--gap); min-height: 0; min-width: 0; overflow: hidden;
+}
+.row-obj { min-height: 0; }
+.row-bonus-hm {
+  display: grid; grid-template-columns: 1.15fr 0.85fr; gap: var(--gap); min-height: 0;
+}
+.row-lower {
+  display: grid; grid-template-columns: 1.15fr 0.85fr; gap: var(--gap); min-height: 0;
+}
+.panel {
+  background: var(--bg-panel); border: 1px solid var(--border); border-radius: var(--radius);
+  padding: var(--pad); display: flex; flex-direction: column; min-height: 0; overflow: hidden;
+}
+.panel-scroll {
+  overflow-y: auto; overflow-x: hidden; min-height: 0; flex: 1; padding-right: 0.3rem;
+  scrollbar-width: thin; scrollbar-color: var(--border) transparent;
+  font-size: var(--body-size);
+}
+.panel-scroll::-webkit-scrollbar { width: 8px; }
+.panel-scroll::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+.panel-title {
+  display: flex; align-items: center; gap: 0.4rem;
+  font-size: 0.82rem; font-weight: 750; letter-spacing: 0.05em; text-transform: uppercase;
+  color: var(--text); margin-bottom: 0.45rem; padding-bottom: 0.35rem;
+  border-bottom: 1px solid var(--border); flex-shrink: 0;
+}
+.panel-title .icon {
+  width: 1.3rem; height: 1.3rem; border-radius: 5px;
+  display: inline-flex; align-items: center; justify-content: center; font-size: 0.75rem;
+}
+.panel.map-panel {
+  border-color: var(--border-glow);
+  background: linear-gradient(180deg, #0e1620 0%, var(--bg-panel) 100%);
+  /* Map takes almost all left column */
+  min-height: 0;
+}
+.panel.objectives { border-top: 2px solid var(--accent); }
+.panel.walkthrough { border-top: 3px solid #5eb8e8; }
+.panel.bonus { border-top: 3px solid var(--bonus); }
+.panel.hard-mode { border-top: 2px solid var(--hm); }
+.panel.bosses { border-top: 2px solid var(--danger); }
+.panel.other { border-top: 2px solid var(--text-muted); }
+
+/* Emphasized reading panels */
+.panel.walkthrough .panel-scroll,
+.panel.walkthrough .wiki-block {
+  font-size: var(--walk-size) !important;
+  line-height: 1.55;
+}
+.panel.bonus .panel-scroll,
+.panel.bonus .wiki-block {
+  font-size: var(--bonus-size) !important;
+  line-height: 1.55;
+}
+.panel.walkthrough .panel-scroll li,
+.panel.bonus .panel-scroll li {
+  margin-bottom: 0.45rem;
+}
+.panel.walkthrough .panel-scroll p,
+.panel.bonus .panel-scroll p {
+  margin-bottom: 0.55rem;
+}
+
+.icon-map { background: var(--accent-soft); color: var(--accent); }
+.icon-obj { background: var(--accent-soft); color: var(--accent); }
+.icon-walk { background: rgba(94, 184, 232, 0.15); color: #5eb8e8; }
+.icon-bonus { background: var(--bonus-soft); color: var(--bonus); }
+.icon-hm { background: var(--hm-soft); color: var(--hm); }
+.icon-boss { background: var(--danger-soft); color: var(--danger); }
+.icon-other { background: rgba(138, 155, 176, 0.15); color: var(--text-muted); }
+
+.map-wrap {
+  flex: 1; min-height: 0; display: flex; flex-direction: column;
+  align-items: center; justify-content: center; gap: 0.4rem;
+}
+.map-frame {
+  flex: 1; min-height: 0; width: 100%;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: 10px; overflow: hidden;
+  border: 2px solid var(--border-glow);
+  box-shadow: 0 0 0 1px rgba(62, 207, 255, 0.1), 0 12px 40px rgba(0, 0, 0, 0.45);
+  background: #05080c; cursor: zoom-in;
+}
+.map-frame img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  image-rendering: auto;
+}
+.map-caption { font-size: 0.72rem; color: var(--text-dim); flex-shrink: 0; }
+.map-missing {
+  color: var(--text-dim); font-size: 1rem; text-align: center; padding: 2rem;
+}
+
+.wiki-block ul, .panel-scroll ul,
+.wiki-block ol, .panel-scroll ol { padding-left: 1.2rem; margin: 0.3rem 0 0.5rem; }
+.wiki-block li, .panel-scroll li { margin-bottom: 0.32rem; }
+.wiki-block p, .panel-scroll p { margin-bottom: 0.45rem; }
+.wiki-block img, .panel-scroll img { vertical-align: middle; max-height: 1.35em; width: auto; }
+.wiki-block table, .panel-scroll table {
+  width: 100%; border-collapse: collapse; font-size: 0.9em; margin: 0.4rem 0;
+}
+.wiki-block th, .wiki-block td, .panel-scroll th, .panel-scroll td {
+  border: 1px solid var(--border); padding: 0.3rem 0.45rem; text-align: left;
+}
+.lede { font-size: 0.92rem; color: var(--text-muted); margin-bottom: 0.35rem; }
+
+/* Collapsed summary */
+details.summary-details {
+  background: var(--bg-panel);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  border-top: 2px solid var(--gold);
+  padding: 0.35rem 0.65rem;
+  flex-shrink: 0;
+}
+details.summary-details summary {
+  cursor: pointer;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--gold);
+  padding: 0.35rem 0;
+  list-style: none;
+}
+details.summary-details summary::-webkit-details-marker { display: none; }
+details.summary-details summary::before {
+  content: "▸ ";
+  color: var(--text-dim);
+}
+details.summary-details[open] summary::before { content: "▾ "; }
+details.summary-details .summary-body {
+  padding: 0.35rem 0 0.55rem;
+  font-size: 0.88rem;
+  color: var(--text-muted);
+  max-height: 18vh;
+  overflow-y: auto;
+}
+
+.boss-note { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.4rem; }
+.boss-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.4rem; }
+.boss-card {
+  background: var(--bg-panel-2); border: 1px solid var(--border);
+  border-radius: 8px; padding: 0.5rem 0.6rem;
+}
+.boss-card-head { font-size: 0.95rem; margin-bottom: 0.2rem; }
+.boss-card-head a { color: #eef6fc; font-weight: 700; }
+.boss-card-head a:hover { color: var(--accent); }
+.boss-elite { font-size: 0.88rem; }
+.elite-label { color: var(--gold); font-weight: 650; margin-right: 0.25rem; }
+.elite-link { color: #ffd78a; font-weight: 650; }
+.elite-link:hover { color: #ffe9b5; }
+.elite-none { color: var(--text-dim); font-style: italic; font-size: 0.85rem; }
+.boss-meta { font-size: 0.78rem; color: var(--text-dim); margin-top: 0.15rem; }
+
+.callout {
+  margin-top: 0.4rem; padding: 0.45rem 0.6rem; border-radius: 6px;
+  font-size: 0.88rem; border-left: 3px solid; line-height: 1.4;
+}
+.callout.tip { background: var(--accent-soft); border-color: var(--accent); color: #b8eaff; }
+.callout.warn { background: var(--danger-soft); border-color: var(--danger); color: #ffb4b4; }
+
+.lightbox {
+  display: none; position: fixed; inset: 0; z-index: 1000; background: rgba(0,0,0,0.94);
+  align-items: center; justify-content: center; padding: 1.5rem; cursor: zoom-out;
+}
+.lightbox.open { display: flex; }
+.lightbox img {
+  max-width: 96vw; max-height: 96vh; border-radius: 8px;
+  border: 2px solid var(--border-glow); object-fit: contain;
+}
+
+@media (min-height: 2400px) {
+  :root {
+    --walk-size: clamp(1.15rem, 0.7vh + 0.3vw, 1.5rem);
+    --bonus-size: clamp(1.15rem, 0.7vh + 0.3vw, 1.5rem);
+    --gap: 0.65rem;
+    --pad: 0.85rem;
+  }
+  .workspace { grid-template-columns: minmax(560px, 1.2fr) minmax(0, 1fr); }
+}
+@media (min-width: 1800px) and (min-height: 2000px) {
+  .workspace { grid-template-columns: minmax(600px, 1.25fr) minmax(0, 1fr); }
+}
+@media (max-height: 1100px) {
+  body { overflow: auto; height: auto; }
+  .app { height: auto; max-height: none; min-height: 100vh; }
+  .workspace {
+    height: auto; overflow: visible; grid-template-columns: 1fr; grid-template-rows: auto;
+  }
+  .col-map { grid-template-rows: auto; }
+  .col-main { overflow: visible; grid-template-rows: auto; }
+  .row-bonus-hm, .row-lower { grid-template-columns: 1fr; }
+  .panel { max-height: none; overflow: visible; }
+  .panel-scroll { overflow: visible; }
+  .map-frame { min-height: 360px; max-height: 55vh; }
+}
+
+    :root { --accent: #e8a84a; --accent-soft: #e8a84a22; }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header class="top-chrome">
+      <div class="brand">
+        <span class="brand-mission">M8</span>
+        <span class="brand-name">Sunjiang District</span>
+        <span class="brand-meta">Factions · Kaineng City · Cooperative · Medium</span>
+      </div>
+      <nav class="chip-nav" aria-label="Sections">
+        <a href="#map">Map</a>
+        <a href="#walkthrough">Walkthrough</a>
+        <a href="#bonus">Bonus</a>
+        <a href="#objectives">Objectives</a>
+        <a href="#hard-mode">Hard Mode</a>
+        <a href="#bosses">Bosses</a>
+        <a href="#other">Tips</a>
+      </nav>
+      <div class="chrome-actions">
+        <a class="btn btn-idx" href="../factions.html">Index</a>
+        <a class="btn btn-prev" href="7_Boreas_Seabed.html">← Prev</a>
+        <a class="btn btn-wiki" href="https://wiki.guildwars.com/wiki/Sunjiang_District" target="_blank" rel="noopener">Wiki ↗</a>
+        <a class="btn btn-next" href="9_The_Eternal_Grove.html">Next: The Eternal Grove →</a>
+      </div>
+    </header>
+
+    <div class="workspace">
+      <div class="col-map">
+        <section class="panel map-panel" id="map">
+          <h2 class="panel-title"><span class="icon icon-map">◉</span> Mission Map</h2>
+          <div class="map-wrap">
+            <div class="map-frame" id="mapOpen" title="Click to enlarge">
+              <img src="../maps/factions_08_Sunjiang_District_map.jpg" alt="Sunjiang District mission map" />
+            </div>
+            <p class="map-caption">Click to enlarge · Local cache · <a href="https://wiki.guildwars.com/wiki/Sunjiang_District" target="_blank" rel="noopener">Wiki</a></p>
+        </div>
+        </section>
+
+        <details class="summary-details" id="summary">
+          <summary>Summary (click to expand)</summary>
+          <div class="summary-body">
+            <p>Prevent Shiro from summoning his spirit army!</p>
+            <p style="margin-top:0.4rem;"><strong>Region:</strong> Kaineng City · <strong>Mission:</strong> 8 of 13 · <strong>Type:</strong> Cooperative</p>
+            <p style="margin-top:0.35rem;"><a href="https://wiki.guildwars.com/wiki/Sunjiang_District" target="_blank" rel="noopener">Full wiki article ↗</a></p>
+          </div>
+        </details>
+      </div>
+
+      <div class="col-main">
+        <section class="panel objectives row-obj" id="objectives">
+          <h2 class="panel-title"><span class="icon icon-obj">✓</span> Objectives</h2>
+          <div class="panel-scroll wiki-block"><p>Prevent Shiro from summoning his spirit army!
+</p><ul><li>Locate Shiro in the sewers.</li>
+<li>Added: <small>[<a class="extiw" href="https://en.wikipedia.org/wiki/Sic" rel="noopener" target="_blank" title="w:Sic"><span title="Unlike the other ADDED objective, this one is lowercase"><i>sic</i></span></a>]</small> Destroy the spirit rifts to remove Shiro's protective shield. [4...0] spirit rift[s] remaining.</li>
+<li>ADDED: <small>[<a class="extiw" href="https://en.wikipedia.org/wiki/Sic" rel="noopener" target="_blank" title="w:Sic"><span title="Unlike the other Added objective, this one is capitalized"><i>sic</i></span></a>]</small> Defeat Shiro's Constructs.</li>
+<li><a href="https://wiki.guildwars.com/wiki/Master_Togo" rel="noopener" target="_blank" title="Master Togo">Togo</a> must survive.</li>
+<li><a href="https://wiki.guildwars.com/wiki/Mhenlo" rel="noopener" target="_blank" title="Mhenlo">Mhenlo</a> must survive.</li></ul></div>
+        </section>
+
+        <section class="panel walkthrough" id="walkthrough">
+          <h2 class="panel-title"><span class="icon icon-walk">→</span> Walkthrough</h2>
+          <div class="panel-scroll wiki-block"><p>The objective of the mission is to destroy four Spirit Rifts (energy spheres) and defeat four Shiro's Constructs. Kill the guarding <a href="https://wiki.guildwars.com/wiki/Spirit_of_Portals" rel="noopener" target="_blank" title="Spirit of Portals">Spirit of Portals</a> to close the Spirit Rift. These guards also summon more Shiro'kens to replace fallen ones.
+</p><p>At the beginning, the party has access to the <a href="https://wiki.guildwars.com/wiki/Spear_of_Archemorus" rel="noopener" target="_blank" title="Spear of Archemorus">Spear of Archemorus</a> and the <a href="https://wiki.guildwars.com/wiki/Urn_of_Saint_Viktor" rel="noopener" target="_blank" title="Urn of Saint Viktor">Urn of Saint Viktor</a>. These tools are provided as boosts only and carrying them is not required to complete the mission. If your party consists mainly of heroes and can only take one of the bundles, consider taking the Spear instead of the Urn, since heroes are not affected by the <a href="https://wiki.guildwars.com/wiki/Shield_of_Saint_Viktor" rel="noopener" target="_blank" title="Shield of Saint Viktor">Urn's effect</a>.
+</p><p>A bridge will come down and the mission will start.
+</p><ol><li>The first area has <a href="https://wiki.guildwars.com/wiki/Flame_Fissure" rel="noopener" target="_blank" title="Flame Fissure">Flame Fissures</a> that cause <a href="https://wiki.guildwars.com/wiki/Burning" rel="noopener" target="_blank" title="Burning">burning</a> and <a href="https://wiki.guildwars.com/wiki/Crippled" rel="noopener" target="_blank" title="Crippled">crippled</a> to anyone who walks over them. The first Spirit Rift and <a href="https://wiki.guildwars.com/wiki/Shiro%27ken_Assassin" rel="noopener" target="_blank" title="Shiro'ken Assassin">Shiro'ken Assassins</a> will be there. The party can now proceed either left or right. If taking right, Shiro can be sighted but will be unreachable at this time.</li>
+<li>There is another fork ahead. The second Spirit Rift and <a href="https://wiki.guildwars.com/wiki/Shiro%27ken_Ranger" rel="noopener" target="_blank" title="Shiro'ken Ranger">Shiro'ken Rangers</a> will be to the right. This area has several spikes squares that cause <a href="https://wiki.guildwars.com/wiki/Bleeding" rel="noopener" target="_blank" title="Bleeding">bleeding</a> and crippled when walked over. Pull carefully to avoid over-aggro.</li>
+<li>The party should double back to the previous fork. The third Spirit Rift and <a href="https://wiki.guildwars.com/wiki/Shiro%27ken_Necromancer" rel="noopener" target="_blank" title="Shiro'ken Necromancer">Shiro'ken Necromancers</a> will be down that path atop a small hill surrounded with <a href="https://wiki.guildwars.com/wiki/Poison" rel="noopener" target="_blank" title="Poison">poisoned</a> water.</li>
+<li>Turn right and out of the poisoned water to find the fourth and final Spirit Rift and <a href="https://wiki.guildwars.com/wiki/Shiro%27ken_Warrior" rel="noopener" target="_blank" title="Shiro'ken Warrior">Shiro'ken Warriors</a>. The spike plates in this area cause <a href="https://wiki.guildwars.com/wiki/Dazed" rel="noopener" target="_blank" title="Dazed">dazed</a>, casters should be careful.</li></ol><p>After the fourth Spirit of Portals and its mob are destroyed, a cinematic will play and then the party will be in the central area where Shiro was previously seen, facing four Construct bosses. Finish off all four to complete the mission. If you are playing with henchmen/heroes, immediately <a href="https://wiki.guildwars.com/wiki/Hero_flag" rel="noopener" target="_blank" title="Hero flag">flag</a> them to the nearest corner as they tend to run to the center between all bosses, causing a quick <a href="https://wiki.guildwars.com/wiki/Wipe" rel="noopener" target="_blank" title="Wipe">wipe</a>. Then slowly pull the bosses one or two at a time.
+</p></div>
+        </section>
+
+        <div class="row-bonus-hm">
+          <section class="panel bonus" id="bonus">
+            <h2 class="panel-title"><span class="icon icon-bonus">★</span> Bonus</h2>
+            <div class="panel-scroll wiki-block"><p class='lede'>See walkthrough and objectives for bonus details (if any).</p></div>
+          </section>
+          <section class="panel hard-mode" id="hard-mode">
+            <h2 class="panel-title"><span class="icon icon-hm">◆</span> Hard Mode</h2>
+            <div class="panel-scroll wiki-block"><p class='lede'>No dedicated Hard Mode section on the wiki — expect tougher foes and adjusted mechanics. See walkthrough notes.</p></div>
+          </section>
+        </div>
+
+        <div class="row-lower">
+          <section class="panel bosses" id="bosses">
+            <h2 class="panel-title"><span class="icon icon-boss">☠</span> Bosses &amp; Elites</h2>
+            <div class="panel-scroll"><div class='boss-grid'>
+<article class="boss-card">
+  <div class="boss-card-head"><a href="https://wiki.guildwars.com/wiki/Warrior%27s_Construct" target="_blank" rel="noopener"><strong>Warrior&#x27;s Construct</strong></a></div>
+  <div class="boss-elite"><span class="elite-label">Elite:</span> <a class="elite-link" href="https://wiki.guildwars.com/wiki/Hundred_Blades" target="_blank" rel="noopener">Hundred Blades</a></div>
+  <div class="boss-meta">24 (30) ( )</div>
+</article>
+<article class="boss-card">
+  <div class="boss-card-head"><a href="https://wiki.guildwars.com/wiki/Ranger%27s_Construct" target="_blank" rel="noopener"><strong>Ranger&#x27;s Construct</strong></a></div>
+  <div class="boss-elite"><span class="elite-label">Elite:</span> <a class="elite-link" href="https://wiki.guildwars.com/wiki/Equinox" target="_blank" rel="noopener">Equinox</a></div>
+  <div class="boss-meta">24 (30) ( )</div>
+</article>
+<article class="boss-card">
+  <div class="boss-card-head"><a href="https://wiki.guildwars.com/wiki/Monk%27s_Construct" target="_blank" rel="noopener"><strong>Monk&#x27;s Construct</strong></a></div>
+  <div class="boss-elite"><span class="elite-label">Elite:</span> <a class="elite-link" href="https://wiki.guildwars.com/wiki/Life_Sheath" target="_blank" rel="noopener">Life Sheath</a></div>
+  <div class="boss-meta">24 (30) ( )</div>
+</article>
+<article class="boss-card">
+  <div class="boss-card-head"><a href="https://wiki.guildwars.com/wiki/Necromancer%27s_Construct" target="_blank" rel="noopener"><strong>Necromancer&#x27;s Construct</strong></a></div>
+  <div class="boss-elite"><span class="elite-label">Elite:</span> <a class="elite-link" href="https://wiki.guildwars.com/wiki/Soul_Bind" target="_blank" rel="noopener">Soul Bind</a></div>
+  <div class="boss-meta">24 (30) ( )</div>
+</article>
+<article class="boss-card">
+  <div class="boss-card-head"><a href="https://wiki.guildwars.com/wiki/Mesmer%27s_Construct" target="_blank" rel="noopener"><strong>Mesmer&#x27;s Construct</strong></a></div>
+  <div class="boss-elite"><span class="elite-label">Elite:</span> <a class="elite-link" href="https://wiki.guildwars.com/wiki/Psychic_Distraction" target="_blank" rel="noopener">Psychic Distraction</a></div>
+  <div class="boss-meta">24 (30) ( )</div>
+</article>
+<article class="boss-card">
+  <div class="boss-card-head"><a href="https://wiki.guildwars.com/wiki/Elemental%27s_Construct" target="_blank" rel="noopener"><strong>Elemental&#x27;s Construct</strong></a></div>
+  <div class="boss-elite"><span class="elite-label">Elite:</span> <a class="elite-link" href="https://wiki.guildwars.com/wiki/Mirror_of_Ice" target="_blank" rel="noopener">Mirror of Ice</a></div>
+  <div class="boss-meta">24 (30) ( )</div>
+</article>
+<article class="boss-card">
+  <div class="boss-card-head"><a href="https://wiki.guildwars.com/wiki/Assassin%27s_Construct" target="_blank" rel="noopener"><strong>Assassin&#x27;s Construct</strong></a></div>
+  <div class="boss-elite"><span class="elite-label">Elite:</span> <a class="elite-link" href="https://wiki.guildwars.com/wiki/Temple_Strike" target="_blank" rel="noopener">Temple Strike</a></div>
+  <div class="boss-meta">24 (30) ( )</div>
+</article>
+<article class="boss-card">
+  <div class="boss-card-head"><a href="https://wiki.guildwars.com/wiki/Ritualist%27s_Construct" target="_blank" rel="noopener"><strong>Ritualist&#x27;s Construct</strong></a></div>
+  <div class="boss-elite"><span class="elite-label">Elite:</span> <a class="elite-link" href="https://wiki.guildwars.com/wiki/Soul_Twisting" target="_blank" rel="noopener">Soul Twisting</a></div>
+  <div class="boss-meta">24 (30) ( )</div>
+</article>
+</div></div>
+          </section>
+          <section class="panel other" id="other">
+            <h2 class="panel-title"><span class="icon icon-other">✦</span> Tips &amp; Notes</h2>
+            <div class="panel-scroll"><h3 style='font-size:0.8rem;color:var(--accent);margin:0.3rem 0;'>Skill recommendations</h3><div class='wiki-block'><ul><li>Spirit of Portals can be defeated quickly by using <a href="https://wiki.guildwars.com/wiki/Gaze_of_Fury" rel="noopener" target="_blank" title="Gaze of Fury">Gaze of Fury</a> on them.</li>
+<li><a class="mw-redirect" href="https://wiki.guildwars.com/wiki/Enchantment" rel="noopener" target="_blank" title="Enchantment">Enchantment</a>-based <a href="https://wiki.guildwars.com/wiki/Build" rel="noopener" target="_blank" title="Build">builds</a> are vulnerable to enchantment removal by <a href="https://wiki.guildwars.com/wiki/Afflicted_Necromancer" rel="noopener" target="_blank" title="Afflicted Necromancer">Afflicted Necromancers</a> and <a href="https://wiki.guildwars.com/wiki/Afflicted_Mesmer" rel="noopener" target="_blank" title="Afflicted Mesmer">Mesmers</a>. Afflicted that deal <a href="https://wiki.guildwars.com/wiki/Physical_damage" rel="noopener" target="_blank" title="Physical damage">physical damage</a> can also remove enchantments when enchanted with Afflicted Necromancer's <a href="https://wiki.guildwars.com/wiki/Order_of_Apostasy" rel="noopener" target="_blank" title="Order of Apostasy">Order of Apostasy</a>.</li></ul></div>
+<h3 style='font-size:0.8rem;color:var(--accent);margin:0.3rem 0;'>Notes</h3><div class='wiki-block'><ul><li>This mission's <a href="https://wiki.guildwars.com/wiki/Environment_effect" rel="noopener" target="_blank" title="Environment effect">environment traps</a> also affect enemies.</li>
+<li>Shiro Tagachi is passive and has <a href="https://wiki.guildwars.com/wiki/Invulnerability" rel="noopener" target="_blank" title="Invulnerability">Invulnerability</a> in this mission; however, allied <a href="https://wiki.guildwars.com/wiki/Minion" rel="noopener" target="_blank" title="Minion">minions</a> that wander into his <a href="https://wiki.guildwars.com/wiki/Aggro" rel="noopener" target="_blank" title="Aggro">aggro</a> circle will still attempt to engage him in combat. He may be killed by means such as <a href="https://wiki.guildwars.com/wiki/Agony" rel="noopener" target="_blank" title="Agony">Agony</a> and <a href="https://wiki.guildwars.com/wiki/Unholy_Feast" rel="noopener" target="_blank" title="Unholy Feast">Unholy Feast</a>, but doing so appears to have no effect on the mission besides preventing him from speaking his lines. In the cinematic after closing all the rifts, he appears as normal.</li>
+<li>This mission does not provide a reliable opportunity to capture skills, because you have to go through the entire mission to reach the bosses, only four of eight potential bosses spawn, and there is very little time to capture the skill of the fourth-defeated boss.</li>
+<li>After completing the mission for the first time, the sectioned off area of <a href="https://wiki.guildwars.com/wiki/Sunjiang_District_(explorable_area)" rel="noopener" target="_blank" title="Sunjiang District (explorable area)">Sunjiang District (explorable area)</a> will be accessible, and in turn so will the six construct bosses.</li>
+<li>Completion of this mission will fill in page #6 of the <a href="https://wiki.guildwars.com/wiki/Shiro%27s_Return" rel="noopener" target="_blank" title="Shiro's Return">Shiro's Return</a> <a href="https://wiki.guildwars.com/wiki/Storybook" rel="noopener" target="_blank" title="Storybook">storybook</a>.</li>
+<li>After completing this mission, your party will be taken to <a href="https://wiki.guildwars.com/wiki/Maatu_Keep" rel="noopener" target="_blank" title="Maatu Keep">Maatu Keep</a>.</li></ul><div style="margin: 1em; border: solid silver; border-width: 1px 0px; padding: 2px 1em 2px 7.5em;"><strong class="hiddenlinks" style="position: absolute; margin-left: -7.3em; color: #900;"><a class="image" href="https://wiki.guildwars.com/wiki/File:Anomaly.png" rel="noopener" target="_blank" title="Anomaly"><img alt="Anomaly" data-file-height="32" data-file-width="32" decoding="async" height="18" loading="lazy" src="https://wiki.guildwars.com/images/thumb/a/a6/Anomaly.png/18px-Anomaly.png" srcset="/images/thumb/a/a6/Anomaly.png/27px-Anomaly.png 1.5x, /images/a/a6/Anomaly.png 2x" width="18"/></a> <a class="mw-redirect" href="https://wiki.guildwars.com/wiki/Anomaly" rel="noopener" target="_blank" title="Anomaly">Anomaly</a>.</strong> Although they are not <a href="https://wiki.guildwars.com/wiki/Fleshy" rel="noopener" target="_blank" title="Fleshy">fleshy</a> (with the exception of <a href="https://wiki.guildwars.com/wiki/Flesh_Golem" rel="noopener" target="_blank" title="Flesh Golem">Flesh Golems</a>), <a href="https://wiki.guildwars.com/wiki/Celestial_Summoning_Stone" rel="noopener" target="_blank" title="Celestial Summoning Stone">Celestial Summoning Stone</a> and minion allies can be affected by the <a href="https://wiki.guildwars.com/wiki/Bleeding" rel="noopener" target="_blank" title="Bleeding">bleeding</a> traps and <a href="https://wiki.guildwars.com/wiki/Poison" rel="noopener" target="_blank" title="Poison">poisoned</a> water.</div><div style="margin: 1em; border: solid silver; border-width: 1px 0px; padding: 2px 1em 2px 5em;"><strong class="hiddenlinks" style="position: absolute; margin-left: -4.8em; color: #900;"><a class="image" href="https://wiki.guildwars.com/wiki/File:Bug.png" rel="noopener" target="_blank" title="Bug"><img alt="Bug" data-file-height="32" data-file-width="32" decoding="async" height="18" loading="lazy" src="https://wiki.guildwars.com/images/thumb/7/7d/Bug.png/18px-Bug.png" srcset="/images/thumb/7/7d/Bug.png/27px-Bug.png 1.5x, /images/7/7d/Bug.png 2x" width="18"/></a> <a href="https://wiki.guildwars.com/wiki/Bug" rel="noopener" target="_blank" title="Bug">Bug</a>.</strong> Both the Spear of Archemorus and the Urn of Saint Viktor are supposed to be destroyed at the end of the mission; however, if a player was holding them (or dropped them just before the defeat of the final boss), both can be seen briefly during the cinematic.</div><table class="stdt" style="margin: 5px auto; border: 1px solid #C0C0C0; font-size: 90%; width: 80%; text-align: center;">
+<tbody><tr>
+<th style="background: #7BC; font-size: 110%;"><a class="mw-redirect" href="https://wiki.guildwars.com/wiki/List_of_Factions_missions" rel="noopener" target="_blank" title="List of Factions missions">Factions missions</a>
+</th></tr>
+<tr>
+<td><a href="https://wiki.guildwars.com/wiki/Minister_Cho%27s_Estate" rel="noopener" target="_blank" title="Minister Cho's Estate">Minister Cho's Estate</a> » <a href="https://wiki.guildwars.com/wiki/Zen_Daijun" rel="noopener" target="_blank" title="Zen Daijun">Zen Daijun</a> » <a href="https://wiki.guildwars.com/wiki/Vizunah_Square" rel="noopener" target="_blank" title="Vizunah Square">Vizunah Square</a> » <a href="https://wiki.guildwars.com/wiki/Nahpui_Quarter" rel="noopener" target="_blank" title="Nahpui Quarter">Nahpui Quarter</a> » <a href="https://wiki.guildwars.com/wiki/Tahnnakai_Temple" rel="noopener" target="_blank" title="Tahnnakai Temple">Tahnnakai Temple</a> » <a href="https://wiki.guildwars.com/wiki/Arborstone" rel="noopener" target="_blank" title="Arborstone">Arborstone</a> » <a href="https://wiki.guildwars.com/wiki/Boreas_Seabed" rel="noopener" target="_blank" title="Boreas Seabed">Boreas Seabed</a> » <a class="mw-selflink selflink">Sunjiang District</a> » <a href="https://wiki.guildwars.com/wiki/Gyala_Hatchery" rel="noopener" target="_blank" title="Gyala Hatchery">Gyala Hatchery</a> <i>or</i> <a href="https://wiki.guildwars.com/wiki/The_Eternal_Grove" rel="noopener" target="_blank" title="The Eternal Grove">The Eternal Grove</a> » <a href="https://wiki.guildwars.com/wiki/Unwaking_Waters" rel="noopener" target="_blank" title="Unwaking Waters">Unwaking Waters</a> » <a href="https://wiki.guildwars.com/wiki/Raisu_Palace" rel="noopener" target="_blank" title="Raisu Palace">Raisu Palace</a> » <a href="https://wiki.guildwars.com/wiki/Imperial_Sanctum" rel="noopener" target="_blank" title="Imperial Sanctum">Imperial Sanctum</a>
+</td></tr>
+<tr>
+<td><i><b><a class="mw-redirect" href="https://wiki.guildwars.com/wiki/Challenge_mission" rel="noopener" target="_blank" title="Challenge mission">Challenge</a></b></i><br/><a href="https://wiki.guildwars.com/wiki/Altrumm_Ruins" rel="noopener" target="_blank" title="Altrumm Ruins">Altrumm Ruins</a> <span style="margin: 0em 0.3em;">•</span> <a href="https://wiki.guildwars.com/wiki/Amatz_Basin" rel="noopener" target="_blank" title="Amatz Basin">Amatz Basin</a> <span style="margin: 0em 0.3em;">•</span> <a href="https://wiki.guildwars.com/wiki/The_Aurios_Mines" rel="noopener" target="_blank" title="The Aurios Mines">The Aurios Mines</a> <span style="margin: 0em 0.3em;">•</span> <a href="https://wiki.guildwars.com/wiki/Dragon%27s_Throat" rel="noopener" target="_blank" title="Dragon's Throat">Dragon's Throat</a> <span style="margin: 0em 0.3em;">•</span> <a href="https://wiki.guildwars.com/wiki/Zos_Shivros_Channel" rel="noopener" target="_blank" title="Zos Shivros Channel">Zos Shivros Channel</a>
+</td></tr>
+<tr>
+<td><i><b><a class="mw-redirect" href="https://wiki.guildwars.com/wiki/Competitive_mission" rel="noopener" target="_blank" title="Competitive mission">Competitive</a></b></i><br/><a href="https://wiki.guildwars.com/wiki/Fort_Aspenwood" rel="noopener" target="_blank" title="Fort Aspenwood">Fort Aspenwood</a> <span style="margin: 0em 0.3em;">•</span> <a href="https://wiki.guildwars.com/wiki/The_Jade_Quarry" rel="noopener" target="_blank" title="The Jade Quarry">The Jade Quarry</a>
+</td></tr>
+<tr>
+<td><i><b><a class="mw-redirect" href="https://wiki.guildwars.com/wiki/Elite_mission" rel="noopener" target="_blank" title="Elite mission">Elite</a></b></i><br/><a href="https://wiki.guildwars.com/wiki/The_Deep" rel="noopener" target="_blank" title="The Deep">The Deep</a> <span style="margin: 0em 0.3em;">•</span> <a href="https://wiki.guildwars.com/wiki/Urgoz%27s_Warren" rel="noopener" target="_blank" title="Urgoz's Warren">Urgoz's Warren</a>
+</td></tr></tbody></table> 
+NewPP limit report
+Cached time: 20260720095847
+Cache expiry: 3600
+Reduced expiry: true
+Complications: [show‐toc]
+CPU time usage: 0.105 seconds
+Real time usage: 0.166 seconds
+Preprocessor visited node count: 1162/1000000
+Post‐expand include size: 13102/2097152 bytes
+Template argument size: 1767/2097152 bytes
+Highest expansion depth: 10/100
+Expensive parser function count: 0/100
+Unstrip recursion depth: 0/20
+Unstrip post‐expand size: 4/5000000 bytes
+ExtLoops count: 0/1000
+
+Transclusion expansion time report (%,ms,calls,template)
+100.00%  101.431      1 -total
+ 40.20%   40.775      1 Template:Location_disambiguation_2
+ 22.94%   23.273      8 Template:Ifexists
+ 12.19%   12.360      1 Template:Mission_rewards
+  9.19%    9.322      1 Template:Mission_infobox
+  6.54%    6.638      6 Template:Cost
+  5.41%    5.487      1 Template:Factions_missions
+  4.77%    4.842      3 Template:Mo
+  3.35%    3.396      1 Template:Infobox_campaign_row
+  3.19%    3.232      8 Template:Profession_icon_sizes
+ Saved in parser cache with key en_wiki:pcache:idhash:380-0!canonical and timestamp 20260720095847 and revision id 2706396.</div></div>
+          </section>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="lightbox" id="lightbox" role="dialog" aria-label="Enlarged map">
+    <img src="../maps/factions_08_Sunjiang_District_map.jpg" alt="Sunjiang District mission map (enlarged)" />
+  </div>
+  <script>
+    (function () {
+      var open = document.getElementById("mapOpen");
+      var box = document.getElementById("lightbox");
+      if (!open || !box) return;
+      open.addEventListener("click", function () { box.classList.add("open"); });
+      box.addEventListener("click", function () { box.classList.remove("open"); });
+      document.addEventListener("keydown", function (e) {
+        if (e.key === "Escape") box.classList.remove("open");
+      });
+    })();
+  </script>
+
+</body>
+</html>

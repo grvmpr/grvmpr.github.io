@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Divinity Coast</title>
+  <style>
+:root {
+  --bg-deep: #070a0f;
+  --bg-panel: #101820;
+  --bg-panel-2: #15202c;
+  --border: #243044;
+  --border-glow: #2a4a6a;
+  --text: #dce6f0;
+  --text-muted: #8a9bb0;
+  --text-dim: #5c6f86;
+  --accent: #3ecfff;
+  --accent-soft: rgba(62, 207, 255, 0.12);
+  --gold: #e8c56a;
+  --gold-soft: rgba(232, 197, 106, 0.12);
+  --bonus: #7dffb3;
+  --bonus-soft: rgba(125, 255, 179, 0.1);
+  --danger: #ff6b6b;
+  --danger-soft: rgba(255, 107, 107, 0.1);
+  --hm: #c78bff;
+  --hm-soft: rgba(199, 139, 255, 0.12);
+  --radius: 10px;
+  --font: "Segoe UI", system-ui, -apple-system, sans-serif;
+  --chrome-h: 3.1rem;
+  --gap: 0.5rem;
+  --pad: 0.7rem;
+  /* Readable on 4K vertical (~2160×3840) */
+  --walk-size: clamp(1.05rem, 0.55vw + 0.55vh, 1.35rem);
+  --bonus-size: clamp(1.05rem, 0.55vw + 0.55vh, 1.35rem);
+  --body-size: clamp(0.95rem, 0.4vw + 0.4vh, 1.1rem);
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html {
+  scroll-behavior: smooth;
+  font-size: clamp(16px, 0.55vw + 0.45vh, 20px);
+  height: 100%;
+  scroll-padding-top: calc(var(--chrome-h) + 0.5rem);
+}
+body {
+  font-family: var(--font);
+  background: var(--bg-deep);
+  color: var(--text);
+  line-height: 1.45;
+  min-height: 100%;
+  height: 100%;
+  overflow: hidden;
+  background-image: radial-gradient(ellipse 70% 25% at 50% 0%, rgba(42, 100, 160, 0.14), transparent);
+}
+a { color: var(--accent); text-decoration: none; }
+a:hover { color: #7de0ff; text-decoration: underline; }
+.app {
+  display: grid;
+  grid-template-rows: var(--chrome-h) 1fr;
+  height: 100vh; height: 100dvh;
+  max-height: 100vh; max-height: 100dvh;
+}
+.top-chrome {
+  display: flex; align-items: center; gap: 0.65rem;
+  padding: 0 0.7rem;
+  background: rgba(8, 12, 18, 0.97);
+  border-bottom: 1px solid var(--border);
+  z-index: 100; min-height: var(--chrome-h);
+}
+.brand { display: flex; align-items: baseline; gap: 0.55rem; min-width: 0; flex-shrink: 0; }
+.brand-mission {
+  font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase;
+  color: var(--accent); font-weight: 700; white-space: nowrap;
+}
+.brand-name {
+  font-size: 1.1rem; font-weight: 750; color: var(--text);
+  white-space: nowrap; letter-spacing: -0.02em;
+}
+.brand-meta { font-size: 0.75rem; color: var(--text-dim); white-space: nowrap; }
+.chip-nav {
+  display: flex; flex: 1; gap: 0.3rem; overflow-x: auto;
+  scrollbar-width: none; min-width: 0; justify-content: center;
+}
+.chip-nav::-webkit-scrollbar { display: none; }
+.chip-nav a {
+  flex: 0 0 auto; padding: 0.3rem 0.65rem; border-radius: 999px;
+  font-size: 0.78rem; font-weight: 600; color: var(--text-muted);
+  background: var(--bg-panel); border: 1px solid var(--border);
+  text-decoration: none; white-space: nowrap;
+}
+.chip-nav a:hover {
+  color: var(--text); border-color: var(--border-glow);
+  background: #1a2836; text-decoration: none;
+}
+.chip-nav a[href="#map"] { color: var(--accent); border-color: rgba(62, 207, 255, 0.35); }
+.chip-nav a[href="#bonus"] { color: var(--bonus); border-color: rgba(125, 255, 179, 0.3); }
+.chip-nav a[href="#hard-mode"] { color: var(--hm); border-color: rgba(199, 139, 255, 0.3); }
+.chip-nav a[href="#bosses"] { color: #ff9a9a; border-color: rgba(255, 107, 107, 0.3); }
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 0.3rem;
+  padding: 0.42rem 0.85rem; border-radius: 8px; font-weight: 650; font-size: 0.8rem;
+  border: none; cursor: pointer; text-decoration: none; white-space: nowrap; flex-shrink: 0;
+}
+.btn:hover { text-decoration: none; }
+.btn-next {
+  background: linear-gradient(135deg, #1a6a9a, #1ab0e0); color: #fff;
+  box-shadow: 0 2px 12px rgba(26, 140, 200, 0.35);
+}
+.btn-next:hover { color: #fff; filter: brightness(1.08); }
+.btn-wiki, .btn-idx, .btn-prev {
+  background: var(--bg-panel); color: var(--text-muted);
+  border: 1px solid var(--border); padding: 0.42rem 0.65rem;
+}
+.btn-wiki:hover, .btn-idx:hover, .btn-prev:hover {
+  color: var(--accent); border-color: var(--border-glow);
+}
+.chrome-actions { display: flex; gap: 0.35rem; flex-shrink: 0; }
+
+/* Map-dominant workspace */
+.workspace {
+  display: grid;
+  grid-template-columns: minmax(480px, 1.15fr) minmax(0, 1fr);
+  grid-template-rows: 1fr;
+  gap: var(--gap); padding: var(--gap);
+  min-height: 0; height: 100%; overflow: hidden;
+}
+.col-map {
+  display: grid;
+  grid-template-rows: 1fr auto;
+  gap: var(--gap);
+  min-height: 0; min-width: 0;
+}
+.col-main {
+  display: grid;
+  /* objectives compact | walkthrough HUGE | bonus+hm | bosses+tips */
+  grid-template-rows: auto minmax(0, 1.6fr) minmax(0, 1.05fr) minmax(0, 0.75fr);
+  gap: var(--gap); min-height: 0; min-width: 0; overflow: hidden;
+}
+.row-obj { min-height: 0; }
+.row-bonus-hm {
+  display: grid; grid-template-columns: 1.15fr 0.85fr; gap: var(--gap); min-height: 0;
+}
+.row-lower {
+  display: grid; grid-template-columns: 1.15fr 0.85fr; gap: var(--gap); min-height: 0;
+}
+.panel {
+  background: var(--bg-panel); border: 1px solid var(--border); border-radius: var(--radius);
+  padding: var(--pad); display: flex; flex-direction: column; min-height: 0; overflow: hidden;
+}
+.panel-scroll {
+  overflow-y: auto; overflow-x: hidden; min-height: 0; flex: 1; padding-right: 0.3rem;
+  scrollbar-width: thin; scrollbar-color: var(--border) transparent;
+  font-size: var(--body-size);
+}
+.panel-scroll::-webkit-scrollbar { width: 8px; }
+.panel-scroll::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+.panel-title {
+  display: flex; align-items: center; gap: 0.4rem;
+  font-size: 0.82rem; font-weight: 750; letter-spacing: 0.05em; text-transform: uppercase;
+  color: var(--text); margin-bottom: 0.45rem; padding-bottom: 0.35rem;
+  border-bottom: 1px solid var(--border); flex-shrink: 0;
+}
+.panel-title .icon {
+  width: 1.3rem; height: 1.3rem; border-radius: 5px;
+  display: inline-flex; align-items: center; justify-content: center; font-size: 0.75rem;
+}
+.panel.map-panel {
+  border-color: var(--border-glow);
+  background: linear-gradient(180deg, #0e1620 0%, var(--bg-panel) 100%);
+  /* Map takes almost all left column */
+  min-height: 0;
+}
+.panel.objectives { border-top: 2px solid var(--accent); }
+.panel.walkthrough { border-top: 3px solid #5eb8e8; }
+.panel.bonus { border-top: 3px solid var(--bonus); }
+.panel.hard-mode { border-top: 2px solid var(--hm); }
+.panel.bosses { border-top: 2px solid var(--danger); }
+.panel.other { border-top: 2px solid var(--text-muted); }
+
+/* Emphasized reading panels */
+.panel.walkthrough .panel-scroll,
+.panel.walkthrough .wiki-block {
+  font-size: var(--walk-size) !important;
+  line-height: 1.55;
+}
+.panel.bonus .panel-scroll,
+.panel.bonus .wiki-block {
+  font-size: var(--bonus-size) !important;
+  line-height: 1.55;
+}
+.panel.walkthrough .panel-scroll li,
+.panel.bonus .panel-scroll li {
+  margin-bottom: 0.45rem;
+}
+.panel.walkthrough .panel-scroll p,
+.panel.bonus .panel-scroll p {
+  margin-bottom: 0.55rem;
+}
+
+.icon-map { background: var(--accent-soft); color: var(--accent); }
+.icon-obj { background: var(--accent-soft); color: var(--accent); }
+.icon-walk { background: rgba(94, 184, 232, 0.15); color: #5eb8e8; }
+.icon-bonus { background: var(--bonus-soft); color: var(--bonus); }
+.icon-hm { background: var(--hm-soft); color: var(--hm); }
+.icon-boss { background: var(--danger-soft); color: var(--danger); }
+.icon-other { background: rgba(138, 155, 176, 0.15); color: var(--text-muted); }
+
+.map-wrap {
+  flex: 1; min-height: 0; display: flex; flex-direction: column;
+  align-items: center; justify-content: center; gap: 0.4rem;
+}
+.map-frame {
+  flex: 1; min-height: 0; width: 100%;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: 10px; overflow: hidden;
+  border: 2px solid var(--border-glow);
+  box-shadow: 0 0 0 1px rgba(62, 207, 255, 0.1), 0 12px 40px rgba(0, 0, 0, 0.45);
+  background: #05080c; cursor: zoom-in;
+}
+.map-frame img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  image-rendering: auto;
+}
+.map-caption { font-size: 0.72rem; color: var(--text-dim); flex-shrink: 0; }
+.map-missing {
+  color: var(--text-dim); font-size: 1rem; text-align: center; padding: 2rem;
+}
+
+.wiki-block ul, .panel-scroll ul,
+.wiki-block ol, .panel-scroll ol { padding-left: 1.2rem; margin: 0.3rem 0 0.5rem; }
+.wiki-block li, .panel-scroll li { margin-bottom: 0.32rem; }
+.wiki-block p, .panel-scroll p { margin-bottom: 0.45rem; }
+.wiki-block img, .panel-scroll img { vertical-align: middle; max-height: 1.35em; width: auto; }
+.wiki-block table, .panel-scroll table {
+  width: 100%; border-collapse: collapse; font-size: 0.9em; margin: 0.4rem 0;
+}
+.wiki-block th, .wiki-block td, .panel-scroll th, .panel-scroll td {
+  border: 1px solid var(--border); padding: 0.3rem 0.45rem; text-align: left;
+}
+.lede { font-size: 0.92rem; color: var(--text-muted); margin-bottom: 0.35rem; }
+
+/* Collapsed summary */
+details.summary-details {
+  background: var(--bg-panel);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  border-top: 2px solid var(--gold);
+  padding: 0.35rem 0.65rem;
+  flex-shrink: 0;
+}
+details.summary-details summary {
+  cursor: pointer;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--gold);
+  padding: 0.35rem 0;
+  list-style: none;
+}
+details.summary-details summary::-webkit-details-marker { display: none; }
+details.summary-details summary::before {
+  content: "▸ ";
+  color: var(--text-dim);
+}
+details.summary-details[open] summary::before { content: "▾ "; }
+details.summary-details .summary-body {
+  padding: 0.35rem 0 0.55rem;
+  font-size: 0.88rem;
+  color: var(--text-muted);
+  max-height: 18vh;
+  overflow-y: auto;
+}
+
+.boss-note { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.4rem; }
+.boss-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.4rem; }
+.boss-card {
+  background: var(--bg-panel-2); border: 1px solid var(--border);
+  border-radius: 8px; padding: 0.5rem 0.6rem;
+}
+.boss-card-head { font-size: 0.95rem; margin-bottom: 0.2rem; }
+.boss-card-head a { color: #eef6fc; font-weight: 700; }
+.boss-card-head a:hover { color: var(--accent); }
+.boss-elite { font-size: 0.88rem; }
+.elite-label { color: var(--gold); font-weight: 650; margin-right: 0.25rem; }
+.elite-link { color: #ffd78a; font-weight: 650; }
+.elite-link:hover { color: #ffe9b5; }
+.elite-none { color: var(--text-dim); font-style: italic; font-size: 0.85rem; }
+.boss-meta { font-size: 0.78rem; color: var(--text-dim); margin-top: 0.15rem; }
+
+.callout {
+  margin-top: 0.4rem; padding: 0.45rem 0.6rem; border-radius: 6px;
+  font-size: 0.88rem; border-left: 3px solid; line-height: 1.4;
+}
+.callout.tip { background: var(--accent-soft); border-color: var(--accent); color: #b8eaff; }
+.callout.warn { background: var(--danger-soft); border-color: var(--danger); color: #ffb4b4; }
+
+.lightbox {
+  display: none; position: fixed; inset: 0; z-index: 1000; background: rgba(0,0,0,0.94);
+  align-items: center; justify-content: center; padding: 1.5rem; cursor: zoom-out;
+}
+.lightbox.open { display: flex; }
+.lightbox img {
+  max-width: 96vw; max-height: 96vh; border-radius: 8px;
+  border: 2px solid var(--border-glow); object-fit: contain;
+}
+
+@media (min-height: 2400px) {
+  :root {
+    --walk-size: clamp(1.15rem, 0.7vh + 0.3vw, 1.5rem);
+    --bonus-size: clamp(1.15rem, 0.7vh + 0.3vw, 1.5rem);
+    --gap: 0.65rem;
+    --pad: 0.85rem;
+  }
+  .workspace { grid-template-columns: minmax(560px, 1.2fr) minmax(0, 1fr); }
+}
+@media (min-width: 1800px) and (min-height: 2000px) {
+  .workspace { grid-template-columns: minmax(600px, 1.25fr) minmax(0, 1fr); }
+}
+@media (max-height: 1100px) {
+  body { overflow: auto; height: auto; }
+  .app { height: auto; max-height: none; min-height: 100vh; }
+  .workspace {
+    height: auto; overflow: visible; grid-template-columns: 1fr; grid-template-rows: auto;
+  }
+  .col-map { grid-template-rows: auto; }
+  .col-main { overflow: visible; grid-template-rows: auto; }
+  .row-bonus-hm, .row-lower { grid-template-columns: 1fr; }
+  .panel { max-height: none; overflow: visible; }
+  .panel-scroll { overflow: visible; }
+  .map-frame { min-height: 360px; max-height: 55vh; }
+}
+
+    :root { --accent: #3ecfff; --accent-soft: #3ecfff22; }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header class="top-chrome">
+      <div class="brand">
+        <span class="brand-mission">M9</span>
+        <span class="brand-name">Divinity Coast</span>
+        <span class="brand-meta">Prophecies · Kryta · Cooperative · Medium</span>
+      </div>
+      <nav class="chip-nav" aria-label="Sections">
+        <a href="#map">Map</a>
+        <a href="#walkthrough">Walkthrough</a>
+        <a href="#bonus">Bonus</a>
+        <a href="#objectives">Objectives</a>
+        <a href="#hard-mode">Hard Mode</a>
+        <a href="#bosses">Bosses</a>
+        <a href="#other">Tips</a>
+      </nav>
+      <div class="chrome-actions">
+        <a class="btn btn-idx" href="../prohecies.html">Index</a>
+        <a class="btn btn-prev" href="8_DAlessio_Seaboard.html">← Prev</a>
+        <a class="btn btn-wiki" href="https://wiki.guildwars.com/wiki/Divinity_Coast" target="_blank" rel="noopener">Wiki ↗</a>
+        <a class="btn btn-next" href="10_The_Wilds.html">Next: The Wilds →</a>
+      </div>
+    </header>
+
+    <div class="workspace">
+      <div class="col-map">
+        <section class="panel map-panel" id="map">
+          <h2 class="panel-title"><span class="icon icon-map">◉</span> Mission Map</h2>
+          <div class="map-wrap">
+            <div class="map-frame" id="mapOpen" title="Click to enlarge">
+              <img src="../maps/prophecies_09_Divinity_Coast_map.jpg" alt="Divinity Coast mission map" />
+            </div>
+            <p class="map-caption">Click to enlarge · Local cache · <a href="https://wiki.guildwars.com/wiki/Divinity_Coast" target="_blank" rel="noopener">Wiki</a></p>
+        </div>
+        </section>
+
+        <details class="summary-details" id="summary">
+          <summary>Summary (click to expand)</summary>
+          <div class="summary-body">
+            <p>As a member of the White Mantle , you&#x27;ve been asked to take the Eye of Janthir to Loamhurst .</p>
+            <p style="margin-top:0.4rem;"><strong>Region:</strong> Kryta · <strong>Mission:</strong> 9 of 25 · <strong>Type:</strong> Cooperative</p>
+            <p style="margin-top:0.35rem;"><a href="https://wiki.guildwars.com/wiki/Divinity_Coast" target="_blank" rel="noopener">Full wiki article ↗</a></p>
+          </div>
+        </details>
+      </div>
+
+      <div class="col-main">
+        <section class="panel objectives row-obj" id="objectives">
+          <h2 class="panel-title"><span class="icon icon-obj">✓</span> Objectives</h2>
+          <div class="panel-scroll wiki-block"><p>Administer the <a href="https://wiki.guildwars.com/wiki/Test_of_the_Chosen" rel="noopener" target="_blank" title="Test of the Chosen">Test of the Chosen</a>.
+</p><ul><li>Retrieve the <a href="https://wiki.guildwars.com/wiki/Eye_of_Janthir" rel="noopener" target="_blank" title="Eye of Janthir">Eye of Janthir</a> from <a href="https://wiki.guildwars.com/wiki/Justiciar_Hablion" rel="noopener" target="_blank" title="Justiciar Hablion">Justiciar Hablion</a> in the upper courtyard of <a href="https://wiki.guildwars.com/wiki/Shaemoor" rel="noopener" target="_blank" title="Shaemoor">Shaemoor</a>.</li>
+<li>Deliver the Eye to the coastal city of <a href="https://wiki.guildwars.com/wiki/Loamhurst" rel="noopener" target="_blank" title="Loamhurst">Loamhurst</a>.</li>
+<li>ADDED: Cleanse yourself in the <a href="https://wiki.guildwars.com/wiki/Fountain_of_Truth" rel="noopener" target="_blank" title="Fountain of Truth">Fountain of Truth</a> on the hill to the southeast.</li>
+<li>*<a class="mw-redirect" href="https://wiki.guildwars.com/wiki/Bonus" rel="noopener" target="_blank" title="Bonus">BONUS</a>* Find and escort all the <a href="https://wiki.guildwars.com/wiki/Chosen" rel="noopener" target="_blank" title="Chosen">chosen</a> to Loamhurst.</li></ul></div>
+        </section>
+
+        <section class="panel walkthrough" id="walkthrough">
+          <h2 class="panel-title"><span class="icon icon-walk">→</span> Walkthrough</h2>
+          <div class="panel-scroll wiki-block"><p><a href="https://wiki.guildwars.com/wiki/Shaemoor" rel="noopener" target="_blank" title="Shaemoor">Shaemoor</a> is a short trip ahead from the start point. <a href="https://wiki.guildwars.com/wiki/Justiciar_Hablion" rel="noopener" target="_blank" title="Justiciar Hablion">Justiciar Hablion</a> will be waiting for you there, and speaking to him will trigger a <a href="https://wiki.guildwars.com/wiki/Cinematic" rel="noopener" target="_blank" title="Cinematic">cinematic</a> which points you towards the <a href="https://wiki.guildwars.com/wiki/Fountain_of_Truth" rel="noopener" target="_blank" title="Fountain of Truth">Fountain of Truth</a> where you will cleanse yourself by simply standing on it to receive the <a href="https://wiki.guildwars.com/wiki/Cleansed" rel="noopener" target="_blank" title="Cleansed">cleansed</a> effect. Return to Hablion and acquire the <a href="https://wiki.guildwars.com/wiki/Eye_of_Janthir" rel="noopener" target="_blank" title="Eye of Janthir">Eye of Janthir</a>. The eye will follow any cleansed party members and help you distinguish the Chosen from amongst the villagers. Those villagers who pass the test will now follow you to Loamhurst.
+</p><p>Head to the western gate in Shaemoor to continue. Head southwest to the bridge. While engaging foes, the Eye will assist by inflicting an area of effect <a class="mw-redirect" href="https://wiki.guildwars.com/wiki/Knockdown" rel="noopener" target="_blank" title="Knockdown">knockdown</a> using <a href="https://wiki.guildwars.com/wiki/Janthir%27s_Gaze" rel="noopener" target="_blank" title="Janthir's Gaze">Janthir's Gaze</a>.
+</p><p>After crossing the high bridge, you'll find a caravan of merchants under attack. If you save the merchants, each one rescued will grant your party a 2% <a class="mw-redirect" href="https://wiki.guildwars.com/wiki/Morale_boost" rel="noopener" target="_blank" title="Morale boost">morale boost</a>. (The villagers that appear in the party list are involved in the bonus task and do not give morale boosts.)
+</p><p>Keep walking west until you reach the second Tengu boss on the border of the swamp, and then head north through the Undead until you reach <a href="https://wiki.guildwars.com/wiki/Loamhurst" rel="noopener" target="_blank" title="Loamhurst">Loamhurst</a>. Before taking the Eye to the pedestal, talking to <a href="https://wiki.guildwars.com/wiki/Lionguard_Minah" rel="noopener" target="_blank" title="Lionguard Minah">Lionguard Minah</a> will reward your party for any Chosen delivered to him.
+</p></div>
+        </section>
+
+        <div class="row-bonus-hm">
+          <section class="panel bonus" id="bonus">
+            <h2 class="panel-title"><span class="icon icon-bonus">★</span> Bonus</h2>
+            <div class="panel-scroll wiki-block"><p>To complete the bonus you need to rescue all five of the Chosen and escort them to Loamhurst unharmed. Chosen villagers will be added to the bottom of your party list as allies, which will help you tell which ones need to be saved. The second and fifth Chosen will be under attack by tengu immediately upon entering compass range, and the third and fourth will be dangerously close to wandering foes as well. Players should bring skills to assist in quickly killing the attackers or saving the Chosen with heals. Skills that hinder enemies at a distance (such as <a href="https://wiki.guildwars.com/wiki/Ineptitude" rel="noopener" target="_blank" title="Ineptitude">Ineptitude</a>) are useful, as are <a href="https://wiki.guildwars.com/wiki/Speed_boost" rel="noopener" target="_blank" title="Speed boost">speed boosts</a>. Moving into close range to take advantage of <a href="https://wiki.guildwars.com/wiki/Janthir%27s_Gaze" rel="noopener" target="_blank" title="Janthir's Gaze">Janthir's Gaze</a> can significantly reduce the enemy's damage output. While fighting, don't forget about the Chosen you have already saved, since they can be attacked as you rush to the defence of the new Chosen.
+</p><p>The Chosen villagers and merchants are only added to the party list once a player enters compass range. Because of this, flagging heroes and henchmen to the locations of the Chosen using the <a href="https://wiki.guildwars.com/wiki/Mission_Map" rel="noopener" target="_blank" title="Mission Map">Mission Map</a> before the player enters compass range provides a very easy way to ensure survival of the Chosen. Moreover, the already saved Chosen will stay with the player and therefore be less vulnerable.
+</p><ul class="gallery mw-gallery-traditional" style="max-width: 772px;">
+<li class="gallerybox" style="width: 185px"><div style="width: 185px">
+<div class="thumb" style="width: 180px;"><div style="margin:15px auto;"><a class="image" href="https://wiki.guildwars.com/wiki/File:Divinity_Coast_Bonus_Villager_2.jpg" rel="noopener" target="_blank"><img alt="Divinity Coast Bonus Villager 2.jpg" data-file-height="379" data-file-width="355" decoding="async" height="150" loading="lazy" src="https://wiki.guildwars.com/images/thumb/d/da/Divinity_Coast_Bonus_Villager_2.jpg/140px-Divinity_Coast_Bonus_Villager_2.jpg" srcset="/images/thumb/d/da/Divinity_Coast_Bonus_Villager_2.jpg/211px-Divinity_Coast_Bonus_Villager_2.jpg 1.5x, /images/thumb/d/da/Divinity_Coast_Bonus_Villager_2.jpg/281px-Divinity_Coast_Bonus_Villager_2.jpg 2x" width="140"/></a></div></div>
+<div class="gallerytext">
+</div>
+</div></li>
+<li class="gallerybox" style="width: 185px"><div style="width: 185px">
+<div class="thumb" style="width: 180px;"><div style="margin:15px auto;"><a class="image" href="https://wiki.guildwars.com/wiki/File:Divinity_Coast_Bonus_Villager_3.jpg" rel="noopener" target="_blank"><img alt="Divinity Coast Bonus Villager 3.jpg" data-file-height="267" data-file-width="230" decoding="async" height="150" loading="lazy" src="https://wiki.guildwars.com/images/thumb/3/39/Divinity_Coast_Bonus_Villager_3.jpg/129px-Divinity_Coast_Bonus_Villager_3.jpg" srcset="/images/thumb/3/39/Divinity_Coast_Bonus_Villager_3.jpg/194px-Divinity_Coast_Bonus_Villager_3.jpg 1.5x, /images/3/39/Divinity_Coast_Bonus_Villager_3.jpg 2x" width="129"/></a></div></div>
+<div class="gallerytext">
+</div>
+</div></li>
+<li class="gallerybox" style="width: 185px"><div style="width: 185px">
+<div class="thumb" style="width: 180px;"><div style="margin:15px auto;"><a class="image" href="https://wiki.guildwars.com/wiki/File:Divinity_Coast_Bonus_Villager_4.jpg" rel="noopener" target="_blank"><img alt="Divinity Coast Bonus Villager 4.jpg" data-file-height="324" data-file-width="296" decoding="async" height="150" loading="lazy" src="https://wiki.guildwars.com/images/thumb/e/ed/Divinity_Coast_Bonus_Villager_4.jpg/137px-Divinity_Coast_Bonus_Villager_4.jpg" srcset="/images/thumb/e/ed/Divinity_Coast_Bonus_Villager_4.jpg/206px-Divinity_Coast_Bonus_Villager_4.jpg 1.5x, /images/thumb/e/ed/Divinity_Coast_Bonus_Villager_4.jpg/274px-Divinity_Coast_Bonus_Villager_4.jpg 2x" width="137"/></a></div></div>
+<div class="gallerytext">
+</div>
+</div></li>
+<li class="gallerybox" style="width: 185px"><div style="width: 185px">
+<div class="thumb" style="width: 180px;"><div style="margin:15px auto;"><a class="image" href="https://wiki.guildwars.com/wiki/File:Divinity_Coast_Bonus_Villager_5.jpg" rel="noopener" target="_blank"><img alt="Divinity Coast Bonus Villager 5.jpg" data-file-height="324" data-file-width="294" decoding="async" height="150" loading="lazy" src="https://wiki.guildwars.com/images/thumb/8/80/Divinity_Coast_Bonus_Villager_5.jpg/136px-Divinity_Coast_Bonus_Villager_5.jpg" srcset="/images/thumb/8/80/Divinity_Coast_Bonus_Villager_5.jpg/204px-Divinity_Coast_Bonus_Villager_5.jpg 1.5x, /images/thumb/8/80/Divinity_Coast_Bonus_Villager_5.jpg/272px-Divinity_Coast_Bonus_Villager_5.jpg 2x" width="136"/></a></div></div>
+<div class="gallerytext">
+</div>
+</div></li>
+</ul><p>After saving the Chosen, the party leader must get close to them to make them follow; it is not enough just to have the Eye of Janthir reveal them as Chosen. The second Chosen also will not follow the party until he has been spoken to and the bonus objective has been displayed.
+</p><p>Once all five have been secured, there will still be a short trip towards Loamhurst through an area with poisoned water and undead; avoid letting the Chosen step in the swamp water. Finally, you must talk to <a href="https://wiki.guildwars.com/wiki/Lionguard_Minah" rel="noopener" target="_blank" title="Lionguard Minah">Lionguard Minah</a> or else you will lose the bonus by skipping to the end of the mission. Make sure all five are with you or the game will consider you have lost one during your way towards the bonus claim. The names of Chosen in the party window will become greyed out if they have been left behind.
+</p></div>
+          </section>
+          <section class="panel hard-mode" id="hard-mode">
+            <h2 class="panel-title"><span class="icon icon-hm">◆</span> Hard Mode</h2>
+            <div class="panel-scroll wiki-block"><p>The Chosen lose health in Hard mode much faster and getting to them in time may pose a problem. Consider bringing <a href="https://wiki.guildwars.com/wiki/Speed_boost" rel="noopener" target="_blank" title="Speed boost">skills that increase the party's movement speed</a>, as well as niche skills such as <a href="https://wiki.guildwars.com/wiki/Ebon_Escape" rel="noopener" target="_blank" title="Ebon Escape">Ebon Escape</a>. As all the Chosen will primarily be targeted by melee attacks, also consider skills as <a href="https://wiki.guildwars.com/wiki/Gust" rel="noopener" target="_blank" title="Gust">Gust</a> and <a href="https://wiki.guildwars.com/wiki/Withering_Aura" rel="noopener" target="_blank" title="Withering Aura">Withering Aura</a> that can keep these targets from dying. Finally, a decent <a href="https://wiki.guildwars.com/wiki/Healer" rel="noopener" target="_blank" title="Healer">healer</a> is most likely crucial to keep the Chosen alive throughout the mission. Taking an AoE skill will cause the enemies to scatter and change targets, which can help protect the Chosen.
+</p><p>If you can successfully rescue the Chosen from their initial attackers but struggle to keep them alive during the rest of the journey, you can avoid approaching them as the party leader so that they will not follow the party, then double back to collect them once the road to Loamhurst is clear. Remember that the first Chosen in Shaemoor is very close to the Eye's initial location, so you will need to keep to the left as you descend the stairs if you intend to use this strategy.
+</p></div>
+          </section>
+        </div>
+
+        <div class="row-lower">
+          <section class="panel bosses" id="bosses">
+            <h2 class="panel-title"><span class="icon icon-boss">☠</span> Bosses &amp; Elites</h2>
+            <div class="panel-scroll"><div class='boss-grid'>
+<article class="boss-card">
+  <div class="boss-card-head"><a href="https://wiki.guildwars.com/wiki/Fluum_Banzo" target="_blank" rel="noopener"><strong>Fluum Banzo</strong></a></div>
+  <div class="boss-elite"><span class="elite-none">Elite: None / not listed</span></div>
+  <div class="boss-meta">18 (28)</div>
+</article>
+<article class="boss-card">
+  <div class="boss-card-head"><a href="https://wiki.guildwars.com/wiki/Gren_Waveslosh" target="_blank" rel="noopener"><strong>Gren Waveslosh</strong></a></div>
+  <div class="boss-elite"><span class="elite-none">Elite: None / not listed</span></div>
+  <div class="boss-meta">18 (28)</div>
+</article>
+<article class="boss-card">
+  <div class="boss-card-head"><a href="https://wiki.guildwars.com/wiki/Frak_Undertow" target="_blank" rel="noopener"><strong>Frak Undertow</strong></a></div>
+  <div class="boss-elite"><span class="elite-none">Elite: None / not listed</span></div>
+  <div class="boss-meta">18 (28)</div>
+</article>
+<article class="boss-card">
+  <div class="boss-card-head"><a href="https://wiki.guildwars.com/wiki/Sky_Quickfeather" target="_blank" rel="noopener"><strong>Sky Quickfeather</strong></a></div>
+  <div class="boss-elite"><span class="elite-none">Elite: None / not listed</span></div>
+  <div class="boss-meta">18 (28)</div>
+</article>
+<article class="boss-card">
+  <div class="boss-card-head"><a href="https://wiki.guildwars.com/wiki/Dyv_Cloudclaw" target="_blank" rel="noopener"><strong>Dyv Cloudclaw</strong></a></div>
+  <div class="boss-elite"><span class="elite-none">Elite: None / not listed</span></div>
+  <div class="boss-meta">18 (28)</div>
+</article>
+<article class="boss-card">
+  <div class="boss-card-head"><a href="https://wiki.guildwars.com/wiki/Glyd_Swiftwing" target="_blank" rel="noopener"><strong>Glyd Swiftwing</strong></a></div>
+  <div class="boss-elite"><span class="elite-none">Elite: None / not listed</span></div>
+  <div class="boss-meta">18 (28)</div>
+</article>
+<article class="boss-card">
+  <div class="boss-card-head"><a href="https://wiki.guildwars.com/wiki/Ghita_Bonz" target="_blank" rel="noopener"><strong>Ghita Bonz</strong></a></div>
+  <div class="boss-elite"><span class="elite-none">Elite: None / not listed</span></div>
+  <div class="boss-meta">16 (28)</div>
+</article>
+<article class="boss-card">
+  <div class="boss-card-head"><a href="https://wiki.guildwars.com/wiki/Raja_Crux" target="_blank" rel="noopener"><strong>Raja Crux</strong></a></div>
+  <div class="boss-elite"><span class="elite-none">Elite: None / not listed</span></div>
+  <div class="boss-meta">17 (28)</div>
+</article>
+<article class="boss-card">
+  <div class="boss-card-head"><a href="https://wiki.guildwars.com/wiki/Bija_Gravewailer" target="_blank" rel="noopener"><strong>Bija Gravewailer</strong></a></div>
+  <div class="boss-elite"><span class="elite-none">Elite: None / not listed</span></div>
+  <div class="boss-meta">17 (28)</div>
+</article>
+<article class="boss-card">
+  <div class="boss-card-head"><a href="https://wiki.guildwars.com/wiki/Najja_Doombringer" target="_blank" rel="noopener"><strong>Najja Doombringer</strong></a></div>
+  <div class="boss-elite"><span class="elite-none">Elite: None / not listed</span></div>
+  <div class="boss-meta">17 (28)</div>
+</article>
+<article class="boss-card">
+  <div class="boss-card-head"><a href="https://wiki.guildwars.com/wiki/Zameel_Dirge" target="_blank" rel="noopener"><strong>Zameel Dirge</strong></a></div>
+  <div class="boss-elite"><span class="elite-none">Elite: None / not listed</span></div>
+  <div class="boss-meta">17 (28)</div>
+</article>
+<article class="boss-card">
+  <div class="boss-card-head"><a href="https://wiki.guildwars.com/wiki/Zukra_Cadava" target="_blank" rel="noopener"><strong>Zukra Cadava</strong></a></div>
+  <div class="boss-elite"><span class="elite-none">Elite: None / not listed</span></div>
+  <div class="boss-meta">17 (28)</div>
+</article>
+</div></div>
+          </section>
+          <section class="panel other" id="other">
+            <h2 class="panel-title"><span class="icon icon-other">✦</span> Tips &amp; Notes</h2>
+            <div class="panel-scroll"><h3 style='font-size:0.8rem;color:var(--accent);margin:0.3rem 0;'>Skill recommendations</h3><div class='wiki-block'><ul><li>Complete exploration of this mission contributes approximately 1.0% to the Tyrian <a href="https://wiki.guildwars.com/wiki/Cartographer" rel="noopener" target="_blank" title="Cartographer">Cartographer</a> title.
+<ul><li>Crossing the river without using the bridge can jeopardise the bonus objective, since the additional tengu foes on alternative routes might block you from rescuing a vulnerable Chosen villager.</li></ul></li>
+<li>After completing this mission, your party will be taken to <a href="https://wiki.guildwars.com/wiki/Druid%27s_Overlook" rel="noopener" target="_blank" title="Druid's Overlook">Druid's Overlook</a>.</li>
+<li>When approaching the Fountain of Truth, the soundtrack Droknar's Forge will play in place of the usual Krytan soundtracks.</li>
+<li>Completion of this mission will fill in page #2 of <a href="https://wiki.guildwars.com/wiki/The_Flameseeker_Prophecies" rel="noopener" target="_blank" title="The Flameseeker Prophecies">The Flameseeker Prophecies</a> <a href="https://wiki.guildwars.com/wiki/Storybook" rel="noopener" target="_blank" title="Storybook">storybook</a>.</li></ul><div style="margin: 1em; border: solid silver; border-width: 1px 0px; padding: 2px 1em 2px 5em;"><strong class="hiddenlinks" style="position: absolute; margin-left: -4.8em; color: #900;"><a class="image" href="https://wiki.guildwars.com/wiki/File:Bug.png" rel="noopener" target="_blank" title="Bug"><img alt="Bug" data-file-height="32" data-file-width="32" decoding="async" height="18" loading="lazy" src="https://wiki.guildwars.com/images/thumb/7/7d/Bug.png/18px-Bug.png" srcset="/images/thumb/7/7d/Bug.png/27px-Bug.png 1.5x, /images/7/7d/Bug.png 2x" width="18"/></a> <a href="https://wiki.guildwars.com/wiki/Bug" rel="noopener" target="_blank" title="Bug">Bug</a>.</strong>The objectives fail to state that one must talk to Lionguard Minah to complete the bonus.</div><div style="margin: 1em; border: solid silver; border-width: 1px 0px; padding: 2px 1em 2px 5em;"><strong class="hiddenlinks" style="position: absolute; margin-left: -4.8em; color: #900;"><a class="image" href="https://wiki.guildwars.com/wiki/File:Bug.png" rel="noopener" target="_blank" title="Bug"><img alt="Bug" data-file-height="32" data-file-width="32" decoding="async" height="18" loading="lazy" src="https://wiki.guildwars.com/images/thumb/7/7d/Bug.png/18px-Bug.png" srcset="/images/thumb/7/7d/Bug.png/27px-Bug.png 1.5x, /images/7/7d/Bug.png 2x" width="18"/></a> <a href="https://wiki.guildwars.com/wiki/Bug" rel="noopener" target="_blank" title="Bug">Bug</a>.</strong>Sometimes the Eye will disappear if you separate too far from a human companion you're running the mission with.</div><div style="margin: 1em; border: solid silver; border-width: 1px 0px; padding: 2px 1em 2px 7.5em;"><strong class="hiddenlinks" style="position: absolute; margin-left: -7.3em; color: #900;"><a class="image" href="https://wiki.guildwars.com/wiki/File:Anomaly.png" rel="noopener" target="_blank" title="Anomaly"><img alt="Anomaly" data-file-height="32" data-file-width="32" decoding="async" height="18" loading="lazy" src="https://wiki.guildwars.com/images/thumb/a/a6/Anomaly.png/18px-Anomaly.png" srcset="/images/thumb/a/a6/Anomaly.png/27px-Anomaly.png 1.5x, /images/a/a6/Anomaly.png 2x" width="18"/></a> <a class="mw-redirect" href="https://wiki.guildwars.com/wiki/Anomaly" rel="noopener" target="_blank" title="Anomaly">Anomaly</a>.</strong>When fighting the <a href="https://wiki.guildwars.com/wiki/Mergoyle_Wavebreaker" rel="noopener" target="_blank" title="Mergoyle Wavebreaker">Mergoyle Wavebreakers</a> at the cleansing fountain, a White Mantle Abbot, assumed to be running around panicking about the Mergoyles, will intentionally heal them with <a href="https://wiki.guildwars.com/wiki/Heal_Other" rel="noopener" target="_blank" title="Heal Other">Heal Other</a>.</div><div style="margin: 1em; border: solid silver; border-width: 1px 0px; padding: 2px 1em 2px 7.5em;"><strong class="hiddenlinks" style="position: absolute; margin-left: -7.3em; color: #900;"><a class="image" href="https://wiki.guildwars.com/wiki/File:Anomaly.png" rel="noopener" target="_blank" title="Anomaly"><img alt="Anomaly" data-file-height="32" data-file-width="32" decoding="async" height="18" loading="lazy" src="https://wiki.guildwars.com/images/thumb/a/a6/Anomaly.png/18px-Anomaly.png" srcset="/images/thumb/a/a6/Anomaly.png/27px-Anomaly.png 1.5x, /images/a/a6/Anomaly.png 2x" width="18"/></a> <a class="mw-redirect" href="https://wiki.guildwars.com/wiki/Anomaly" rel="noopener" target="_blank" title="Anomaly">Anomaly</a>.</strong>While up to five chosen are saved during the mission, the end cutscene only has four.</div><div style="margin: 1em; border: solid silver; border-width: 1px 0px; padding: 2px 1em 2px 7.5em;"><strong class="hiddenlinks" style="position: absolute; margin-left: -7.3em; color: #900;"><a class="image" href="https://wiki.guildwars.com/wiki/File:Anomaly.png" rel="noopener" target="_blank" title="Anomaly"><img alt="Anomaly" data-file-height="32" data-file-width="32" decoding="async" height="18" loading="lazy" src="https://wiki.guildwars.com/images/thumb/a/a6/Anomaly.png/18px-Anomaly.png" srcset="/images/thumb/a/a6/Anomaly.png/27px-Anomaly.png 1.5x, /images/a/a6/Anomaly.png 2x" width="18"/></a> <a class="mw-redirect" href="https://wiki.guildwars.com/wiki/Anomaly" rel="noopener" target="_blank" title="Anomaly">Anomaly</a>.</strong>The first chosen Villager becomes an ally before acquiring the Eye.</div><div style="margin: 1em; border: solid silver; border-width: 1px 0px; padding: 2px 1em 2px 7.5em;"><strong class="hiddenlinks" style="position: absolute; margin-left: -7.3em; color: #900;"><a class="image" href="https://wiki.guildwars.com/wiki/File:Anomaly.png" rel="noopener" target="_blank" title="Anomaly"><img alt="Anomaly" data-file-height="32" data-file-width="32" decoding="async" height="18" loading="lazy" src="https://wiki.guildwars.com/images/thumb/a/a6/Anomaly.png/18px-Anomaly.png" srcset="/images/thumb/a/a6/Anomaly.png/27px-Anomaly.png 1.5x, /images/a/a6/Anomaly.png 2x" width="18"/></a> <a class="mw-redirect" href="https://wiki.guildwars.com/wiki/Anomaly" rel="noopener" target="_blank" title="Anomaly">Anomaly</a>.</strong>Skipping the initial cutscene while the camera is focused on the Fountain of Truth will move Justicar Hablion from his position near the Eye of Janthir to stand by the fountain.</div><table class="stdt" style="margin: 5px auto; border: 1px solid #C0C0C0; font-size: 90%; width: 80%; text-align: center;">
+<tbody><tr>
+<th style="background: #7BC; font-size: 110%;"><a class="mw-redirect" href="https://wiki.guildwars.com/wiki/List_of_Prophecies_missions" rel="noopener" target="_blank" title="List of Prophecies missions">Prophecies missions</a>
+</th></tr>
+<tr>
+<td><a href="https://wiki.guildwars.com/wiki/The_Great_Northern_Wall" rel="noopener" target="_blank" title="The Great Northern Wall">The Great Northern Wall</a> » <a href="https://wiki.guildwars.com/wiki/Fort_Ranik" rel="noopener" target="_blank" title="Fort Ranik">Fort Ranik</a> » <a href="https://wiki.guildwars.com/wiki/Ruins_of_Surmia" rel="noopener" target="_blank" title="Ruins of Surmia">Ruins of Surmia</a> » <a href="https://wiki.guildwars.com/wiki/Nolani_Academy" rel="noopener" target="_blank" title="Nolani Academy">Nolani Academy</a> » <a href="https://wiki.guildwars.com/wiki/Borlis_Pass" rel="noopener" target="_blank" title="Borlis Pass">Borlis Pass</a> » <a href="https://wiki.guildwars.com/wiki/The_Frost_Gate" rel="noopener" target="_blank" title="The Frost Gate">The Frost Gate</a> » <a href="https://wiki.guildwars.com/wiki/Gates_of_Kryta" rel="noopener" target="_blank" title="Gates of Kryta">Gates of Kryta</a> » <a href="https://wiki.guildwars.com/wiki/D%27Alessio_Seaboard" rel="noopener" target="_blank" title="D'Alessio Seaboard">D'Alessio Seaboard</a> » <a class="mw-selflink selflink">Divinity Coast</a> » <a href="https://wiki.guildwars.com/wiki/The_Wilds" rel="noopener" target="_blank" title="The Wilds">The Wilds</a> » <a href="https://wiki.guildwars.com/wiki/Bloodstone_Fen" rel="noopener" target="_blank" title="Bloodstone Fen">Bloodstone Fen</a> » <a href="https://wiki.guildwars.com/wiki/Aurora_Glade" rel="noopener" target="_blank" title="Aurora Glade">Aurora Glade</a> » <a href="https://wiki.guildwars.com/wiki/Riverside_Province" rel="noopener" target="_blank" title="Riverside Province">Riverside Province</a> » <a href="https://wiki.guildwars.com/wiki/Sanctum_Cay" rel="noopener" target="_blank" title="Sanctum Cay">Sanctum Cay</a> » <a href="https://wiki.guildwars.com/wiki/Dunes_of_Despair" rel="noopener" target="_blank" title="Dunes of Despair">Dunes of Despair</a> <i>and</i> <a href="https://wiki.guildwars.com/wiki/Thirsty_River" rel="noopener" target="_blank" title="Thirsty River">Thirsty River</a> <i>and</i> <a href="https://wiki.guildwars.com/wiki/Elona_Reach" rel="noopener" target="_blank" title="Elona Reach">Elona Reach</a> » <a href="https://wiki.guildwars.com/wiki/Augury_Rock" rel="noopener" target="_blank" title="Augury Rock">Augury Rock</a> » <a href="https://wiki.guildwars.com/wiki/The_Dragon%27s_Lair" rel="noopener" target="_blank" title="The Dragon's Lair">The Dragon's Lair</a> » <a href="https://wiki.guildwars.com/wiki/Ice_Caves_of_Sorrow" rel="noopener" target="_blank" title="Ice Caves of Sorrow">Ice Caves of Sorrow</a> » <a href="https://wiki.guildwars.com/wiki/Iron_Mines_of_Moladune" rel="noopener" target="_blank" title="Iron Mines of Moladune">Iron Mines of Moladune</a> » <a href="https://wiki.guildwars.com/wiki/Thunderhead_Keep" rel="noopener" target="_blank" title="Thunderhead Keep">Thunderhead Keep</a> » <a href="https://wiki.guildwars.com/wiki/Ring_of_Fire" rel="noopener" target="_blank" title="Ring of Fire">Ring of Fire</a> » <a href="https://wiki.guildwars.com/wiki/Abaddon%27s_Mouth" rel="noopener" target="_blank" title="Abaddon's Mouth">Abaddon's Mouth</a> » <a href="https://wiki.guildwars.com/wiki/Hell%27s_Precipice" rel="noopener" target="_blank" title="Hell's Precipice">Hell's Precipice</a>
+</td></tr></tbody></table> 
+NewPP limit report
+Cached time: 20260720090937
+Cache expiry: 3600
+Reduced expiry: true
+Complications: [show‐toc]
+CPU time usage: 0.119 seconds
+Real time usage: 0.167 seconds
+Preprocessor visited node count: 1180/1000000
+Post‐expand include size: 13877/2097152 bytes
+Template argument size: 1500/2097152 bytes
+Highest expansion depth: 10/100
+Expensive parser function count: 0/100
+Unstrip recursion depth: 0/20
+Unstrip post‐expand size: 3121/5000000 bytes
+ExtLoops count: 0/1000
+
+Transclusion expansion time report (%,ms,calls,template)
+100.00%   89.788      1 -total
+ 35.52%   31.891      1 Template:Location_disambiguation_2
+ 17.80%   15.978      7 Template:Ifexists
+ 13.28%   11.923      1 Template:Mission_rewards
+  9.40%    8.437      1 Template:Mission_infobox
+  6.14%    5.517      5 Template:Cost
+  4.79%    4.302     15 Template:W
+  3.31%    2.976      1 Template:Infobox_campaign_row
+  3.00%    2.696      1 Template:More
+  2.86%    2.564      6 Template:Profession_icon_sizes
+ Saved in parser cache with key en_wiki:pcache:idhash:15265-0!canonical and timestamp 20260720090937 and revision id 2723626.</div>
+<h3 style='font-size:0.8rem;color:var(--accent);margin:0.3rem 0;'>Notes</h3><div class='wiki-block'><ul><li>Complete exploration of this mission contributes approximately 1.0% to the Tyrian <a href="https://wiki.guildwars.com/wiki/Cartographer" rel="noopener" target="_blank" title="Cartographer">Cartographer</a> title.
+<ul><li>Crossing the river without using the bridge can jeopardise the bonus objective, since the additional tengu foes on alternative routes might block you from rescuing a vulnerable Chosen villager.</li></ul></li>
+<li>After completing this mission, your party will be taken to <a href="https://wiki.guildwars.com/wiki/Druid%27s_Overlook" rel="noopener" target="_blank" title="Druid's Overlook">Druid's Overlook</a>.</li>
+<li>When approaching the Fountain of Truth, the soundtrack Droknar's Forge will play in place of the usual Krytan soundtracks.</li>
+<li>Completion of this mission will fill in page #2 of <a href="https://wiki.guildwars.com/wiki/The_Flameseeker_Prophecies" rel="noopener" target="_blank" title="The Flameseeker Prophecies">The Flameseeker Prophecies</a> <a href="https://wiki.guildwars.com/wiki/Storybook" rel="noopener" target="_blank" title="Storybook">storybook</a>.</li></ul><div style="margin: 1em; border: solid silver; border-width: 1px 0px; padding: 2px 1em 2px 5em;"><strong class="hiddenlinks" style="position: absolute; margin-left: -4.8em; color: #900;"><a class="image" href="https://wiki.guildwars.com/wiki/File:Bug.png" rel="noopener" target="_blank" title="Bug"><img alt="Bug" data-file-height="32" data-file-width="32" decoding="async" height="18" loading="lazy" src="https://wiki.guildwars.com/images/thumb/7/7d/Bug.png/18px-Bug.png" srcset="/images/thumb/7/7d/Bug.png/27px-Bug.png 1.5x, /images/7/7d/Bug.png 2x" width="18"/></a> <a href="https://wiki.guildwars.com/wiki/Bug" rel="noopener" target="_blank" title="Bug">Bug</a>.</strong>The objectives fail to state that one must talk to Lionguard Minah to complete the bonus.</div><div style="margin: 1em; border: solid silver; border-width: 1px 0px; padding: 2px 1em 2px 5em;"><strong class="hiddenlinks" style="position: absolute; margin-left: -4.8em; color: #900;"><a class="image" href="https://wiki.guildwars.com/wiki/File:Bug.png" rel="noopener" target="_blank" title="Bug"><img alt="Bug" data-file-height="32" data-file-width="32" decoding="async" height="18" loading="lazy" src="https://wiki.guildwars.com/images/thumb/7/7d/Bug.png/18px-Bug.png" srcset="/images/thumb/7/7d/Bug.png/27px-Bug.png 1.5x, /images/7/7d/Bug.png 2x" width="18"/></a> <a href="https://wiki.guildwars.com/wiki/Bug" rel="noopener" target="_blank" title="Bug">Bug</a>.</strong>Sometimes the Eye will disappear if you separate too far from a human companion you're running the mission with.</div><div style="margin: 1em; border: solid silver; border-width: 1px 0px; padding: 2px 1em 2px 7.5em;"><strong class="hiddenlinks" style="position: absolute; margin-left: -7.3em; color: #900;"><a class="image" href="https://wiki.guildwars.com/wiki/File:Anomaly.png" rel="noopener" target="_blank" title="Anomaly"><img alt="Anomaly" data-file-height="32" data-file-width="32" decoding="async" height="18" loading="lazy" src="https://wiki.guildwars.com/images/thumb/a/a6/Anomaly.png/18px-Anomaly.png" srcset="/images/thumb/a/a6/Anomaly.png/27px-Anomaly.png 1.5x, /images/a/a6/Anomaly.png 2x" width="18"/></a> <a class="mw-redirect" href="https://wiki.guildwars.com/wiki/Anomaly" rel="noopener" target="_blank" title="Anomaly">Anomaly</a>.</strong>When fighting the <a href="https://wiki.guildwars.com/wiki/Mergoyle_Wavebreaker" rel="noopener" target="_blank" title="Mergoyle Wavebreaker">Mergoyle Wavebreakers</a> at the cleansing fountain, a White Mantle Abbot, assumed to be running around panicking about the Mergoyles, will intentionally heal them with <a href="https://wiki.guildwars.com/wiki/Heal_Other" rel="noopener" target="_blank" title="Heal Other">Heal Other</a>.</div><div style="margin: 1em; border: solid silver; border-width: 1px 0px; padding: 2px 1em 2px 7.5em;"><strong class="hiddenlinks" style="position: absolute; margin-left: -7.3em; color: #900;"><a class="image" href="https://wiki.guildwars.com/wiki/File:Anomaly.png" rel="noopener" target="_blank" title="Anomaly"><img alt="Anomaly" data-file-height="32" data-file-width="32" decoding="async" height="18" loading="lazy" src="https://wiki.guildwars.com/images/thumb/a/a6/Anomaly.png/18px-Anomaly.png" srcset="/images/thumb/a/a6/Anomaly.png/27px-Anomaly.png 1.5x, /images/a/a6/Anomaly.png 2x" width="18"/></a> <a class="mw-redirect" href="https://wiki.guildwars.com/wiki/Anomaly" rel="noopener" target="_blank" title="Anomaly">Anomaly</a>.</strong>While up to five chosen are saved during the mission, the end cutscene only has four.</div><div style="margin: 1em; border: solid silver; border-width: 1px 0px; padding: 2px 1em 2px 7.5em;"><strong class="hiddenlinks" style="position: absolute; margin-left: -7.3em; color: #900;"><a class="image" href="https://wiki.guildwars.com/wiki/File:Anomaly.png" rel="noopener" target="_blank" title="Anomaly"><img alt="Anomaly" data-file-height="32" data-file-width="32" decoding="async" height="18" loading="lazy" src="https://wiki.guildwars.com/images/thumb/a/a6/Anomaly.png/18px-Anomaly.png" srcset="/images/thumb/a/a6/Anomaly.png/27px-Anomaly.png 1.5x, /images/a/a6/Anomaly.png 2x" width="18"/></a> <a class="mw-redirect" href="https://wiki.guildwars.com/wiki/Anomaly" rel="noopener" target="_blank" title="Anomaly">Anomaly</a>.</strong>The first chosen Villager becomes an ally before acquiring the Eye.</div><div style="margin: 1em; border: solid silver; border-width: 1px 0px; padding: 2px 1em 2px 7.5em;"><strong class="hiddenlinks" style="position: absolute; margin-left: -7.3em; color: #900;"><a class="image" href="https://wiki.guildwars.com/wiki/File:Anomaly.png" rel="noopener" target="_blank" title="Anomaly"><img alt="Anomaly" data-file-height="32" data-file-width="32" decoding="async" height="18" loading="lazy" src="https://wiki.guildwars.com/images/thumb/a/a6/Anomaly.png/18px-Anomaly.png" srcset="/images/thumb/a/a6/Anomaly.png/27px-Anomaly.png 1.5x, /images/a/a6/Anomaly.png 2x" width="18"/></a> <a class="mw-redirect" href="https://wiki.guildwars.com/wiki/Anomaly" rel="noopener" target="_blank" title="Anomaly">Anomaly</a>.</strong>Skipping the initial cutscene while the camera is focused on the Fountain of Truth will move Justicar Hablion from his position near the Eye of Janthir to stand by the fountain.</div><table class="stdt" style="margin: 5px auto; border: 1px solid #C0C0C0; font-size: 90%; width: 80%; text-align: center;">
+<tbody><tr>
+<th style="background: #7BC; font-size: 110%;"><a class="mw-redirect" href="https://wiki.guildwars.com/wiki/List_of_Prophecies_missions" rel="noopener" target="_blank" title="List of Prophecies missions">Prophecies missions</a>
+</th></tr>
+<tr>
+<td><a href="https://wiki.guildwars.com/wiki/The_Great_Northern_Wall" rel="noopener" target="_blank" title="The Great Northern Wall">The Great Northern Wall</a> » <a href="https://wiki.guildwars.com/wiki/Fort_Ranik" rel="noopener" target="_blank" title="Fort Ranik">Fort Ranik</a> » <a href="https://wiki.guildwars.com/wiki/Ruins_of_Surmia" rel="noopener" target="_blank" title="Ruins of Surmia">Ruins of Surmia</a> » <a href="https://wiki.guildwars.com/wiki/Nolani_Academy" rel="noopener" target="_blank" title="Nolani Academy">Nolani Academy</a> » <a href="https://wiki.guildwars.com/wiki/Borlis_Pass" rel="noopener" target="_blank" title="Borlis Pass">Borlis Pass</a> » <a href="https://wiki.guildwars.com/wiki/The_Frost_Gate" rel="noopener" target="_blank" title="The Frost Gate">The Frost Gate</a> » <a href="https://wiki.guildwars.com/wiki/Gates_of_Kryta" rel="noopener" target="_blank" title="Gates of Kryta">Gates of Kryta</a> » <a href="https://wiki.guildwars.com/wiki/D%27Alessio_Seaboard" rel="noopener" target="_blank" title="D'Alessio Seaboard">D'Alessio Seaboard</a> » <a class="mw-selflink selflink">Divinity Coast</a> » <a href="https://wiki.guildwars.com/wiki/The_Wilds" rel="noopener" target="_blank" title="The Wilds">The Wilds</a> » <a href="https://wiki.guildwars.com/wiki/Bloodstone_Fen" rel="noopener" target="_blank" title="Bloodstone Fen">Bloodstone Fen</a> » <a href="https://wiki.guildwars.com/wiki/Aurora_Glade" rel="noopener" target="_blank" title="Aurora Glade">Aurora Glade</a> » <a href="https://wiki.guildwars.com/wiki/Riverside_Province" rel="noopener" target="_blank" title="Riverside Province">Riverside Province</a> » <a href="https://wiki.guildwars.com/wiki/Sanctum_Cay" rel="noopener" target="_blank" title="Sanctum Cay">Sanctum Cay</a> » <a href="https://wiki.guildwars.com/wiki/Dunes_of_Despair" rel="noopener" target="_blank" title="Dunes of Despair">Dunes of Despair</a> <i>and</i> <a href="https://wiki.guildwars.com/wiki/Thirsty_River" rel="noopener" target="_blank" title="Thirsty River">Thirsty River</a> <i>and</i> <a href="https://wiki.guildwars.com/wiki/Elona_Reach" rel="noopener" target="_blank" title="Elona Reach">Elona Reach</a> » <a href="https://wiki.guildwars.com/wiki/Augury_Rock" rel="noopener" target="_blank" title="Augury Rock">Augury Rock</a> » <a href="https://wiki.guildwars.com/wiki/The_Dragon%27s_Lair" rel="noopener" target="_blank" title="The Dragon's Lair">The Dragon's Lair</a> » <a href="https://wiki.guildwars.com/wiki/Ice_Caves_of_Sorrow" rel="noopener" target="_blank" title="Ice Caves of Sorrow">Ice Caves of Sorrow</a> » <a href="https://wiki.guildwars.com/wiki/Iron_Mines_of_Moladune" rel="noopener" target="_blank" title="Iron Mines of Moladune">Iron Mines of Moladune</a> » <a href="https://wiki.guildwars.com/wiki/Thunderhead_Keep" rel="noopener" target="_blank" title="Thunderhead Keep">Thunderhead Keep</a> » <a href="https://wiki.guildwars.com/wiki/Ring_of_Fire" rel="noopener" target="_blank" title="Ring of Fire">Ring of Fire</a> » <a href="https://wiki.guildwars.com/wiki/Abaddon%27s_Mouth" rel="noopener" target="_blank" title="Abaddon's Mouth">Abaddon's Mouth</a> » <a href="https://wiki.guildwars.com/wiki/Hell%27s_Precipice" rel="noopener" target="_blank" title="Hell's Precipice">Hell's Precipice</a>
+</td></tr></tbody></table> 
+NewPP limit report
+Cached time: 20260720090937
+Cache expiry: 3600
+Reduced expiry: true
+Complications: [show‐toc]
+CPU time usage: 0.119 seconds
+Real time usage: 0.167 seconds
+Preprocessor visited node count: 1180/1000000
+Post‐expand include size: 13877/2097152 bytes
+Template argument size: 1500/2097152 bytes
+Highest expansion depth: 10/100
+Expensive parser function count: 0/100
+Unstrip recursion depth: 0/20
+Unstrip post‐expand size: 3121/5000000 bytes
+ExtLoops count: 0/1000
+
+Transclusion expansion time report (%,ms,calls,template)
+100.00%   89.788      1 -total
+ 35.52%   31.891      1 Template:Location_disambiguation_2
+ 17.80%   15.978      7 Template:Ifexists
+ 13.28%   11.923      1 Template:Mission_rewards
+  9.40%    8.437      1 Template:Mission_infobox
+  6.14%    5.517      5 Template:Cost
+  4.79%    4.302     15 Template:W
+  3.31%    2.976      1 Template:Infobox_campaign_row
+  3.00%    2.696      1 Template:More
+  2.86%    2.564      6 Template:Profession_icon_sizes
+ Saved in parser cache with key en_wiki:pcache:idhash:15265-0!canonical and timestamp 20260720090937 and revision id 2723626.</div></div>
+          </section>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="lightbox" id="lightbox" role="dialog" aria-label="Enlarged map">
+    <img src="../maps/prophecies_09_Divinity_Coast_map.jpg" alt="Divinity Coast mission map (enlarged)" />
+  </div>
+  <script>
+    (function () {
+      var open = document.getElementById("mapOpen");
+      var box = document.getElementById("lightbox");
+      if (!open || !box) return;
+      open.addEventListener("click", function () { box.classList.add("open"); });
+      box.addEventListener("click", function () { box.classList.remove("open"); });
+      document.addEventListener("keydown", function (e) {
+        if (e.key === "Escape") box.classList.remove("open");
+      });
+    })();
+  </script>
+
+</body>
+</html>

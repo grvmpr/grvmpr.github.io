@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Tihark Orchard</title>
+  <style>
+:root {
+  --bg-deep: #070a0f;
+  --bg-panel: #101820;
+  --bg-panel-2: #15202c;
+  --border: #243044;
+  --border-glow: #2a4a6a;
+  --text: #dce6f0;
+  --text-muted: #8a9bb0;
+  --text-dim: #5c6f86;
+  --accent: #3ecfff;
+  --accent-soft: rgba(62, 207, 255, 0.12);
+  --gold: #e8c56a;
+  --gold-soft: rgba(232, 197, 106, 0.12);
+  --bonus: #7dffb3;
+  --bonus-soft: rgba(125, 255, 179, 0.1);
+  --danger: #ff6b6b;
+  --danger-soft: rgba(255, 107, 107, 0.1);
+  --hm: #c78bff;
+  --hm-soft: rgba(199, 139, 255, 0.12);
+  --radius: 10px;
+  --font: "Segoe UI", system-ui, -apple-system, sans-serif;
+  --chrome-h: 3.1rem;
+  --gap: 0.5rem;
+  --pad: 0.7rem;
+  /* Readable on 4K vertical (~2160×3840) */
+  --walk-size: clamp(1.05rem, 0.55vw + 0.55vh, 1.35rem);
+  --bonus-size: clamp(1.05rem, 0.55vw + 0.55vh, 1.35rem);
+  --body-size: clamp(0.95rem, 0.4vw + 0.4vh, 1.1rem);
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html {
+  scroll-behavior: smooth;
+  font-size: clamp(16px, 0.55vw + 0.45vh, 20px);
+  height: 100%;
+  scroll-padding-top: calc(var(--chrome-h) + 0.5rem);
+}
+body {
+  font-family: var(--font);
+  background: var(--bg-deep);
+  color: var(--text);
+  line-height: 1.45;
+  min-height: 100%;
+  height: 100%;
+  overflow: hidden;
+  background-image: radial-gradient(ellipse 70% 25% at 50% 0%, rgba(42, 100, 160, 0.14), transparent);
+}
+a { color: var(--accent); text-decoration: none; }
+a:hover { color: #7de0ff; text-decoration: underline; }
+.app {
+  display: grid;
+  grid-template-rows: var(--chrome-h) 1fr;
+  height: 100vh; height: 100dvh;
+  max-height: 100vh; max-height: 100dvh;
+}
+.top-chrome {
+  display: flex; align-items: center; gap: 0.65rem;
+  padding: 0 0.7rem;
+  background: rgba(8, 12, 18, 0.97);
+  border-bottom: 1px solid var(--border);
+  z-index: 100; min-height: var(--chrome-h);
+}
+.brand { display: flex; align-items: baseline; gap: 0.55rem; min-width: 0; flex-shrink: 0; }
+.brand-mission {
+  font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase;
+  color: var(--accent); font-weight: 700; white-space: nowrap;
+}
+.brand-name {
+  font-size: 1.1rem; font-weight: 750; color: var(--text);
+  white-space: nowrap; letter-spacing: -0.02em;
+}
+.brand-meta { font-size: 0.75rem; color: var(--text-dim); white-space: nowrap; }
+.chip-nav {
+  display: flex; flex: 1; gap: 0.3rem; overflow-x: auto;
+  scrollbar-width: none; min-width: 0; justify-content: center;
+}
+.chip-nav::-webkit-scrollbar { display: none; }
+.chip-nav a {
+  flex: 0 0 auto; padding: 0.3rem 0.65rem; border-radius: 999px;
+  font-size: 0.78rem; font-weight: 600; color: var(--text-muted);
+  background: var(--bg-panel); border: 1px solid var(--border);
+  text-decoration: none; white-space: nowrap;
+}
+.chip-nav a:hover {
+  color: var(--text); border-color: var(--border-glow);
+  background: #1a2836; text-decoration: none;
+}
+.chip-nav a[href="#map"] { color: var(--accent); border-color: rgba(62, 207, 255, 0.35); }
+.chip-nav a[href="#bonus"] { color: var(--bonus); border-color: rgba(125, 255, 179, 0.3); }
+.chip-nav a[href="#hard-mode"] { color: var(--hm); border-color: rgba(199, 139, 255, 0.3); }
+.chip-nav a[href="#bosses"] { color: #ff9a9a; border-color: rgba(255, 107, 107, 0.3); }
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 0.3rem;
+  padding: 0.42rem 0.85rem; border-radius: 8px; font-weight: 650; font-size: 0.8rem;
+  border: none; cursor: pointer; text-decoration: none; white-space: nowrap; flex-shrink: 0;
+}
+.btn:hover { text-decoration: none; }
+.btn-next {
+  background: linear-gradient(135deg, #1a6a9a, #1ab0e0); color: #fff;
+  box-shadow: 0 2px 12px rgba(26, 140, 200, 0.35);
+}
+.btn-next:hover { color: #fff; filter: brightness(1.08); }
+.btn-wiki, .btn-idx, .btn-prev {
+  background: var(--bg-panel); color: var(--text-muted);
+  border: 1px solid var(--border); padding: 0.42rem 0.65rem;
+}
+.btn-wiki:hover, .btn-idx:hover, .btn-prev:hover {
+  color: var(--accent); border-color: var(--border-glow);
+}
+.chrome-actions { display: flex; gap: 0.35rem; flex-shrink: 0; }
+
+/* Map-dominant workspace */
+.workspace {
+  display: grid;
+  grid-template-columns: minmax(480px, 1.15fr) minmax(0, 1fr);
+  grid-template-rows: 1fr;
+  gap: var(--gap); padding: var(--gap);
+  min-height: 0; height: 100%; overflow: hidden;
+}
+.col-map {
+  display: grid;
+  grid-template-rows: 1fr auto;
+  gap: var(--gap);
+  min-height: 0; min-width: 0;
+}
+.col-main {
+  display: grid;
+  /* objectives compact | walkthrough HUGE | bonus+hm | bosses+tips */
+  grid-template-rows: auto minmax(0, 1.6fr) minmax(0, 1.05fr) minmax(0, 0.75fr);
+  gap: var(--gap); min-height: 0; min-width: 0; overflow: hidden;
+}
+.row-obj { min-height: 0; }
+.row-bonus-hm {
+  display: grid; grid-template-columns: 1.15fr 0.85fr; gap: var(--gap); min-height: 0;
+}
+.row-lower {
+  display: grid; grid-template-columns: 1.15fr 0.85fr; gap: var(--gap); min-height: 0;
+}
+.panel {
+  background: var(--bg-panel); border: 1px solid var(--border); border-radius: var(--radius);
+  padding: var(--pad); display: flex; flex-direction: column; min-height: 0; overflow: hidden;
+}
+.panel-scroll {
+  overflow-y: auto; overflow-x: hidden; min-height: 0; flex: 1; padding-right: 0.3rem;
+  scrollbar-width: thin; scrollbar-color: var(--border) transparent;
+  font-size: var(--body-size);
+}
+.panel-scroll::-webkit-scrollbar { width: 8px; }
+.panel-scroll::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+.panel-title {
+  display: flex; align-items: center; gap: 0.4rem;
+  font-size: 0.82rem; font-weight: 750; letter-spacing: 0.05em; text-transform: uppercase;
+  color: var(--text); margin-bottom: 0.45rem; padding-bottom: 0.35rem;
+  border-bottom: 1px solid var(--border); flex-shrink: 0;
+}
+.panel-title .icon {
+  width: 1.3rem; height: 1.3rem; border-radius: 5px;
+  display: inline-flex; align-items: center; justify-content: center; font-size: 0.75rem;
+}
+.panel.map-panel {
+  border-color: var(--border-glow);
+  background: linear-gradient(180deg, #0e1620 0%, var(--bg-panel) 100%);
+  /* Map takes almost all left column */
+  min-height: 0;
+}
+.panel.objectives { border-top: 2px solid var(--accent); }
+.panel.walkthrough { border-top: 3px solid #5eb8e8; }
+.panel.bonus { border-top: 3px solid var(--bonus); }
+.panel.hard-mode { border-top: 2px solid var(--hm); }
+.panel.bosses { border-top: 2px solid var(--danger); }
+.panel.other { border-top: 2px solid var(--text-muted); }
+
+/* Emphasized reading panels */
+.panel.walkthrough .panel-scroll,
+.panel.walkthrough .wiki-block {
+  font-size: var(--walk-size) !important;
+  line-height: 1.55;
+}
+.panel.bonus .panel-scroll,
+.panel.bonus .wiki-block {
+  font-size: var(--bonus-size) !important;
+  line-height: 1.55;
+}
+.panel.walkthrough .panel-scroll li,
+.panel.bonus .panel-scroll li {
+  margin-bottom: 0.45rem;
+}
+.panel.walkthrough .panel-scroll p,
+.panel.bonus .panel-scroll p {
+  margin-bottom: 0.55rem;
+}
+
+.icon-map { background: var(--accent-soft); color: var(--accent); }
+.icon-obj { background: var(--accent-soft); color: var(--accent); }
+.icon-walk { background: rgba(94, 184, 232, 0.15); color: #5eb8e8; }
+.icon-bonus { background: var(--bonus-soft); color: var(--bonus); }
+.icon-hm { background: var(--hm-soft); color: var(--hm); }
+.icon-boss { background: var(--danger-soft); color: var(--danger); }
+.icon-other { background: rgba(138, 155, 176, 0.15); color: var(--text-muted); }
+
+.map-wrap {
+  flex: 1; min-height: 0; display: flex; flex-direction: column;
+  align-items: center; justify-content: center; gap: 0.4rem;
+}
+.map-frame {
+  flex: 1; min-height: 0; width: 100%;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: 10px; overflow: hidden;
+  border: 2px solid var(--border-glow);
+  box-shadow: 0 0 0 1px rgba(62, 207, 255, 0.1), 0 12px 40px rgba(0, 0, 0, 0.45);
+  background: #05080c; cursor: zoom-in;
+}
+.map-frame img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  image-rendering: auto;
+}
+.map-caption { font-size: 0.72rem; color: var(--text-dim); flex-shrink: 0; }
+.map-missing {
+  color: var(--text-dim); font-size: 1rem; text-align: center; padding: 2rem;
+}
+
+.wiki-block ul, .panel-scroll ul,
+.wiki-block ol, .panel-scroll ol { padding-left: 1.2rem; margin: 0.3rem 0 0.5rem; }
+.wiki-block li, .panel-scroll li { margin-bottom: 0.32rem; }
+.wiki-block p, .panel-scroll p { margin-bottom: 0.45rem; }
+.wiki-block img, .panel-scroll img { vertical-align: middle; max-height: 1.35em; width: auto; }
+.wiki-block table, .panel-scroll table {
+  width: 100%; border-collapse: collapse; font-size: 0.9em; margin: 0.4rem 0;
+}
+.wiki-block th, .wiki-block td, .panel-scroll th, .panel-scroll td {
+  border: 1px solid var(--border); padding: 0.3rem 0.45rem; text-align: left;
+}
+.lede { font-size: 0.92rem; color: var(--text-muted); margin-bottom: 0.35rem; }
+
+/* Collapsed summary */
+details.summary-details {
+  background: var(--bg-panel);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  border-top: 2px solid var(--gold);
+  padding: 0.35rem 0.65rem;
+  flex-shrink: 0;
+}
+details.summary-details summary {
+  cursor: pointer;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--gold);
+  padding: 0.35rem 0;
+  list-style: none;
+}
+details.summary-details summary::-webkit-details-marker { display: none; }
+details.summary-details summary::before {
+  content: "▸ ";
+  color: var(--text-dim);
+}
+details.summary-details[open] summary::before { content: "▾ "; }
+details.summary-details .summary-body {
+  padding: 0.35rem 0 0.55rem;
+  font-size: 0.88rem;
+  color: var(--text-muted);
+  max-height: 18vh;
+  overflow-y: auto;
+}
+
+.boss-note { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.4rem; }
+.boss-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.4rem; }
+.boss-card {
+  background: var(--bg-panel-2); border: 1px solid var(--border);
+  border-radius: 8px; padding: 0.5rem 0.6rem;
+}
+.boss-card-head { font-size: 0.95rem; margin-bottom: 0.2rem; }
+.boss-card-head a { color: #eef6fc; font-weight: 700; }
+.boss-card-head a:hover { color: var(--accent); }
+.boss-elite { font-size: 0.88rem; }
+.elite-label { color: var(--gold); font-weight: 650; margin-right: 0.25rem; }
+.elite-link { color: #ffd78a; font-weight: 650; }
+.elite-link:hover { color: #ffe9b5; }
+.elite-none { color: var(--text-dim); font-style: italic; font-size: 0.85rem; }
+.boss-meta { font-size: 0.78rem; color: var(--text-dim); margin-top: 0.15rem; }
+
+.callout {
+  margin-top: 0.4rem; padding: 0.45rem 0.6rem; border-radius: 6px;
+  font-size: 0.88rem; border-left: 3px solid; line-height: 1.4;
+}
+.callout.tip { background: var(--accent-soft); border-color: var(--accent); color: #b8eaff; }
+.callout.warn { background: var(--danger-soft); border-color: var(--danger); color: #ffb4b4; }
+
+.lightbox {
+  display: none; position: fixed; inset: 0; z-index: 1000; background: rgba(0,0,0,0.94);
+  align-items: center; justify-content: center; padding: 1.5rem; cursor: zoom-out;
+}
+.lightbox.open { display: flex; }
+.lightbox img {
+  max-width: 96vw; max-height: 96vh; border-radius: 8px;
+  border: 2px solid var(--border-glow); object-fit: contain;
+}
+
+@media (min-height: 2400px) {
+  :root {
+    --walk-size: clamp(1.15rem, 0.7vh + 0.3vw, 1.5rem);
+    --bonus-size: clamp(1.15rem, 0.7vh + 0.3vw, 1.5rem);
+    --gap: 0.65rem;
+    --pad: 0.85rem;
+  }
+  .workspace { grid-template-columns: minmax(560px, 1.2fr) minmax(0, 1fr); }
+}
+@media (min-width: 1800px) and (min-height: 2000px) {
+  .workspace { grid-template-columns: minmax(600px, 1.25fr) minmax(0, 1fr); }
+}
+@media (max-height: 1100px) {
+  body { overflow: auto; height: auto; }
+  .app { height: auto; max-height: none; min-height: 100vh; }
+  .workspace {
+    height: auto; overflow: visible; grid-template-columns: 1fr; grid-template-rows: auto;
+  }
+  .col-map { grid-template-rows: auto; }
+  .col-main { overflow: visible; grid-template-rows: auto; }
+  .row-bonus-hm, .row-lower { grid-template-columns: 1fr; }
+  .panel { max-height: none; overflow: visible; }
+  .panel-scroll { overflow: visible; }
+  .map-frame { min-height: 360px; max-height: 55vh; }
+}
+
+    :root { --accent: #c78bff; --accent-soft: #c78bff22; }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header class="top-chrome">
+      <div class="brand">
+        <span class="brand-mission">M9</span>
+        <span class="brand-name">Tihark Orchard</span>
+        <span class="brand-meta">Nightfall · Vabbi · Cooperative · —</span>
+      </div>
+      <nav class="chip-nav" aria-label="Sections">
+        <a href="#map">Map</a>
+        <a href="#walkthrough">Walkthrough</a>
+        <a href="#bonus">Bonus</a>
+        <a href="#objectives">Objectives</a>
+        <a href="#hard-mode">Hard Mode</a>
+        <a href="#bosses">Bosses</a>
+        <a href="#other">Tips</a>
+      </nav>
+      <div class="chrome-actions">
+        <a class="btn btn-idx" href="../nightfall.html">Index</a>
+        <a class="btn btn-prev" href="9_Moddok_Crevice.html">← Prev</a>
+        <a class="btn btn-wiki" href="https://wiki.guildwars.com/wiki/Tihark_Orchard" target="_blank" rel="noopener">Wiki ↗</a>
+        <a class="btn btn-next" href="11_Dasha_Vestibule.html">Next: Dasha Vestibule →</a>
+      </div>
+    </header>
+
+    <div class="workspace">
+      <div class="col-map">
+        <section class="panel map-panel" id="map">
+          <h2 class="panel-title"><span class="icon icon-map">◉</span> Mission Map</h2>
+          <div class="map-wrap">
+            <div class="map-frame" id="mapOpen" title="Click to enlarge">
+              <img src="../maps/nightfall_10_Tihark_Orchard_map.jpg" alt="Tihark Orchard mission map" />
+            </div>
+            <p class="map-caption">Click to enlarge · Local cache · <a href="https://wiki.guildwars.com/wiki/Tihark_Orchard" target="_blank" rel="noopener">Wiki</a></p>
+        </div>
+        </section>
+
+        <details class="summary-details" id="summary">
+          <summary>Summary (click to expand)</summary>
+          <div class="summary-body">
+            <p>The priestess Kehanni has given you an invitation to the Garden of Seborhin for the Festival of Lyss which the three Vabbi princes are known to be attending. In this mission you must perform tasks around the festival to convince each of the princes you are worth talking to and try to convince them that they should side with Istan and the Sunspears against Varesh and Kourna .</p>
+            <p style="margin-top:0.4rem;"><strong>Region:</strong> Vabbi · <strong>Mission:</strong> 9 of 20 · <strong>Type:</strong> Cooperative</p>
+            <p style="margin-top:0.35rem;"><a href="https://wiki.guildwars.com/wiki/Tihark_Orchard" target="_blank" rel="noopener">Full wiki article ↗</a></p>
+          </div>
+        </details>
+      </div>
+
+      <div class="col-main">
+        <section class="panel objectives row-obj" id="objectives">
+          <h2 class="panel-title"><span class="icon icon-obj">✓</span> Objectives</h2>
+          <div class="panel-scroll wiki-block"><p>Convince the three <a href="https://wiki.guildwars.com/wiki/Princes_of_Vabbi" rel="noopener" target="_blank" title="Princes of Vabbi">Princes of Vabbi</a> to join the fight against <a class="mw-redirect" href="https://wiki.guildwars.com/wiki/Varesh" rel="noopener" target="_blank" title="Varesh">Varesh</a>.
+</p><ul><li>Recruit <a href="https://wiki.guildwars.com/wiki/Prince_Mehtu_the_Wise" rel="noopener" target="_blank" title="Prince Mehtu the Wise">Prince Mehtu the Wise</a> for your war against Varesh.</li>
+<li>Persuade <a href="https://wiki.guildwars.com/wiki/Prince_Bokka_the_Magnificent" rel="noopener" target="_blank" title="Prince Bokka the Magnificent">Prince Bokka the Magnificent</a> to join the <a class="mw-redirect" href="https://wiki.guildwars.com/wiki/Sunspears" rel="noopener" target="_blank" title="Sunspears">Sunspears</a> in the struggle against Warmarshal Varesh.</li>
+<li>Coerce <a href="https://wiki.guildwars.com/wiki/Prince_Ahmtur_the_Mighty" rel="noopener" target="_blank" title="Prince Ahmtur the Mighty">Prince Ahmtur the Mighty</a> to rally against Warmarshal Varesh.</li>
+<li>Prince Ahmtur the Mighty wishes to speak with you again.  Find out what he has to say.</li>
+<li>Defend the garden and its guests by slaying the harpies.</li>
+<li>*<a class="mw-redirect" href="https://wiki.guildwars.com/wiki/Bonus" rel="noopener" target="_blank" title="Bonus">Bonus</a>* Participate in the <a href="https://wiki.guildwars.com/wiki/Festival_of_Lyss" rel="noopener" target="_blank" title="Festival of Lyss">Festival of Lyss</a>.</li>
+<li>You have participated in [0...5] of 5 festivities.</li></ul></div>
+        </section>
+
+        <section class="panel walkthrough" id="walkthrough">
+          <h2 class="panel-title"><span class="icon icon-walk">→</span> Walkthrough</h2>
+          <div class="panel-scroll wiki-block"><p>The aim of this mission is to try to convince the three Vabbian princes that they should join the fight against Varesh. However, to gain an audience with them, you must participate in some of the festival's mini-games. Although this can be done without any fighting, gaining the master's reward requires that you defeat at least one foe. Towards the end of the mission, you must also help the guards defeat several mobs of harpies. This means you need to bring a <a href="https://wiki.guildwars.com/wiki/Build" rel="noopener" target="_blank" title="Build">build</a> that includes some damage and some self-healing.
+</p><h3><span class="mw-headline" id="Gaining_an_audience">Gaining an audience</span></h3><p>The quickest way to get permission to speak to the princes is:
+</p><ul><li>Prince Mehtu the Wise: (One of the following)
+<ul><li>Teach his niece or nephew to dance by using the <i>/dance</i> <a href="https://wiki.guildwars.com/wiki/Emote" rel="noopener" target="_blank" title="Emote">emote</a> after speaking to <a href="https://wiki.guildwars.com/wiki/Dende" rel="noopener" target="_blank" title="Dende">Dende</a> (female <a href="https://wiki.guildwars.com/wiki/Character" rel="noopener" target="_blank" title="Character">characters</a>) or <a href="https://wiki.guildwars.com/wiki/Mina" rel="noopener" target="_blank" title="Mina">Mina</a> (male characters). This counts as one of the festivities for the bonus.</li>
+<li>Win the Mime Duel against Lumo the Mime. This counts as one of the festivities for the bonus.</li></ul></li>
+<li>Prince Bokka the Magnificent: (One of the following)
+<ul><li>Present Royal Finance Minister Oluda with a gift of the <a href="https://wiki.guildwars.com/wiki/Rare_Antique_Elonian_Vase" rel="noopener" target="_blank" title="Rare Antique Elonian Vase">Rare Antique Elonian Vase</a>, obtained from <a href="https://wiki.guildwars.com/wiki/Jejumba" rel="noopener" target="_blank" title="Jejumba">Jejumba</a> via one of the following methods. This counts as one of the festivities for the bonus.
+<ul><li>Pay her 4 <a class="mw-redirect" href="https://wiki.guildwars.com/wiki/Platinum" rel="noopener" target="_blank" title="Platinum">platinum</a>.</li>
+<li>Obtain the <a href="https://wiki.guildwars.com/wiki/Golden_Phoenix_Feather" rel="noopener" target="_blank" title="Golden Phoenix Feather">Golden Phoenix Feather</a> from the <a href="https://wiki.guildwars.com/wiki/Royal_Guard_Captain" rel="noopener" target="_blank" title="Royal Guard Captain">Royal Guard Captain</a>, located in the eastern corridor, by defeating him.</li>
+<li>Defeat Jejumba.</li></ul></li>
+<li>Bribe <a href="https://wiki.guildwars.com/wiki/Royal_Finance_Minister_Oluda" rel="noopener" target="_blank" title="Royal Finance Minister Oluda">Royal Finance Minister Oluda</a> (cost: 5<a href="https://wiki.guildwars.com/wiki/Currency" rel="noopener" target="_blank" title="Platinum"><img alt="Platinum" data-file-height="15" data-file-width="16" decoding="async" height="15" loading="lazy" src="https://wiki.guildwars.com/images/f/fe/Platinum.gif" width="16"/></a>) If done after presenting the gift, this counts as another one of the festivities for the bonus as well.</li></ul></li>
+<li>Prince Ahmtur the Mighty: (One of the following)
+<ul><li>Defeat <a href="https://wiki.guildwars.com/wiki/%22Palawa_Joko%22" rel="noopener" target="_blank" title='"Palawa Joko"'>"Palawa Joko"</a> in the re-enactment of the <a href="https://wiki.guildwars.com/wiki/Battle_of_Jahai" rel="noopener" target="_blank" title="Battle of Jahai">Battle of Jahai</a> (requires fighting).  This counts as one of the festivities for the bonus.</li>
+<li>Beat <a href="https://wiki.guildwars.com/wiki/Zilo_the_Drunkard" rel="noopener" target="_blank" title="Zilo the Drunkard">Zilo the Drunkard</a> in a drinking contest (does not require combat). This counts as another one of the festivities for the bonus as well.</li></ul></li></ul><p>Speak to each prince in turn, after which Ahmtur will request that you speak with him again, triggering a <a href="https://wiki.guildwars.com/wiki/Cinematic" rel="noopener" target="_blank" title="Cinematic">cinematic</a> of a harpy invasion of the event. You will need to complete the bonus before doing this.
+</p></div>
+        </section>
+
+        <div class="row-bonus-hm">
+          <section class="panel bonus" id="bonus">
+            <h2 class="panel-title"><span class="icon icon-bonus">★</span> Bonus</h2>
+            <div class="panel-scroll wiki-block"><dl><dd><i>See also: <a href="https://wiki.guildwars.com/wiki/Tihark_Orchard/Guide" rel="noopener" target="_blank" title="Tihark Orchard/Guide">Tihark Orchard/Guide</a></i> <i>for a detailed walkthrough</i></dd></dl><p>To obtain the <a class="mw-redirect" href="https://wiki.guildwars.com/wiki/Master%27s_Reward" rel="noopener" target="_blank" title="Master's Reward">Master's Reward</a>, you have to participate in five festival events, which in practical terms means just two more mini-games than the minimum you need to complete the primary mission. The two optional activities listed above will meet the requirements for the bonus; it is usually a choice between dueling the mime (not required for the primary mission) or spending 5<a href="https://wiki.guildwars.com/wiki/Currency" rel="noopener" target="_blank" title="Platinum"><img alt="Platinum" data-file-height="15" data-file-width="16" decoding="async" height="15" loading="lazy" src="https://wiki.guildwars.com/images/f/fe/Platinum.gif" width="16"/></a> on the bribe.
+</p></div>
+          </section>
+          <section class="panel hard-mode" id="hard-mode">
+            <h2 class="panel-title"><span class="icon icon-hm">◆</span> Hard Mode</h2>
+            <div class="panel-scroll wiki-block"><p>The mini-games work the same in <a href="https://wiki.guildwars.com/wiki/Hard_mode" rel="noopener" target="_blank" title="Hard mode">hard</a> or <a href="https://wiki.guildwars.com/wiki/Normal_mode" rel="noopener" target="_blank" title="Normal mode">normal mode</a>; only the harpy fight is different. However, in either case, you have enough support from the various guards and NPCs in the area that you just need to stay alive while leading your allies to the harpies (or <a href="https://wiki.guildwars.com/wiki/Pull" rel="noopener" target="_blank" title="Pull">pulling</a> the foes towards your allies).
+</p></div>
+          </section>
+        </div>
+
+        <div class="row-lower">
+          <section class="panel bosses" id="bosses">
+            <h2 class="panel-title"><span class="icon icon-boss">☠</span> Bosses &amp; Elites</h2>
+            <div class="panel-scroll"><p class='boss-note'>See wiki for boss list (or none listed).</p></div>
+          </section>
+          <section class="panel other" id="other">
+            <h2 class="panel-title"><span class="icon icon-other">✦</span> Tips &amp; Notes</h2>
+            <div class="panel-scroll"><h3 style='font-size:0.8rem;color:var(--accent);margin:0.3rem 0;'>Skill recommendations</h3><div class='wiki-block'><dl><dd><i>See also: <a href="https://wiki.guildwars.com/wiki/Tihark_Orchard/Guide" rel="noopener" target="_blank" title="Tihark Orchard/Guide">Tihark Orchard/Guide</a></i> <i>for a detailed walkthrough</i></dd></dl><ul><li>This is a solo mission, so you need to bring some <a href="https://wiki.guildwars.com/wiki/Self-healing_skill" rel="noopener" target="_blank" title="Self-healing skill">Self-healing skills</a>.</li>
+<li>Although the mission can be completed without <a href="https://wiki.guildwars.com/wiki/Damage" rel="noopener" target="_blank" title="Damage">damage</a>-dealing skills, it goes more quickly if you bring a few.</li>
+<li>A <a href="https://wiki.guildwars.com/wiki/Spirit_spammer" rel="noopener" target="_blank" title="Spirit spammer">spirit spammer</a> can easily win all the fights, including the mini-games (you can typically create the spirits and proceed to the next game while these spirits kill any foes).</li>
+<li><a href="https://wiki.guildwars.com/wiki/Speed_boost" rel="noopener" target="_blank" title="Speed boost">Speed boosts</a> help you move quickly between the mini-games, which are spread far apart. You can also use <a href="https://wiki.guildwars.com/wiki/Shadow_step" rel="noopener" target="_blank" title="Shadow step">shadow steps</a> to jump between floors.</li></ul></div>
+<h3 style='font-size:0.8rem;color:var(--accent);margin:0.3rem 0;'>Notes</h3><div class='wiki-block'><table cellspacing="3" style="float: right; border: 1px solid #D16E5A; width: 250px; margin: 0 0 1em 1em; line-height: 1.4em; font-size: 0.9em; background: #F9F9F9;">
+<tbody><tr>
+<td><a href="https://wiki.guildwars2.com/wiki/Main_Page" rel="noopener" target="_blank" title="gw2:Main Page"><img alt="Gw2logo.png" data-file-height="479" data-file-width="692" decoding="async" height="28" loading="lazy" src="https://wiki.guildwars.com/images/thumb/b/b1/Gw2logo.png/41px-Gw2logo.png" srcset="/images/thumb/b/b1/Gw2logo.png/61px-Gw2logo.png 1.5x, /images/thumb/b/b1/Gw2logo.png/81px-Gw2logo.png 2x" width="41"/></a>
+</td>
+<td>The <a class="extiw" href="https://wiki.guildwars2.com/wiki/Main_Page" rel="noopener" target="_blank" title="gw2:Main Page">Guild Wars 2 Wiki</a>  has an article on <i><b><a class="extiw" href="https://wiki.guildwars2.com/wiki/Tihark_Orchard" rel="noopener" target="_blank" title="gw2:Tihark Orchard">Tihark Orchard</a></b></i>.
+</td></tr></tbody></table><ul><li>Complete exploration of this area contributes approximately 3.2% to the Elonian <a href="https://wiki.guildwars.com/wiki/Cartographer" rel="noopener" target="_blank" title="Cartographer">Cartographer</a> title.
+<ul><li>If you let the guards by the north stairwell fall to the Harpies and leave the Harpies on the south balcony (near Dende and Mina), you can take the north stairwell to explore the entire orchard area for the Elonian Cartographer title. You can come back to the south Harpies to finish the mission after you have finished exploring. Exploring the whole map this way takes about 25 minutes with <a href="https://wiki.guildwars.com/wiki/Speed_boost" rel="noopener" target="_blank" title="Speed boost">speed boosts</a>.</li>
+<li>Alternatively, bring <a href="https://wiki.guildwars.com/wiki/Death%27s_Retreat" rel="noopener" target="_blank" title="Death's Retreat">Death's Retreat</a>, <a href="https://wiki.guildwars.com/wiki/Return" rel="noopener" target="_blank" title="Return">Return</a>, <a href="https://wiki.guildwars.com/wiki/Heart_of_Shadow" rel="noopener" target="_blank" title="Heart of Shadow">Heart of Shadow</a> or <a href="https://wiki.guildwars.com/wiki/Ebon_Escape" rel="noopener" target="_blank" title="Ebon Escape">Ebon Escape</a> and <a href="https://wiki.guildwars.com/wiki/Shadow_step" rel="noopener" target="_blank" title="Shadow step">shadow step</a> past the guards (e.g. by using the skill on a dropped item).</li></ul></li>
+<li>Looting a <a href="https://wiki.guildwars.com/wiki/Food_Tray" rel="noopener" target="_blank" title="Food Tray">Food</a> or <a href="https://wiki.guildwars.com/wiki/Drink_Tray" rel="noopener" target="_blank" title="Drink Tray">Drink tray</a> before the final Harpies are killed by the guards will cause your character to be holding it in the final <a href="https://wiki.guildwars.com/wiki/Cinematic" rel="noopener" target="_blank" title="Cinematic">cinematic</a>. This has no impact on the story.</li>
+<li>If you leave the Harpies be and take the north-eastern way to the back of the garden, you will see the princes, Norgu, Goren, Talhkora and Vabbi Guards standing ready for the final cinematic.</li>
+<li><a href="https://wiki.guildwars.com/wiki/Tahlkora" rel="noopener" target="_blank" title="Tahlkora">Tahlkora</a> appears in the mission as a level 12 Monk, wearing her own armor and weapons (wand and focus item).</li>
+<li>Death during this mission will cause a note to come up saying <i>"MISSION FAILED: You died during the party. Drink responsibly next time!"</i></li>
+<li>You can participate in six festival activities: the dance, the mime duel, the re-enactment, the drinking duel, obtaining the vase, and bribing the finance minister. To obtain Master's Reward, you only need to participate in five.</li>
+<li>After completing this mission, your character will be taken to <a href="https://wiki.guildwars.com/wiki/The_Kodash_Bazaar" rel="noopener" target="_blank" title="The Kodash Bazaar">The Kodash Bazaar</a>.</li>
+<li>Completion of this mission will fill in page #7 in the <a href="https://wiki.guildwars.com/wiki/Night_Falls" rel="noopener" target="_blank" title="Night Falls">Night Falls</a> <a href="https://wiki.guildwars.com/wiki/Storybook" rel="noopener" target="_blank" title="Storybook">storybook</a>.</li></ul><div style="margin: 1em; border: solid silver; border-width: 1px 0px; padding: 2px 1em 2px 7.5em;"><strong class="hiddenlinks" style="position: absolute; margin-left: -7.3em; color: #900;"><a class="image" href="https://wiki.guildwars.com/wiki/File:Anomaly.png" rel="noopener" target="_blank" title="Anomaly"><img alt="Anomaly" data-file-height="32" data-file-width="32" decoding="async" height="18" loading="lazy" src="https://wiki.guildwars.com/images/thumb/a/a6/Anomaly.png/18px-Anomaly.png" srcset="/images/thumb/a/a6/Anomaly.png/27px-Anomaly.png 1.5x, /images/a/a6/Anomaly.png 2x" width="18"/></a> <a class="mw-redirect" href="https://wiki.guildwars.com/wiki/Anomaly" rel="noopener" target="_blank" title="Anomaly">Anomaly</a>.</strong> Unlike <a href="https://wiki.guildwars.com/wiki/Augury_Rock" rel="noopener" target="_blank" title="Augury Rock">Augury Rock</a>, you can use <a href="https://wiki.guildwars.com/wiki/Summoning_stone" rel="noopener" target="_blank" title="Summoning stone">summoning stones</a> during this mission.</div><div style="margin: 1em; border: solid silver; border-width: 1px 0px; padding: 2px 1em 2px 5em;"><strong class="hiddenlinks" style="position: absolute; margin-left: -4.8em; color: #900;"><a class="image" href="https://wiki.guildwars.com/wiki/File:Bug.png" rel="noopener" target="_blank" title="Bug"><img alt="Bug" data-file-height="32" data-file-width="32" decoding="async" height="18" loading="lazy" src="https://wiki.guildwars.com/images/thumb/7/7d/Bug.png/18px-Bug.png" srcset="/images/thumb/7/7d/Bug.png/27px-Bug.png 1.5x, /images/7/7d/Bug.png 2x" width="18"/></a> <a href="https://wiki.guildwars.com/wiki/Bug" rel="noopener" target="_blank" title="Bug">Bug</a>.</strong> As with Margrid in "<a href="https://wiki.guildwars.com/wiki/No_Me,_No_Kormir" rel="noopener" target="_blank" title="No Me, No Kormir">No Me, No Kormir</a>", Morgahn will call you an Istani even if you are a Prophecies or Factions character.</div></div></div>
+          </section>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="lightbox" id="lightbox" role="dialog" aria-label="Enlarged map">
+    <img src="../maps/nightfall_10_Tihark_Orchard_map.jpg" alt="Tihark Orchard mission map (enlarged)" />
+  </div>
+  <script>
+    (function () {
+      var open = document.getElementById("mapOpen");
+      var box = document.getElementById("lightbox");
+      if (!open || !box) return;
+      open.addEventListener("click", function () { box.classList.add("open"); });
+      box.addEventListener("click", function () { box.classList.remove("open"); });
+      document.addEventListener("keydown", function (e) {
+        if (e.key === "Escape") box.classList.remove("open");
+      });
+    })();
+  </script>
+
+</body>
+</html>

@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Prophecies Missions — Guide Index</title>
+  <style>
+:root {
+  --bg: #070a0f; --panel: #101820; --panel2: #15202c; --border: #243044;
+  --text: #dce6f0; --muted: #8a9bb0; --dim: #5c6f86; --accent: #3ecfff; --gold: #e8c56a;
+  --font: "Segoe UI", system-ui, -apple-system, sans-serif;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { font-size: clamp(15px, 0.7vw + 0.3vh, 18px); scroll-behavior: smooth; }
+body {
+  font-family: var(--font); background: var(--bg); color: var(--text); line-height: 1.5; min-height: 100vh;
+  background-image:
+    radial-gradient(ellipse 80% 40% at 50% -10%, rgba(42, 110, 170, 0.2), transparent),
+    radial-gradient(ellipse 50% 30% at 100% 80%, rgba(80, 40, 120, 0.08), transparent);
+}
+a { color: var(--accent); text-decoration: none; }
+a:hover { color: #7de0ff; text-decoration: underline; }
+.wrap { max-width: 1100px; margin: 0 auto; padding: 1.5rem 1.25rem 3rem; }
+header.hero { margin-bottom: 1.5rem; padding-bottom: 1.25rem; border-bottom: 1px solid var(--border); }
+.kicker {
+  font-size: 0.75rem; letter-spacing: 0.14em; text-transform: uppercase;
+  color: var(--accent); font-weight: 700; margin-bottom: 0.35rem;
+}
+h1 {
+  font-size: clamp(1.6rem, 2.5vw, 2.2rem); font-weight: 800; letter-spacing: -0.02em;
+  background: linear-gradient(135deg, #e8f4ff, var(--accent));
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+}
+.sub { color: var(--muted); margin-top: 0.5rem; max-width: 52rem; }
+.meta-row { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.9rem; align-items: center; }
+.tag {
+  font-size: 0.72rem; font-weight: 650; letter-spacing: 0.04em; text-transform: uppercase;
+  padding: 0.28rem 0.6rem; border-radius: 999px;
+  background: rgba(62, 207, 255, 0.12); color: var(--accent);
+  border: 1px solid rgba(62, 207, 255, 0.25); text-decoration: none;
+}
+.tag:hover { filter: brightness(1.1); text-decoration: none; }
+.tag.gold { background: rgba(232, 197, 106, 0.12); color: var(--gold); border-color: rgba(232, 197, 106, 0.3); }
+.campaign-switch { display: flex; flex-wrap: wrap; gap: 0.45rem; margin: 1rem 0 1.25rem; }
+.campaign-switch a {
+  font-size: 0.85rem; font-weight: 700; padding: 0.5rem 0.9rem;
+  border-radius: 10px; background: var(--panel); border: 1px solid var(--border);
+  color: var(--muted); text-decoration: none;
+}
+.campaign-switch a:hover { color: var(--text); border-color: #2a4a6a; text-decoration: none; }
+.campaign-switch a.active { color: #0a1018; background: var(--accent); border-color: transparent; }
+.toc { display: flex; flex-wrap: wrap; gap: 0.4rem; margin: 0 0 1.5rem; }
+.toc a {
+  font-size: 0.78rem; font-weight: 600; padding: 0.35rem 0.7rem;
+  border-radius: 8px; background: var(--panel); border: 1px solid var(--border);
+  color: var(--muted); text-decoration: none;
+}
+.toc a:hover { color: var(--text); border-color: #2a4a6a; text-decoration: none; }
+.region { margin-bottom: 1.75rem; }
+.region-title {
+  display: flex; align-items: baseline; gap: 0.75rem;
+  margin-bottom: 0.75rem; padding-bottom: 0.4rem; border-bottom: 1px solid var(--border);
+}
+.region-title h2 { font-size: 1.05rem; font-weight: 750; }
+.region-title span { font-size: 0.78rem; color: var(--dim); }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 0.65rem; }
+.card {
+  display: flex; flex-direction: column; gap: 0.35rem; padding: 0.9rem 1rem;
+  background: var(--panel); border: 1px solid var(--border); border-radius: 12px;
+  text-decoration: none; color: inherit; position: relative; overflow: hidden;
+  transition: border-color 0.15s, transform 0.12s, background 0.15s, box-shadow 0.15s;
+}
+.card::before {
+  content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 3px;
+  background: var(--accent); opacity: 0.7;
+}
+.card:hover {
+  border-color: #2a4a6a; background: var(--panel2); transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.3); text-decoration: none; color: inherit;
+}
+.card-num { font-size: 0.7rem; font-weight: 750; letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent); }
+.card-name { font-size: 1.02rem; font-weight: 700; color: var(--text); line-height: 1.25; }
+.card-region { font-size: 0.78rem; color: var(--dim); }
+.card-extra { font-size: 0.75rem; color: var(--muted); }
+.card-go { margin-top: 0.35rem; font-size: 0.78rem; font-weight: 650; color: var(--accent); }
+.notes {
+  margin-top: 2rem; padding: 1rem 1.1rem; background: var(--panel);
+  border: 1px solid var(--border); border-radius: 12px; font-size: 0.88rem; color: var(--muted);
+}
+.notes h3 { color: var(--gold); font-size: 0.85rem; margin-bottom: 0.45rem; text-transform: uppercase; letter-spacing: 0.06em; }
+.notes ul { padding-left: 1.15rem; }
+.notes li { margin-bottom: 0.3rem; }
+footer { margin-top: 2rem; text-align: center; font-size: 0.75rem; color: var(--dim); }
+
+    :root { --accent: #3ecfff; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header class="hero">
+      <div class="kicker">Guild Wars · Campaign Guide</div>
+      <h1>Prophecies Missions</h1>
+      <p class="sub">Second-monitor guides for all primary storyline missions in Guild Wars Prophecies.</p>
+      <div class="meta-row">
+        <span class="tag">25 Missions</span>
+        <span class="tag gold">Prophecies</span>
+        <span class="tag">4K vertical · large map</span>
+        <a class="tag" href="https://wiki.guildwars.com/wiki/List_of_Prophecies_missions_and_primary_quests" target="_blank" rel="noopener">Wiki list ↗</a>
+      </div>
+    </header>
+    <nav class="campaign-switch" aria-label="Campaigns"><a class="active" href="prohecies.html">Prophecies</a><a class="" href="factions.html">Factions</a><a class="" href="nightfall.html">Nightfall</a></nav>
+    <nav class="toc" aria-label="Regions"><a href="#region-ascalon">Ascalon</a><a href="#region-northern-shiverpeaks">Northern Shiverpeaks</a><a href="#region-kryta">Kryta</a><a href="#region-maguuma-jungle">Maguuma Jungle</a><a href="#region-crystal-desert">Crystal Desert</a><a href="#region-southern-shiverpeaks">Southern Shiverpeaks</a><a href="#region-ring-of-fire-islands">Ring of Fire Islands</a></nav>
+    <section class="region" id="region-ascalon">
+  <div class="region-title">
+    <h2>Ascalon</h2>
+    <span>4 missions</span>
+  </div>
+  <div class="grid"><a class="card" href="prophecies/1_The_Great_Northern_Wall.html">
+  <div class="card-num">Mission 1</div>
+  <div class="card-name">The Great Northern Wall</div>
+  <div class="card-region">Ascalon</div>
+  
+  <div class="card-go">Open guide →</div>
+</a><a class="card" href="prophecies/2_Fort_Ranik.html">
+  <div class="card-num">Mission 2</div>
+  <div class="card-name">Fort Ranik</div>
+  <div class="card-region">Ascalon</div>
+  
+  <div class="card-go">Open guide →</div>
+</a><a class="card" href="prophecies/3_Ruins_of_Surmia.html">
+  <div class="card-num">Mission 3</div>
+  <div class="card-name">Ruins of Surmia</div>
+  <div class="card-region">Ascalon</div>
+  
+  <div class="card-go">Open guide →</div>
+</a><a class="card" href="prophecies/4_Nolani_Academy.html">
+  <div class="card-num">Mission 4</div>
+  <div class="card-name">Nolani Academy</div>
+  <div class="card-region">Ascalon</div>
+  
+  <div class="card-go">Open guide →</div>
+</a></div>
+</section><section class="region" id="region-northern-shiverpeaks">
+  <div class="region-title">
+    <h2>Northern Shiverpeaks</h2>
+    <span>2 missions</span>
+  </div>
+  <div class="grid"><a class="card" href="prophecies/5_Borlis_Pass.html">
+  <div class="card-num">Mission 5</div>
+  <div class="card-name">Borlis Pass</div>
+  <div class="card-region">Northern Shiverpeaks</div>
+  
+  <div class="card-go">Open guide →</div>
+</a><a class="card" href="prophecies/6_The_Frost_Gate.html">
+  <div class="card-num">Mission 6</div>
+  <div class="card-name">The Frost Gate</div>
+  <div class="card-region">Northern Shiverpeaks</div>
+  
+  <div class="card-go">Open guide →</div>
+</a></div>
+</section><section class="region" id="region-kryta">
+  <div class="region-title">
+    <h2>Kryta</h2>
+    <span>5 missions</span>
+  </div>
+  <div class="grid"><a class="card" href="prophecies/7_Gates_of_Kryta.html">
+  <div class="card-num">Mission 7</div>
+  <div class="card-name">Gates of Kryta</div>
+  <div class="card-region">Kryta</div>
+  
+  <div class="card-go">Open guide →</div>
+</a><a class="card" href="prophecies/8_DAlessio_Seaboard.html">
+  <div class="card-num">Mission 8</div>
+  <div class="card-name">D&#x27;Alessio Seaboard</div>
+  <div class="card-region">Kryta</div>
+  
+  <div class="card-go">Open guide →</div>
+</a><a class="card" href="prophecies/9_Divinity_Coast.html">
+  <div class="card-num">Mission 9</div>
+  <div class="card-name">Divinity Coast</div>
+  <div class="card-region">Kryta</div>
+  
+  <div class="card-go">Open guide →</div>
+</a><a class="card" href="prophecies/13_Riverside_Province.html">
+  <div class="card-num">Mission 13</div>
+  <div class="card-name">Riverside Province</div>
+  <div class="card-region">Kryta</div>
+  
+  <div class="card-go">Open guide →</div>
+</a><a class="card" href="prophecies/14_Sanctum_Cay.html">
+  <div class="card-num">Mission 14</div>
+  <div class="card-name">Sanctum Cay</div>
+  <div class="card-region">Kryta</div>
+  
+  <div class="card-go">Open guide →</div>
+</a></div>
+</section><section class="region" id="region-maguuma-jungle">
+  <div class="region-title">
+    <h2>Maguuma Jungle</h2>
+    <span>3 missions</span>
+  </div>
+  <div class="grid"><a class="card" href="prophecies/10_The_Wilds.html">
+  <div class="card-num">Mission 10</div>
+  <div class="card-name">The Wilds</div>
+  <div class="card-region">Maguuma Jungle</div>
+  
+  <div class="card-go">Open guide →</div>
+</a><a class="card" href="prophecies/11_Bloodstone_Fen.html">
+  <div class="card-num">Mission 11</div>
+  <div class="card-name">Bloodstone Fen</div>
+  <div class="card-region">Maguuma Jungle</div>
+  
+  <div class="card-go">Open guide →</div>
+</a><a class="card" href="prophecies/12_Aurora_Glade.html">
+  <div class="card-num">Mission 12</div>
+  <div class="card-name">Aurora Glade</div>
+  <div class="card-region">Maguuma Jungle</div>
+  
+  <div class="card-go">Open guide →</div>
+</a></div>
+</section><section class="region" id="region-crystal-desert">
+  <div class="region-title">
+    <h2>Crystal Desert</h2>
+    <span>5 missions</span>
+  </div>
+  <div class="grid"><a class="card" href="prophecies/15_Dunes_of_Despair.html">
+  <div class="card-num">Mission 15</div>
+  <div class="card-name">Dunes of Despair</div>
+  <div class="card-region">Crystal Desert</div>
+  
+  <div class="card-go">Open guide →</div>
+</a><a class="card" href="prophecies/16_Thirsty_River.html">
+  <div class="card-num">Mission 16</div>
+  <div class="card-name">Thirsty River</div>
+  <div class="card-region">Crystal Desert</div>
+  
+  <div class="card-go">Open guide →</div>
+</a><a class="card" href="prophecies/17_Elona_Reach.html">
+  <div class="card-num">Mission 17</div>
+  <div class="card-name">Elona Reach</div>
+  <div class="card-region">Crystal Desert</div>
+  
+  <div class="card-go">Open guide →</div>
+</a><a class="card" href="prophecies/18_Augury_Rock.html">
+  <div class="card-num">Mission 18</div>
+  <div class="card-name">Augury Rock</div>
+  <div class="card-region">Crystal Desert</div>
+  
+  <div class="card-go">Open guide →</div>
+</a><a class="card" href="prophecies/19_The_Dragons_Lair.html">
+  <div class="card-num">Mission 19</div>
+  <div class="card-name">The Dragon&#x27;s Lair</div>
+  <div class="card-region">Crystal Desert</div>
+  
+  <div class="card-go">Open guide →</div>
+</a></div>
+</section><section class="region" id="region-southern-shiverpeaks">
+  <div class="region-title">
+    <h2>Southern Shiverpeaks</h2>
+    <span>3 missions</span>
+  </div>
+  <div class="grid"><a class="card" href="prophecies/20_Ice_Caves_of_Sorrow.html">
+  <div class="card-num">Mission 20</div>
+  <div class="card-name">Ice Caves of Sorrow</div>
+  <div class="card-region">Southern Shiverpeaks</div>
+  
+  <div class="card-go">Open guide →</div>
+</a><a class="card" href="prophecies/21_Iron_Mines_of_Moladune.html">
+  <div class="card-num">Mission 21</div>
+  <div class="card-name">Iron Mines of Moladune</div>
+  <div class="card-region">Southern Shiverpeaks</div>
+  
+  <div class="card-go">Open guide →</div>
+</a><a class="card" href="prophecies/22_Thunderhead_Keep.html">
+  <div class="card-num">Mission 22</div>
+  <div class="card-name">Thunderhead Keep</div>
+  <div class="card-region">Southern Shiverpeaks</div>
+  
+  <div class="card-go">Open guide →</div>
+</a></div>
+</section><section class="region" id="region-ring-of-fire-islands">
+  <div class="region-title">
+    <h2>Ring of Fire Islands</h2>
+    <span>3 missions</span>
+  </div>
+  <div class="grid"><a class="card" href="prophecies/23_Ring_of_Fire.html">
+  <div class="card-num">Mission 23</div>
+  <div class="card-name">Ring of Fire</div>
+  <div class="card-region">Ring of Fire Islands</div>
+  
+  <div class="card-go">Open guide →</div>
+</a><a class="card" href="prophecies/24_Abaddons_Mouth.html">
+  <div class="card-num">Mission 24</div>
+  <div class="card-name">Abaddon&#x27;s Mouth</div>
+  <div class="card-region">Ring of Fire Islands</div>
+  
+  <div class="card-go">Open guide →</div>
+</a><a class="card" href="prophecies/25_Hells_Precipice.html">
+  <div class="card-num">Mission 25</div>
+  <div class="card-name">Hell&#x27;s Precipice</div>
+  <div class="card-region">Ring of Fire Islands</div>
+  
+  <div class="card-go">Open guide →</div>
+</a></div>
+</section>
+    <div class="notes"><h3>Storyline notes</h3><ul><li>Pre-Searing primary quests lead into Mission 1 after the Searing.</li><li>Crystal Desert Ascension missions (15–17) can be done in any order.</li><li>Thunderhead Keep through Hell’s Precipice cannot be skipped to finish the game.</li><li>Foreign characters join at Lion’s Arch with Report to the White Mantle.</li></ul></div>
+    <footer>
+      Content adapted from
+      <a href="https://wiki.guildwars.com/wiki/List_of_Prophecies_missions_and_primary_quests" target="_blank" rel="noopener">Guild Wars Wiki</a>
+      · Maps &amp; text © ArenaNet / NCsoft · Local offline guides
+    </footer>
+  </div>
+</body>
+</html>

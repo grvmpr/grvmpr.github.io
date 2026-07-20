@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Borlis Pass</title>
+  <style>
+:root {
+  --bg-deep: #070a0f;
+  --bg-panel: #101820;
+  --bg-panel-2: #15202c;
+  --border: #243044;
+  --border-glow: #2a4a6a;
+  --text: #dce6f0;
+  --text-muted: #8a9bb0;
+  --text-dim: #5c6f86;
+  --accent: #3ecfff;
+  --accent-soft: rgba(62, 207, 255, 0.12);
+  --gold: #e8c56a;
+  --gold-soft: rgba(232, 197, 106, 0.12);
+  --bonus: #7dffb3;
+  --bonus-soft: rgba(125, 255, 179, 0.1);
+  --danger: #ff6b6b;
+  --danger-soft: rgba(255, 107, 107, 0.1);
+  --hm: #c78bff;
+  --hm-soft: rgba(199, 139, 255, 0.12);
+  --radius: 10px;
+  --font: "Segoe UI", system-ui, -apple-system, sans-serif;
+  --chrome-h: 3.1rem;
+  --gap: 0.5rem;
+  --pad: 0.7rem;
+  /* Readable on 4K vertical (~2160×3840) */
+  --walk-size: clamp(1.05rem, 0.55vw + 0.55vh, 1.35rem);
+  --bonus-size: clamp(1.05rem, 0.55vw + 0.55vh, 1.35rem);
+  --body-size: clamp(0.95rem, 0.4vw + 0.4vh, 1.1rem);
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html {
+  scroll-behavior: smooth;
+  font-size: clamp(16px, 0.55vw + 0.45vh, 20px);
+  height: 100%;
+  scroll-padding-top: calc(var(--chrome-h) + 0.5rem);
+}
+body {
+  font-family: var(--font);
+  background: var(--bg-deep);
+  color: var(--text);
+  line-height: 1.45;
+  min-height: 100%;
+  height: 100%;
+  overflow: hidden;
+  background-image: radial-gradient(ellipse 70% 25% at 50% 0%, rgba(42, 100, 160, 0.14), transparent);
+}
+a { color: var(--accent); text-decoration: none; }
+a:hover { color: #7de0ff; text-decoration: underline; }
+.app {
+  display: grid;
+  grid-template-rows: var(--chrome-h) 1fr;
+  height: 100vh; height: 100dvh;
+  max-height: 100vh; max-height: 100dvh;
+}
+.top-chrome {
+  display: flex; align-items: center; gap: 0.65rem;
+  padding: 0 0.7rem;
+  background: rgba(8, 12, 18, 0.97);
+  border-bottom: 1px solid var(--border);
+  z-index: 100; min-height: var(--chrome-h);
+}
+.brand { display: flex; align-items: baseline; gap: 0.55rem; min-width: 0; flex-shrink: 0; }
+.brand-mission {
+  font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase;
+  color: var(--accent); font-weight: 700; white-space: nowrap;
+}
+.brand-name {
+  font-size: 1.1rem; font-weight: 750; color: var(--text);
+  white-space: nowrap; letter-spacing: -0.02em;
+}
+.brand-meta { font-size: 0.75rem; color: var(--text-dim); white-space: nowrap; }
+.chip-nav {
+  display: flex; flex: 1; gap: 0.3rem; overflow-x: auto;
+  scrollbar-width: none; min-width: 0; justify-content: center;
+}
+.chip-nav::-webkit-scrollbar { display: none; }
+.chip-nav a {
+  flex: 0 0 auto; padding: 0.3rem 0.65rem; border-radius: 999px;
+  font-size: 0.78rem; font-weight: 600; color: var(--text-muted);
+  background: var(--bg-panel); border: 1px solid var(--border);
+  text-decoration: none; white-space: nowrap;
+}
+.chip-nav a:hover {
+  color: var(--text); border-color: var(--border-glow);
+  background: #1a2836; text-decoration: none;
+}
+.chip-nav a[href="#map"] { color: var(--accent); border-color: rgba(62, 207, 255, 0.35); }
+.chip-nav a[href="#bonus"] { color: var(--bonus); border-color: rgba(125, 255, 179, 0.3); }
+.chip-nav a[href="#hard-mode"] { color: var(--hm); border-color: rgba(199, 139, 255, 0.3); }
+.chip-nav a[href="#bosses"] { color: #ff9a9a; border-color: rgba(255, 107, 107, 0.3); }
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 0.3rem;
+  padding: 0.42rem 0.85rem; border-radius: 8px; font-weight: 650; font-size: 0.8rem;
+  border: none; cursor: pointer; text-decoration: none; white-space: nowrap; flex-shrink: 0;
+}
+.btn:hover { text-decoration: none; }
+.btn-next {
+  background: linear-gradient(135deg, #1a6a9a, #1ab0e0); color: #fff;
+  box-shadow: 0 2px 12px rgba(26, 140, 200, 0.35);
+}
+.btn-next:hover { color: #fff; filter: brightness(1.08); }
+.btn-wiki, .btn-idx, .btn-prev {
+  background: var(--bg-panel); color: var(--text-muted);
+  border: 1px solid var(--border); padding: 0.42rem 0.65rem;
+}
+.btn-wiki:hover, .btn-idx:hover, .btn-prev:hover {
+  color: var(--accent); border-color: var(--border-glow);
+}
+.chrome-actions { display: flex; gap: 0.35rem; flex-shrink: 0; }
+
+/* Map-dominant workspace */
+.workspace {
+  display: grid;
+  grid-template-columns: minmax(480px, 1.15fr) minmax(0, 1fr);
+  grid-template-rows: 1fr;
+  gap: var(--gap); padding: var(--gap);
+  min-height: 0; height: 100%; overflow: hidden;
+}
+.col-map {
+  display: grid;
+  grid-template-rows: 1fr auto;
+  gap: var(--gap);
+  min-height: 0; min-width: 0;
+}
+.col-main {
+  display: grid;
+  /* objectives compact | walkthrough HUGE | bonus+hm | bosses+tips */
+  grid-template-rows: auto minmax(0, 1.6fr) minmax(0, 1.05fr) minmax(0, 0.75fr);
+  gap: var(--gap); min-height: 0; min-width: 0; overflow: hidden;
+}
+.row-obj { min-height: 0; }
+.row-bonus-hm {
+  display: grid; grid-template-columns: 1.15fr 0.85fr; gap: var(--gap); min-height: 0;
+}
+.row-lower {
+  display: grid; grid-template-columns: 1.15fr 0.85fr; gap: var(--gap); min-height: 0;
+}
+.panel {
+  background: var(--bg-panel); border: 1px solid var(--border); border-radius: var(--radius);
+  padding: var(--pad); display: flex; flex-direction: column; min-height: 0; overflow: hidden;
+}
+.panel-scroll {
+  overflow-y: auto; overflow-x: hidden; min-height: 0; flex: 1; padding-right: 0.3rem;
+  scrollbar-width: thin; scrollbar-color: var(--border) transparent;
+  font-size: var(--body-size);
+}
+.panel-scroll::-webkit-scrollbar { width: 8px; }
+.panel-scroll::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+.panel-title {
+  display: flex; align-items: center; gap: 0.4rem;
+  font-size: 0.82rem; font-weight: 750; letter-spacing: 0.05em; text-transform: uppercase;
+  color: var(--text); margin-bottom: 0.45rem; padding-bottom: 0.35rem;
+  border-bottom: 1px solid var(--border); flex-shrink: 0;
+}
+.panel-title .icon {
+  width: 1.3rem; height: 1.3rem; border-radius: 5px;
+  display: inline-flex; align-items: center; justify-content: center; font-size: 0.75rem;
+}
+.panel.map-panel {
+  border-color: var(--border-glow);
+  background: linear-gradient(180deg, #0e1620 0%, var(--bg-panel) 100%);
+  /* Map takes almost all left column */
+  min-height: 0;
+}
+.panel.objectives { border-top: 2px solid var(--accent); }
+.panel.walkthrough { border-top: 3px solid #5eb8e8; }
+.panel.bonus { border-top: 3px solid var(--bonus); }
+.panel.hard-mode { border-top: 2px solid var(--hm); }
+.panel.bosses { border-top: 2px solid var(--danger); }
+.panel.other { border-top: 2px solid var(--text-muted); }
+
+/* Emphasized reading panels */
+.panel.walkthrough .panel-scroll,
+.panel.walkthrough .wiki-block {
+  font-size: var(--walk-size) !important;
+  line-height: 1.55;
+}
+.panel.bonus .panel-scroll,
+.panel.bonus .wiki-block {
+  font-size: var(--bonus-size) !important;
+  line-height: 1.55;
+}
+.panel.walkthrough .panel-scroll li,
+.panel.bonus .panel-scroll li {
+  margin-bottom: 0.45rem;
+}
+.panel.walkthrough .panel-scroll p,
+.panel.bonus .panel-scroll p {
+  margin-bottom: 0.55rem;
+}
+
+.icon-map { background: var(--accent-soft); color: var(--accent); }
+.icon-obj { background: var(--accent-soft); color: var(--accent); }
+.icon-walk { background: rgba(94, 184, 232, 0.15); color: #5eb8e8; }
+.icon-bonus { background: var(--bonus-soft); color: var(--bonus); }
+.icon-hm { background: var(--hm-soft); color: var(--hm); }
+.icon-boss { background: var(--danger-soft); color: var(--danger); }
+.icon-other { background: rgba(138, 155, 176, 0.15); color: var(--text-muted); }
+
+.map-wrap {
+  flex: 1; min-height: 0; display: flex; flex-direction: column;
+  align-items: center; justify-content: center; gap: 0.4rem;
+}
+.map-frame {
+  flex: 1; min-height: 0; width: 100%;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: 10px; overflow: hidden;
+  border: 2px solid var(--border-glow);
+  box-shadow: 0 0 0 1px rgba(62, 207, 255, 0.1), 0 12px 40px rgba(0, 0, 0, 0.45);
+  background: #05080c; cursor: zoom-in;
+}
+.map-frame img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  image-rendering: auto;
+}
+.map-caption { font-size: 0.72rem; color: var(--text-dim); flex-shrink: 0; }
+.map-missing {
+  color: var(--text-dim); font-size: 1rem; text-align: center; padding: 2rem;
+}
+
+.wiki-block ul, .panel-scroll ul,
+.wiki-block ol, .panel-scroll ol { padding-left: 1.2rem; margin: 0.3rem 0 0.5rem; }
+.wiki-block li, .panel-scroll li { margin-bottom: 0.32rem; }
+.wiki-block p, .panel-scroll p { margin-bottom: 0.45rem; }
+.wiki-block img, .panel-scroll img { vertical-align: middle; max-height: 1.35em; width: auto; }
+.wiki-block table, .panel-scroll table {
+  width: 100%; border-collapse: collapse; font-size: 0.9em; margin: 0.4rem 0;
+}
+.wiki-block th, .wiki-block td, .panel-scroll th, .panel-scroll td {
+  border: 1px solid var(--border); padding: 0.3rem 0.45rem; text-align: left;
+}
+.lede { font-size: 0.92rem; color: var(--text-muted); margin-bottom: 0.35rem; }
+
+/* Collapsed summary */
+details.summary-details {
+  background: var(--bg-panel);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  border-top: 2px solid var(--gold);
+  padding: 0.35rem 0.65rem;
+  flex-shrink: 0;
+}
+details.summary-details summary {
+  cursor: pointer;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--gold);
+  padding: 0.35rem 0;
+  list-style: none;
+}
+details.summary-details summary::-webkit-details-marker { display: none; }
+details.summary-details summary::before {
+  content: "▸ ";
+  color: var(--text-dim);
+}
+details.summary-details[open] summary::before { content: "▾ "; }
+details.summary-details .summary-body {
+  padding: 0.35rem 0 0.55rem;
+  font-size: 0.88rem;
+  color: var(--text-muted);
+  max-height: 18vh;
+  overflow-y: auto;
+}
+
+.boss-note { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.4rem; }
+.boss-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.4rem; }
+.boss-card {
+  background: var(--bg-panel-2); border: 1px solid var(--border);
+  border-radius: 8px; padding: 0.5rem 0.6rem;
+}
+.boss-card-head { font-size: 0.95rem; margin-bottom: 0.2rem; }
+.boss-card-head a { color: #eef6fc; font-weight: 700; }
+.boss-card-head a:hover { color: var(--accent); }
+.boss-elite { font-size: 0.88rem; }
+.elite-label { color: var(--gold); font-weight: 650; margin-right: 0.25rem; }
+.elite-link { color: #ffd78a; font-weight: 650; }
+.elite-link:hover { color: #ffe9b5; }
+.elite-none { color: var(--text-dim); font-style: italic; font-size: 0.85rem; }
+.boss-meta { font-size: 0.78rem; color: var(--text-dim); margin-top: 0.15rem; }
+
+.callout {
+  margin-top: 0.4rem; padding: 0.45rem 0.6rem; border-radius: 6px;
+  font-size: 0.88rem; border-left: 3px solid; line-height: 1.4;
+}
+.callout.tip { background: var(--accent-soft); border-color: var(--accent); color: #b8eaff; }
+.callout.warn { background: var(--danger-soft); border-color: var(--danger); color: #ffb4b4; }
+
+.lightbox {
+  display: none; position: fixed; inset: 0; z-index: 1000; background: rgba(0,0,0,0.94);
+  align-items: center; justify-content: center; padding: 1.5rem; cursor: zoom-out;
+}
+.lightbox.open { display: flex; }
+.lightbox img {
+  max-width: 96vw; max-height: 96vh; border-radius: 8px;
+  border: 2px solid var(--border-glow); object-fit: contain;
+}
+
+@media (min-height: 2400px) {
+  :root {
+    --walk-size: clamp(1.15rem, 0.7vh + 0.3vw, 1.5rem);
+    --bonus-size: clamp(1.15rem, 0.7vh + 0.3vw, 1.5rem);
+    --gap: 0.65rem;
+    --pad: 0.85rem;
+  }
+  .workspace { grid-template-columns: minmax(560px, 1.2fr) minmax(0, 1fr); }
+}
+@media (min-width: 1800px) and (min-height: 2000px) {
+  .workspace { grid-template-columns: minmax(600px, 1.25fr) minmax(0, 1fr); }
+}
+@media (max-height: 1100px) {
+  body { overflow: auto; height: auto; }
+  .app { height: auto; max-height: none; min-height: 100vh; }
+  .workspace {
+    height: auto; overflow: visible; grid-template-columns: 1fr; grid-template-rows: auto;
+  }
+  .col-map { grid-template-rows: auto; }
+  .col-main { overflow: visible; grid-template-rows: auto; }
+  .row-bonus-hm, .row-lower { grid-template-columns: 1fr; }
+  .panel { max-height: none; overflow: visible; }
+  .panel-scroll { overflow: visible; }
+  .map-frame { min-height: 360px; max-height: 55vh; }
+}
+
+    :root { --accent: #3ecfff; --accent-soft: #3ecfff22; }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header class="top-chrome">
+      <div class="brand">
+        <span class="brand-mission">M5</span>
+        <span class="brand-name">Borlis Pass</span>
+        <span class="brand-meta">Prophecies · Northern Shiverpeaks · Cooperative · —</span>
+      </div>
+      <nav class="chip-nav" aria-label="Sections">
+        <a href="#map">Map</a>
+        <a href="#walkthrough">Walkthrough</a>
+        <a href="#bonus">Bonus</a>
+        <a href="#objectives">Objectives</a>
+        <a href="#hard-mode">Hard Mode</a>
+        <a href="#bosses">Bosses</a>
+        <a href="#other">Tips</a>
+      </nav>
+      <div class="chrome-actions">
+        <a class="btn btn-idx" href="../prohecies.html">Index</a>
+        <a class="btn btn-prev" href="4_Nolani_Academy.html">← Prev</a>
+        <a class="btn btn-wiki" href="https://wiki.guildwars.com/wiki/Borlis_Pass" target="_blank" rel="noopener">Wiki ↗</a>
+        <a class="btn btn-next" href="6_The_Frost_Gate.html">Next: The Frost Gate →</a>
+      </div>
+    </header>
+
+    <div class="workspace">
+      <div class="col-map">
+        <section class="panel map-panel" id="map">
+          <h2 class="panel-title"><span class="icon icon-map">◉</span> Mission Map</h2>
+          <div class="map-wrap">
+            <div class="map-frame" id="mapOpen" title="Click to enlarge">
+              <img src="../maps/prophecies_05_Borlis_Pass_map.jpg" alt="Borlis Pass mission map" />
+            </div>
+            <p class="map-caption">Click to enlarge · Local cache · <a href="https://wiki.guildwars.com/wiki/Borlis_Pass" target="_blank" rel="noopener">Wiki</a></p>
+        </div>
+        </section>
+
+        <details class="summary-details" id="summary">
+          <summary>Summary (click to expand)</summary>
+          <div class="summary-body">
+            <p>The refugees have waited days for Prince Rurik to return with word of his meeting with Jalis Ironhammer . Now, to cross the pass, they must head out into a raging snowstorm, and reach the shelter of Grooble&#x27;s Gulch . You must go out ahead, and light the storm beacons so that refugees can make it through without getting lost. Once the beacons are lit, you must keep going until you locate Rurik.</p>
+            <p style="margin-top:0.4rem;"><strong>Region:</strong> Northern Shiverpeaks · <strong>Mission:</strong> 5 of 25 · <strong>Type:</strong> Cooperative</p>
+            <p style="margin-top:0.35rem;"><a href="https://wiki.guildwars.com/wiki/Borlis_Pass" target="_blank" rel="noopener">Full wiki article ↗</a></p>
+          </div>
+        </details>
+      </div>
+
+      <div class="col-main">
+        <section class="panel objectives row-obj" id="objectives">
+          <h2 class="panel-title"><span class="icon icon-obj">✓</span> Objectives</h2>
+          <div class="panel-scroll wiki-block"><p>Negotiate passage to <a class="mw-redirect" href="https://wiki.guildwars.com/wiki/Grooble%27s_Gulch" rel="noopener" target="_blank" title="Grooble's Gulch">Grooble's Gulch</a> and shelter for the Ascalon refugees.
+</p><ul><li>Ignite all the <a class="mw-redirect" href="https://wiki.guildwars.com/wiki/Storm_beacon" rel="noopener" target="_blank" title="Storm beacon">storm beacons</a> to light the way through the storm.</li>
+<li>Find out what happened to <a href="https://wiki.guildwars.com/wiki/Prince_Rurik" rel="noopener" target="_blank" title="Prince Rurik">Prince Rurik</a>'s negotiations with Dwarf <a href="https://wiki.guildwars.com/wiki/King_Jalis_Ironhammer" rel="noopener" target="_blank" title="King Jalis Ironhammer">king Jalis Ironhammer</a>.</li>
+<li>ADDED: Break through the locked gate into <a href="https://wiki.guildwars.com/wiki/Maladar%27s_Fort" rel="noopener" target="_blank" title="Maladar's Fort">Maladar's Fort</a>.</li>
+<li>ADDED: Bring an end to the siege of <a href="https://wiki.guildwars.com/wiki/Krok%27s_Hollow" rel="noopener" target="_blank" title="Krok's Hollow">Krok's Hollow</a>. Destroy the ballistae and the forces outside the gates.</li>
+<li>ADDED: Light the magical signal beacons.</li>
+<li>*<a class="mw-redirect" href="https://wiki.guildwars.com/wiki/Bonus" rel="noopener" target="_blank" title="Bonus">BONUS</a>* Kill the <a href="https://wiki.guildwars.com/wiki/Ice_Drake" rel="noopener" target="_blank" title="Ice Drake">ice drake</a>.</li></ul></div>
+        </section>
+
+        <section class="panel walkthrough" id="walkthrough">
+          <h2 class="panel-title"><span class="icon icon-walk">→</span> Walkthrough</h2>
+          <div class="panel-scroll wiki-block"><p>The first part of the Borlis Pass mission is fairly straightforward. Talk to <a href="https://wiki.guildwars.com/wiki/Ascalon_Guard_Hayden" rel="noopener" target="_blank" title="Ascalon Guard Hayden">Ascalon Guard Hayden</a> at the beginning of the mission, he will hand you a <a href="https://wiki.guildwars.com/wiki/Torch" rel="noopener" target="_blank" title="Torch">torch</a> and tell you to light the Storm Beacons along the road so the <a href="https://wiki.guildwars.com/wiki/Ascalon" rel="noopener" target="_blank" title="Ascalon">Ascalon</a> refugees can find their way through the mountains while the storm rages. Follow the path and light all beacons on the way, the centaur <a href="https://wiki.guildwars.com/wiki/Patrol" rel="noopener" target="_blank" title="Patrol">patrols</a> shouldn't be too hard to deal with. There are a total of seven beacons, with the last being guarded by a centaur boss.
+</p><p><a href="https://wiki.guildwars.com/wiki/Ascalon_Guard_Tolis" rel="noopener" target="_blank" title="Ascalon Guard Tolis">Ascalon Guard Tolis</a> will be standing a short distance from the last beacon, guarding a large iron gate, hand him the torch when you have lit all the beacons and he'll grant you passage as well as your next objective, destroying the gate to Maladar's Fort.
+</p><p>Follow the path once again and obtain a <a href="https://wiki.guildwars.com/wiki/Dwarven_Powder_Keg_(bundle)" rel="noopener" target="_blank" title="Dwarven Powder Keg (bundle)">Dwarven Powder Keg</a> from the nearby <a href="https://wiki.guildwars.com/wiki/Dwarven_Powder_Keg_Station" rel="noopener" target="_blank" title="Dwarven Powder Keg Station">Dwarven Powder Keg Station</a> which you will use to blow open the gate once you reach it. The gate is easy to find, a boss guards the entrance, defeat him and any nearby enemies and blow open the gate by dropping the powder keg close to it.
+</p><p>A new objective has now been added to your quest log, destroying the ballistae and ending the siege of Krok's Hollow.
+</p><p>Continue on through the destroyed gate and you'll quickly spot the first two <a href="https://wiki.guildwars.com/wiki/Ballista" rel="noopener" target="_blank" title="Ballista">ballistae</a>, with a boss near them. Defeat him and the two <a href="https://wiki.guildwars.com/wiki/Stone_Summit" rel="noopener" target="_blank" title="Stone Summit">Stone Summit</a> Engineers to destroy the ballistae. Once you have done this continue down the path left of the ballistae and you'll come across another closed gate with a single mob in front of it. Defeat them and open the gate by using the lever nearby.
+</p><p>Note: To complete the bonus mission you will need to head past the gate and spring <a href="https://wiki.guildwars.com/wiki/Rornak_Stonesledge" rel="noopener" target="_blank" title="Rornak Stonesledge">Rornak Stonesledge</a> free from his prison, more information on the bonus can be found in the bonus section.
+</p><p>After opening the gate, continue on the path and defeat any enemies you come across. You'll end up before the gates to Krok's Hollow, which will only open once all Stone Summit and Ice Golems nearby have been defeated. The groups are particularly close to each other in this area, so proper <a href="https://wiki.guildwars.com/wiki/Pull" rel="noopener" target="_blank" title="Pull">pulling</a> is very important to avoid over<a href="https://wiki.guildwars.com/wiki/Aggro" rel="noopener" target="_blank" title="Aggro">aggro</a>. Beware of two Ice Golem patrols that may seem to be stationary due to the long time they take to move. In <a href="https://wiki.guildwars.com/wiki/Hard_mode" rel="noopener" target="_blank" title="Hard mode">Hard mode</a>, it advisable to leave the two <a href="https://wiki.guildwars.com/wiki/Stone_Summit_Engineer" rel="noopener" target="_blank" title="Stone Summit Engineer">Stone Summit Engineers</a> for last as they are easily dispatched and provide a <a href="https://wiki.guildwars.com/wiki/Morale_Boost" rel="noopener" target="_blank" title="Morale Boost">Morale Boost</a> that will recharge your signets if needed.
+</p><p>Once the gates open, head inside and speak with Prince Rurik; a short movie will be played. 
+</p><p><a href="https://wiki.guildwars.com/wiki/King_Jalis_Ironhammer" rel="noopener" target="_blank" title="King Jalis Ironhammer">King Jalis Ironhammer</a> will have given you an Enchanted Torch during the movie that you'll need to use to light the beacon outside Grooble's Gulch. Cross the bridge and follow the path. The group of allied dwarves nearby will help you defeat any Stone Summit enemies you encounter along the way. 
+</p><p>At the point where the path splits, taking a right is usually preferable: moving carefully, it is possible to avoid combat and completely ignore the two Stone Summit groups that patrol the other side; however, it may result in a party <a href="https://wiki.guildwars.com/wiki/Wipe" rel="noopener" target="_blank" title="Wipe">wipe</a> if your party aggros both groups when attempting to sneak past them. They can be especially difficult in hard mode due to the fact that each group contains a <a href="https://wiki.guildwars.com/wiki/Dolyak_Rider" rel="noopener" target="_blank" title="Dolyak Rider">Dolyak Rider</a>. Another method is to stay back and wait for the one group that will patrol north towards your party, kill them and sneak past the second group.
+</p><p>At the end of the path, you will encounter the last boss of this mission. The three beacons you need to light stand a short distance behind him, protected by three Stone Summit Beastmasters that can be engaged separately and should be easily managed. Defeat them all and light the beacons, a movie will play and you will have completed the mission.
+</p></div>
+        </section>
+
+        <div class="row-bonus-hm">
+          <section class="panel bonus" id="bonus">
+            <h2 class="panel-title"><span class="icon icon-bonus">★</span> Bonus</h2>
+            <div class="panel-scroll wiki-block"><p>The bonus objective is obtained by speaking to <a href="https://wiki.guildwars.com/wiki/Rornak_Stonesledge" rel="noopener" target="_blank" title="Rornak Stonesledge">Rornak Stonesledge</a>, who stands behind a gate that you need to blow up with a Dwarven Powder Keg from the nearby station. After talking to Rornak, fetch another keg and place it inside the wood and chains directly behind him to destroy the wall of snow blocking the cave entrance. Place the keg around the front half of the pile, as placing it against the wall of snow itself will have no effect. Inside the cave, at the end, is an <a href="https://wiki.guildwars.com/wiki/Ice_Drake" rel="noopener" target="_blank" title="Ice Drake">Ice Drake</a> that you need to kill to complete the bonus.
+</p><p>The path to the Ice Drake is populated with several small groups of <a href="https://wiki.guildwars.com/wiki/Frostfire_Dryder" rel="noopener" target="_blank" title="Frostfire Dryder">Frostfire Dryders</a> that tend to cast <a href="https://wiki.guildwars.com/wiki/Suffering" rel="noopener" target="_blank" title="Suffering">Suffering</a> on the party.
+</p></div>
+          </section>
+          <section class="panel hard-mode" id="hard-mode">
+            <h2 class="panel-title"><span class="icon icon-hm">◆</span> Hard Mode</h2>
+            <div class="panel-scroll wiki-block"><p>Tactics for Hard Mode are no different to that of normal mode. Slower pacing and luring enemies in smaller groups helps. Some of the bosses near to enemy groups are separate to those groups, and can be lured on their own. Dryders in the Bonus Cave are Necromancers (Curses and Blood magic), so can be tricky if you are not prepared for the health degen effects.
+</p></div>
+          </section>
+        </div>
+
+        <div class="row-lower">
+          <section class="panel bosses" id="bosses">
+            <h2 class="panel-title"><span class="icon icon-boss">☠</span> Bosses &amp; Elites</h2>
+            <div class="panel-scroll"><div class='boss-grid'>
+<article class="boss-card">
+  <div class="boss-card-head"><a href="https://wiki.guildwars.com/wiki/Yino_Burlyhaunch" target="_blank" rel="noopener"><strong>Yino Burlyhaunch</strong></a></div>
+  <div class="boss-elite"><span class="elite-none">Elite: None / not listed</span></div>
+  <div class="boss-meta">11 (27)</div>
+</article>
+<article class="boss-card">
+  <div class="boss-card-head"><a href="https://wiki.guildwars.com/wiki/Rubi_Spottedmane" target="_blank" rel="noopener"><strong>Rubi Spottedmane</strong></a></div>
+  <div class="boss-elite"><span class="elite-none">Elite: None / not listed</span></div>
+  <div class="boss-meta">11 (27)</div>
+</article>
+<article class="boss-card">
+  <div class="boss-card-head"><a href="https://wiki.guildwars.com/wiki/Jolo_Lighthaunch" target="_blank" rel="noopener"><strong>Jolo Lighthaunch</strong></a></div>
+  <div class="boss-elite"><span class="elite-none">Elite: None / not listed</span></div>
+  <div class="boss-meta">11 (27)</div>
+</article>
+<article class="boss-card">
+  <div class="boss-card-head"><a href="https://wiki.guildwars.com/wiki/Geno_Darkheart" target="_blank" rel="noopener"><strong>Geno Darkheart</strong></a></div>
+  <div class="boss-elite"><span class="elite-none">Elite: None / not listed</span></div>
+  <div class="boss-meta">11 (27)</div>
+</article>
+<article class="boss-card">
+  <div class="boss-card-head"><a href="https://wiki.guildwars.com/wiki/Ullo_Specterhaunch" target="_blank" rel="noopener"><strong>Ullo Specterhaunch</strong></a></div>
+  <div class="boss-elite"><span class="elite-none">Elite: None / not listed</span></div>
+  <div class="boss-meta">11 (27)</div>
+</article>
+<article class="boss-card">
+  <div class="boss-card-head"><a href="https://wiki.guildwars.com/wiki/Moro_Stormcalf" target="_blank" rel="noopener"><strong>Moro Stormcalf</strong></a></div>
+  <div class="boss-elite"><span class="elite-none">Elite: None / not listed</span></div>
+  <div class="boss-meta">11 (27)</div>
+</article>
+<article class="boss-card">
+  <div class="boss-card-head"><a href="https://wiki.guildwars.com/wiki/Ice_Drake" target="_blank" rel="noopener"><strong>Ice Drake</strong></a></div>
+  <div class="boss-elite"><span class="elite-none">Elite: None / not listed</span></div>
+  <div class="boss-meta">14 (28) or</div>
+</article>
+<article class="boss-card">
+  <div class="boss-card-head"><a href="https://wiki.guildwars.com/wiki/Toris_Stonehammer" target="_blank" rel="noopener"><strong>Toris Stonehammer</strong></a></div>
+  <div class="boss-elite"><span class="elite-none">Elite: None / not listed</span></div>
+  <div class="boss-meta">12 (27)</div>
+</article>
+<article class="boss-card">
+  <div class="boss-card-head"><a href="https://wiki.guildwars.com/wiki/Ulhar_Stonehound" target="_blank" rel="noopener"><strong>Ulhar Stonehound</strong></a></div>
+  <div class="boss-elite"><span class="elite-label">Elite:</span> <a class="elite-link" href="https://wiki.guildwars.com/wiki/Melandru%27s_Arrows" target="_blank" rel="noopener">Melandru&#x27;s Arrows</a></div>
+  <div class="boss-meta">12 (27)</div>
+</article>
+<article class="boss-card">
+  <div class="boss-card-head"><a href="https://wiki.guildwars.com/wiki/Riine_Windrot" target="_blank" rel="noopener"><strong>Riine Windrot</strong></a></div>
+  <div class="boss-elite"><span class="elite-label">Elite:</span> <a class="elite-link" href="https://wiki.guildwars.com/wiki/Offering_of_Blood" target="_blank" rel="noopener">Offering of Blood</a></div>
+  <div class="boss-meta">12 (27)</div>
+</article>
+<article class="boss-card">
+  <div class="boss-card-head"><a href="https://wiki.guildwars.com/wiki/Saris_Headstaver" target="_blank" rel="noopener"><strong>Saris Headstaver</strong></a></div>
+  <div class="boss-elite"><span class="elite-none">Elite: None / not listed</span></div>
+  <div class="boss-meta">12 (27)</div>
+</article>
+<article class="boss-card">
+  <div class="boss-card-head"><a href="https://wiki.guildwars.com/wiki/Priest_of_Dagnar" target="_blank" rel="noopener"><strong>Priest of Dagnar</strong></a></div>
+  <div class="boss-elite"><span class="elite-none">Elite: None / not listed</span></div>
+  <div class="boss-meta">13 (27)</div>
+</article>
+</div></div>
+          </section>
+          <section class="panel other" id="other">
+            <h2 class="panel-title"><span class="icon icon-other">✦</span> Tips &amp; Notes</h2>
+            <div class="panel-scroll"><h3 style='font-size:0.8rem;color:var(--accent);margin:0.3rem 0;'>Skill recommendations</h3><div class='wiki-block'><ul><li>In <a href="https://wiki.guildwars.com/wiki/Hard_mode" rel="noopener" target="_blank" title="Hard mode">Hard mode</a>, <a href="https://wiki.guildwars.com/wiki/List_of_enchantment_removal_skills" rel="noopener" target="_blank" title="List of enchantment removal skills">enchantment removal skills</a> should prove invaluable by stripping the Dolyak Riders of their <a href="https://wiki.guildwars.com/wiki/Mark_of_Protection" rel="noopener" target="_blank" title="Mark of Protection">Mark of Protection</a> <a class="mw-redirect" href="https://wiki.guildwars.com/wiki/Enchantment" rel="noopener" target="_blank" title="Enchantment">enchantment</a>. Skills that inflict the <a href="https://wiki.guildwars.com/wiki/Dazed" rel="noopener" target="_blank" title="Dazed">dazed</a> condition will help in interrupting and preventing the Dolyak Riders from casting Mark of Protection.</li>
+<li><a class="mw-redirect" href="https://wiki.guildwars.com/wiki/Enchantment" rel="noopener" target="_blank" title="Enchantment">Enchantment</a>-based <a href="https://wiki.guildwars.com/wiki/Build" rel="noopener" target="_blank" title="Build">builds</a> are vulnerable to enchantment removal by <a href="https://wiki.guildwars.com/wiki/Stone_Summit_Howler" rel="noopener" target="_blank" title="Stone Summit Howler">Stone Summit Howlers</a> and <a href="https://wiki.guildwars.com/wiki/Stone_Summit_Sage" rel="noopener" target="_blank" title="Stone Summit Sage">Sages</a>.</li></ul></div>
+<h3 style='font-size:0.8rem;color:var(--accent);margin:0.3rem 0;'>Notes</h3><div class='wiki-block'><ul><li>Complete exploration of the mission area contributes approximately 1.5% to the Tyrian <a href="https://wiki.guildwars.com/wiki/Cartographer" rel="noopener" target="_blank" title="Cartographer">Cartographer</a> title.</li>
+<li>The Stone Summit do not appear to be allied with the Ice Golems, as the Dolyak Riders do not appear to heal the Ice Golems, even when in range</li>
+<li>If the door just before Rurik does not open, yet you have killed off the local enemies, you will have to backtrack and find the Boss and engineers you did not kill. This has previously been misinterpreted as a bug.</li>
+<li>Just using the kegs to access and kill the Ice Drake is enough for the bonus, <a href="https://wiki.guildwars.com/wiki/Rornak_Stonesledge" rel="noopener" target="_blank" title="Rornak Stonesledge">Rornak Stonesledge</a> doesn't need to be talked to at all.</li>
+<li>The gate lever can accidentally be pulled twice while moving. Closing it on your party and trapping the player on the inside alone. Henchmen and heroes cannot operate the lever and the player can no longer reach it from the inside.</li>
+<li>After completing this mission, your party will be <a href="https://wiki.guildwars.com/wiki/Teleport" rel="noopener" target="_blank" title="Teleport">teleported</a> to <a href="https://wiki.guildwars.com/wiki/The_Frost_Gate_(outpost)" rel="noopener" target="_blank" title="The Frost Gate (outpost)">The Frost Gate</a>.</li>
+<li>Completion of this mission in Hard Mode will fill in page #6 of the <a href="https://wiki.guildwars.com/wiki/Young_Heroes_of_Tyria" rel="noopener" target="_blank" title="Young Heroes of Tyria">Young Heroes of Tyria</a> <a href="https://wiki.guildwars.com/wiki/Storybook" rel="noopener" target="_blank" title="Storybook">storybook</a>.</li></ul><div style="margin: 1em; border: solid silver; border-width: 1px 0px; padding: 2px 1em 2px 7.5em;"><strong class="hiddenlinks" style="position: absolute; margin-left: -7.3em; color: #900;"><a class="image" href="https://wiki.guildwars.com/wiki/File:Anomaly.png" rel="noopener" target="_blank" title="Anomaly"><img alt="Anomaly" data-file-height="32" data-file-width="32" decoding="async" height="18" loading="lazy" src="https://wiki.guildwars.com/images/thumb/a/a6/Anomaly.png/18px-Anomaly.png" srcset="/images/thumb/a/a6/Anomaly.png/27px-Anomaly.png 1.5x, /images/a/a6/Anomaly.png 2x" width="18"/></a> <a class="mw-redirect" href="https://wiki.guildwars.com/wiki/Anomaly" rel="noopener" target="_blank" title="Anomaly">Anomaly</a>.</strong>The Dwarven Soldier mentions being safe in <a href="https://wiki.guildwars.com/wiki/Droknar%27s_Forge" rel="noopener" target="_blank" title="Droknar's Forge">Droknar's Forge</a>, but that town is not reached until later in the Prophecies' storyline.</div><div style="margin: 1em; border: solid silver; border-width: 1px 0px; padding: 2px 1em 2px 5em;"><strong class="hiddenlinks" style="position: absolute; margin-left: -4.8em; color: #900;"><a class="image" href="https://wiki.guildwars.com/wiki/File:Bug.png" rel="noopener" target="_blank" title="Bug"><img alt="Bug" data-file-height="32" data-file-width="32" decoding="async" height="18" loading="lazy" src="https://wiki.guildwars.com/images/thumb/7/7d/Bug.png/18px-Bug.png" srcset="/images/thumb/7/7d/Bug.png/27px-Bug.png 1.5x, /images/7/7d/Bug.png 2x" width="18"/></a> <a href="https://wiki.guildwars.com/wiki/Bug" rel="noopener" target="_blank" title="Bug">Bug</a>.</strong>The gate to Krok's Hollow may not open if any of the four Stone Summit Engineers are killed by a <a href="https://wiki.guildwars.com/wiki/Minion" rel="noopener" target="_blank" title="Minion">minion</a> or other non-<a href="https://wiki.guildwars.com/wiki/Party" rel="noopener" target="_blank" title="Party">party</a> NPC.</div><div style="margin: 1em; border: solid silver; border-width: 1px 0px; padding: 2px 1em 2px 5em;"><strong class="hiddenlinks" style="position: absolute; margin-left: -4.8em; color: #900;"><a class="image" href="https://wiki.guildwars.com/wiki/File:Bug.png" rel="noopener" target="_blank" title="Bug"><img alt="Bug" data-file-height="32" data-file-width="32" decoding="async" height="18" loading="lazy" src="https://wiki.guildwars.com/images/thumb/7/7d/Bug.png/18px-Bug.png" srcset="/images/thumb/7/7d/Bug.png/27px-Bug.png 1.5x, /images/7/7d/Bug.png 2x" width="18"/></a> <a href="https://wiki.guildwars.com/wiki/Bug" rel="noopener" target="_blank" title="Bug">Bug</a>.</strong>Sometimes if the gate leading to the drake is destroyed with a powder keg while the lever is being used at the same time, the door will appear open but cannot be pass through and the bonus cannot be completed.</div><div style="margin: 1em; border: solid silver; border-width: 1px 0px; padding: 2px 1em 2px 5em;"><strong class="hiddenlinks" style="position: absolute; margin-left: -4.8em; color: #900;"><a class="image" href="https://wiki.guildwars.com/wiki/File:Bug.png" rel="noopener" target="_blank" title="Bug"><img alt="Bug" data-file-height="32" data-file-width="32" decoding="async" height="18" loading="lazy" src="https://wiki.guildwars.com/images/thumb/7/7d/Bug.png/18px-Bug.png" srcset="/images/thumb/7/7d/Bug.png/27px-Bug.png 1.5x, /images/7/7d/Bug.png 2x" width="18"/></a> <a href="https://wiki.guildwars.com/wiki/Bug" rel="noopener" target="_blank" title="Bug">Bug</a>.</strong>Sometimes players can get stuck and become trapped within the <a href="https://wiki.guildwars.com/wiki/Storm_Beacon" rel="noopener" target="_blank" title="Storm Beacon">Storm Beacon</a> area, unable to leave.</div><div style="margin: 1em; border: solid silver; border-width: 1px 0px; padding: 2px 1em 2px 7.5em;"><strong class="hiddenlinks" style="position: absolute; margin-left: -7.3em; color: #900;"><a class="image" href="https://wiki.guildwars.com/wiki/File:Anomaly.png" rel="noopener" target="_blank" title="Anomaly"><img alt="Anomaly" data-file-height="32" data-file-width="32" decoding="async" height="18" loading="lazy" src="https://wiki.guildwars.com/images/thumb/a/a6/Anomaly.png/18px-Anomaly.png" srcset="/images/thumb/a/a6/Anomaly.png/27px-Anomaly.png 1.5x, /images/a/a6/Anomaly.png 2x" width="18"/></a> <a class="mw-redirect" href="https://wiki.guildwars.com/wiki/Anomaly" rel="noopener" target="_blank" title="Anomaly">Anomaly</a>.</strong>Sometimes <a href="https://wiki.guildwars.com/wiki/Whiskar_Featherstorm" rel="noopener" target="_blank" title="Whiskar Featherstorm">Whiskar Featherstorm</a> spawns instead of Ice Drake. Killing Whiskar Featherstorm will still complete the bonus objective.</div><div style="margin: 1em; border: solid silver; border-width: 1px 0px; padding: 2px 1em 2px 7.5em;"><strong class="hiddenlinks" style="position: absolute; margin-left: -7.3em; color: #900;"><a class="image" href="https://wiki.guildwars.com/wiki/File:Anomaly.png" rel="noopener" target="_blank" title="Anomaly"><img alt="Anomaly" data-file-height="32" data-file-width="32" decoding="async" height="18" loading="lazy" src="https://wiki.guildwars.com/images/thumb/a/a6/Anomaly.png/18px-Anomaly.png" srcset="/images/thumb/a/a6/Anomaly.png/27px-Anomaly.png 1.5x, /images/a/a6/Anomaly.png 2x" width="18"/></a> <a class="mw-redirect" href="https://wiki.guildwars.com/wiki/Anomaly" rel="noopener" target="_blank" title="Anomaly">Anomaly</a>.</strong>The two <a href="https://wiki.guildwars.com/wiki/Frostfire_Dryder" rel="noopener" target="_blank" title="Frostfire Dryder">Frostfire Dryders</a> that accompany the Ice Drake/Whiskar Featherstorm also have to be killed to complete the bonus objective.</div><table class="stdt" style="margin: 5px auto; border: 1px solid #C0C0C0; font-size: 90%; width: 80%; text-align: center;">
+<tbody><tr>
+<th style="background: #7BC; font-size: 110%;"><a class="mw-redirect" href="https://wiki.guildwars.com/wiki/List_of_Prophecies_missions" rel="noopener" target="_blank" title="List of Prophecies missions">Prophecies missions</a>
+</th></tr>
+<tr>
+<td><a href="https://wiki.guildwars.com/wiki/The_Great_Northern_Wall" rel="noopener" target="_blank" title="The Great Northern Wall">The Great Northern Wall</a> » <a href="https://wiki.guildwars.com/wiki/Fort_Ranik" rel="noopener" target="_blank" title="Fort Ranik">Fort Ranik</a> » <a href="https://wiki.guildwars.com/wiki/Ruins_of_Surmia" rel="noopener" target="_blank" title="Ruins of Surmia">Ruins of Surmia</a> » <a href="https://wiki.guildwars.com/wiki/Nolani_Academy" rel="noopener" target="_blank" title="Nolani Academy">Nolani Academy</a> » <a class="mw-selflink selflink">Borlis Pass</a> » <a href="https://wiki.guildwars.com/wiki/The_Frost_Gate" rel="noopener" target="_blank" title="The Frost Gate">The Frost Gate</a> » <a href="https://wiki.guildwars.com/wiki/Gates_of_Kryta" rel="noopener" target="_blank" title="Gates of Kryta">Gates of Kryta</a> » <a href="https://wiki.guildwars.com/wiki/D%27Alessio_Seaboard" rel="noopener" target="_blank" title="D'Alessio Seaboard">D'Alessio Seaboard</a> » <a href="https://wiki.guildwars.com/wiki/Divinity_Coast" rel="noopener" target="_blank" title="Divinity Coast">Divinity Coast</a> » <a href="https://wiki.guildwars.com/wiki/The_Wilds" rel="noopener" target="_blank" title="The Wilds">The Wilds</a> » <a href="https://wiki.guildwars.com/wiki/Bloodstone_Fen" rel="noopener" target="_blank" title="Bloodstone Fen">Bloodstone Fen</a> » <a href="https://wiki.guildwars.com/wiki/Aurora_Glade" rel="noopener" target="_blank" title="Aurora Glade">Aurora Glade</a> » <a href="https://wiki.guildwars.com/wiki/Riverside_Province" rel="noopener" target="_blank" title="Riverside Province">Riverside Province</a> » <a href="https://wiki.guildwars.com/wiki/Sanctum_Cay" rel="noopener" target="_blank" title="Sanctum Cay">Sanctum Cay</a> » <a href="https://wiki.guildwars.com/wiki/Dunes_of_Despair" rel="noopener" target="_blank" title="Dunes of Despair">Dunes of Despair</a> <i>and</i> <a href="https://wiki.guildwars.com/wiki/Thirsty_River" rel="noopener" target="_blank" title="Thirsty River">Thirsty River</a> <i>and</i> <a href="https://wiki.guildwars.com/wiki/Elona_Reach" rel="noopener" target="_blank" title="Elona Reach">Elona Reach</a> » <a href="https://wiki.guildwars.com/wiki/Augury_Rock" rel="noopener" target="_blank" title="Augury Rock">Augury Rock</a> » <a href="https://wiki.guildwars.com/wiki/The_Dragon%27s_Lair" rel="noopener" target="_blank" title="The Dragon's Lair">The Dragon's Lair</a> » <a href="https://wiki.guildwars.com/wiki/Ice_Caves_of_Sorrow" rel="noopener" target="_blank" title="Ice Caves of Sorrow">Ice Caves of Sorrow</a> » <a href="https://wiki.guildwars.com/wiki/Iron_Mines_of_Moladune" rel="noopener" target="_blank" title="Iron Mines of Moladune">Iron Mines of Moladune</a> » <a href="https://wiki.guildwars.com/wiki/Thunderhead_Keep" rel="noopener" target="_blank" title="Thunderhead Keep">Thunderhead Keep</a> » <a href="https://wiki.guildwars.com/wiki/Ring_of_Fire" rel="noopener" target="_blank" title="Ring of Fire">Ring of Fire</a> » <a href="https://wiki.guildwars.com/wiki/Abaddon%27s_Mouth" rel="noopener" target="_blank" title="Abaddon's Mouth">Abaddon's Mouth</a> » <a href="https://wiki.guildwars.com/wiki/Hell%27s_Precipice" rel="noopener" target="_blank" title="Hell's Precipice">Hell's Precipice</a>
+</td></tr></tbody></table> 
+NewPP limit report
+Cached time: 20260720090928
+Cache expiry: 3600
+Reduced expiry: true
+Complications: [show‐toc]
+CPU time usage: 0.103 seconds
+Real time usage: 0.143 seconds
+Preprocessor visited node count: 1117/1000000
+Post‐expand include size: 12913/2097152 bytes
+Template argument size: 1497/2097152 bytes
+Highest expansion depth: 10/100
+Expensive parser function count: 0/100
+Unstrip recursion depth: 0/20
+Unstrip post‐expand size: 2/5000000 bytes
+ExtLoops count: 0/1000
+
+Transclusion expansion time report (%,ms,calls,template)
+100.00%   73.881      1 -total
+ 44.23%   32.675      1 Template:Location_disambiguation_2
+ 22.63%   16.718      8 Template:Ifexists
+ 12.82%    9.475      1 Template:Mission_rewards
+  9.36%    6.914      1 Template:Mission_infobox
+  4.24%    3.132      9 Template:W
+  3.11%    2.299      1 Template:Infobox_campaign_row
+  3.06%    2.261      2 Template:Cost
+  2.79%    2.060      6 Template:Profession_icon_sizes
+  2.72%    2.007      1 Template:Main
+ Saved in parser cache with key en_wiki:pcache:idhash:12032-0!canonical and timestamp 20260720090928 and revision id 2729947.</div></div>
+          </section>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="lightbox" id="lightbox" role="dialog" aria-label="Enlarged map">
+    <img src="../maps/prophecies_05_Borlis_Pass_map.jpg" alt="Borlis Pass mission map (enlarged)" />
+  </div>
+  <script>
+    (function () {
+      var open = document.getElementById("mapOpen");
+      var box = document.getElementById("lightbox");
+      if (!open || !box) return;
+      open.addEventListener("click", function () { box.classList.add("open"); });
+      box.addEventListener("click", function () { box.classList.remove("open"); });
+      document.addEventListener("keydown", function (e) {
+        if (e.key === "Escape") box.classList.remove("open");
+      });
+    })();
+  </script>
+
+</body>
+</html>

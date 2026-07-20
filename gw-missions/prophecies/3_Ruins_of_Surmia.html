@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Ruins of Surmia</title>
+  <style>
+:root {
+  --bg-deep: #070a0f;
+  --bg-panel: #101820;
+  --bg-panel-2: #15202c;
+  --border: #243044;
+  --border-glow: #2a4a6a;
+  --text: #dce6f0;
+  --text-muted: #8a9bb0;
+  --text-dim: #5c6f86;
+  --accent: #3ecfff;
+  --accent-soft: rgba(62, 207, 255, 0.12);
+  --gold: #e8c56a;
+  --gold-soft: rgba(232, 197, 106, 0.12);
+  --bonus: #7dffb3;
+  --bonus-soft: rgba(125, 255, 179, 0.1);
+  --danger: #ff6b6b;
+  --danger-soft: rgba(255, 107, 107, 0.1);
+  --hm: #c78bff;
+  --hm-soft: rgba(199, 139, 255, 0.12);
+  --radius: 10px;
+  --font: "Segoe UI", system-ui, -apple-system, sans-serif;
+  --chrome-h: 3.1rem;
+  --gap: 0.5rem;
+  --pad: 0.7rem;
+  /* Readable on 4K vertical (~2160×3840) */
+  --walk-size: clamp(1.05rem, 0.55vw + 0.55vh, 1.35rem);
+  --bonus-size: clamp(1.05rem, 0.55vw + 0.55vh, 1.35rem);
+  --body-size: clamp(0.95rem, 0.4vw + 0.4vh, 1.1rem);
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html {
+  scroll-behavior: smooth;
+  font-size: clamp(16px, 0.55vw + 0.45vh, 20px);
+  height: 100%;
+  scroll-padding-top: calc(var(--chrome-h) + 0.5rem);
+}
+body {
+  font-family: var(--font);
+  background: var(--bg-deep);
+  color: var(--text);
+  line-height: 1.45;
+  min-height: 100%;
+  height: 100%;
+  overflow: hidden;
+  background-image: radial-gradient(ellipse 70% 25% at 50% 0%, rgba(42, 100, 160, 0.14), transparent);
+}
+a { color: var(--accent); text-decoration: none; }
+a:hover { color: #7de0ff; text-decoration: underline; }
+.app {
+  display: grid;
+  grid-template-rows: var(--chrome-h) 1fr;
+  height: 100vh; height: 100dvh;
+  max-height: 100vh; max-height: 100dvh;
+}
+.top-chrome {
+  display: flex; align-items: center; gap: 0.65rem;
+  padding: 0 0.7rem;
+  background: rgba(8, 12, 18, 0.97);
+  border-bottom: 1px solid var(--border);
+  z-index: 100; min-height: var(--chrome-h);
+}
+.brand { display: flex; align-items: baseline; gap: 0.55rem; min-width: 0; flex-shrink: 0; }
+.brand-mission {
+  font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase;
+  color: var(--accent); font-weight: 700; white-space: nowrap;
+}
+.brand-name {
+  font-size: 1.1rem; font-weight: 750; color: var(--text);
+  white-space: nowrap; letter-spacing: -0.02em;
+}
+.brand-meta { font-size: 0.75rem; color: var(--text-dim); white-space: nowrap; }
+.chip-nav {
+  display: flex; flex: 1; gap: 0.3rem; overflow-x: auto;
+  scrollbar-width: none; min-width: 0; justify-content: center;
+}
+.chip-nav::-webkit-scrollbar { display: none; }
+.chip-nav a {
+  flex: 0 0 auto; padding: 0.3rem 0.65rem; border-radius: 999px;
+  font-size: 0.78rem; font-weight: 600; color: var(--text-muted);
+  background: var(--bg-panel); border: 1px solid var(--border);
+  text-decoration: none; white-space: nowrap;
+}
+.chip-nav a:hover {
+  color: var(--text); border-color: var(--border-glow);
+  background: #1a2836; text-decoration: none;
+}
+.chip-nav a[href="#map"] { color: var(--accent); border-color: rgba(62, 207, 255, 0.35); }
+.chip-nav a[href="#bonus"] { color: var(--bonus); border-color: rgba(125, 255, 179, 0.3); }
+.chip-nav a[href="#hard-mode"] { color: var(--hm); border-color: rgba(199, 139, 255, 0.3); }
+.chip-nav a[href="#bosses"] { color: #ff9a9a; border-color: rgba(255, 107, 107, 0.3); }
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 0.3rem;
+  padding: 0.42rem 0.85rem; border-radius: 8px; font-weight: 650; font-size: 0.8rem;
+  border: none; cursor: pointer; text-decoration: none; white-space: nowrap; flex-shrink: 0;
+}
+.btn:hover { text-decoration: none; }
+.btn-next {
+  background: linear-gradient(135deg, #1a6a9a, #1ab0e0); color: #fff;
+  box-shadow: 0 2px 12px rgba(26, 140, 200, 0.35);
+}
+.btn-next:hover { color: #fff; filter: brightness(1.08); }
+.btn-wiki, .btn-idx, .btn-prev {
+  background: var(--bg-panel); color: var(--text-muted);
+  border: 1px solid var(--border); padding: 0.42rem 0.65rem;
+}
+.btn-wiki:hover, .btn-idx:hover, .btn-prev:hover {
+  color: var(--accent); border-color: var(--border-glow);
+}
+.chrome-actions { display: flex; gap: 0.35rem; flex-shrink: 0; }
+
+/* Map-dominant workspace */
+.workspace {
+  display: grid;
+  grid-template-columns: minmax(480px, 1.15fr) minmax(0, 1fr);
+  grid-template-rows: 1fr;
+  gap: var(--gap); padding: var(--gap);
+  min-height: 0; height: 100%; overflow: hidden;
+}
+.col-map {
+  display: grid;
+  grid-template-rows: 1fr auto;
+  gap: var(--gap);
+  min-height: 0; min-width: 0;
+}
+.col-main {
+  display: grid;
+  /* objectives compact | walkthrough HUGE | bonus+hm | bosses+tips */
+  grid-template-rows: auto minmax(0, 1.6fr) minmax(0, 1.05fr) minmax(0, 0.75fr);
+  gap: var(--gap); min-height: 0; min-width: 0; overflow: hidden;
+}
+.row-obj { min-height: 0; }
+.row-bonus-hm {
+  display: grid; grid-template-columns: 1.15fr 0.85fr; gap: var(--gap); min-height: 0;
+}
+.row-lower {
+  display: grid; grid-template-columns: 1.15fr 0.85fr; gap: var(--gap); min-height: 0;
+}
+.panel {
+  background: var(--bg-panel); border: 1px solid var(--border); border-radius: var(--radius);
+  padding: var(--pad); display: flex; flex-direction: column; min-height: 0; overflow: hidden;
+}
+.panel-scroll {
+  overflow-y: auto; overflow-x: hidden; min-height: 0; flex: 1; padding-right: 0.3rem;
+  scrollbar-width: thin; scrollbar-color: var(--border) transparent;
+  font-size: var(--body-size);
+}
+.panel-scroll::-webkit-scrollbar { width: 8px; }
+.panel-scroll::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+.panel-title {
+  display: flex; align-items: center; gap: 0.4rem;
+  font-size: 0.82rem; font-weight: 750; letter-spacing: 0.05em; text-transform: uppercase;
+  color: var(--text); margin-bottom: 0.45rem; padding-bottom: 0.35rem;
+  border-bottom: 1px solid var(--border); flex-shrink: 0;
+}
+.panel-title .icon {
+  width: 1.3rem; height: 1.3rem; border-radius: 5px;
+  display: inline-flex; align-items: center; justify-content: center; font-size: 0.75rem;
+}
+.panel.map-panel {
+  border-color: var(--border-glow);
+  background: linear-gradient(180deg, #0e1620 0%, var(--bg-panel) 100%);
+  /* Map takes almost all left column */
+  min-height: 0;
+}
+.panel.objectives { border-top: 2px solid var(--accent); }
+.panel.walkthrough { border-top: 3px solid #5eb8e8; }
+.panel.bonus { border-top: 3px solid var(--bonus); }
+.panel.hard-mode { border-top: 2px solid var(--hm); }
+.panel.bosses { border-top: 2px solid var(--danger); }
+.panel.other { border-top: 2px solid var(--text-muted); }
+
+/* Emphasized reading panels */
+.panel.walkthrough .panel-scroll,
+.panel.walkthrough .wiki-block {
+  font-size: var(--walk-size) !important;
+  line-height: 1.55;
+}
+.panel.bonus .panel-scroll,
+.panel.bonus .wiki-block {
+  font-size: var(--bonus-size) !important;
+  line-height: 1.55;
+}
+.panel.walkthrough .panel-scroll li,
+.panel.bonus .panel-scroll li {
+  margin-bottom: 0.45rem;
+}
+.panel.walkthrough .panel-scroll p,
+.panel.bonus .panel-scroll p {
+  margin-bottom: 0.55rem;
+}
+
+.icon-map { background: var(--accent-soft); color: var(--accent); }
+.icon-obj { background: var(--accent-soft); color: var(--accent); }
+.icon-walk { background: rgba(94, 184, 232, 0.15); color: #5eb8e8; }
+.icon-bonus { background: var(--bonus-soft); color: var(--bonus); }
+.icon-hm { background: var(--hm-soft); color: var(--hm); }
+.icon-boss { background: var(--danger-soft); color: var(--danger); }
+.icon-other { background: rgba(138, 155, 176, 0.15); color: var(--text-muted); }
+
+.map-wrap {
+  flex: 1; min-height: 0; display: flex; flex-direction: column;
+  align-items: center; justify-content: center; gap: 0.4rem;
+}
+.map-frame {
+  flex: 1; min-height: 0; width: 100%;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: 10px; overflow: hidden;
+  border: 2px solid var(--border-glow);
+  box-shadow: 0 0 0 1px rgba(62, 207, 255, 0.1), 0 12px 40px rgba(0, 0, 0, 0.45);
+  background: #05080c; cursor: zoom-in;
+}
+.map-frame img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  image-rendering: auto;
+}
+.map-caption { font-size: 0.72rem; color: var(--text-dim); flex-shrink: 0; }
+.map-missing {
+  color: var(--text-dim); font-size: 1rem; text-align: center; padding: 2rem;
+}
+
+.wiki-block ul, .panel-scroll ul,
+.wiki-block ol, .panel-scroll ol { padding-left: 1.2rem; margin: 0.3rem 0 0.5rem; }
+.wiki-block li, .panel-scroll li { margin-bottom: 0.32rem; }
+.wiki-block p, .panel-scroll p { margin-bottom: 0.45rem; }
+.wiki-block img, .panel-scroll img { vertical-align: middle; max-height: 1.35em; width: auto; }
+.wiki-block table, .panel-scroll table {
+  width: 100%; border-collapse: collapse; font-size: 0.9em; margin: 0.4rem 0;
+}
+.wiki-block th, .wiki-block td, .panel-scroll th, .panel-scroll td {
+  border: 1px solid var(--border); padding: 0.3rem 0.45rem; text-align: left;
+}
+.lede { font-size: 0.92rem; color: var(--text-muted); margin-bottom: 0.35rem; }
+
+/* Collapsed summary */
+details.summary-details {
+  background: var(--bg-panel);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  border-top: 2px solid var(--gold);
+  padding: 0.35rem 0.65rem;
+  flex-shrink: 0;
+}
+details.summary-details summary {
+  cursor: pointer;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--gold);
+  padding: 0.35rem 0;
+  list-style: none;
+}
+details.summary-details summary::-webkit-details-marker { display: none; }
+details.summary-details summary::before {
+  content: "▸ ";
+  color: var(--text-dim);
+}
+details.summary-details[open] summary::before { content: "▾ "; }
+details.summary-details .summary-body {
+  padding: 0.35rem 0 0.55rem;
+  font-size: 0.88rem;
+  color: var(--text-muted);
+  max-height: 18vh;
+  overflow-y: auto;
+}
+
+.boss-note { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.4rem; }
+.boss-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.4rem; }
+.boss-card {
+  background: var(--bg-panel-2); border: 1px solid var(--border);
+  border-radius: 8px; padding: 0.5rem 0.6rem;
+}
+.boss-card-head { font-size: 0.95rem; margin-bottom: 0.2rem; }
+.boss-card-head a { color: #eef6fc; font-weight: 700; }
+.boss-card-head a:hover { color: var(--accent); }
+.boss-elite { font-size: 0.88rem; }
+.elite-label { color: var(--gold); font-weight: 650; margin-right: 0.25rem; }
+.elite-link { color: #ffd78a; font-weight: 650; }
+.elite-link:hover { color: #ffe9b5; }
+.elite-none { color: var(--text-dim); font-style: italic; font-size: 0.85rem; }
+.boss-meta { font-size: 0.78rem; color: var(--text-dim); margin-top: 0.15rem; }
+
+.callout {
+  margin-top: 0.4rem; padding: 0.45rem 0.6rem; border-radius: 6px;
+  font-size: 0.88rem; border-left: 3px solid; line-height: 1.4;
+}
+.callout.tip { background: var(--accent-soft); border-color: var(--accent); color: #b8eaff; }
+.callout.warn { background: var(--danger-soft); border-color: var(--danger); color: #ffb4b4; }
+
+.lightbox {
+  display: none; position: fixed; inset: 0; z-index: 1000; background: rgba(0,0,0,0.94);
+  align-items: center; justify-content: center; padding: 1.5rem; cursor: zoom-out;
+}
+.lightbox.open { display: flex; }
+.lightbox img {
+  max-width: 96vw; max-height: 96vh; border-radius: 8px;
+  border: 2px solid var(--border-glow); object-fit: contain;
+}
+
+@media (min-height: 2400px) {
+  :root {
+    --walk-size: clamp(1.15rem, 0.7vh + 0.3vw, 1.5rem);
+    --bonus-size: clamp(1.15rem, 0.7vh + 0.3vw, 1.5rem);
+    --gap: 0.65rem;
+    --pad: 0.85rem;
+  }
+  .workspace { grid-template-columns: minmax(560px, 1.2fr) minmax(0, 1fr); }
+}
+@media (min-width: 1800px) and (min-height: 2000px) {
+  .workspace { grid-template-columns: minmax(600px, 1.25fr) minmax(0, 1fr); }
+}
+@media (max-height: 1100px) {
+  body { overflow: auto; height: auto; }
+  .app { height: auto; max-height: none; min-height: 100vh; }
+  .workspace {
+    height: auto; overflow: visible; grid-template-columns: 1fr; grid-template-rows: auto;
+  }
+  .col-map { grid-template-rows: auto; }
+  .col-main { overflow: visible; grid-template-rows: auto; }
+  .row-bonus-hm, .row-lower { grid-template-columns: 1fr; }
+  .panel { max-height: none; overflow: visible; }
+  .panel-scroll { overflow: visible; }
+  .map-frame { min-height: 360px; max-height: 55vh; }
+}
+
+    :root { --accent: #3ecfff; --accent-soft: #3ecfff22; }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header class="top-chrome">
+      <div class="brand">
+        <span class="brand-mission">M3</span>
+        <span class="brand-name">Ruins of Surmia</span>
+        <span class="brand-meta">Prophecies · Ascalon · Cooperative · —</span>
+      </div>
+      <nav class="chip-nav" aria-label="Sections">
+        <a href="#map">Map</a>
+        <a href="#walkthrough">Walkthrough</a>
+        <a href="#bonus">Bonus</a>
+        <a href="#objectives">Objectives</a>
+        <a href="#hard-mode">Hard Mode</a>
+        <a href="#bosses">Bosses</a>
+        <a href="#other">Tips</a>
+      </nav>
+      <div class="chrome-actions">
+        <a class="btn btn-idx" href="../prohecies.html">Index</a>
+        <a class="btn btn-prev" href="2_Fort_Ranik.html">← Prev</a>
+        <a class="btn btn-wiki" href="https://wiki.guildwars.com/wiki/Ruins_of_Surmia" target="_blank" rel="noopener">Wiki ↗</a>
+        <a class="btn btn-next" href="4_Nolani_Academy.html">Next: Nolani Academy →</a>
+      </div>
+    </header>
+
+    <div class="workspace">
+      <div class="col-map">
+        <section class="panel map-panel" id="map">
+          <h2 class="panel-title"><span class="icon icon-map">◉</span> Mission Map</h2>
+          <div class="map-wrap">
+            <div class="map-frame" id="mapOpen" title="Click to enlarge">
+              <img src="../maps/prophecies_03_Ruins_of_Surmia_map.jpg" alt="Ruins of Surmia mission map" />
+            </div>
+            <p class="map-caption">Click to enlarge · Local cache · <a href="https://wiki.guildwars.com/wiki/Ruins_of_Surmia" target="_blank" rel="noopener">Wiki</a></p>
+        </div>
+        </section>
+
+        <details class="summary-details" id="summary">
+          <summary>Summary (click to expand)</summary>
+          <div class="summary-body">
+            <p>The Charr have retreated, but some members of the Ascalon Army have been taken prisoner! Rescue the survivors.</p>
+            <p style="margin-top:0.4rem;"><strong>Region:</strong> Ascalon · <strong>Mission:</strong> 3 of 25 · <strong>Type:</strong> Cooperative</p>
+            <p style="margin-top:0.35rem;"><a href="https://wiki.guildwars.com/wiki/Ruins_of_Surmia" target="_blank" rel="noopener">Full wiki article ↗</a></p>
+          </div>
+        </details>
+      </div>
+
+      <div class="col-main">
+        <section class="panel objectives row-obj" id="objectives">
+          <h2 class="panel-title"><span class="icon icon-obj">✓</span> Objectives</h2>
+          <div class="panel-scroll wiki-block"><p>Rescue the soldiers taken prisoner by the Charr.
+</p><ul><li>Safeguard <a href="https://wiki.guildwars.com/wiki/Prince_Rurik" rel="noopener" target="_blank" title="Prince Rurik">Prince Rurik</a>'s life.</li>
+<li>Free all the Ascalon captives.</li>
+<li>Get to the <a href="https://wiki.guildwars.com/wiki/Obelisk" rel="noopener" target="_blank" title="Obelisk">obelisks</a> inside the ruined academy.</li>
+<li>ADDED: Cross the ravine and open the drawbridge for Rurik and <a href="https://wiki.guildwars.com/wiki/Erol" rel="noopener" target="_blank" title="Erol">Erol</a>. <i>(Only appears in the Mission Objectives after it is completed.)</i></li>
+<li>*<a class="mw-redirect" href="https://wiki.guildwars.com/wiki/Bonus" rel="noopener" target="_blank" title="Bonus">BONUS</a>* Follow the <a href="https://wiki.guildwars.com/wiki/Flame_Keeper" rel="noopener" target="_blank" title="Flame Keeper">Flame Keepers</a> <small>[<a class="extiw" href="https://en.wikipedia.org/wiki/Sic" rel="noopener" target="_blank" title="w:Sic"><span title="w:Sic"><i>sic</i></span></a>]</small> at a distance to gain entrance to the <a href="https://wiki.guildwars.com/wiki/Flame_Temple" rel="noopener" target="_blank" title="Flame Temple">Flame Temple</a>. Extinguish the Flame Temple once inside.</li></ul></div>
+        </section>
+
+        <section class="panel walkthrough" id="walkthrough">
+          <h2 class="panel-title"><span class="icon icon-walk">→</span> Walkthrough</h2>
+          <div class="panel-scroll wiki-block"><p>The goal of this mission is to rescue Ascalon captives while ensuring Rurik's survival (who only uses <a href="https://wiki.guildwars.com/wiki/Defensive_Stance" rel="noopener" target="_blank" title="Defensive Stance">Defensive Stance</a>). The Prince's scripted AI has two behaviors. He will run ahead to direct characters across the area. But also remain passive and follow the player once on course.
+</p><p>The mission has three stages: Before the drawbridge, opening it and the last stand with the obelisks:
+</p><p>The first part has many hidden devourers pop-ups. Take it slowly. Even if Prince Rurik rushes forwards, it is still possible to control the pace of the mission. Consider letting Rurik fight with little support when enemies are few and weak to give your party some time to regenerate health and energy (Rurik will continue ahead once the foes are defeated). Soon, you will rescue <a href="https://wiki.guildwars.com/wiki/Erol" rel="noopener" target="_blank" title="Erol">Erol</a> (a cinematic will trigger) who joins your party and uses <a href="https://wiki.guildwars.com/wiki/Flare" rel="noopener" target="_blank" title="Flare">Flare</a>. His survival is not required and is not involved in the bonus either.
+</p><p>During the second part, you are ordered to open the drawbridge while Rurik and Erol wait behind it. The lever for it is just on the opposite side of the tar river. To reach it, follow the tar river counter-clockwise, looping around beneath the drawbridge and north into an area crawling with Charr. Cross the wall as soon as possible and head south to the lever to allow Rurik and Erol to rejoin your party.
+</p><p>At the beginning of the third part, following Rurik north along the eastern edge will take your party to a Charr group with a boss. Be warned that Rurik will not take the straight path and will circle to the left and will likely aggro a group or two of Charr that you thought were safely away from the main path.  Once Erol reaches the boss location a wave of four Charr will run at your group from the southwest. Defeating them will free three <a href="https://wiki.guildwars.com/wiki/Mage" rel="noopener" target="_blank" title="Mage">Mages</a>. Once liberated, these <a class="mw-redirect" href="https://wiki.guildwars.com/wiki/NPC" rel="noopener" target="_blank" title="NPC">NPCs</a> will run toward the <a href="https://wiki.guildwars.com/wiki/Obelisk" rel="noopener" target="_blank" title="Obelisk">obelisks</a> inside the ruined academy and attempt to fend off Charr parties while Rurik attempts to open the gate (talking to the Mages will let you hold them closer to you instead). The prince will use a skill called <a href="https://wiki.guildwars.com/wiki/Knock" rel="noopener" target="_blank" title="Knock">Knock</a> which will only complete when the waves of Charr are defeated. The final cinematic will trigger once Knock is activated.
+</p><p>An alternative - and safer - approach for players who find the last two stages challenging consists of clearing all the Charr <i>before</i> letting Rurik and Erol through the drawbridge.  Approach the end counter-clockwise, enter the ending area, then go back east to free the mages from behind.  You can also go to the end normally, then kill groups of Charr visible from the ruins.  These changes drastically reduce the risk of Rurik's death as he may rush towards the ruins full of Charr in the middle and commit suicide with over-<a href="https://wiki.guildwars.com/wiki/Aggro" rel="noopener" target="_blank" title="Aggro">aggro</a>.
+</p><div style="margin: 1em; border: solid silver; border-width: 1px 0px; padding: 2px 1em 2px 5em;"><strong class="hiddenlinks" style="position: absolute; margin-left: -4.8em; color: #900;"><a class="image" href="https://wiki.guildwars.com/wiki/File:Bug.png" rel="noopener" target="_blank" title="Bug"><img alt="Bug" data-file-height="32" data-file-width="32" decoding="async" height="18" loading="lazy" src="https://wiki.guildwars.com/images/thumb/7/7d/Bug.png/18px-Bug.png" srcset="/images/thumb/7/7d/Bug.png/27px-Bug.png 1.5x, /images/7/7d/Bug.png 2x" width="18"/></a> <a href="https://wiki.guildwars.com/wiki/Bug" rel="noopener" target="_blank" title="Bug">Bug</a>.</strong>Prince Rurik can sometimes get obstructed by a chest spawn or get stuck on the stairs before the tar area. If this happens, you'll have to restart the mission and try again.</div><div style="margin: 1em; border: solid silver; border-width: 1px 0px; padding: 2px 1em 2px 5em;"><strong class="hiddenlinks" style="position: absolute; margin-left: -4.8em; color: #900;"><a class="image" href="https://wiki.guildwars.com/wiki/File:Bug.png" rel="noopener" target="_blank" title="Bug"><img alt="Bug" data-file-height="32" data-file-width="32" decoding="async" height="18" loading="lazy" src="https://wiki.guildwars.com/images/thumb/7/7d/Bug.png/18px-Bug.png" srcset="/images/thumb/7/7d/Bug.png/27px-Bug.png 1.5x, /images/7/7d/Bug.png 2x" width="18"/></a> <a href="https://wiki.guildwars.com/wiki/Bug" rel="noopener" target="_blank" title="Bug">Bug</a>.</strong>If you approach the imprisoned Mages before opening the drawbridge, sometimes one of them will run straight through the closed door and follow you around until he is killed or brought within range of an obelisk.</div><div style="margin: 1em; border: solid silver; border-width: 1px 0px; padding: 2px 1em 2px 5em;"><strong class="hiddenlinks" style="position: absolute; margin-left: -4.8em; color: #900;"><a class="image" href="https://wiki.guildwars.com/wiki/File:Bug.png" rel="noopener" target="_blank" title="Bug"><img alt="Bug" data-file-height="32" data-file-width="32" decoding="async" height="18" loading="lazy" src="https://wiki.guildwars.com/images/thumb/7/7d/Bug.png/18px-Bug.png" srcset="/images/thumb/7/7d/Bug.png/27px-Bug.png 1.5x, /images/7/7d/Bug.png 2x" width="18"/></a> <a href="https://wiki.guildwars.com/wiki/Bug" rel="noopener" target="_blank" title="Bug">Bug</a>.</strong>Sometimes a charr can spawn underground near the imprisoned mages gate.</div></div>
+        </section>
+
+        <div class="row-bonus-hm">
+          <section class="panel bonus" id="bonus">
+            <h2 class="panel-title"><span class="icon icon-bonus">★</span> Bonus</h2>
+            <div class="panel-scroll wiki-block"><p>The bonus can be started by talking to <a href="https://wiki.guildwars.com/wiki/Breena_Stavinson" rel="noopener" target="_blank" title="Breena Stavinson">Breena Stavinson</a> (point 2 on the wiki map) who is captive and guarded by a Charr boss. She will inform you about the <a href="https://wiki.guildwars.com/wiki/Flame_Keeper" rel="noopener" target="_blank" title="Flame Keeper">Flame Keeper</a> Charrs's ritual which consist of transferring their <a href="https://wiki.guildwars.com/wiki/Sacred_Flame" rel="noopener" target="_blank" title="Sacred Flame">Sacred Flame</a> towards  a Flame Temple nearby. The objective is to gain entrance past a locked gate (point 4) by following the Charr (without attacking them) and waiting for them to open it. Once the gate is open you can kill the Ember Bearers. Go extinguish the Flame Temple by killing the four Flame Keepers guarding the <a href="https://wiki.guildwars.com/wiki/Cauldron_of_Cataclysm" rel="noopener" target="_blank" title="Cauldron of Cataclysm">Cauldron of Cataclysm</a> to complete the bonus (point 3).  It is a lot faster to exit the back gate clockwise to meet up with the main path than it is to go all the way back and follow the non-bonus path counter-clockwise, past where Breena was.
+</p><div style="margin: 1em; border: solid silver; border-width: 1px 0px; padding: 2px 1em 2px 7.5em;"><strong class="hiddenlinks" style="position: absolute; margin-left: -7.3em; color: #900;"><a class="image" href="https://wiki.guildwars.com/wiki/File:Anomaly.png" rel="noopener" target="_blank" title="Anomaly"><img alt="Anomaly" data-file-height="32" data-file-width="32" decoding="async" height="18" loading="lazy" src="https://wiki.guildwars.com/images/thumb/a/a6/Anomaly.png/18px-Anomaly.png" srcset="/images/thumb/a/a6/Anomaly.png/27px-Anomaly.png 1.5x, /images/a/a6/Anomaly.png 2x" width="18"/></a> <a class="mw-redirect" href="https://wiki.guildwars.com/wiki/Anomaly" rel="noopener" target="_blank" title="Anomaly">Anomaly</a>.</strong>Note that the <a href="https://wiki.guildwars.com/wiki/Quest_Log" rel="noopener" target="_blank" title="Quest Log">Quest Log</a> indicates to "follow the Flame Keepers", but the name of the Charr the party must follow is "Ember Bearer".</div><div style="margin: 1em; border: solid silver; border-width: 1px 0px; padding: 2px 1em 2px 5em;"><strong class="hiddenlinks" style="position: absolute; margin-left: -4.8em; color: #900;"><a class="image" href="https://wiki.guildwars.com/wiki/File:Bug.png" rel="noopener" target="_blank" title="Bug"><img alt="Bug" data-file-height="32" data-file-width="32" decoding="async" height="18" loading="lazy" src="https://wiki.guildwars.com/images/thumb/7/7d/Bug.png/18px-Bug.png" srcset="/images/thumb/7/7d/Bug.png/27px-Bug.png 1.5x, /images/7/7d/Bug.png 2x" width="18"/></a> <a href="https://wiki.guildwars.com/wiki/Bug" rel="noopener" target="_blank" title="Bug">Bug</a>.</strong>Sometimes Breena doesn't appear at point 2, possibly killed by the Charr boss near her. When this happens, you'll have to restart the mission and try again.</div><div style="margin: 1em; border: solid silver; border-width: 1px 0px; padding: 2px 1em 2px 5em;"><strong class="hiddenlinks" style="position: absolute; margin-left: -4.8em; color: #900;"><a class="image" href="https://wiki.guildwars.com/wiki/File:Bug.png" rel="noopener" target="_blank" title="Bug"><img alt="Bug" data-file-height="32" data-file-width="32" decoding="async" height="18" loading="lazy" src="https://wiki.guildwars.com/images/thumb/7/7d/Bug.png/18px-Bug.png" srcset="/images/thumb/7/7d/Bug.png/27px-Bug.png 1.5x, /images/7/7d/Bug.png 2x" width="18"/></a> <a href="https://wiki.guildwars.com/wiki/Bug" rel="noopener" target="_blank" title="Bug">Bug</a>.</strong>The Flame that the Ember Bearers carry can get stuck on the wall of the tar pit or any minions, the Ember Bearers will carry on but when they get to the gate it doesn't open. However, if you pull them near The Flame and run off it will begin to follow them again.</div><div style="margin: 1em; border: solid silver; border-width: 1px 0px; padding: 2px 1em 2px 5em;"><strong class="hiddenlinks" style="position: absolute; margin-left: -4.8em; color: #900;"><a class="image" href="https://wiki.guildwars.com/wiki/File:Bug.png" rel="noopener" target="_blank" title="Bug"><img alt="Bug" data-file-height="32" data-file-width="32" decoding="async" height="18" loading="lazy" src="https://wiki.guildwars.com/images/thumb/7/7d/Bug.png/18px-Bug.png" srcset="/images/thumb/7/7d/Bug.png/27px-Bug.png 1.5x, /images/7/7d/Bug.png 2x" width="18"/></a> <a href="https://wiki.guildwars.com/wiki/Bug" rel="noopener" target="_blank" title="Bug">Bug</a>.</strong>Sometimes the Ember Bearers will get caught at the gate they enter through and prevent the exit gate from being opened. The bonus is still completable as long as the entrance gate opens, but you will not be able to use the exit gate as a shortcut.</div></div>
+          </section>
+          <section class="panel hard-mode" id="hard-mode">
+            <h2 class="panel-title"><span class="icon icon-hm">◆</span> Hard Mode</h2>
+            <div class="panel-scroll wiki-block"><ul><li>Be careful when facing Charr Elementalists, as their multiple <a href="https://wiki.guildwars.com/wiki/Meteor_Shower" rel="noopener" target="_blank" title="Meteor Shower">Meteor Showers</a> can easily cause a <a href="https://wiki.guildwars.com/wiki/Wipe" rel="noopener" target="_blank" title="Wipe">wipe</a>.</li>
+<li>Beware the Charr Mesmers who use <a href="https://wiki.guildwars.com/wiki/Power_Block" rel="noopener" target="_blank" title="Power Block">Power Block</a> which can <a href="https://wiki.guildwars.com/wiki/Shutdown" rel="noopener" target="_blank" title="Shutdown">shutdown</a> your party's casters.</li>
+<li>Be especially careful before letting Rurik into the ruins of Surmia after the drawbridge. Clearing out all Charr is highly advisable.</li></ul></div>
+          </section>
+        </div>
+
+        <div class="row-lower">
+          <section class="panel bosses" id="bosses">
+            <h2 class="panel-title"><span class="icon icon-boss">☠</span> Bosses &amp; Elites</h2>
+            <div class="panel-scroll"><div class='boss-grid'>
+<article class="boss-card">
+  <div class="boss-card-head"><a href="https://wiki.guildwars.com/wiki/Puugh_the_Slasher" target="_blank" rel="noopener"><strong>Puugh the Slasher</strong></a></div>
+  <div class="boss-elite"><span class="elite-none">Elite: None / not listed</span></div>
+  <div class="boss-meta">9 (27)</div>
+</article>
+<article class="boss-card">
+  <div class="boss-card-head"><a href="https://wiki.guildwars.com/wiki/Fling_Bloodpelt" target="_blank" rel="noopener"><strong>Fling Bloodpelt</strong></a></div>
+  <div class="boss-elite"><span class="elite-none">Elite: None / not listed</span></div>
+  <div class="boss-meta">7 (26)</div>
+</article>
+<article class="boss-card">
+  <div class="boss-card-head"><a href="https://wiki.guildwars.com/wiki/Scaar_Sternclaw" target="_blank" rel="noopener"><strong>Scaar Sternclaw</strong></a></div>
+  <div class="boss-elite"><span class="elite-none">Elite: None / not listed</span></div>
+  <div class="boss-meta">9 (27)</div>
+</article>
+<article class="boss-card">
+  <div class="boss-card-head"><a href="https://wiki.guildwars.com/wiki/Burr_Mankiller" target="_blank" rel="noopener"><strong>Burr Mankiller</strong></a></div>
+  <div class="boss-elite"><span class="elite-none">Elite: None / not listed</span></div>
+  <div class="boss-meta">9 (27)</div>
+</article>
+<article class="boss-card">
+  <div class="boss-card-head"><a href="https://wiki.guildwars.com/wiki/Scint_the_Malign" target="_blank" rel="noopener"><strong>Scint the Malign</strong></a></div>
+  <div class="boss-elite"><span class="elite-none">Elite: None / not listed</span></div>
+  <div class="boss-meta">9 (27)</div>
+</article>
+<article class="boss-card">
+  <div class="boss-card-head"><a href="https://wiki.guildwars.com/wiki/Slaug_Firehide" target="_blank" rel="noopener"><strong>Slaug Firehide</strong></a></div>
+  <div class="boss-elite"><span class="elite-none">Elite: None / not listed</span></div>
+  <div class="boss-meta">9 (27)</div>
+</article>
+<article class="boss-card">
+  <div class="boss-card-head"><a href="https://wiki.guildwars.com/wiki/Gnash_Underfoot" target="_blank" rel="noopener"><strong>Gnash Underfoot</strong></a></div>
+  <div class="boss-elite"><span class="elite-none">Elite: None / not listed</span></div>
+  <div class="boss-meta">9 (27)</div>
+</article>
+<article class="boss-card">
+  <div class="boss-card-head"><a href="https://wiki.guildwars.com/wiki/Hurl_Foulspine" target="_blank" rel="noopener"><strong>Hurl Foulspine</strong></a></div>
+  <div class="boss-elite"><span class="elite-none">Elite: None / not listed</span></div>
+  <div class="boss-meta">9 (27)</div>
+</article>
+<article class="boss-card">
+  <div class="boss-card-head"><a href="https://wiki.guildwars.com/wiki/Fester_Fang" target="_blank" rel="noopener"><strong>Fester Fang</strong></a></div>
+  <div class="boss-elite"><span class="elite-none">Elite: None / not listed</span></div>
+  <div class="boss-meta">9 (27)</div>
+</article>
+</div></div>
+          </section>
+          <section class="panel other" id="other">
+            <h2 class="panel-title"><span class="icon icon-other">✦</span> Tips &amp; Notes</h2>
+            <div class="panel-scroll"><h3 style='font-size:0.8rem;color:var(--accent);margin:0.3rem 0;'>Skill recommendations</h3><div class='wiki-block'><ul><li><a class="mw-redirect" href="https://wiki.guildwars.com/wiki/Bond#Primary_bonder_spells" rel="noopener" target="_blank" title="Bond">Bond</a> skills (if possible on other than the <a href="https://wiki.guildwars.com/wiki/Healer" rel="noopener" target="_blank" title="Healer">healer</a>) to ensure Prince Rurik's survival, especially when he rushes ahead of the party and aggros several foes.</li>
+<li><a href="https://wiki.guildwars.com/wiki/Minion" rel="noopener" target="_blank" title="Minion">Minions</a> and/or <a href="https://wiki.guildwars.com/wiki/Binding_ritual" rel="noopener" target="_blank" title="Binding ritual">binding rituals</a> as <a href="https://wiki.guildwars.com/wiki/Meat_shield" rel="noopener" target="_blank" title="Meat shield">meat shields</a> to prevent Rurik taking all of the damage.</li></ul></div>
+<h3 style='font-size:0.8rem;color:var(--accent);margin:0.3rem 0;'>Notes</h3><div class='wiki-block'><ul><li>The quest <a href="https://wiki.guildwars.com/wiki/Cities_of_Ascalon" rel="noopener" target="_blank" title="Cities of Ascalon">Cities of Ascalon</a> requires playing through about two-thirds of this mission to reach the <a href="https://wiki.guildwars.com/wiki/Historical_Monument_of_Surmia" rel="noopener" target="_blank" title="Historical Monument of Surmia">Historical Monument of Surmia</a>.</li>
+<li>Complete exploration of this mission contributes approximately 1.1% to the Tyrian <a href="https://wiki.guildwars.com/wiki/Cartographer" rel="noopener" target="_blank" title="Cartographer">Cartographer</a> title. There are some hard to get areas in the northern tar pit that most players usually miss.  They can be reached by following the bonus route and exploring after the Ember Bearers open the gate barring the way to the Flame Temple.  Finally, explore the northwest part of the map from the outside of the fortress before opening the drawbridge.</li>
+<li>After completing this mission, your party will appear in <a href="https://wiki.guildwars.com/wiki/Nolani_Academy_(outpost)" rel="noopener" target="_blank" title="Nolani Academy (outpost)">Nolani Academy</a>.</li>
+<li>It's possible that if you do not keep the Ember Bearers in sight on your compass, they will leave the Flame Brazier behind, causing it to get stuck, and the gate to not open. The only options here if you want the bonus is to <a href="https://wiki.guildwars.com/wiki/Gate_glitch" rel="noopener" target="_blank" title="Gate glitch">glitch</a> through the gate or restart.</li>
+<li>If using a skill such as <a href="https://wiki.guildwars.com/wiki/Cyclone_Axe" rel="noopener" target="_blank" title="Cyclone Axe">Cyclone Axe</a> while fighting the ember bearers, you will probably notice an additional packet of 0 damage. This shows that the Flame is actually an untargetable invulnerable NPC.</li>
+<li>If using Heroes, make sure you wait for any spirits summoned in the path of the Flame Bearers to expire before talking to Breena. If your spirits aggro the Flame Bearers, they will follow up to you.</li>
+<li>Completion of this mission in Hard Mode will fill in page #4 of the <a href="https://wiki.guildwars.com/wiki/Young_Heroes_of_Tyria" rel="noopener" target="_blank" title="Young Heroes of Tyria">Young Heroes of Tyria</a> <a href="https://wiki.guildwars.com/wiki/Storybook" rel="noopener" target="_blank" title="Storybook">storybook</a>.</li></ul><table class="stdt" style="margin: 5px auto; border: 1px solid #C0C0C0; font-size: 90%; width: 80%; text-align: center;">
+<tbody><tr>
+<th style="background: #7BC; font-size: 110%;"><a class="mw-redirect" href="https://wiki.guildwars.com/wiki/List_of_Prophecies_missions" rel="noopener" target="_blank" title="List of Prophecies missions">Prophecies missions</a>
+</th></tr>
+<tr>
+<td><a href="https://wiki.guildwars.com/wiki/The_Great_Northern_Wall" rel="noopener" target="_blank" title="The Great Northern Wall">The Great Northern Wall</a> » <a href="https://wiki.guildwars.com/wiki/Fort_Ranik" rel="noopener" target="_blank" title="Fort Ranik">Fort Ranik</a> » <a class="mw-selflink selflink">Ruins of Surmia</a> » <a href="https://wiki.guildwars.com/wiki/Nolani_Academy" rel="noopener" target="_blank" title="Nolani Academy">Nolani Academy</a> » <a href="https://wiki.guildwars.com/wiki/Borlis_Pass" rel="noopener" target="_blank" title="Borlis Pass">Borlis Pass</a> » <a href="https://wiki.guildwars.com/wiki/The_Frost_Gate" rel="noopener" target="_blank" title="The Frost Gate">The Frost Gate</a> » <a href="https://wiki.guildwars.com/wiki/Gates_of_Kryta" rel="noopener" target="_blank" title="Gates of Kryta">Gates of Kryta</a> » <a href="https://wiki.guildwars.com/wiki/D%27Alessio_Seaboard" rel="noopener" target="_blank" title="D'Alessio Seaboard">D'Alessio Seaboard</a> » <a href="https://wiki.guildwars.com/wiki/Divinity_Coast" rel="noopener" target="_blank" title="Divinity Coast">Divinity Coast</a> » <a href="https://wiki.guildwars.com/wiki/The_Wilds" rel="noopener" target="_blank" title="The Wilds">The Wilds</a> » <a href="https://wiki.guildwars.com/wiki/Bloodstone_Fen" rel="noopener" target="_blank" title="Bloodstone Fen">Bloodstone Fen</a> » <a href="https://wiki.guildwars.com/wiki/Aurora_Glade" rel="noopener" target="_blank" title="Aurora Glade">Aurora Glade</a> » <a href="https://wiki.guildwars.com/wiki/Riverside_Province" rel="noopener" target="_blank" title="Riverside Province">Riverside Province</a> » <a href="https://wiki.guildwars.com/wiki/Sanctum_Cay" rel="noopener" target="_blank" title="Sanctum Cay">Sanctum Cay</a> » <a href="https://wiki.guildwars.com/wiki/Dunes_of_Despair" rel="noopener" target="_blank" title="Dunes of Despair">Dunes of Despair</a> <i>and</i> <a href="https://wiki.guildwars.com/wiki/Thirsty_River" rel="noopener" target="_blank" title="Thirsty River">Thirsty River</a> <i>and</i> <a href="https://wiki.guildwars.com/wiki/Elona_Reach" rel="noopener" target="_blank" title="Elona Reach">Elona Reach</a> » <a href="https://wiki.guildwars.com/wiki/Augury_Rock" rel="noopener" target="_blank" title="Augury Rock">Augury Rock</a> » <a href="https://wiki.guildwars.com/wiki/The_Dragon%27s_Lair" rel="noopener" target="_blank" title="The Dragon's Lair">The Dragon's Lair</a> » <a href="https://wiki.guildwars.com/wiki/Ice_Caves_of_Sorrow" rel="noopener" target="_blank" title="Ice Caves of Sorrow">Ice Caves of Sorrow</a> » <a href="https://wiki.guildwars.com/wiki/Iron_Mines_of_Moladune" rel="noopener" target="_blank" title="Iron Mines of Moladune">Iron Mines of Moladune</a> » <a href="https://wiki.guildwars.com/wiki/Thunderhead_Keep" rel="noopener" target="_blank" title="Thunderhead Keep">Thunderhead Keep</a> » <a href="https://wiki.guildwars.com/wiki/Ring_of_Fire" rel="noopener" target="_blank" title="Ring of Fire">Ring of Fire</a> » <a href="https://wiki.guildwars.com/wiki/Abaddon%27s_Mouth" rel="noopener" target="_blank" title="Abaddon's Mouth">Abaddon's Mouth</a> » <a href="https://wiki.guildwars.com/wiki/Hell%27s_Precipice" rel="noopener" target="_blank" title="Hell's Precipice">Hell's Precipice</a>
+</td></tr></tbody></table> 
+NewPP limit report
+Cached time: 20260720064211
+Cache expiry: 3600
+Reduced expiry: true
+Complications: [show‐toc]
+CPU time usage: 0.106 seconds
+Real time usage: 0.145 seconds
+Preprocessor visited node count: 1143/1000000
+Post‐expand include size: 14422/2097152 bytes
+Template argument size: 2069/2097152 bytes
+Highest expansion depth: 10/100
+Expensive parser function count: 0/100
+Unstrip recursion depth: 0/20
+Unstrip post‐expand size: 2/5000000 bytes
+ExtLoops count: 0/1000
+
+Transclusion expansion time report (%,ms,calls,template)
+100.00%   78.283      1 -total
+ 50.28%   39.363      1 Template:Location_disambiguation_2
+ 29.45%   23.058      9 Template:Ifexists
+ 12.43%    9.733      1 Template:Mission_rewards
+  8.57%    6.707      1 Template:Mission_infobox
+  4.01%    3.139      8 Template:W
+  2.95%    2.311      1 Template:Infobox_campaign_row
+  2.92%    2.283      2 Template:Cost
+  2.66%    2.080      6 Template:Profession_icon_sizes
+  2.49%    1.952      5 Template:R
+ Saved in parser cache with key en_wiki:pcache:idhash:8564-0!canonical and timestamp 20260720064211 and revision id 2729714.</div></div>
+          </section>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="lightbox" id="lightbox" role="dialog" aria-label="Enlarged map">
+    <img src="../maps/prophecies_03_Ruins_of_Surmia_map.jpg" alt="Ruins of Surmia mission map (enlarged)" />
+  </div>
+  <script>
+    (function () {
+      var open = document.getElementById("mapOpen");
+      var box = document.getElementById("lightbox");
+      if (!open || !box) return;
+      open.addEventListener("click", function () { box.classList.add("open"); });
+      box.addEventListener("click", function () { box.classList.remove("open"); });
+      document.addEventListener("keydown", function (e) {
+        if (e.key === "Escape") box.classList.remove("open");
+      });
+    })();
+  </script>
+
+</body>
+</html>

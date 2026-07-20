@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Jennur&#x27;s Horde</title>
+  <style>
+:root {
+  --bg-deep: #070a0f;
+  --bg-panel: #101820;
+  --bg-panel-2: #15202c;
+  --border: #243044;
+  --border-glow: #2a4a6a;
+  --text: #dce6f0;
+  --text-muted: #8a9bb0;
+  --text-dim: #5c6f86;
+  --accent: #3ecfff;
+  --accent-soft: rgba(62, 207, 255, 0.12);
+  --gold: #e8c56a;
+  --gold-soft: rgba(232, 197, 106, 0.12);
+  --bonus: #7dffb3;
+  --bonus-soft: rgba(125, 255, 179, 0.1);
+  --danger: #ff6b6b;
+  --danger-soft: rgba(255, 107, 107, 0.1);
+  --hm: #c78bff;
+  --hm-soft: rgba(199, 139, 255, 0.12);
+  --radius: 10px;
+  --font: "Segoe UI", system-ui, -apple-system, sans-serif;
+  --chrome-h: 3.1rem;
+  --gap: 0.5rem;
+  --pad: 0.7rem;
+  /* Readable on 4K vertical (~2160×3840) */
+  --walk-size: clamp(1.05rem, 0.55vw + 0.55vh, 1.35rem);
+  --bonus-size: clamp(1.05rem, 0.55vw + 0.55vh, 1.35rem);
+  --body-size: clamp(0.95rem, 0.4vw + 0.4vh, 1.1rem);
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html {
+  scroll-behavior: smooth;
+  font-size: clamp(16px, 0.55vw + 0.45vh, 20px);
+  height: 100%;
+  scroll-padding-top: calc(var(--chrome-h) + 0.5rem);
+}
+body {
+  font-family: var(--font);
+  background: var(--bg-deep);
+  color: var(--text);
+  line-height: 1.45;
+  min-height: 100%;
+  height: 100%;
+  overflow: hidden;
+  background-image: radial-gradient(ellipse 70% 25% at 50% 0%, rgba(42, 100, 160, 0.14), transparent);
+}
+a { color: var(--accent); text-decoration: none; }
+a:hover { color: #7de0ff; text-decoration: underline; }
+.app {
+  display: grid;
+  grid-template-rows: var(--chrome-h) 1fr;
+  height: 100vh; height: 100dvh;
+  max-height: 100vh; max-height: 100dvh;
+}
+.top-chrome {
+  display: flex; align-items: center; gap: 0.65rem;
+  padding: 0 0.7rem;
+  background: rgba(8, 12, 18, 0.97);
+  border-bottom: 1px solid var(--border);
+  z-index: 100; min-height: var(--chrome-h);
+}
+.brand { display: flex; align-items: baseline; gap: 0.55rem; min-width: 0; flex-shrink: 0; }
+.brand-mission {
+  font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase;
+  color: var(--accent); font-weight: 700; white-space: nowrap;
+}
+.brand-name {
+  font-size: 1.1rem; font-weight: 750; color: var(--text);
+  white-space: nowrap; letter-spacing: -0.02em;
+}
+.brand-meta { font-size: 0.75rem; color: var(--text-dim); white-space: nowrap; }
+.chip-nav {
+  display: flex; flex: 1; gap: 0.3rem; overflow-x: auto;
+  scrollbar-width: none; min-width: 0; justify-content: center;
+}
+.chip-nav::-webkit-scrollbar { display: none; }
+.chip-nav a {
+  flex: 0 0 auto; padding: 0.3rem 0.65rem; border-radius: 999px;
+  font-size: 0.78rem; font-weight: 600; color: var(--text-muted);
+  background: var(--bg-panel); border: 1px solid var(--border);
+  text-decoration: none; white-space: nowrap;
+}
+.chip-nav a:hover {
+  color: var(--text); border-color: var(--border-glow);
+  background: #1a2836; text-decoration: none;
+}
+.chip-nav a[href="#map"] { color: var(--accent); border-color: rgba(62, 207, 255, 0.35); }
+.chip-nav a[href="#bonus"] { color: var(--bonus); border-color: rgba(125, 255, 179, 0.3); }
+.chip-nav a[href="#hard-mode"] { color: var(--hm); border-color: rgba(199, 139, 255, 0.3); }
+.chip-nav a[href="#bosses"] { color: #ff9a9a; border-color: rgba(255, 107, 107, 0.3); }
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 0.3rem;
+  padding: 0.42rem 0.85rem; border-radius: 8px; font-weight: 650; font-size: 0.8rem;
+  border: none; cursor: pointer; text-decoration: none; white-space: nowrap; flex-shrink: 0;
+}
+.btn:hover { text-decoration: none; }
+.btn-next {
+  background: linear-gradient(135deg, #1a6a9a, #1ab0e0); color: #fff;
+  box-shadow: 0 2px 12px rgba(26, 140, 200, 0.35);
+}
+.btn-next:hover { color: #fff; filter: brightness(1.08); }
+.btn-wiki, .btn-idx, .btn-prev {
+  background: var(--bg-panel); color: var(--text-muted);
+  border: 1px solid var(--border); padding: 0.42rem 0.65rem;
+}
+.btn-wiki:hover, .btn-idx:hover, .btn-prev:hover {
+  color: var(--accent); border-color: var(--border-glow);
+}
+.chrome-actions { display: flex; gap: 0.35rem; flex-shrink: 0; }
+
+/* Map-dominant workspace */
+.workspace {
+  display: grid;
+  grid-template-columns: minmax(480px, 1.15fr) minmax(0, 1fr);
+  grid-template-rows: 1fr;
+  gap: var(--gap); padding: var(--gap);
+  min-height: 0; height: 100%; overflow: hidden;
+}
+.col-map {
+  display: grid;
+  grid-template-rows: 1fr auto;
+  gap: var(--gap);
+  min-height: 0; min-width: 0;
+}
+.col-main {
+  display: grid;
+  /* objectives compact | walkthrough HUGE | bonus+hm | bosses+tips */
+  grid-template-rows: auto minmax(0, 1.6fr) minmax(0, 1.05fr) minmax(0, 0.75fr);
+  gap: var(--gap); min-height: 0; min-width: 0; overflow: hidden;
+}
+.row-obj { min-height: 0; }
+.row-bonus-hm {
+  display: grid; grid-template-columns: 1.15fr 0.85fr; gap: var(--gap); min-height: 0;
+}
+.row-lower {
+  display: grid; grid-template-columns: 1.15fr 0.85fr; gap: var(--gap); min-height: 0;
+}
+.panel {
+  background: var(--bg-panel); border: 1px solid var(--border); border-radius: var(--radius);
+  padding: var(--pad); display: flex; flex-direction: column; min-height: 0; overflow: hidden;
+}
+.panel-scroll {
+  overflow-y: auto; overflow-x: hidden; min-height: 0; flex: 1; padding-right: 0.3rem;
+  scrollbar-width: thin; scrollbar-color: var(--border) transparent;
+  font-size: var(--body-size);
+}
+.panel-scroll::-webkit-scrollbar { width: 8px; }
+.panel-scroll::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+.panel-title {
+  display: flex; align-items: center; gap: 0.4rem;
+  font-size: 0.82rem; font-weight: 750; letter-spacing: 0.05em; text-transform: uppercase;
+  color: var(--text); margin-bottom: 0.45rem; padding-bottom: 0.35rem;
+  border-bottom: 1px solid var(--border); flex-shrink: 0;
+}
+.panel-title .icon {
+  width: 1.3rem; height: 1.3rem; border-radius: 5px;
+  display: inline-flex; align-items: center; justify-content: center; font-size: 0.75rem;
+}
+.panel.map-panel {
+  border-color: var(--border-glow);
+  background: linear-gradient(180deg, #0e1620 0%, var(--bg-panel) 100%);
+  /* Map takes almost all left column */
+  min-height: 0;
+}
+.panel.objectives { border-top: 2px solid var(--accent); }
+.panel.walkthrough { border-top: 3px solid #5eb8e8; }
+.panel.bonus { border-top: 3px solid var(--bonus); }
+.panel.hard-mode { border-top: 2px solid var(--hm); }
+.panel.bosses { border-top: 2px solid var(--danger); }
+.panel.other { border-top: 2px solid var(--text-muted); }
+
+/* Emphasized reading panels */
+.panel.walkthrough .panel-scroll,
+.panel.walkthrough .wiki-block {
+  font-size: var(--walk-size) !important;
+  line-height: 1.55;
+}
+.panel.bonus .panel-scroll,
+.panel.bonus .wiki-block {
+  font-size: var(--bonus-size) !important;
+  line-height: 1.55;
+}
+.panel.walkthrough .panel-scroll li,
+.panel.bonus .panel-scroll li {
+  margin-bottom: 0.45rem;
+}
+.panel.walkthrough .panel-scroll p,
+.panel.bonus .panel-scroll p {
+  margin-bottom: 0.55rem;
+}
+
+.icon-map { background: var(--accent-soft); color: var(--accent); }
+.icon-obj { background: var(--accent-soft); color: var(--accent); }
+.icon-walk { background: rgba(94, 184, 232, 0.15); color: #5eb8e8; }
+.icon-bonus { background: var(--bonus-soft); color: var(--bonus); }
+.icon-hm { background: var(--hm-soft); color: var(--hm); }
+.icon-boss { background: var(--danger-soft); color: var(--danger); }
+.icon-other { background: rgba(138, 155, 176, 0.15); color: var(--text-muted); }
+
+.map-wrap {
+  flex: 1; min-height: 0; display: flex; flex-direction: column;
+  align-items: center; justify-content: center; gap: 0.4rem;
+}
+.map-frame {
+  flex: 1; min-height: 0; width: 100%;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: 10px; overflow: hidden;
+  border: 2px solid var(--border-glow);
+  box-shadow: 0 0 0 1px rgba(62, 207, 255, 0.1), 0 12px 40px rgba(0, 0, 0, 0.45);
+  background: #05080c; cursor: zoom-in;
+}
+.map-frame img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  image-rendering: auto;
+}
+.map-caption { font-size: 0.72rem; color: var(--text-dim); flex-shrink: 0; }
+.map-missing {
+  color: var(--text-dim); font-size: 1rem; text-align: center; padding: 2rem;
+}
+
+.wiki-block ul, .panel-scroll ul,
+.wiki-block ol, .panel-scroll ol { padding-left: 1.2rem; margin: 0.3rem 0 0.5rem; }
+.wiki-block li, .panel-scroll li { margin-bottom: 0.32rem; }
+.wiki-block p, .panel-scroll p { margin-bottom: 0.45rem; }
+.wiki-block img, .panel-scroll img { vertical-align: middle; max-height: 1.35em; width: auto; }
+.wiki-block table, .panel-scroll table {
+  width: 100%; border-collapse: collapse; font-size: 0.9em; margin: 0.4rem 0;
+}
+.wiki-block th, .wiki-block td, .panel-scroll th, .panel-scroll td {
+  border: 1px solid var(--border); padding: 0.3rem 0.45rem; text-align: left;
+}
+.lede { font-size: 0.92rem; color: var(--text-muted); margin-bottom: 0.35rem; }
+
+/* Collapsed summary */
+details.summary-details {
+  background: var(--bg-panel);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  border-top: 2px solid var(--gold);
+  padding: 0.35rem 0.65rem;
+  flex-shrink: 0;
+}
+details.summary-details summary {
+  cursor: pointer;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--gold);
+  padding: 0.35rem 0;
+  list-style: none;
+}
+details.summary-details summary::-webkit-details-marker { display: none; }
+details.summary-details summary::before {
+  content: "▸ ";
+  color: var(--text-dim);
+}
+details.summary-details[open] summary::before { content: "▾ "; }
+details.summary-details .summary-body {
+  padding: 0.35rem 0 0.55rem;
+  font-size: 0.88rem;
+  color: var(--text-muted);
+  max-height: 18vh;
+  overflow-y: auto;
+}
+
+.boss-note { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.4rem; }
+.boss-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.4rem; }
+.boss-card {
+  background: var(--bg-panel-2); border: 1px solid var(--border);
+  border-radius: 8px; padding: 0.5rem 0.6rem;
+}
+.boss-card-head { font-size: 0.95rem; margin-bottom: 0.2rem; }
+.boss-card-head a { color: #eef6fc; font-weight: 700; }
+.boss-card-head a:hover { color: var(--accent); }
+.boss-elite { font-size: 0.88rem; }
+.elite-label { color: var(--gold); font-weight: 650; margin-right: 0.25rem; }
+.elite-link { color: #ffd78a; font-weight: 650; }
+.elite-link:hover { color: #ffe9b5; }
+.elite-none { color: var(--text-dim); font-style: italic; font-size: 0.85rem; }
+.boss-meta { font-size: 0.78rem; color: var(--text-dim); margin-top: 0.15rem; }
+
+.callout {
+  margin-top: 0.4rem; padding: 0.45rem 0.6rem; border-radius: 6px;
+  font-size: 0.88rem; border-left: 3px solid; line-height: 1.4;
+}
+.callout.tip { background: var(--accent-soft); border-color: var(--accent); color: #b8eaff; }
+.callout.warn { background: var(--danger-soft); border-color: var(--danger); color: #ffb4b4; }
+
+.lightbox {
+  display: none; position: fixed; inset: 0; z-index: 1000; background: rgba(0,0,0,0.94);
+  align-items: center; justify-content: center; padding: 1.5rem; cursor: zoom-out;
+}
+.lightbox.open { display: flex; }
+.lightbox img {
+  max-width: 96vw; max-height: 96vh; border-radius: 8px;
+  border: 2px solid var(--border-glow); object-fit: contain;
+}
+
+@media (min-height: 2400px) {
+  :root {
+    --walk-size: clamp(1.15rem, 0.7vh + 0.3vw, 1.5rem);
+    --bonus-size: clamp(1.15rem, 0.7vh + 0.3vw, 1.5rem);
+    --gap: 0.65rem;
+    --pad: 0.85rem;
+  }
+  .workspace { grid-template-columns: minmax(560px, 1.2fr) minmax(0, 1fr); }
+}
+@media (min-width: 1800px) and (min-height: 2000px) {
+  .workspace { grid-template-columns: minmax(600px, 1.25fr) minmax(0, 1fr); }
+}
+@media (max-height: 1100px) {
+  body { overflow: auto; height: auto; }
+  .app { height: auto; max-height: none; min-height: 100vh; }
+  .workspace {
+    height: auto; overflow: visible; grid-template-columns: 1fr; grid-template-rows: auto;
+  }
+  .col-map { grid-template-rows: auto; }
+  .col-main { overflow: visible; grid-template-rows: auto; }
+  .row-bonus-hm, .row-lower { grid-template-columns: 1fr; }
+  .panel { max-height: none; overflow: visible; }
+  .panel-scroll { overflow: visible; }
+  .map-frame { min-height: 360px; max-height: 55vh; }
+}
+
+    :root { --accent: #c78bff; --accent-soft: #c78bff22; }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header class="top-chrome">
+      <div class="brand">
+        <span class="brand-mission">M12a</span>
+        <span class="brand-name">Jennur&#x27;s Horde</span>
+        <span class="brand-meta">Nightfall · Vabbi · Cooperative · Medium</span>
+      </div>
+      <nav class="chip-nav" aria-label="Sections">
+        <a href="#map">Map</a>
+        <a href="#walkthrough">Walkthrough</a>
+        <a href="#bonus">Bonus</a>
+        <a href="#objectives">Objectives</a>
+        <a href="#hard-mode">Hard Mode</a>
+        <a href="#bosses">Bosses</a>
+        <a href="#other">Tips</a>
+      </nav>
+      <div class="chrome-actions">
+        <a class="btn btn-idx" href="../nightfall.html">Index</a>
+        <a class="btn btn-prev" href="13_Grand_Court_of_Sebelkeh.html">← Prev</a>
+        <a class="btn btn-wiki" href="https://wiki.guildwars.com/wiki/Jennur%27s_Horde" target="_blank" rel="noopener">Wiki ↗</a>
+        <a class="btn btn-next" href="15_Nundu_Bay.html">Next: Nundu Bay →</a>
+      </div>
+    </header>
+
+    <div class="workspace">
+      <div class="col-map">
+        <section class="panel map-panel" id="map">
+          <h2 class="panel-title"><span class="icon icon-map">◉</span> Mission Map</h2>
+          <div class="map-wrap">
+            <div class="map-frame" id="mapOpen" title="Click to enlarge">
+              <img src="../maps/nightfall_14_Jennurs_Horde_map.jpg" alt="Jennur&#x27;s Horde mission map" />
+            </div>
+            <p class="map-caption">Click to enlarge · Local cache · <a href="https://wiki.guildwars.com/wiki/Jennur%27s_Horde" target="_blank" rel="noopener">Wiki</a></p>
+        </div>
+        </section>
+
+        <details class="summary-details" id="summary">
+          <summary>Summary (click to expand)</summary>
+          <div class="summary-body">
+            <p>Jennur&#x27;s Horde is a mission which represents a branch in the Nightfall storyline. Either this mission or Nundu Bay needs to be completed to progress the storyline.</p>
+            <p style="margin-top:0.4rem;"><strong>Region:</strong> Vabbi · <strong>Mission:</strong> 12a of 20 · <strong>Type:</strong> Cooperative<br/><strong>Required hero:</strong> Koss<br/><strong>Path:</strong> Garden path</p>
+            <p style="margin-top:0.35rem;"><a href="https://wiki.guildwars.com/wiki/Jennur%27s_Horde" target="_blank" rel="noopener">Full wiki article ↗</a></p>
+          </div>
+        </details>
+      </div>
+
+      <div class="col-main">
+        <section class="panel objectives row-obj" id="objectives">
+          <h2 class="panel-title"><span class="icon icon-obj">✓</span> Objectives</h2>
+          <div class="panel-scroll wiki-block"><p>Defeat the <a href="https://wiki.guildwars.com/wiki/Harbinger_of_Nightfall" rel="noopener" target="_blank" title="Harbinger of Nightfall">Harbinger of Nightfall</a> before it summons enough demons to destroy Seborhin.
+</p><ul><li>Protect the <a href="https://wiki.guildwars.com/wiki/Spirit_of_Seborhin" rel="noopener" target="_blank" title="Spirit of Seborhin">Spirits of Seborhin</a> from the onslaught of torment demons.</li>
+<li>The <a href="https://wiki.guildwars.com/wiki/Light_of_Seborhin_(bundle)" rel="noopener" target="_blank" title="Light of Seborhin (bundle)">Light of Seborhin</a> is the only thing that can harm the <a href="https://wiki.guildwars.com/wiki/Harbinger" rel="noopener" target="_blank" title="Harbinger">Harbingers</a>. Drop the Light of Seborhin when you are close enough to an enemy to release its energy.</li>
+<li><a href="https://wiki.guildwars.com/wiki/Horticulturist_Hinon" rel="noopener" target="_blank" title="Horticulturist Hinon">Horticulturist Hinon</a> must survive.</li>
+<li>*<a class="mw-redirect" href="https://wiki.guildwars.com/wiki/Bonus" rel="noopener" target="_blank" title="Bonus">Bonus</a>* Defeat the additional Harbingers.</li>
+<li>You have defeated [0...2] of 2 additional Harbingers.</li></ul></div>
+        </section>
+
+        <section class="panel walkthrough" id="walkthrough">
+          <h2 class="panel-title"><span class="icon icon-walk">→</span> Walkthrough</h2>
+          <div class="panel-scroll wiki-block"><p>The goal of this mission is to stop the corruption of the entire Garden by defeating the <a href="https://wiki.guildwars.com/wiki/Harbinger_of_Nightfall" rel="noopener" target="_blank" title="Harbinger of Nightfall">Harbinger of Nightfall</a>.
+</p><p>There are regular <a href="https://wiki.guildwars.com/wiki/Harbinger" rel="noopener" target="_blank" title="Harbinger">Harbingers</a> and also two types of Margonite groups; stationary groups and groups that spawn every two minutes and <a href="https://wiki.guildwars.com/wiki/Patrol" rel="noopener" target="_blank" title="Patrol">patrol</a> towards <a href="https://wiki.guildwars.com/wiki/Horticulturist_Hinon" rel="noopener" target="_blank" title="Horticulturist Hinon">Horticulturist Hinon</a> - who must survive. The patrol will either go north or south around the large trench in the floor, but they always start in the same place. Any character with a <a class="mw-redirect" href="https://wiki.guildwars.com/wiki/IMS" rel="noopener" target="_blank" title="IMS">speed boost</a> should be able to lure the patrol back to the party before they run to Hinon.
+</p><p>At the start, Horticulturist Hinon will create a <a href="https://wiki.guildwars.com/wiki/Light_of_Seborhin_(bundle)" rel="noopener" target="_blank" title="Light of Seborhin (bundle)">Light of Seborhin (bundle)</a> which is the only tool that can harm the Harbingers and the final boss, the Harbinger of Nightfall. Dropping a Light of Seborhin beside a Harbinger will kill it (granting a morale boost) - and then the Harbinger will be replaced by a <a href="https://wiki.guildwars.com/wiki/Spirit_of_Seborhin" rel="noopener" target="_blank" title="Spirit of Seborhin">Spirit of Seborhin</a>, which will <a href="https://wiki.guildwars.com/wiki/Create_Light_of_Seborhin" rel="noopener" target="_blank" title="Create Light of Seborhin">create</a> another Light of Seborhin. Try and keep these Spirits alive since they shorten the distance the player has to run to fetch a Light of Seborhin. (Note that although the Lights of Seborhin are destroyed when they kill a Harbinger, if they are dropped in the wrong place they can be picked up again.)
+</p><p>The easiest tactic to avoid the threat of being overwhelmed by the patrol is to alternate between killing a stationary group and a patrol group of Margonites.
+</p><p>To make things easier for you, only eliminate the Harbinger located at the top of the stairs, so the groups of Margonites that appear every two minutes will be limited to 4 members. To do this, quickly tag your group where this Harbinger is located, and thus avoid the two located in your path.
+</p><p>Repeat this same pattern (i.e. Patrol → Stationary → Patrol → Stationary, etc.) until you reach the Harbinger of Nightfall. This end boss will only die after three Lights of Seborhin have been dropped on it. Either have the three needed ready somewhere nearby before engaging, or have three players carry each of them.
+</p></div>
+        </section>
+
+        <div class="row-bonus-hm">
+          <section class="panel bonus" id="bonus">
+            <h2 class="panel-title"><span class="icon icon-bonus">★</span> Bonus</h2>
+            <div class="panel-scroll wiki-block"><p>The bonus consists of killing the two additional Harbingers <i>and</i> their Margonite company located at the top of the north and south stairs. Ideally, lure some of the foes down the stairs towards where the patrol will cross - so that you can catch the patrol before they escape your party - walking next to the edge of the staircase and then away, is usually enough to pull the Margonites down the stairs. Note that killing only the Harbinger is not enough, and you must kill the entire group of Margonites near the Harbinger to get credit.
+</p></div>
+          </section>
+          <section class="panel hard-mode" id="hard-mode">
+            <h2 class="panel-title"><span class="icon icon-hm">◆</span> Hard Mode</h2>
+            <div class="panel-scroll wiki-block"><p class='lede'>No dedicated Hard Mode section on the wiki — expect tougher foes and adjusted mechanics. See walkthrough notes.</p></div>
+          </section>
+        </div>
+
+        <div class="row-lower">
+          <section class="panel bosses" id="bosses">
+            <h2 class="panel-title"><span class="icon icon-boss">☠</span> Bosses &amp; Elites</h2>
+            <div class="panel-scroll"><p class='boss-note'>See wiki for boss list (or none listed).</p></div>
+          </section>
+          <section class="panel other" id="other">
+            <h2 class="panel-title"><span class="icon icon-other">✦</span> Tips &amp; Notes</h2>
+            <div class="panel-scroll"><h3 style='font-size:0.8rem;color:var(--accent);margin:0.3rem 0;'>Skill recommendations</h3><div class='wiki-block'><ul><li><a class="mw-redirect" href="https://wiki.guildwars.com/wiki/List_of_Lightbringer_skills" rel="noopener" target="_blank" title="List of Lightbringer skills">Lightbringer skills</a> and <a href="https://wiki.guildwars.com/wiki/Lightbringer" rel="noopener" target="_blank" title="Lightbringer">Lightbringer</a> title active.</li>
+<li>A <a href="https://wiki.guildwars.com/wiki/Speed_boost" rel="noopener" target="_blank" title="Speed boost">speed boost</a> to intercept the patrols and transport Lights of Seborhin.</li>
+<li>A <a href="https://wiki.guildwars.com/wiki/Minion_master" rel="noopener" target="_blank" title="Minion master">minion master</a> to provide a <a href="https://wiki.guildwars.com/wiki/Meat_shield" rel="noopener" target="_blank" title="Meat shield">meat shield</a> and prevent <a href="https://wiki.guildwars.com/wiki/Margonite_Warlock" rel="noopener" target="_blank" title="Margonite Warlock">Margonite Warlocks</a> creating wells.</li>
+<li>Martial professions should focus on bursting down <a href="https://wiki.guildwars.com/wiki/Margonite_Cleric" rel="noopener" target="_blank" title="Margonite Cleric">Margonite Clerics</a> who use <a href="https://wiki.guildwars.com/wiki/Spell_Breaker" rel="noopener" target="_blank" title="Spell Breaker">Spell Breaker</a>.</li>
+<li>Abilities that <a href="https://wiki.guildwars.com/wiki/Blind" rel="noopener" target="_blank" title="Blind">blind</a> such as <a href="https://wiki.guildwars.com/wiki/Blinding_Surge" rel="noopener" target="_blank" title="Blinding Surge">Blinding Surge</a> and or <a href="https://wiki.guildwars.com/wiki/Ineptitude" rel="noopener" target="_blank" title="Ineptitude">Ineptitude</a> can be helpful against the melee <a href="https://wiki.guildwars.com/wiki/Margonite_Reaper" rel="noopener" target="_blank" title="Margonite Reaper">Margonite Reapers</a> and <a href="https://wiki.guildwars.com/wiki/Margonite_Executioner" rel="noopener" target="_blank" title="Margonite Executioner">Executioners</a>.</li>
+<li><a href="https://wiki.guildwars.com/wiki/Interrupt" rel="noopener" target="_blank" title="Interrupt">Interrupts</a> are important to bring, not just for <a href="https://wiki.guildwars.com/wiki/Margonite_Cleric" rel="noopener" target="_blank" title="Margonite Cleric">Margonite Clerics</a>, <a href="https://wiki.guildwars.com/wiki/Margonite_Sorcerer" rel="noopener" target="_blank" title="Margonite Sorcerer">Sorcerers</a> and <a href="https://wiki.guildwars.com/wiki/Margonite_Warlock" rel="noopener" target="_blank" title="Margonite Warlock">Warlocks</a>, but also to interrupt the <a href="https://wiki.guildwars.com/wiki/Margonite" rel="noopener" target="_blank" title="Margonite">Margonite</a> monster skill <a href="https://wiki.guildwars.com/wiki/Abaddon%27s_Chosen" rel="noopener" target="_blank" title="Abaddon's Chosen">Abaddon's Chosen</a> which will lengthen a fight drastically.</li>
+<li>Martial professions should bring <a class="mw-redirect" href="https://wiki.guildwars.com/wiki/Unblockable" rel="noopener" target="_blank" title="Unblockable">unblockable</a> skills or <a href="https://wiki.guildwars.com/wiki/Asuran_Scan" rel="noopener" target="_blank" title="Asuran Scan">Asuran Scan</a> as <a href="https://wiki.guildwars.com/wiki/Margonite_Cleric" rel="noopener" target="_blank" title="Margonite Cleric">Margonite Clerics</a> use <a href="https://wiki.guildwars.com/wiki/Aegis" rel="noopener" target="_blank" title="Aegis">Aegis</a>.</li></ul></div>
+<h3 style='font-size:0.8rem;color:var(--accent);margin:0.3rem 0;'>Notes</h3><div class='wiki-block'><h3><span class="mw-headline" id="Patrol_group_composition">Patrol group composition</span></h3><p>The types of Margonites found in the patrol group depends on how many Harbingers have been killed. However, the composition of the teams does not affect the above strategy.
+</p><dl><dd><table cellpadding="3" cellspacing="0" rules="all" style="margin: 0.25em; border: 1px solid #000;">
+<tbody><tr align="center">
+<th>Harbingers Killed</th>
+<th><a href="https://wiki.guildwars.com/wiki/Margonite_Executioner" rel="noopener" target="_blank" title="Margonite Executioner"><img alt="Warrior-tango-icon-20.png" data-file-height="20" data-file-width="20" decoding="async" height="20" loading="lazy" src="https://wiki.guildwars.com/images/3/3b/Warrior-tango-icon-20.png" width="20"/></a></th>
+<th><a href="https://wiki.guildwars.com/wiki/Margonite_Bowmaster" rel="noopener" target="_blank" title="Margonite Bowmaster"><img alt="Ranger-tango-icon-20.png" data-file-height="20" data-file-width="20" decoding="async" height="20" loading="lazy" src="https://wiki.guildwars.com/images/d/dc/Ranger-tango-icon-20.png" width="20"/></a></th>
+<th><a href="https://wiki.guildwars.com/wiki/Margonite_Cleric" rel="noopener" target="_blank" title="Margonite Cleric"><img alt="Monk-tango-icon-20.png" data-file-height="20" data-file-width="20" decoding="async" height="20" loading="lazy" src="https://wiki.guildwars.com/images/f/f8/Monk-tango-icon-20.png" width="20"/></a></th>
+<th><a href="https://wiki.guildwars.com/wiki/Margonite_Seer" rel="noopener" target="_blank" title="Margonite Seer"><img alt="Mesmer-tango-icon-20.png" data-file-height="20" data-file-width="20" decoding="async" height="20" loading="lazy" src="https://wiki.guildwars.com/images/f/fb/Mesmer-tango-icon-20.png" width="20"/></a></th>
+<th><a href="https://wiki.guildwars.com/wiki/Margonite_Warlock" rel="noopener" target="_blank" title="Margonite Warlock"><img alt="Necromancer-tango-icon-20.png" data-file-height="20" data-file-width="20" decoding="async" height="20" loading="lazy" src="https://wiki.guildwars.com/images/7/7b/Necromancer-tango-icon-20.png" width="20"/></a></th>
+<th><a href="https://wiki.guildwars.com/wiki/Margonite_Sorcerer" rel="noopener" target="_blank" title="Margonite Sorcerer"><img alt="Elementalist-tango-icon-20.png" data-file-height="20" data-file-width="20" decoding="async" height="20" loading="lazy" src="https://wiki.guildwars.com/images/a/ab/Elementalist-tango-icon-20.png" width="20"/></a></th>
+<th><a href="https://wiki.guildwars.com/wiki/Margonite_Ascendant" rel="noopener" target="_blank" title="Margonite Ascendant"><img alt="Paragon-tango-icon-20.png" data-file-height="20" data-file-width="20" decoding="async" height="20" loading="lazy" src="https://wiki.guildwars.com/images/5/55/Paragon-tango-icon-20.png" width="20"/></a></th>
+<th><a href="https://wiki.guildwars.com/wiki/Margonite_Reaper" rel="noopener" target="_blank" title="Margonite Reaper"><img alt="Dervish-tango-icon-20.png" data-file-height="20" data-file-width="20" decoding="async" height="20" loading="lazy" src="https://wiki.guildwars.com/images/3/3e/Dervish-tango-icon-20.png" width="20"/></a>
+</th></tr>
+<tr>
+<td align="center">0-1</td>
+<td><a class="image" href="https://wiki.guildwars.com/wiki/File:Tick_green.png" rel="noopener" target="_blank" title="Yes"><img alt="Yes" data-file-height="20" data-file-width="20" decoding="async" height="20" loading="lazy" src="https://wiki.guildwars.com/images/5/52/Tick_green.png" width="20"/></a></td>
+<td><a class="image" href="https://wiki.guildwars.com/wiki/File:Cross_white.png" rel="noopener" target="_blank" title="No"><img alt="No" data-file-height="20" data-file-width="20" decoding="async" height="20" loading="lazy" src="https://wiki.guildwars.com/images/9/96/Cross_white.png" width="20"/></a></td>
+<td><a class="image" href="https://wiki.guildwars.com/wiki/File:Cross_white.png" rel="noopener" target="_blank" title="No"><img alt="No" data-file-height="20" data-file-width="20" decoding="async" height="20" loading="lazy" src="https://wiki.guildwars.com/images/9/96/Cross_white.png" width="20"/></a></td>
+<td><a class="image" href="https://wiki.guildwars.com/wiki/File:Tick_green.png" rel="noopener" target="_blank" title="Yes"><img alt="Yes" data-file-height="20" data-file-width="20" decoding="async" height="20" loading="lazy" src="https://wiki.guildwars.com/images/5/52/Tick_green.png" width="20"/></a></td>
+<td><a class="image" href="https://wiki.guildwars.com/wiki/File:Cross_white.png" rel="noopener" target="_blank" title="No"><img alt="No" data-file-height="20" data-file-width="20" decoding="async" height="20" loading="lazy" src="https://wiki.guildwars.com/images/9/96/Cross_white.png" width="20"/></a></td>
+<td><a class="image" href="https://wiki.guildwars.com/wiki/File:Tick_green.png" rel="noopener" target="_blank" title="Yes"><img alt="Yes" data-file-height="20" data-file-width="20" decoding="async" height="20" loading="lazy" src="https://wiki.guildwars.com/images/5/52/Tick_green.png" width="20"/></a></td>
+<td><a class="image" href="https://wiki.guildwars.com/wiki/File:Cross_white.png" rel="noopener" target="_blank" title="No"><img alt="No" data-file-height="20" data-file-width="20" decoding="async" height="20" loading="lazy" src="https://wiki.guildwars.com/images/9/96/Cross_white.png" width="20"/></a></td>
+<td><a class="image" href="https://wiki.guildwars.com/wiki/File:Tick_green.png" rel="noopener" target="_blank" title="Yes"><img alt="Yes" data-file-height="20" data-file-width="20" decoding="async" height="20" loading="lazy" src="https://wiki.guildwars.com/images/5/52/Tick_green.png" width="20"/></a>
+</td></tr>
+<tr>
+<td align="center">2-3</td>
+<td><a class="image" href="https://wiki.guildwars.com/wiki/File:Tick_green.png" rel="noopener" target="_blank" title="Yes"><img alt="Yes" data-file-height="20" data-file-width="20" decoding="async" height="20" loading="lazy" src="https://wiki.guildwars.com/images/5/52/Tick_green.png" width="20"/></a></td>
+<td><a class="image" href="https://wiki.guildwars.com/wiki/File:Cross_white.png" rel="noopener" target="_blank" title="No"><img alt="No" data-file-height="20" data-file-width="20" decoding="async" height="20" loading="lazy" src="https://wiki.guildwars.com/images/9/96/Cross_white.png" width="20"/></a></td>
+<td><a class="image" href="https://wiki.guildwars.com/wiki/File:Tick_green.png" rel="noopener" target="_blank" title="Yes"><img alt="Yes" data-file-height="20" data-file-width="20" decoding="async" height="20" loading="lazy" src="https://wiki.guildwars.com/images/5/52/Tick_green.png" width="20"/></a></td>
+<td><a class="image" href="https://wiki.guildwars.com/wiki/File:Cross_white.png" rel="noopener" target="_blank" title="No"><img alt="No" data-file-height="20" data-file-width="20" decoding="async" height="20" loading="lazy" src="https://wiki.guildwars.com/images/9/96/Cross_white.png" width="20"/></a></td>
+<td><a class="image" href="https://wiki.guildwars.com/wiki/File:Tick_green.png" rel="noopener" target="_blank" title="Yes"><img alt="Yes" data-file-height="20" data-file-width="20" decoding="async" height="20" loading="lazy" src="https://wiki.guildwars.com/images/5/52/Tick_green.png" width="20"/></a></td>
+<td><a class="image" href="https://wiki.guildwars.com/wiki/File:Tick_green.png" rel="noopener" target="_blank" title="Yes"><img alt="Yes" data-file-height="20" data-file-width="20" decoding="async" height="20" loading="lazy" src="https://wiki.guildwars.com/images/5/52/Tick_green.png" width="20"/></a></td>
+<td><a class="image" href="https://wiki.guildwars.com/wiki/File:Cross_white.png" rel="noopener" target="_blank" title="No"><img alt="No" data-file-height="20" data-file-width="20" decoding="async" height="20" loading="lazy" src="https://wiki.guildwars.com/images/9/96/Cross_white.png" width="20"/></a></td>
+<td><a class="image" href="https://wiki.guildwars.com/wiki/File:Tick_green.png" rel="noopener" target="_blank" title="Yes"><img alt="Yes" data-file-height="20" data-file-width="20" decoding="async" height="20" loading="lazy" src="https://wiki.guildwars.com/images/5/52/Tick_green.png" width="20"/></a>
+</td></tr>
+<tr>
+<td align="center">4-5</td>
+<td><a class="image" href="https://wiki.guildwars.com/wiki/File:Cross_white.png" rel="noopener" target="_blank" title="No"><img alt="No" data-file-height="20" data-file-width="20" decoding="async" height="20" loading="lazy" src="https://wiki.guildwars.com/images/9/96/Cross_white.png" width="20"/></a></td>
+<td><a class="image" href="https://wiki.guildwars.com/wiki/File:Tick_green.png" rel="noopener" target="_blank" title="Yes"><img alt="Yes" data-file-height="20" data-file-width="20" decoding="async" height="20" loading="lazy" src="https://wiki.guildwars.com/images/5/52/Tick_green.png" width="20"/></a></td>
+<td><a class="image" href="https://wiki.guildwars.com/wiki/File:Tick_green.png" rel="noopener" target="_blank" title="Yes"><img alt="Yes" data-file-height="20" data-file-width="20" decoding="async" height="20" loading="lazy" src="https://wiki.guildwars.com/images/5/52/Tick_green.png" width="20"/></a></td>
+<td><a class="image" href="https://wiki.guildwars.com/wiki/File:Tick_green.png" rel="noopener" target="_blank" title="Yes"><img alt="Yes" data-file-height="20" data-file-width="20" decoding="async" height="20" loading="lazy" src="https://wiki.guildwars.com/images/5/52/Tick_green.png" width="20"/></a></td>
+<td><a class="image" href="https://wiki.guildwars.com/wiki/File:Tick_green.png" rel="noopener" target="_blank" title="Yes"><img alt="Yes" data-file-height="20" data-file-width="20" decoding="async" height="20" loading="lazy" src="https://wiki.guildwars.com/images/5/52/Tick_green.png" width="20"/></a></td>
+<td><a class="image" href="https://wiki.guildwars.com/wiki/File:Cross_white.png" rel="noopener" target="_blank" title="No"><img alt="No" data-file-height="20" data-file-width="20" decoding="async" height="20" loading="lazy" src="https://wiki.guildwars.com/images/9/96/Cross_white.png" width="20"/></a></td>
+<td><a class="image" href="https://wiki.guildwars.com/wiki/File:Tick_green.png" rel="noopener" target="_blank" title="Yes"><img alt="Yes" data-file-height="20" data-file-width="20" decoding="async" height="20" loading="lazy" src="https://wiki.guildwars.com/images/5/52/Tick_green.png" width="20"/></a></td>
+<td><a class="image" href="https://wiki.guildwars.com/wiki/File:Tick_green.png" rel="noopener" target="_blank" title="Yes"><img alt="Yes" data-file-height="20" data-file-width="20" decoding="async" height="20" loading="lazy" src="https://wiki.guildwars.com/images/5/52/Tick_green.png" width="20"/></a>
+</td></tr></tbody></table></dd></dl><ul><li>The Margonite patrols do not <a href="https://wiki.guildwars.com/wiki/Drop" rel="noopener" target="_blank" title="Drop">drop</a> loot or give <a href="https://wiki.guildwars.com/wiki/Experience" rel="noopener" target="_blank" title="Experience">experience</a>, possibly to prevent farming exploitation.</li></ul><div style="margin: 1em; border: solid silver; border-width: 1px 0px; padding: 2px 1em 2px 5em;"><strong class="hiddenlinks" style="position: absolute; margin-left: -4.8em; color: #900;"><a class="image" href="https://wiki.guildwars.com/wiki/File:Bug.png" rel="noopener" target="_blank" title="Bug"><img alt="Bug" data-file-height="32" data-file-width="32" decoding="async" height="18" loading="lazy" src="https://wiki.guildwars.com/images/thumb/7/7d/Bug.png/18px-Bug.png" srcset="/images/thumb/7/7d/Bug.png/27px-Bug.png 1.5x, /images/7/7d/Bug.png 2x" width="18"/></a> <a href="https://wiki.guildwars.com/wiki/Bug" rel="noopener" target="_blank" title="Bug">Bug</a>.</strong>On rare occasion, killing both additional Harbingers and their support groups will not progress the bonus objective (<font color="#789922"><i>"You have defeated [0 or 1] of 2 additional Harbingers."</i></font>). Players will have to restart the mission to get master's reward. (Let the Bonus Harbingers hit you before you drop the Light and kill them, the bug seems to trigger when they get killed before they have the chance to land a single blow.)</div><ul><li>After completing this mission, your party will be taken to <a href="https://wiki.guildwars.com/wiki/The_Kodash_Bazaar" rel="noopener" target="_blank" title="The Kodash Bazaar">The Kodash Bazaar</a>.</li>
+<li>Completion of this mission will fill in page #11 in the <a href="https://wiki.guildwars.com/wiki/Night_Falls" rel="noopener" target="_blank" title="Night Falls">Night Falls</a> <a href="https://wiki.guildwars.com/wiki/Storybook" rel="noopener" target="_blank" title="Storybook">storybook</a>.</li></ul><table class="stdt" style="margin: 5px auto; border: 1px solid #C0C0C0; font-size: 90%; width: 80%; text-align: center;">
+<tbody><tr>
+<th style="background: #7BC; font-size: 110%;"><a href="https://wiki.guildwars.com/wiki/List_of_Nightfall_missions_and_primary_quests" rel="noopener" target="_blank" title="List of Nightfall missions and primary quests">Nightfall missions</a>
+</th></tr>
+<tr>
+<td><a href="https://wiki.guildwars.com/wiki/Chahbek_Village" rel="noopener" target="_blank" title="Chahbek Village">Chahbek Village</a> » <a href="https://wiki.guildwars.com/wiki/Jokanur_Diggings" rel="noopener" target="_blank" title="Jokanur Diggings">Jokanur Diggings</a> » <a href="https://wiki.guildwars.com/wiki/Blacktide_Den" rel="noopener" target="_blank" title="Blacktide Den">Blacktide Den</a> » <a href="https://wiki.guildwars.com/wiki/Consulate_Docks" rel="noopener" target="_blank" title="Consulate Docks">Consulate Docks</a> » <a href="https://wiki.guildwars.com/wiki/Venta_Cemetery" rel="noopener" target="_blank" title="Venta Cemetery">Venta Cemetery </a> » <a href="https://wiki.guildwars.com/wiki/Kodonur_Crossroads" rel="noopener" target="_blank" title="Kodonur Crossroads">Kodonur Crossroads</a> » <a href="https://wiki.guildwars.com/wiki/Pogahn_Passage" rel="noopener" target="_blank" title="Pogahn Passage">Pogahn Passage</a> <i>or</i> <a href="https://wiki.guildwars.com/wiki/Rilohn_Refuge" rel="noopener" target="_blank" title="Rilohn Refuge">Rilohn Refuge</a> » <a href="https://wiki.guildwars.com/wiki/Moddok_Crevice" rel="noopener" target="_blank" title="Moddok Crevice">Moddok Crevice</a> » <a href="https://wiki.guildwars.com/wiki/Tihark_Orchard" rel="noopener" target="_blank" title="Tihark Orchard">Tihark Orchard</a> » <a href="https://wiki.guildwars.com/wiki/Dasha_Vestibule" rel="noopener" target="_blank" title="Dasha Vestibule">Dasha Vestibule</a> <i>or</i> <a href="https://wiki.guildwars.com/wiki/Dzagonur_Bastion" rel="noopener" target="_blank" title="Dzagonur Bastion">Dzagonur Bastion</a> » <a href="https://wiki.guildwars.com/wiki/Grand_Court_of_Sebelkeh" rel="noopener" target="_blank" title="Grand Court of Sebelkeh">Grand Court of Sebelkeh</a> » <a class="mw-selflink selflink">Jennur's Horde</a> <i>or</i> <a href="https://wiki.guildwars.com/wiki/Nundu_Bay" rel="noopener" target="_blank" title="Nundu Bay">Nundu Bay</a> » <a href="https://wiki.guildwars.com/wiki/Gate_of_Desolation" rel="noopener" target="_blank" title="Gate of Desolation">Gate of Desolation</a> » <a href="https://wiki.guildwars.com/wiki/Ruins_of_Morah" rel="noopener" target="_blank" title="Ruins of Morah">Ruins of Morah</a> » <a href="https://wiki.guildwars.com/wiki/Gate_of_Pain" rel="noopener" target="_blank" title="Gate of Pain">Gate of Pain</a> » <a href="https://wiki.guildwars.com/wiki/Gate_of_Madness" rel="noopener" target="_blank" title="Gate of Madness">Gate of Madness</a> » <a href="https://wiki.guildwars.com/wiki/Abaddon%27s_Gate" rel="noopener" target="_blank" title="Abaddon's Gate">Abaddon's Gate</a>
+</td></tr>
+<tr>
+<td><i><b><a class="mw-redirect" href="https://wiki.guildwars.com/wiki/Challenge_mission" rel="noopener" target="_blank" title="Challenge mission">Challenge</a></b></i><br/><a href="https://wiki.guildwars.com/wiki/Dajkah_Inlet" rel="noopener" target="_blank" title="Dajkah Inlet">Dajkah Inlet</a> <span style="margin: 0em 0.3em;">•</span> <a href="https://wiki.guildwars.com/wiki/Remains_of_Sahlahja" rel="noopener" target="_blank" title="Remains of Sahlahja">Remains of Sahlahja</a> <span style="margin: 0em 0.3em;">•</span> <a href="https://wiki.guildwars.com/wiki/The_Shadow_Nexus" rel="noopener" target="_blank" title="The Shadow Nexus">The Shadow Nexus</a>
+</td></tr>
+<tr>
+<td><i><b><a class="mw-redirect" href="https://wiki.guildwars.com/wiki/Elite_mission" rel="noopener" target="_blank" title="Elite mission">Elite</a></b></i><br/><a href="https://wiki.guildwars.com/wiki/The_Ebony_Citadel_of_Mallyx" rel="noopener" target="_blank" title="The Ebony Citadel of Mallyx">The Ebony Citadel of Mallyx</a>
+</td></tr></tbody></table> 
+NewPP limit report
+Cached time: 20260720100001
+Cache expiry: 3600
+Reduced expiry: true
+Complications: [show‐toc]
+CPU time usage: 0.107 seconds
+Real time usage: 0.162 seconds
+Preprocessor visited node count: 1121/1000000
+Post‐expand include size: 13368/2097152 bytes
+Template argument size: 1428/2097152 bytes
+Highest expansion depth: 10/100
+Expensive parser function count: 0/100
+Unstrip recursion depth: 0/20
+Unstrip post‐expand size: 0/5000000 bytes
+ExtLoops count: 0/1000
+
+Transclusion expansion time report (%,ms,calls,template)
+100.00%   90.501      1 -total
+ 34.61%   31.319      1 Template:Location_disambiguation_2
+ 16.79%   15.191      8 Template:Ifexists
+ 12.28%   11.116      1 Template:Mission_rewards
+  9.57%    8.661      1 Template:Mission_infobox
+  6.49%    5.878      6 Template:Cost
+  4.88%    4.413      1 Template:Nightfall_missions
+  4.84%    4.382      1 Template:Bug
+  4.75%    4.299      2 Template:R
+  3.26%    2.952      1 Template:Infobox_campaign_row
+ Saved in parser cache with key en_wiki:pcache:idhash:4364-0!canonical and timestamp 20260720100000 and revision id 2714383.</div></div>
+          </section>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="lightbox" id="lightbox" role="dialog" aria-label="Enlarged map">
+    <img src="../maps/nightfall_14_Jennurs_Horde_map.jpg" alt="Jennur&#x27;s Horde mission map (enlarged)" />
+  </div>
+  <script>
+    (function () {
+      var open = document.getElementById("mapOpen");
+      var box = document.getElementById("lightbox");
+      if (!open || !box) return;
+      open.addEventListener("click", function () { box.classList.add("open"); });
+      box.addEventListener("click", function () { box.classList.remove("open"); });
+      document.addEventListener("keydown", function (e) {
+        if (e.key === "Escape") box.classList.remove("open");
+      });
+    })();
+  </script>
+
+</body>
+</html>

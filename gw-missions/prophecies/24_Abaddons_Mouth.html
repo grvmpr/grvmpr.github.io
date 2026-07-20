@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Abaddon&#x27;s Mouth</title>
+  <style>
+:root {
+  --bg-deep: #070a0f;
+  --bg-panel: #101820;
+  --bg-panel-2: #15202c;
+  --border: #243044;
+  --border-glow: #2a4a6a;
+  --text: #dce6f0;
+  --text-muted: #8a9bb0;
+  --text-dim: #5c6f86;
+  --accent: #3ecfff;
+  --accent-soft: rgba(62, 207, 255, 0.12);
+  --gold: #e8c56a;
+  --gold-soft: rgba(232, 197, 106, 0.12);
+  --bonus: #7dffb3;
+  --bonus-soft: rgba(125, 255, 179, 0.1);
+  --danger: #ff6b6b;
+  --danger-soft: rgba(255, 107, 107, 0.1);
+  --hm: #c78bff;
+  --hm-soft: rgba(199, 139, 255, 0.12);
+  --radius: 10px;
+  --font: "Segoe UI", system-ui, -apple-system, sans-serif;
+  --chrome-h: 3.1rem;
+  --gap: 0.5rem;
+  --pad: 0.7rem;
+  /* Readable on 4K vertical (~2160×3840) */
+  --walk-size: clamp(1.05rem, 0.55vw + 0.55vh, 1.35rem);
+  --bonus-size: clamp(1.05rem, 0.55vw + 0.55vh, 1.35rem);
+  --body-size: clamp(0.95rem, 0.4vw + 0.4vh, 1.1rem);
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html {
+  scroll-behavior: smooth;
+  font-size: clamp(16px, 0.55vw + 0.45vh, 20px);
+  height: 100%;
+  scroll-padding-top: calc(var(--chrome-h) + 0.5rem);
+}
+body {
+  font-family: var(--font);
+  background: var(--bg-deep);
+  color: var(--text);
+  line-height: 1.45;
+  min-height: 100%;
+  height: 100%;
+  overflow: hidden;
+  background-image: radial-gradient(ellipse 70% 25% at 50% 0%, rgba(42, 100, 160, 0.14), transparent);
+}
+a { color: var(--accent); text-decoration: none; }
+a:hover { color: #7de0ff; text-decoration: underline; }
+.app {
+  display: grid;
+  grid-template-rows: var(--chrome-h) 1fr;
+  height: 100vh; height: 100dvh;
+  max-height: 100vh; max-height: 100dvh;
+}
+.top-chrome {
+  display: flex; align-items: center; gap: 0.65rem;
+  padding: 0 0.7rem;
+  background: rgba(8, 12, 18, 0.97);
+  border-bottom: 1px solid var(--border);
+  z-index: 100; min-height: var(--chrome-h);
+}
+.brand { display: flex; align-items: baseline; gap: 0.55rem; min-width: 0; flex-shrink: 0; }
+.brand-mission {
+  font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase;
+  color: var(--accent); font-weight: 700; white-space: nowrap;
+}
+.brand-name {
+  font-size: 1.1rem; font-weight: 750; color: var(--text);
+  white-space: nowrap; letter-spacing: -0.02em;
+}
+.brand-meta { font-size: 0.75rem; color: var(--text-dim); white-space: nowrap; }
+.chip-nav {
+  display: flex; flex: 1; gap: 0.3rem; overflow-x: auto;
+  scrollbar-width: none; min-width: 0; justify-content: center;
+}
+.chip-nav::-webkit-scrollbar { display: none; }
+.chip-nav a {
+  flex: 0 0 auto; padding: 0.3rem 0.65rem; border-radius: 999px;
+  font-size: 0.78rem; font-weight: 600; color: var(--text-muted);
+  background: var(--bg-panel); border: 1px solid var(--border);
+  text-decoration: none; white-space: nowrap;
+}
+.chip-nav a:hover {
+  color: var(--text); border-color: var(--border-glow);
+  background: #1a2836; text-decoration: none;
+}
+.chip-nav a[href="#map"] { color: var(--accent); border-color: rgba(62, 207, 255, 0.35); }
+.chip-nav a[href="#bonus"] { color: var(--bonus); border-color: rgba(125, 255, 179, 0.3); }
+.chip-nav a[href="#hard-mode"] { color: var(--hm); border-color: rgba(199, 139, 255, 0.3); }
+.chip-nav a[href="#bosses"] { color: #ff9a9a; border-color: rgba(255, 107, 107, 0.3); }
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 0.3rem;
+  padding: 0.42rem 0.85rem; border-radius: 8px; font-weight: 650; font-size: 0.8rem;
+  border: none; cursor: pointer; text-decoration: none; white-space: nowrap; flex-shrink: 0;
+}
+.btn:hover { text-decoration: none; }
+.btn-next {
+  background: linear-gradient(135deg, #1a6a9a, #1ab0e0); color: #fff;
+  box-shadow: 0 2px 12px rgba(26, 140, 200, 0.35);
+}
+.btn-next:hover { color: #fff; filter: brightness(1.08); }
+.btn-wiki, .btn-idx, .btn-prev {
+  background: var(--bg-panel); color: var(--text-muted);
+  border: 1px solid var(--border); padding: 0.42rem 0.65rem;
+}
+.btn-wiki:hover, .btn-idx:hover, .btn-prev:hover {
+  color: var(--accent); border-color: var(--border-glow);
+}
+.chrome-actions { display: flex; gap: 0.35rem; flex-shrink: 0; }
+
+/* Map-dominant workspace */
+.workspace {
+  display: grid;
+  grid-template-columns: minmax(480px, 1.15fr) minmax(0, 1fr);
+  grid-template-rows: 1fr;
+  gap: var(--gap); padding: var(--gap);
+  min-height: 0; height: 100%; overflow: hidden;
+}
+.col-map {
+  display: grid;
+  grid-template-rows: 1fr auto;
+  gap: var(--gap);
+  min-height: 0; min-width: 0;
+}
+.col-main {
+  display: grid;
+  /* objectives compact | walkthrough HUGE | bonus+hm | bosses+tips */
+  grid-template-rows: auto minmax(0, 1.6fr) minmax(0, 1.05fr) minmax(0, 0.75fr);
+  gap: var(--gap); min-height: 0; min-width: 0; overflow: hidden;
+}
+.row-obj { min-height: 0; }
+.row-bonus-hm {
+  display: grid; grid-template-columns: 1.15fr 0.85fr; gap: var(--gap); min-height: 0;
+}
+.row-lower {
+  display: grid; grid-template-columns: 1.15fr 0.85fr; gap: var(--gap); min-height: 0;
+}
+.panel {
+  background: var(--bg-panel); border: 1px solid var(--border); border-radius: var(--radius);
+  padding: var(--pad); display: flex; flex-direction: column; min-height: 0; overflow: hidden;
+}
+.panel-scroll {
+  overflow-y: auto; overflow-x: hidden; min-height: 0; flex: 1; padding-right: 0.3rem;
+  scrollbar-width: thin; scrollbar-color: var(--border) transparent;
+  font-size: var(--body-size);
+}
+.panel-scroll::-webkit-scrollbar { width: 8px; }
+.panel-scroll::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+.panel-title {
+  display: flex; align-items: center; gap: 0.4rem;
+  font-size: 0.82rem; font-weight: 750; letter-spacing: 0.05em; text-transform: uppercase;
+  color: var(--text); margin-bottom: 0.45rem; padding-bottom: 0.35rem;
+  border-bottom: 1px solid var(--border); flex-shrink: 0;
+}
+.panel-title .icon {
+  width: 1.3rem; height: 1.3rem; border-radius: 5px;
+  display: inline-flex; align-items: center; justify-content: center; font-size: 0.75rem;
+}
+.panel.map-panel {
+  border-color: var(--border-glow);
+  background: linear-gradient(180deg, #0e1620 0%, var(--bg-panel) 100%);
+  /* Map takes almost all left column */
+  min-height: 0;
+}
+.panel.objectives { border-top: 2px solid var(--accent); }
+.panel.walkthrough { border-top: 3px solid #5eb8e8; }
+.panel.bonus { border-top: 3px solid var(--bonus); }
+.panel.hard-mode { border-top: 2px solid var(--hm); }
+.panel.bosses { border-top: 2px solid var(--danger); }
+.panel.other { border-top: 2px solid var(--text-muted); }
+
+/* Emphasized reading panels */
+.panel.walkthrough .panel-scroll,
+.panel.walkthrough .wiki-block {
+  font-size: var(--walk-size) !important;
+  line-height: 1.55;
+}
+.panel.bonus .panel-scroll,
+.panel.bonus .wiki-block {
+  font-size: var(--bonus-size) !important;
+  line-height: 1.55;
+}
+.panel.walkthrough .panel-scroll li,
+.panel.bonus .panel-scroll li {
+  margin-bottom: 0.45rem;
+}
+.panel.walkthrough .panel-scroll p,
+.panel.bonus .panel-scroll p {
+  margin-bottom: 0.55rem;
+}
+
+.icon-map { background: var(--accent-soft); color: var(--accent); }
+.icon-obj { background: var(--accent-soft); color: var(--accent); }
+.icon-walk { background: rgba(94, 184, 232, 0.15); color: #5eb8e8; }
+.icon-bonus { background: var(--bonus-soft); color: var(--bonus); }
+.icon-hm { background: var(--hm-soft); color: var(--hm); }
+.icon-boss { background: var(--danger-soft); color: var(--danger); }
+.icon-other { background: rgba(138, 155, 176, 0.15); color: var(--text-muted); }
+
+.map-wrap {
+  flex: 1; min-height: 0; display: flex; flex-direction: column;
+  align-items: center; justify-content: center; gap: 0.4rem;
+}
+.map-frame {
+  flex: 1; min-height: 0; width: 100%;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: 10px; overflow: hidden;
+  border: 2px solid var(--border-glow);
+  box-shadow: 0 0 0 1px rgba(62, 207, 255, 0.1), 0 12px 40px rgba(0, 0, 0, 0.45);
+  background: #05080c; cursor: zoom-in;
+}
+.map-frame img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  image-rendering: auto;
+}
+.map-caption { font-size: 0.72rem; color: var(--text-dim); flex-shrink: 0; }
+.map-missing {
+  color: var(--text-dim); font-size: 1rem; text-align: center; padding: 2rem;
+}
+
+.wiki-block ul, .panel-scroll ul,
+.wiki-block ol, .panel-scroll ol { padding-left: 1.2rem; margin: 0.3rem 0 0.5rem; }
+.wiki-block li, .panel-scroll li { margin-bottom: 0.32rem; }
+.wiki-block p, .panel-scroll p { margin-bottom: 0.45rem; }
+.wiki-block img, .panel-scroll img { vertical-align: middle; max-height: 1.35em; width: auto; }
+.wiki-block table, .panel-scroll table {
+  width: 100%; border-collapse: collapse; font-size: 0.9em; margin: 0.4rem 0;
+}
+.wiki-block th, .wiki-block td, .panel-scroll th, .panel-scroll td {
+  border: 1px solid var(--border); padding: 0.3rem 0.45rem; text-align: left;
+}
+.lede { font-size: 0.92rem; color: var(--text-muted); margin-bottom: 0.35rem; }
+
+/* Collapsed summary */
+details.summary-details {
+  background: var(--bg-panel);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  border-top: 2px solid var(--gold);
+  padding: 0.35rem 0.65rem;
+  flex-shrink: 0;
+}
+details.summary-details summary {
+  cursor: pointer;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--gold);
+  padding: 0.35rem 0;
+  list-style: none;
+}
+details.summary-details summary::-webkit-details-marker { display: none; }
+details.summary-details summary::before {
+  content: "▸ ";
+  color: var(--text-dim);
+}
+details.summary-details[open] summary::before { content: "▾ "; }
+details.summary-details .summary-body {
+  padding: 0.35rem 0 0.55rem;
+  font-size: 0.88rem;
+  color: var(--text-muted);
+  max-height: 18vh;
+  overflow-y: auto;
+}
+
+.boss-note { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.4rem; }
+.boss-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.4rem; }
+.boss-card {
+  background: var(--bg-panel-2); border: 1px solid var(--border);
+  border-radius: 8px; padding: 0.5rem 0.6rem;
+}
+.boss-card-head { font-size: 0.95rem; margin-bottom: 0.2rem; }
+.boss-card-head a { color: #eef6fc; font-weight: 700; }
+.boss-card-head a:hover { color: var(--accent); }
+.boss-elite { font-size: 0.88rem; }
+.elite-label { color: var(--gold); font-weight: 650; margin-right: 0.25rem; }
+.elite-link { color: #ffd78a; font-weight: 650; }
+.elite-link:hover { color: #ffe9b5; }
+.elite-none { color: var(--text-dim); font-style: italic; font-size: 0.85rem; }
+.boss-meta { font-size: 0.78rem; color: var(--text-dim); margin-top: 0.15rem; }
+
+.callout {
+  margin-top: 0.4rem; padding: 0.45rem 0.6rem; border-radius: 6px;
+  font-size: 0.88rem; border-left: 3px solid; line-height: 1.4;
+}
+.callout.tip { background: var(--accent-soft); border-color: var(--accent); color: #b8eaff; }
+.callout.warn { background: var(--danger-soft); border-color: var(--danger); color: #ffb4b4; }
+
+.lightbox {
+  display: none; position: fixed; inset: 0; z-index: 1000; background: rgba(0,0,0,0.94);
+  align-items: center; justify-content: center; padding: 1.5rem; cursor: zoom-out;
+}
+.lightbox.open { display: flex; }
+.lightbox img {
+  max-width: 96vw; max-height: 96vh; border-radius: 8px;
+  border: 2px solid var(--border-glow); object-fit: contain;
+}
+
+@media (min-height: 2400px) {
+  :root {
+    --walk-size: clamp(1.15rem, 0.7vh + 0.3vw, 1.5rem);
+    --bonus-size: clamp(1.15rem, 0.7vh + 0.3vw, 1.5rem);
+    --gap: 0.65rem;
+    --pad: 0.85rem;
+  }
+  .workspace { grid-template-columns: minmax(560px, 1.2fr) minmax(0, 1fr); }
+}
+@media (min-width: 1800px) and (min-height: 2000px) {
+  .workspace { grid-template-columns: minmax(600px, 1.25fr) minmax(0, 1fr); }
+}
+@media (max-height: 1100px) {
+  body { overflow: auto; height: auto; }
+  .app { height: auto; max-height: none; min-height: 100vh; }
+  .workspace {
+    height: auto; overflow: visible; grid-template-columns: 1fr; grid-template-rows: auto;
+  }
+  .col-map { grid-template-rows: auto; }
+  .col-main { overflow: visible; grid-template-rows: auto; }
+  .row-bonus-hm, .row-lower { grid-template-columns: 1fr; }
+  .panel { max-height: none; overflow: visible; }
+  .panel-scroll { overflow: visible; }
+  .map-frame { min-height: 360px; max-height: 55vh; }
+}
+
+    :root { --accent: #3ecfff; --accent-soft: #3ecfff22; }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header class="top-chrome">
+      <div class="brand">
+        <span class="brand-mission">M24</span>
+        <span class="brand-name">Abaddon&#x27;s Mouth</span>
+        <span class="brand-meta">Prophecies · Ring of Fire Islands · Cooperative · —</span>
+      </div>
+      <nav class="chip-nav" aria-label="Sections">
+        <a href="#map">Map</a>
+        <a href="#walkthrough">Walkthrough</a>
+        <a href="#bonus">Bonus</a>
+        <a href="#objectives">Objectives</a>
+        <a href="#hard-mode">Hard Mode</a>
+        <a href="#bosses">Bosses</a>
+        <a href="#other">Tips</a>
+      </nav>
+      <div class="chrome-actions">
+        <a class="btn btn-idx" href="../prohecies.html">Index</a>
+        <a class="btn btn-prev" href="23_Ring_of_Fire.html">← Prev</a>
+        <a class="btn btn-wiki" href="https://wiki.guildwars.com/wiki/Abaddon%27s_Mouth" target="_blank" rel="noopener">Wiki ↗</a>
+        <a class="btn btn-next" href="25_Hells_Precipice.html">Next: Hell&#x27;s Precipice →</a>
+      </div>
+    </header>
+
+    <div class="workspace">
+      <div class="col-map">
+        <section class="panel map-panel" id="map">
+          <h2 class="panel-title"><span class="icon icon-map">◉</span> Mission Map</h2>
+          <div class="map-wrap">
+            <div class="map-frame" id="mapOpen" title="Click to enlarge">
+              <img src="../maps/prophecies_24_Abaddons_Mouth_map.jpg" alt="Abaddon&#x27;s Mouth mission map" />
+            </div>
+            <p class="map-caption">Click to enlarge · Local cache · <a href="https://wiki.guildwars.com/wiki/Abaddon%27s_Mouth" target="_blank" rel="noopener">Wiki</a></p>
+        </div>
+        </section>
+
+        <details class="summary-details" id="summary">
+          <summary>Summary (click to expand)</summary>
+          <div class="summary-body">
+            <p>The Door of Komalie is nearby. Push your way through the Mursaat and break the seals to open it.</p>
+            <p style="margin-top:0.4rem;"><strong>Region:</strong> Ring of Fire Islands · <strong>Mission:</strong> 24 of 25 · <strong>Type:</strong> Cooperative</p>
+            <p style="margin-top:0.35rem;"><a href="https://wiki.guildwars.com/wiki/Abaddon%27s_Mouth" target="_blank" rel="noopener">Full wiki article ↗</a></p>
+          </div>
+        </details>
+      </div>
+
+      <div class="col-main">
+        <section class="panel objectives row-obj" id="objectives">
+          <h2 class="panel-title"><span class="icon icon-obj">✓</span> Objectives</h2>
+          <div class="panel-scroll wiki-block"><p>Open the <a href="https://wiki.guildwars.com/wiki/Door_of_Komalie" rel="noopener" target="_blank" title="Door of Komalie">Door of Komalie</a>.
+</p><ul><li>Disable the seals to power down the <a href="https://wiki.guildwars.com/wiki/Onyx_Gate" rel="noopener" target="_blank" title="Onyx Gate">Onyx Gate</a>.</li>
+<li>Climb the path into Abaddon's Mouth.</li>
+<li>Break the magical seals holding closed the Door of Komalie.</li>
+<li>*BONUS* Escort the spirit of <a href="https://wiki.guildwars.com/wiki/Leah_Stone" rel="noopener" target="_blank" title="Leah Stone">Leah Stone</a> to its final resting place.</li></ul></div>
+        </section>
+
+        <section class="panel walkthrough" id="walkthrough">
+          <h2 class="panel-title"><span class="icon icon-walk">→</span> Walkthrough</h2>
+          <div class="panel-scroll wiki-block"><p>This mission requires you to break through a Mursaat fortress by powering down the <a href="https://wiki.guildwars.com/wiki/Onyx_Gate" rel="noopener" target="_blank" title="Onyx Gate">Onyx Gate</a> to finally reach the <a href="https://wiki.guildwars.com/wiki/Door_of_Komalie" rel="noopener" target="_blank" title="Door of Komalie">Door of Komalie</a>. <a href="https://wiki.guildwars.com/wiki/Vizier_Khilbron" rel="noopener" target="_blank" title="Vizier Khilbron">Vizier Khilbron</a> will periodically enchant the party with <a href="https://wiki.guildwars.com/wiki/Chimera_of_Intensity" rel="noopener" target="_blank" title="Chimera of Intensity">Chimera of Intensity</a>, but this only lasts two minutes so is little help overall. The complex includes many gates that prevent access to the fortress; destroy each gate's <a href="https://wiki.guildwars.com/wiki/Ether_Seal" rel="noopener" target="_blank" title="Ether Seal">Ether Seal</a> to open them. Some of the gates are close to nearby groups of foes and guarded by <a href="https://wiki.guildwars.com/wiki/Jade_Bow" rel="noopener" target="_blank" title="Jade Bow">Jade Bows</a>; it is unwise to fight them together. You can spike the seal first or <a href="https://wiki.guildwars.com/wiki/Pull" rel="noopener" target="_blank" title="Pull">pull</a> the jade away from it.
+</p><p>You will start outside the Mursaat fortress; the vizier will enchant you when you get close to the main entrance. Before targeting the first Ether Seal, dispatch the side guards on top of the wall. All the Mursaat troops are stationed close to each other, so pull them apart to avoid over-aggro. Destroy the Ether Seals on either side of the Onyx Gate to open it. Leave through the Onyx Gate to continue with the mission.
+</p><p>Intermediately after leaving the Onyx Gate, the Vizier will re-enchant the party. You have to destroy three more gates; the two pairs of bosses between them can be easily defeated, if you keep them away from the seals.
+</p><p>After entering the caldera, Khilbron will aid you for a third and last time. Players arrive to a platform with six seals that lock the Door of Komalie and must be destroyed.
+</p><p>Each time you destroy a singular seal, four level-10 (lvl 20 in Hard Mode) <a href="https://wiki.guildwars.com/wiki/Seal_Guard" rel="noopener" target="_blank" title="Seal Guard">Seal Guards</a> will spawn while <a href="https://wiki.guildwars.com/wiki/Mursaat_Guardian" rel="noopener" target="_blank" title="Mursaat Guardian">Mursaat Guardians</a> will join the battle from the north and south. Clear the area of the current crop of foes before destroying another seal, otherwise you will get overwhelmed. As with other similar missions, patience is the key to success.
+</p><p>After the last seal is destroyed, a cinematic will trigger, then a <a href="https://wiki.guildwars.com/wiki/Burning_Titan" rel="noopener" target="_blank" title="Burning Titan">Burning Titan</a> will spawn at the center of the bloodstone. Defeat it to complete the mission.
+</p></div>
+        </section>
+
+        <div class="row-bonus-hm">
+          <section class="panel bonus" id="bonus">
+            <h2 class="panel-title"><span class="icon icon-bonus">★</span> Bonus</h2>
+            <div class="panel-scroll wiki-block"><p>Your goal is to escort the spirit of <a href="https://wiki.guildwars.com/wiki/Leah_Stone" rel="noopener" target="_blank" title="Leah Stone">Leah Stone</a> from the fortress to a small island in the west. She only appears once the Ether Seal at the docks near her spawn point is defeated. The main difficulty is that this <a class="mw-redirect" href="https://wiki.guildwars.com/wiki/NPC" rel="noopener" target="_blank" title="NPC">NPC</a> is fragile and can be easily killed. She stops moving if you move out of compass range; and she slows down once she leaves the fortress. Finally, she is affected by <a href="https://wiki.guildwars.com/wiki/Burning" rel="noopener" target="_blank" title="Burning">burning</a> from the lava, requiring you to stop frequently and wait for her to regenerate her health.
+</p><p>In <a href="https://wiki.guildwars.com/wiki/Hard_mode" rel="noopener" target="_blank" title="Hard mode">hard mode</a>, your best bet is to clear the path of foes before releasing her spirit; she takes the largest coast road bordering the island from north to west. Be sure to trigger any <a class="mw-redirect" href="https://wiki.guildwars.com/wiki/Pop-up" rel="noopener" target="_blank" title="Pop-up">pop-ups</a> in the area past the <a href="https://wiki.guildwars.com/wiki/Eidolon" rel="noopener" target="_blank" title="Eidolon">Eidolon</a> and remove the dryders, <a href="https://wiki.guildwars.com/wiki/Crag_Behemoth" rel="noopener" target="_blank" title="Crag Behemoth">Crag Behemoths</a>, <a href="https://wiki.guildwars.com/wiki/Wurm" rel="noopener" target="_blank" title="Wurm">wurms</a> and possibly <a href="https://wiki.guildwars.com/wiki/Snyk_the_Hundred_Tongue" rel="noopener" target="_blank" title="Snyk the Hundred Tongue">Snyk the Hundred Tongue</a>, any of which can kill her. Once you have removed these threats, return to the fortress, kill the nearby boss, and then lead her back towards the island. Note that if you clear the path first, then free her, that she will stop after the lava if unescorted (no players in compass range).
+</p><p>In <a href="https://wiki.guildwars.com/wiki/Normal_mode" rel="noopener" target="_blank" title="Normal mode">normal mode</a>, if you are confident of your team's strength, you can trigger her appearance earlier, which will save you from retracing your steps.
+</p><div style="margin: 1em; border: solid silver; border-width: 1px 0px; padding: 2px 1em 2px 5em;"><strong class="hiddenlinks" style="position: absolute; margin-left: -4.8em; color: #900;"><a class="image" href="https://wiki.guildwars.com/wiki/File:Bug.png" rel="noopener" target="_blank" title="Bug"><img alt="Bug" data-file-height="32" data-file-width="32" decoding="async" height="18" loading="lazy" src="https://wiki.guildwars.com/images/thumb/7/7d/Bug.png/18px-Bug.png" srcset="/images/thumb/7/7d/Bug.png/27px-Bug.png 1.5x, /images/7/7d/Bug.png 2x" width="18"/></a> <a href="https://wiki.guildwars.com/wiki/Bug" rel="noopener" target="_blank" title="Bug">Bug</a>.</strong>If you let <a href="https://wiki.guildwars.com/wiki/Leah_Stone" rel="noopener" target="_blank" title="Leah Stone">Leah Stone</a> run ahead of you, and out of your compass range, it is possible for her to make it to her resting place unharmed, successfully granting you bonus.</div></div>
+          </section>
+          <section class="panel hard-mode" id="hard-mode">
+            <h2 class="panel-title"><span class="icon icon-hm">◆</span> Hard Mode</h2>
+            <div class="panel-scroll wiki-block"><p class='lede'>No dedicated Hard Mode section on the wiki — expect tougher foes and adjusted mechanics. See walkthrough notes.</p></div>
+          </section>
+        </div>
+
+        <div class="row-lower">
+          <section class="panel bosses" id="bosses">
+            <h2 class="panel-title"><span class="icon icon-boss">☠</span> Bosses &amp; Elites</h2>
+            <div class="panel-scroll"><div class='boss-grid'>
+<article class="boss-card">
+  <div class="boss-card-head"><a href="https://wiki.guildwars.com/wiki/Snyk_the_Hundred_Tongue" target="_blank" rel="noopener"><strong>Snyk the Hundred Tongue</strong></a></div>
+  <div class="boss-elite"><span class="elite-label">Elite:</span> <a class="elite-link" href="https://wiki.guildwars.com/wiki/Barrage" target="_blank" rel="noopener">Barrage</a></div>
+  <div class="boss-meta">28 (30)</div>
+</article>
+<article class="boss-card">
+  <div class="boss-card-head"><a href="https://wiki.guildwars.com/wiki/Spindle_Agonyvein" target="_blank" rel="noopener"><strong>Spindle Agonyvein</strong></a></div>
+  <div class="boss-elite"><span class="elite-label">Elite:</span> <a class="elite-link" href="https://wiki.guildwars.com/wiki/Restore_Condition" target="_blank" rel="noopener">Restore Condition</a></div>
+  <div class="boss-meta">28 (30)</div>
+</article>
+<article class="boss-card">
+  <div class="boss-card-head"><a href="https://wiki.guildwars.com/wiki/Goss_Darkweb" target="_blank" rel="noopener"><strong>Goss Darkweb</strong></a></div>
+  <div class="boss-elite"><span class="elite-label">Elite:</span> <a class="elite-link" href="https://wiki.guildwars.com/wiki/Soul_Leech" target="_blank" rel="noopener">Soul Leech</a></div>
+  <div class="boss-meta">28 (30)</div>
+</article>
+<article class="boss-card">
+  <div class="boss-card-head"><a href="https://wiki.guildwars.com/wiki/Plexus_Shadowhook" target="_blank" rel="noopener"><strong>Plexus Shadowhook</strong></a></div>
+  <div class="boss-elite"><span class="elite-label">Elite:</span> <a class="elite-link" href="https://wiki.guildwars.com/wiki/Fevered_Dreams" target="_blank" rel="noopener">Fevered Dreams</a></div>
+  <div class="boss-meta">28 (30)</div>
+</article>
+<article class="boss-card">
+  <div class="boss-card-head"><a href="https://wiki.guildwars.com/wiki/Eidolon" target="_blank" rel="noopener"><strong>Eidolon</strong></a></div>
+  <div class="boss-elite"><span class="elite-label">Elite:</span> <a class="elite-link" href="https://wiki.guildwars.com/wiki/Mist_Form" target="_blank" rel="noopener">Mist Form</a></div>
+  <div class="boss-meta">24 (30)</div>
+</article>
+<article class="boss-card">
+  <div class="boss-card-head"><a href="https://wiki.guildwars.com/wiki/Cairn_the_Destroyer" target="_blank" rel="noopener"><strong>Cairn the Destroyer</strong></a></div>
+  <div class="boss-elite"><span class="elite-label">Elite:</span> <a class="elite-link" href="https://wiki.guildwars.com/wiki/Devastating_Hammer" target="_blank" rel="noopener">Devastating Hammer</a></div>
+  <div class="boss-meta">28 (30)</div>
+</article>
+<article class="boss-card">
+  <div class="boss-card-head"><a href="https://wiki.guildwars.com/wiki/Cairn_the_Relentless" target="_blank" rel="noopener"><strong>Cairn the Relentless</strong></a></div>
+  <div class="boss-elite"><span class="elite-label">Elite:</span> <a class="elite-link" href="https://wiki.guildwars.com/wiki/Oath_Shot" target="_blank" rel="noopener">Oath Shot</a></div>
+  <div class="boss-meta">28 (30)</div>
+</article>
+<article class="boss-card">
+  <div class="boss-card-head"><a href="https://wiki.guildwars.com/wiki/Willa_the_Unpleasant" target="_blank" rel="noopener"><strong>Willa the Unpleasant</strong></a></div>
+  <div class="boss-elite"><span class="elite-label">Elite:</span> <a class="elite-link" href="https://wiki.guildwars.com/wiki/Aura_of_Faith" target="_blank" rel="noopener">Aura of Faith</a></div>
+  <div class="boss-meta">28 (30)</div>
+</article>
+<article class="boss-card">
+  <div class="boss-card-head"><a href="https://wiki.guildwars.com/wiki/Sarlic_the_Judge" target="_blank" rel="noopener"><strong>Sarlic the Judge</strong></a></div>
+  <div class="boss-elite"><span class="elite-label">Elite:</span> <a class="elite-link" href="https://wiki.guildwars.com/wiki/Life_Transfer" target="_blank" rel="noopener">Life Transfer</a></div>
+  <div class="boss-meta">28 (30)</div>
+</article>
+<article class="boss-card">
+  <div class="boss-card-head"><a href="https://wiki.guildwars.com/wiki/Mercia_the_Smug" target="_blank" rel="noopener"><strong>Mercia the Smug</strong></a></div>
+  <div class="boss-elite"><span class="elite-label">Elite:</span> <a class="elite-link" href="https://wiki.guildwars.com/wiki/Energy_Surge" target="_blank" rel="noopener">Energy Surge</a></div>
+  <div class="boss-meta">28 (30)</div>
+</article>
+<article class="boss-card">
+  <div class="boss-card-head"><a href="https://wiki.guildwars.com/wiki/Optimus_Caliph" target="_blank" rel="noopener"><strong>Optimus Caliph</strong></a></div>
+  <div class="boss-elite"><span class="elite-label">Elite:</span> <a class="elite-link" href="https://wiki.guildwars.com/wiki/Thunderclap" target="_blank" rel="noopener">Thunderclap</a></div>
+  <div class="boss-meta">28 (30)</div>
+</article>
+</div></div>
+          </section>
+          <section class="panel other" id="other">
+            <h2 class="panel-title"><span class="icon icon-other">✦</span> Tips &amp; Notes</h2>
+            <div class="panel-scroll"><h3 style='font-size:0.8rem;color:var(--accent);margin:0.3rem 0;'>Skill recommendations</h3><div class='wiki-block'><ul><li><a href="https://wiki.guildwars.com/wiki/Area_damage_over_time" rel="noopener" target="_blank" title="Area damage over time">Area damage over time</a> skills to kill the Ether Seals since they cannot flee.</li>
+<li><a href="https://wiki.guildwars.com/wiki/Damage_reduction" rel="noopener" target="_blank" title="Damage reduction">Damage reduction</a>, e.g. <a href="https://wiki.guildwars.com/wiki/Protective_Spirit" rel="noopener" target="_blank" title="Protective Spirit">Protective Spirit</a>, to negate some of the Ether Seal's <a href="https://wiki.guildwars.com/wiki/Spike" rel="noopener" target="_blank" title="Spike">spike</a>.</li>
+<li><a href="https://wiki.guildwars.com/wiki/Interrupt" rel="noopener" target="_blank" title="Interrupt">Interrupts</a> and <a class="mw-redirect" href="https://wiki.guildwars.com/wiki/Daze" rel="noopener" target="_blank" title="Daze">Daze</a> are useful against the hydras and some of the bosses.</li>
+<li>Party-wide <a href="https://wiki.guildwars.com/wiki/Speed_boost" rel="noopener" target="_blank" title="Speed boost">speed boosts</a> help reduce the time spent backtracking during the bonus.</li></ul></div>
+<h3 style='font-size:0.8rem;color:var(--accent);margin:0.3rem 0;'>Notes</h3><div class='wiki-block'><ul><li>Sometimes, chests spawn in Leah Stone's scripted path, making the bonus impossible. Checking her route before attempting bonus might therefore save a lot of time.</li>
+<li>Occasionally, if you kill the <a href="https://wiki.guildwars.com/wiki/Burning_Titan" rel="noopener" target="_blank" title="Burning Titan">Burning Titan</a> at the end too quickly, the mission will fail. Give it a couple of seconds after the last cut scene.</li>
+<li>The <a href="https://wiki.guildwars.com/wiki/Ancient_Seer" rel="noopener" target="_blank" title="Ancient Seer">Ancient Seer</a> stands on the south western coast of the island. Give him the <a href="https://wiki.guildwars.com/wiki/Eidolon" rel="noopener" target="_blank" title="Eidolon">Eidolon</a>'s <a href="https://wiki.guildwars.com/wiki/Spectral_Essence" rel="noopener" target="_blank" title="Spectral Essence">Spectral Essence</a> to <a href="https://wiki.guildwars.com/wiki/Infusion" rel="noopener" target="_blank" title="Infusion">infuse</a> your <a href="https://wiki.guildwars.com/wiki/Armor" rel="noopener" target="_blank" title="Armor">armor</a> together with any other player who talks to him. This is a good opportunity to infuse a second set of armor.</li>
+<li>Some of the <a href="https://wiki.guildwars.com/wiki/Elite_skill" rel="noopener" target="_blank" title="Elite skill">elite skills</a> found in this mission cannot be captured anywhere else. If attempting the bonus, it may be wise to bring a <a href="https://wiki.guildwars.com/wiki/Signet_of_Capture" rel="noopener" target="_blank" title="Signet of Capture">Signet of Capture</a>.</li>
+<li>The Jade and Mursaat bosses share 3 spawn points. 2 of the six bosses will spawn at each point.</li>
+<li>The Dryder bosses share 4 spawn points.</li>
+<li>Complete exploration of this mission adds about 1.3% to the Tyrian Explorer title.</li>
+<li>Completion of this mission will fill in page #17 of <a href="https://wiki.guildwars.com/wiki/The_Flameseeker_Prophecies" rel="noopener" target="_blank" title="The Flameseeker Prophecies">The Flameseeker Prophecies</a> <a href="https://wiki.guildwars.com/wiki/Storybook" rel="noopener" target="_blank" title="Storybook">storybook</a>.</li>
+<li>After completing this mission, your party will be taken to <a href="https://wiki.guildwars.com/wiki/Hell%27s_Precipice_(outpost)" rel="noopener" target="_blank" title="Hell's Precipice (outpost)">Hell's Precipice</a>.</li></ul><div style="margin: 1em; border: solid silver; border-width: 1px 0px; padding: 2px 1em 2px 7.5em;"><strong class="hiddenlinks" style="position: absolute; margin-left: -7.3em; color: #900;"><a class="image" href="https://wiki.guildwars.com/wiki/File:Anomaly.png" rel="noopener" target="_blank" title="Anomaly"><img alt="Anomaly" data-file-height="32" data-file-width="32" decoding="async" height="18" loading="lazy" src="https://wiki.guildwars.com/images/thumb/a/a6/Anomaly.png/18px-Anomaly.png" srcset="/images/thumb/a/a6/Anomaly.png/27px-Anomaly.png 1.5x, /images/a/a6/Anomaly.png 2x" width="18"/></a> <a class="mw-redirect" href="https://wiki.guildwars.com/wiki/Anomaly" rel="noopener" target="_blank" title="Anomaly">Anomaly</a>.</strong>Dryder bosses may not spawn at all.</div><div style="margin: 1em; border: solid silver; border-width: 1px 0px; padding: 2px 1em 2px 5em;"><strong class="hiddenlinks" style="position: absolute; margin-left: -4.8em; color: #900;"><a class="image" href="https://wiki.guildwars.com/wiki/File:Bug.png" rel="noopener" target="_blank" title="Bug"><img alt="Bug" data-file-height="32" data-file-width="32" decoding="async" height="18" loading="lazy" src="https://wiki.guildwars.com/images/thumb/7/7d/Bug.png/18px-Bug.png" srcset="/images/thumb/7/7d/Bug.png/27px-Bug.png 1.5x, /images/7/7d/Bug.png 2x" width="18"/></a> <a href="https://wiki.guildwars.com/wiki/Bug" rel="noopener" target="_blank" title="Bug">Bug</a>.</strong>If the western Ether Seal is fighting Dryders and isn't allowed to finish them off, its gate will not open after being killed.</div></div></div>
+          </section>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="lightbox" id="lightbox" role="dialog" aria-label="Enlarged map">
+    <img src="../maps/prophecies_24_Abaddons_Mouth_map.jpg" alt="Abaddon&#x27;s Mouth mission map (enlarged)" />
+  </div>
+  <script>
+    (function () {
+      var open = document.getElementById("mapOpen");
+      var box = document.getElementById("lightbox");
+      if (!open || !box) return;
+      open.addEventListener("click", function () { box.classList.add("open"); });
+      box.addEventListener("click", function () { box.classList.remove("open"); });
+      document.addEventListener("keydown", function (e) {
+        if (e.key === "Escape") box.classList.remove("open");
+      });
+    })();
+  </script>
+
+</body>
+</html>

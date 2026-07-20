@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Abaddon&#x27;s Gate</title>
+  <style>
+:root {
+  --bg-deep: #070a0f;
+  --bg-panel: #101820;
+  --bg-panel-2: #15202c;
+  --border: #243044;
+  --border-glow: #2a4a6a;
+  --text: #dce6f0;
+  --text-muted: #8a9bb0;
+  --text-dim: #5c6f86;
+  --accent: #3ecfff;
+  --accent-soft: rgba(62, 207, 255, 0.12);
+  --gold: #e8c56a;
+  --gold-soft: rgba(232, 197, 106, 0.12);
+  --bonus: #7dffb3;
+  --bonus-soft: rgba(125, 255, 179, 0.1);
+  --danger: #ff6b6b;
+  --danger-soft: rgba(255, 107, 107, 0.1);
+  --hm: #c78bff;
+  --hm-soft: rgba(199, 139, 255, 0.12);
+  --radius: 10px;
+  --font: "Segoe UI", system-ui, -apple-system, sans-serif;
+  --chrome-h: 3.1rem;
+  --gap: 0.5rem;
+  --pad: 0.7rem;
+  /* Readable on 4K vertical (~2160×3840) */
+  --walk-size: clamp(1.05rem, 0.55vw + 0.55vh, 1.35rem);
+  --bonus-size: clamp(1.05rem, 0.55vw + 0.55vh, 1.35rem);
+  --body-size: clamp(0.95rem, 0.4vw + 0.4vh, 1.1rem);
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html {
+  scroll-behavior: smooth;
+  font-size: clamp(16px, 0.55vw + 0.45vh, 20px);
+  height: 100%;
+  scroll-padding-top: calc(var(--chrome-h) + 0.5rem);
+}
+body {
+  font-family: var(--font);
+  background: var(--bg-deep);
+  color: var(--text);
+  line-height: 1.45;
+  min-height: 100%;
+  height: 100%;
+  overflow: hidden;
+  background-image: radial-gradient(ellipse 70% 25% at 50% 0%, rgba(42, 100, 160, 0.14), transparent);
+}
+a { color: var(--accent); text-decoration: none; }
+a:hover { color: #7de0ff; text-decoration: underline; }
+.app {
+  display: grid;
+  grid-template-rows: var(--chrome-h) 1fr;
+  height: 100vh; height: 100dvh;
+  max-height: 100vh; max-height: 100dvh;
+}
+.top-chrome {
+  display: flex; align-items: center; gap: 0.65rem;
+  padding: 0 0.7rem;
+  background: rgba(8, 12, 18, 0.97);
+  border-bottom: 1px solid var(--border);
+  z-index: 100; min-height: var(--chrome-h);
+}
+.brand { display: flex; align-items: baseline; gap: 0.55rem; min-width: 0; flex-shrink: 0; }
+.brand-mission {
+  font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase;
+  color: var(--accent); font-weight: 700; white-space: nowrap;
+}
+.brand-name {
+  font-size: 1.1rem; font-weight: 750; color: var(--text);
+  white-space: nowrap; letter-spacing: -0.02em;
+}
+.brand-meta { font-size: 0.75rem; color: var(--text-dim); white-space: nowrap; }
+.chip-nav {
+  display: flex; flex: 1; gap: 0.3rem; overflow-x: auto;
+  scrollbar-width: none; min-width: 0; justify-content: center;
+}
+.chip-nav::-webkit-scrollbar { display: none; }
+.chip-nav a {
+  flex: 0 0 auto; padding: 0.3rem 0.65rem; border-radius: 999px;
+  font-size: 0.78rem; font-weight: 600; color: var(--text-muted);
+  background: var(--bg-panel); border: 1px solid var(--border);
+  text-decoration: none; white-space: nowrap;
+}
+.chip-nav a:hover {
+  color: var(--text); border-color: var(--border-glow);
+  background: #1a2836; text-decoration: none;
+}
+.chip-nav a[href="#map"] { color: var(--accent); border-color: rgba(62, 207, 255, 0.35); }
+.chip-nav a[href="#bonus"] { color: var(--bonus); border-color: rgba(125, 255, 179, 0.3); }
+.chip-nav a[href="#hard-mode"] { color: var(--hm); border-color: rgba(199, 139, 255, 0.3); }
+.chip-nav a[href="#bosses"] { color: #ff9a9a; border-color: rgba(255, 107, 107, 0.3); }
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 0.3rem;
+  padding: 0.42rem 0.85rem; border-radius: 8px; font-weight: 650; font-size: 0.8rem;
+  border: none; cursor: pointer; text-decoration: none; white-space: nowrap; flex-shrink: 0;
+}
+.btn:hover { text-decoration: none; }
+.btn-next {
+  background: linear-gradient(135deg, #1a6a9a, #1ab0e0); color: #fff;
+  box-shadow: 0 2px 12px rgba(26, 140, 200, 0.35);
+}
+.btn-next:hover { color: #fff; filter: brightness(1.08); }
+.btn-wiki, .btn-idx, .btn-prev {
+  background: var(--bg-panel); color: var(--text-muted);
+  border: 1px solid var(--border); padding: 0.42rem 0.65rem;
+}
+.btn-wiki:hover, .btn-idx:hover, .btn-prev:hover {
+  color: var(--accent); border-color: var(--border-glow);
+}
+.chrome-actions { display: flex; gap: 0.35rem; flex-shrink: 0; }
+
+/* Map-dominant workspace */
+.workspace {
+  display: grid;
+  grid-template-columns: minmax(480px, 1.15fr) minmax(0, 1fr);
+  grid-template-rows: 1fr;
+  gap: var(--gap); padding: var(--gap);
+  min-height: 0; height: 100%; overflow: hidden;
+}
+.col-map {
+  display: grid;
+  grid-template-rows: 1fr auto;
+  gap: var(--gap);
+  min-height: 0; min-width: 0;
+}
+.col-main {
+  display: grid;
+  /* objectives compact | walkthrough HUGE | bonus+hm | bosses+tips */
+  grid-template-rows: auto minmax(0, 1.6fr) minmax(0, 1.05fr) minmax(0, 0.75fr);
+  gap: var(--gap); min-height: 0; min-width: 0; overflow: hidden;
+}
+.row-obj { min-height: 0; }
+.row-bonus-hm {
+  display: grid; grid-template-columns: 1.15fr 0.85fr; gap: var(--gap); min-height: 0;
+}
+.row-lower {
+  display: grid; grid-template-columns: 1.15fr 0.85fr; gap: var(--gap); min-height: 0;
+}
+.panel {
+  background: var(--bg-panel); border: 1px solid var(--border); border-radius: var(--radius);
+  padding: var(--pad); display: flex; flex-direction: column; min-height: 0; overflow: hidden;
+}
+.panel-scroll {
+  overflow-y: auto; overflow-x: hidden; min-height: 0; flex: 1; padding-right: 0.3rem;
+  scrollbar-width: thin; scrollbar-color: var(--border) transparent;
+  font-size: var(--body-size);
+}
+.panel-scroll::-webkit-scrollbar { width: 8px; }
+.panel-scroll::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+.panel-title {
+  display: flex; align-items: center; gap: 0.4rem;
+  font-size: 0.82rem; font-weight: 750; letter-spacing: 0.05em; text-transform: uppercase;
+  color: var(--text); margin-bottom: 0.45rem; padding-bottom: 0.35rem;
+  border-bottom: 1px solid var(--border); flex-shrink: 0;
+}
+.panel-title .icon {
+  width: 1.3rem; height: 1.3rem; border-radius: 5px;
+  display: inline-flex; align-items: center; justify-content: center; font-size: 0.75rem;
+}
+.panel.map-panel {
+  border-color: var(--border-glow);
+  background: linear-gradient(180deg, #0e1620 0%, var(--bg-panel) 100%);
+  /* Map takes almost all left column */
+  min-height: 0;
+}
+.panel.objectives { border-top: 2px solid var(--accent); }
+.panel.walkthrough { border-top: 3px solid #5eb8e8; }
+.panel.bonus { border-top: 3px solid var(--bonus); }
+.panel.hard-mode { border-top: 2px solid var(--hm); }
+.panel.bosses { border-top: 2px solid var(--danger); }
+.panel.other { border-top: 2px solid var(--text-muted); }
+
+/* Emphasized reading panels */
+.panel.walkthrough .panel-scroll,
+.panel.walkthrough .wiki-block {
+  font-size: var(--walk-size) !important;
+  line-height: 1.55;
+}
+.panel.bonus .panel-scroll,
+.panel.bonus .wiki-block {
+  font-size: var(--bonus-size) !important;
+  line-height: 1.55;
+}
+.panel.walkthrough .panel-scroll li,
+.panel.bonus .panel-scroll li {
+  margin-bottom: 0.45rem;
+}
+.panel.walkthrough .panel-scroll p,
+.panel.bonus .panel-scroll p {
+  margin-bottom: 0.55rem;
+}
+
+.icon-map { background: var(--accent-soft); color: var(--accent); }
+.icon-obj { background: var(--accent-soft); color: var(--accent); }
+.icon-walk { background: rgba(94, 184, 232, 0.15); color: #5eb8e8; }
+.icon-bonus { background: var(--bonus-soft); color: var(--bonus); }
+.icon-hm { background: var(--hm-soft); color: var(--hm); }
+.icon-boss { background: var(--danger-soft); color: var(--danger); }
+.icon-other { background: rgba(138, 155, 176, 0.15); color: var(--text-muted); }
+
+.map-wrap {
+  flex: 1; min-height: 0; display: flex; flex-direction: column;
+  align-items: center; justify-content: center; gap: 0.4rem;
+}
+.map-frame {
+  flex: 1; min-height: 0; width: 100%;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: 10px; overflow: hidden;
+  border: 2px solid var(--border-glow);
+  box-shadow: 0 0 0 1px rgba(62, 207, 255, 0.1), 0 12px 40px rgba(0, 0, 0, 0.45);
+  background: #05080c; cursor: zoom-in;
+}
+.map-frame img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  image-rendering: auto;
+}
+.map-caption { font-size: 0.72rem; color: var(--text-dim); flex-shrink: 0; }
+.map-missing {
+  color: var(--text-dim); font-size: 1rem; text-align: center; padding: 2rem;
+}
+
+.wiki-block ul, .panel-scroll ul,
+.wiki-block ol, .panel-scroll ol { padding-left: 1.2rem; margin: 0.3rem 0 0.5rem; }
+.wiki-block li, .panel-scroll li { margin-bottom: 0.32rem; }
+.wiki-block p, .panel-scroll p { margin-bottom: 0.45rem; }
+.wiki-block img, .panel-scroll img { vertical-align: middle; max-height: 1.35em; width: auto; }
+.wiki-block table, .panel-scroll table {
+  width: 100%; border-collapse: collapse; font-size: 0.9em; margin: 0.4rem 0;
+}
+.wiki-block th, .wiki-block td, .panel-scroll th, .panel-scroll td {
+  border: 1px solid var(--border); padding: 0.3rem 0.45rem; text-align: left;
+}
+.lede { font-size: 0.92rem; color: var(--text-muted); margin-bottom: 0.35rem; }
+
+/* Collapsed summary */
+details.summary-details {
+  background: var(--bg-panel);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  border-top: 2px solid var(--gold);
+  padding: 0.35rem 0.65rem;
+  flex-shrink: 0;
+}
+details.summary-details summary {
+  cursor: pointer;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--gold);
+  padding: 0.35rem 0;
+  list-style: none;
+}
+details.summary-details summary::-webkit-details-marker { display: none; }
+details.summary-details summary::before {
+  content: "▸ ";
+  color: var(--text-dim);
+}
+details.summary-details[open] summary::before { content: "▾ "; }
+details.summary-details .summary-body {
+  padding: 0.35rem 0 0.55rem;
+  font-size: 0.88rem;
+  color: var(--text-muted);
+  max-height: 18vh;
+  overflow-y: auto;
+}
+
+.boss-note { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.4rem; }
+.boss-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.4rem; }
+.boss-card {
+  background: var(--bg-panel-2); border: 1px solid var(--border);
+  border-radius: 8px; padding: 0.5rem 0.6rem;
+}
+.boss-card-head { font-size: 0.95rem; margin-bottom: 0.2rem; }
+.boss-card-head a { color: #eef6fc; font-weight: 700; }
+.boss-card-head a:hover { color: var(--accent); }
+.boss-elite { font-size: 0.88rem; }
+.elite-label { color: var(--gold); font-weight: 650; margin-right: 0.25rem; }
+.elite-link { color: #ffd78a; font-weight: 650; }
+.elite-link:hover { color: #ffe9b5; }
+.elite-none { color: var(--text-dim); font-style: italic; font-size: 0.85rem; }
+.boss-meta { font-size: 0.78rem; color: var(--text-dim); margin-top: 0.15rem; }
+
+.callout {
+  margin-top: 0.4rem; padding: 0.45rem 0.6rem; border-radius: 6px;
+  font-size: 0.88rem; border-left: 3px solid; line-height: 1.4;
+}
+.callout.tip { background: var(--accent-soft); border-color: var(--accent); color: #b8eaff; }
+.callout.warn { background: var(--danger-soft); border-color: var(--danger); color: #ffb4b4; }
+
+.lightbox {
+  display: none; position: fixed; inset: 0; z-index: 1000; background: rgba(0,0,0,0.94);
+  align-items: center; justify-content: center; padding: 1.5rem; cursor: zoom-out;
+}
+.lightbox.open { display: flex; }
+.lightbox img {
+  max-width: 96vw; max-height: 96vh; border-radius: 8px;
+  border: 2px solid var(--border-glow); object-fit: contain;
+}
+
+@media (min-height: 2400px) {
+  :root {
+    --walk-size: clamp(1.15rem, 0.7vh + 0.3vw, 1.5rem);
+    --bonus-size: clamp(1.15rem, 0.7vh + 0.3vw, 1.5rem);
+    --gap: 0.65rem;
+    --pad: 0.85rem;
+  }
+  .workspace { grid-template-columns: minmax(560px, 1.2fr) minmax(0, 1fr); }
+}
+@media (min-width: 1800px) and (min-height: 2000px) {
+  .workspace { grid-template-columns: minmax(600px, 1.25fr) minmax(0, 1fr); }
+}
+@media (max-height: 1100px) {
+  body { overflow: auto; height: auto; }
+  .app { height: auto; max-height: none; min-height: 100vh; }
+  .workspace {
+    height: auto; overflow: visible; grid-template-columns: 1fr; grid-template-rows: auto;
+  }
+  .col-map { grid-template-rows: auto; }
+  .col-main { overflow: visible; grid-template-rows: auto; }
+  .row-bonus-hm, .row-lower { grid-template-columns: 1fr; }
+  .panel { max-height: none; overflow: visible; }
+  .panel-scroll { overflow: visible; }
+  .map-frame { min-height: 360px; max-height: 55vh; }
+}
+
+    :root { --accent: #c78bff; --accent-soft: #c78bff22; }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header class="top-chrome">
+      <div class="brand">
+        <span class="brand-mission">M17</span>
+        <span class="brand-name">Abaddon&#x27;s Gate</span>
+        <span class="brand-meta">Nightfall · Realm of Torment · Cooperative · —</span>
+      </div>
+      <nav class="chip-nav" aria-label="Sections">
+        <a href="#map">Map</a>
+        <a href="#walkthrough">Walkthrough</a>
+        <a href="#bonus">Bonus</a>
+        <a href="#objectives">Objectives</a>
+        <a href="#hard-mode">Hard Mode</a>
+        <a href="#bosses">Bosses</a>
+        <a href="#other">Tips</a>
+      </nav>
+      <div class="chrome-actions">
+        <a class="btn btn-idx" href="../nightfall.html">Index</a>
+        <a class="btn btn-prev" href="19_Gate_of_Madness.html">← Prev</a>
+        <a class="btn btn-wiki" href="https://wiki.guildwars.com/wiki/Abaddon%27s_Gate" target="_blank" rel="noopener">Wiki ↗</a>
+        <a class="btn btn-next" href="../nightfall.html">Campaign complete · Index</a>
+      </div>
+    </header>
+
+    <div class="workspace">
+      <div class="col-map">
+        <section class="panel map-panel" id="map">
+          <h2 class="panel-title"><span class="icon icon-map">◉</span> Mission Map</h2>
+          <div class="map-wrap">
+            <div class="map-frame" id="mapOpen" title="Click to enlarge">
+              <img src="../maps/nightfall_20_Abaddons_Gate_map.jpg" alt="Abaddon&#x27;s Gate mission map" />
+            </div>
+            <p class="map-caption">Click to enlarge · Local cache · <a href="https://wiki.guildwars.com/wiki/Abaddon%27s_Gate" target="_blank" rel="noopener">Wiki</a></p>
+        </div>
+        </section>
+
+        <details class="summary-details" id="summary">
+          <summary>Summary (click to expand)</summary>
+          <div class="summary-body">
+            <p>It is time to destroy Abaddon once and for all, and to save the world from Nightfall . This mission has a simple objective; to kill Abaddon before he breaks completely free from his bindings. Compared to the previous mission, Gate of Madness , this mission is simpler.</p>
+            <p style="margin-top:0.4rem;"><strong>Region:</strong> Realm of Torment · <strong>Mission:</strong> 17 of 20 · <strong>Type:</strong> Cooperative</p>
+            <p style="margin-top:0.35rem;"><a href="https://wiki.guildwars.com/wiki/Abaddon%27s_Gate" target="_blank" rel="noopener">Full wiki article ↗</a></p>
+          </div>
+        </details>
+      </div>
+
+      <div class="col-main">
+        <section class="panel objectives row-obj" id="objectives">
+          <h2 class="panel-title"><span class="icon icon-obj">✓</span> Objectives</h2>
+          <div class="panel-scroll wiki-block"><p>Destroy Abaddon.
+</p><ul><li>Destroy the <a href="https://wiki.guildwars.com/wiki/Graven_Monolith" rel="noopener" target="_blank" title="Graven Monolith">graven monoliths</a> to power the chains of Abaddon.</li>
+<li>Attack Abaddon while he is vulnerable.</li></ul></div>
+        </section>
+
+        <section class="panel walkthrough" id="walkthrough">
+          <h2 class="panel-title"><span class="icon icon-walk">→</span> Walkthrough</h2>
+          <div class="panel-scroll wiki-block"><p>Run along the passage until you get to the end, there is only one way you can go. You'll come to a bridge which looks down on the spot where Abaddon is imprisoned.  There are three paths down to Abaddon from here, two to the binding points for each of his hands which are situated to the left and right and one which leads to where his head is bound in the middle. Two Graven Monoliths guard each of the binding points, a maximum of six are on the map at any one time.  
+</p><p>Abaddon will break free as you approach and you must kill the Monoliths to rebind him and get the opportunity to attack him. It is best to attack the Monoliths at the hands first, as killing those at the head first, without first rebinding the hands means the Monoliths will re<a href="https://wiki.guildwars.com/wiki/Spawn" rel="noopener" target="_blank" title="Spawn">spawn</a> at the head, wasting your effort.  
+</p><p>When the Monoliths at each of the binding points are destroyed Abaddon's head will be lowered and you will have a short while to lay down as much damage on him as possible before he breaks free and you have to start over again at rebinding the hands to get another opportunity to attack. It will take several cycles of binding, damaging and breaking-free before Abaddon is killed. Get into a rhythm, agree before-hand which side you will go to first each time so your party can kill off the Monoliths with least effort. Each time you rebind part of Abaddon by defeating a pair of Monoliths you will receive a <a class="mw-redirect" href="https://wiki.guildwars.com/wiki/Morale_boost" rel="noopener" target="_blank" title="Morale boost">morale boost</a>. Every time Abaddon is fully bound, he loses 1000 health.
+</p><p>Abaddon isn't entirely defenseless while you complete this ritual, he has a number of attacks which can be rather frustrating and damaging for a party. Of particular note is <a href="https://wiki.guildwars.com/wiki/Words_of_Madness" rel="noopener" target="_blank" title="Words of Madness">Words of Madness</a> which causes the party to be <a href="https://wiki.guildwars.com/wiki/Knock_down" rel="noopener" target="_blank" title="Knock down">knocked down</a>, <a href="https://wiki.guildwars.com/wiki/Dazed" rel="noopener" target="_blank" title="Dazed">dazed</a> and to take damage;  key to coping with this is timing your skill use to avoid getting <a href="https://wiki.guildwars.com/wiki/Interrupt" rel="noopener" target="_blank" title="Interrupt">interrupted</a>. Of particular note is when Abaddon is in his prone state, invariably this skill is used about 5 seconds after he is bound just when you're launching into your best spell. The party has to be prepared to remove daze or to operate with it on. <a href="https://wiki.guildwars.com/wiki/Party_healing" rel="noopener" target="_blank" title="Party healing">Party healing</a> is a good counter to the <a href="https://wiki.guildwars.com/wiki/Area_of_effect" rel="noopener" target="_blank" title="Area of effect">area of effect</a> damage which Abaddon deals.
+</p><p>Finally, Torment Claws appear from time to time during the battle. They have a nasty area of effect attack which can devastate your party if they're not noticed and taken care of. Keep a wary eye out for them to interrupt their attack skill and kill them.
+</p></div>
+        </section>
+
+        <div class="row-bonus-hm">
+          <section class="panel bonus" id="bonus">
+            <h2 class="panel-title"><span class="icon icon-bonus">★</span> Bonus</h2>
+            <div class="panel-scroll wiki-block"><p class='lede'>See walkthrough and objectives for bonus details (if any).</p></div>
+          </section>
+          <section class="panel hard-mode" id="hard-mode">
+            <h2 class="panel-title"><span class="icon icon-hm">◆</span> Hard Mode</h2>
+            <div class="panel-scroll wiki-block"><p class='lede'>No dedicated Hard Mode section on the wiki — expect tougher foes and adjusted mechanics. See walkthrough notes.</p></div>
+          </section>
+        </div>
+
+        <div class="row-lower">
+          <section class="panel bosses" id="bosses">
+            <h2 class="panel-title"><span class="icon icon-boss">☠</span> Bosses &amp; Elites</h2>
+            <div class="panel-scroll"><p class='boss-note'>See wiki for boss list (or none listed).</p></div>
+          </section>
+          <section class="panel other" id="other">
+            <h2 class="panel-title"><span class="icon icon-other">✦</span> Tips &amp; Notes</h2>
+            <div class="panel-scroll"><h3 style='font-size:0.8rem;color:var(--accent);margin:0.3rem 0;'>Skill recommendations</h3><div class='wiki-block'><ul><li>Bring <a href="https://wiki.guildwars.com/wiki/Lightbringer%27s_Gaze" rel="noopener" target="_blank" title="Lightbringer's Gaze">Lightbringer's Gaze</a> for the Torment Claws. Alternatively, any skill <a href="https://wiki.guildwars.com/wiki/Interrupt" rel="noopener" target="_blank" title="Interrupt">interrupt</a> will do.</li>
+<li>The real premium is not in dealing inordinate damage, but in staying alive. An additional <a href="https://wiki.guildwars.com/wiki/Healer" rel="noopener" target="_blank" title="Healer">healer</a> instead of a damage dealer can make the difference. The healers should concentrate on party-wide <a href="https://wiki.guildwars.com/wiki/List_of_condition_removal_skills" rel="noopener" target="_blank" title="List of condition removal skills">condition removal</a> and <a href="https://wiki.guildwars.com/wiki/Party_healing" rel="noopener" target="_blank" title="Party healing">heals</a>, such as:
+<ul><li><a href="https://wiki.guildwars.com/wiki/Light_of_Deliverance" rel="noopener" target="_blank" title="Light of Deliverance">Light of Deliverance</a>, <a href="https://wiki.guildwars.com/wiki/Heal_Party" rel="noopener" target="_blank" title="Heal Party">Heal Party</a>, <a href="https://wiki.guildwars.com/wiki/Recuperation" rel="noopener" target="_blank" title="Recuperation">Recuperation</a>, <a href="https://wiki.guildwars.com/wiki/Protective_Was_Kaolai" rel="noopener" target="_blank" title="Protective Was Kaolai">Protective Was Kaolai</a></li>
+<li><a href="https://wiki.guildwars.com/wiki/Martyr" rel="noopener" target="_blank" title="Martyr">Martyr</a>, <a href="https://wiki.guildwars.com/wiki/Extinguish" rel="noopener" target="_blank" title="Extinguish">Extinguish</a>, <a href="https://wiki.guildwars.com/wiki/Cautery_Signet" rel="noopener" target="_blank" title="Cautery Signet">Cautery Signet</a>, <a href="https://wiki.guildwars.com/wiki/Recovery" rel="noopener" target="_blank" title="Recovery">Recovery</a>, <a href="https://wiki.guildwars.com/wiki/Pure_Was_Li_Ming" rel="noopener" target="_blank" title="Pure Was Li Ming">Pure Was Li Ming</a></li>
+<li><a href="https://wiki.guildwars.com/wiki/Healer%27s_Boon" rel="noopener" target="_blank" title="Healer's Boon">Healer's Boon</a> is very effective in countering <a href="https://wiki.guildwars.com/wiki/Words_of_Madness" rel="noopener" target="_blank" title="Words of Madness">Words of Madness</a> as it also halves casting time allowing the <a href="https://wiki.guildwars.com/wiki/Dazed" rel="noopener" target="_blank" title="Dazed">dazed</a> effect to be minimal.</li>
+<li><a href="https://wiki.guildwars.com/wiki/Heal_Area" rel="noopener" target="_blank" title="Heal Area">Heal Area</a> is a cheap and very effective spell in this mission, as even a secondary <a href="https://wiki.guildwars.com/wiki/Monk" rel="noopener" target="_blank" title="Monk">monk</a> with a rank of 3 <a href="https://wiki.guildwars.com/wiki/Healing_Prayers" rel="noopener" target="_blank" title="Healing Prayers">Healing Prayers</a> will counter a lot of the <a class="mw-redirect" href="https://wiki.guildwars.com/wiki/AoE" rel="noopener" target="_blank" title="AoE">AoE</a> damage (60 health per adjacent <a href="https://wiki.guildwars.com/wiki/Creature" rel="noopener" target="_blank" title="Creature">creature</a>).</li></ul></li>
+<li>Secondary monks can be very effective using <a href="https://wiki.guildwars.com/wiki/Extinguish" rel="noopener" target="_blank" title="Extinguish">Extinguish</a>, <a href="https://wiki.guildwars.com/wiki/Purge_Conditions" rel="noopener" target="_blank" title="Purge Conditions">Purge Conditions</a>, <a href="https://wiki.guildwars.com/wiki/Martyr" rel="noopener" target="_blank" title="Martyr">Martyr</a>, or <a href="https://wiki.guildwars.com/wiki/Empathic_Removal" rel="noopener" target="_blank" title="Empathic Removal">Empathic Removal</a>.</li>
+<li><a href="https://wiki.guildwars.com/wiki/Resurrection_Signet" rel="noopener" target="_blank" title="Resurrection Signet">Resurrection Signet</a> or <a href="https://wiki.guildwars.com/wiki/Sunspear_Rebirth_Signet" rel="noopener" target="_blank" title="Sunspear Rebirth Signet">Sunspear Rebirth Signet</a> are preferable to <a href="https://wiki.guildwars.com/wiki/Hard_resurrection" rel="noopener" target="_blank" title="Hard resurrection">hard resurrection</a> skills, as you will be receiving many <a class="mw-redirect" href="https://wiki.guildwars.com/wiki/Morale_boost" rel="noopener" target="_blank" title="Morale boost">morale boosts</a> throughout the mission. Or even better, a hero with <a href="https://wiki.guildwars.com/wiki/Unyielding_Aura" rel="noopener" target="_blank" title="Unyielding Aura">Unyielding Aura</a>, to resurrect instantly with full health and energy. Avoid <a href="https://wiki.guildwars.com/wiki/Resurrection" rel="noopener" target="_blank" title="Resurrection">resurrection</a> spells as they will be affected by dazed caused by Words of Madness.</li>
+<li>Consider skills that prevent <a href="https://wiki.guildwars.com/wiki/Knock_down" rel="noopener" target="_blank" title="Knock down">knock downs</a> (such as <a href="https://wiki.guildwars.com/wiki/Ward_of_Stability" rel="noopener" target="_blank" title="Ward of Stability">Ward of Stability</a> and/or <a href="https://wiki.guildwars.com/wiki/%22Don%27t_Trip!%22" rel="noopener" target="_blank" title="&quot;Don't Trip!&quot;">"Don't Trip!"</a>) from <a href="https://wiki.guildwars.com/wiki/Earth_Shattering_Blow" rel="noopener" target="_blank" title="Earth Shattering Blow">Earth Shattering Blow</a> and Words of Madness.</li>
+<li>Bring plenty of direct damage and <a href="https://wiki.guildwars.com/wiki/Armor-ignoring_damage" rel="noopener" target="_blank" title="Armor-ignoring damage">armor-ignoring damage</a>.</li>
+<li>Consider spells with short <a href="https://wiki.guildwars.com/wiki/Activation_time" rel="noopener" target="_blank" title="Activation time">activation times</a> to avoid getting interrupted.</li>
+<li>A Paragon with <a href="https://wiki.guildwars.com/wiki/%22Fall_Back!%22" rel="noopener" target="_blank" title='"Fall Back!"'>"Fall Back!"</a> or a Warrior with <a href="https://wiki.guildwars.com/wiki/%22Charge!%22" rel="noopener" target="_blank" title='"Charge!"'>"Charge!"</a> helps a lot when Abaddon breaks free and your party needs to move away from him before being attacked by the recently spawned Monoliths.
+<ul><li><a href="https://wiki.guildwars.com/wiki/Hexbreaker_Aria" rel="noopener" target="_blank" title="Hexbreaker Aria">Hexbreaker Aria</a> works when the Monoliths are in their Mesmer form where they cast <a href="https://wiki.guildwars.com/wiki/Conjure_Phantasm" rel="noopener" target="_blank" title="Conjure Phantasm">Conjure Phantasm</a> on each party member and <a href="https://wiki.guildwars.com/wiki/Song_of_Purification" rel="noopener" target="_blank" title="Song of Purification">Song of Purification</a> helps when <a class="mw-redirect" href="https://wiki.guildwars.com/wiki/Cripple" rel="noopener" target="_blank" title="Cripple">cripple</a> and dazed occurs. Having two Paragons, one casting Hexbreaker Aria and the other casting Song of Purification with different <a class="mw-redirect" href="https://wiki.guildwars.com/wiki/Skill_bar" rel="noopener" target="_blank" title="Skill bar">skill bars</a> is recommended instead of having one Paragon with both of these skills.</li></ul></li>
+<li><a href="https://wiki.guildwars.com/wiki/Wastrel%27s_Worry" rel="noopener" target="_blank" title="Wastrel's Worry">Wastrel's Worry</a> is quite effective against Abaddon.</li>
+<li><a href="https://wiki.guildwars.com/wiki/Area_damage_over_time" rel="noopener" target="_blank" title="Area damage over time">Area damage over time</a> skills (see <a href="https://wiki.guildwars.com/wiki/Nuker" rel="noopener" target="_blank" title="Nuker">Nuker</a>), such as <a href="https://wiki.guildwars.com/wiki/Chaos_Storm" rel="noopener" target="_blank" title="Chaos Storm">Chaos Storm</a> and <a href="https://wiki.guildwars.com/wiki/Fire_Storm" rel="noopener" target="_blank" title="Fire Storm">Fire Storm</a>, work very well against Abaddon.</li>
+<li>Powerful skills with long <a href="https://wiki.guildwars.com/wiki/Recharge_time" rel="noopener" target="_blank" title="Recharge time">recharge times</a> work well here, because frequent morale boosts recharge them instantly.</li></ul></div>
+<h3 style='font-size:0.8rem;color:var(--accent);margin:0.3rem 0;'>Notes</h3><div class='wiki-block'><ul><li>Kormir follows the <a href="https://wiki.guildwars.com/wiki/Party" rel="noopener" target="_blank" title="Party">party</a> leader, never <a href="https://wiki.guildwars.com/wiki/Attack" rel="noopener" target="_blank" title="Attack">attacks</a> and rarely uses <a href="https://wiki.guildwars.com/wiki/Skill" rel="noopener" target="_blank" title="Skill">skills</a> except for <a href="https://wiki.guildwars.com/wiki/%22Incoming!%22" rel="noopener" target="_blank" title='"Incoming!"'>"Incoming!"</a>. Foes cannot <a href="https://wiki.guildwars.com/wiki/Target" rel="noopener" target="_blank" title="Target">target</a> her but she does take damage from <a href="https://wiki.guildwars.com/wiki/Area_of_effect" rel="noopener" target="_blank" title="Area of effect">area of effect</a> skills.
+<ul><li>She sometimes <a href="https://wiki.guildwars.com/wiki/Body_block" rel="noopener" target="_blank" title="Body block">body blocks</a> her own allies.</li></ul></li>
+<li>The Torment Claws and Graven Monoliths in this mission do not appear to <a href="https://wiki.guildwars.com/wiki/Drop" rel="noopener" target="_blank" title="Drop">drop</a> loot.</li>
+<li>After completing this mission, all <i>players</i> in the party are taken to the <a href="https://wiki.guildwars.com/wiki/Throne_of_Secrets" rel="noopener" target="_blank" title="Throne of Secrets">Throne of Secrets</a> and subsequently may enter <a href="https://wiki.guildwars.com/wiki/Kamadan,_Jewel_of_Istan" rel="noopener" target="_blank" title="Kamadan, Jewel of Istan">Kamadan, Jewel of Istan</a> with a party larger than 4.</li>
+<li>After completing this mission, <a href="https://wiki.guildwars.com/wiki/Nightfallen_Garden" rel="noopener" target="_blank" title="Nightfallen Garden">Nightfallen Garden</a> is reverted back to <a href="https://wiki.guildwars.com/wiki/Garden_of_Seborhin" rel="noopener" target="_blank" title="Garden of Seborhin">Garden of Seborhin</a> unless <a href="https://wiki.guildwars.com/wiki/Heart_or_Mind:_Garden_in_Danger" rel="noopener" target="_blank" title="Heart or Mind: Garden in Danger">Heart or Mind: Garden in Danger</a> is active.</li>
+<li>Completion of this mission will fill in page #17 in the <a href="https://wiki.guildwars.com/wiki/Night_Falls" rel="noopener" target="_blank" title="Night Falls">Night Falls</a> <a href="https://wiki.guildwars.com/wiki/Storybook" rel="noopener" target="_blank" title="Storybook">storybook</a>.</li></ul></div></div>
+          </section>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="lightbox" id="lightbox" role="dialog" aria-label="Enlarged map">
+    <img src="../maps/nightfall_20_Abaddons_Gate_map.jpg" alt="Abaddon&#x27;s Gate mission map (enlarged)" />
+  </div>
+  <script>
+    (function () {
+      var open = document.getElementById("mapOpen");
+      var box = document.getElementById("lightbox");
+      if (!open || !box) return;
+      open.addEventListener("click", function () { box.classList.add("open"); });
+      box.addEventListener("click", function () { box.classList.remove("open"); });
+      document.addEventListener("keydown", function (e) {
+        if (e.key === "Escape") box.classList.remove("open");
+      });
+    })();
+  </script>
+
+</body>
+</html>

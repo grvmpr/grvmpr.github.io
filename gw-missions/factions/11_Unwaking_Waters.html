@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Unwaking Waters</title>
+  <style>
+:root {
+  --bg-deep: #070a0f;
+  --bg-panel: #101820;
+  --bg-panel-2: #15202c;
+  --border: #243044;
+  --border-glow: #2a4a6a;
+  --text: #dce6f0;
+  --text-muted: #8a9bb0;
+  --text-dim: #5c6f86;
+  --accent: #3ecfff;
+  --accent-soft: rgba(62, 207, 255, 0.12);
+  --gold: #e8c56a;
+  --gold-soft: rgba(232, 197, 106, 0.12);
+  --bonus: #7dffb3;
+  --bonus-soft: rgba(125, 255, 179, 0.1);
+  --danger: #ff6b6b;
+  --danger-soft: rgba(255, 107, 107, 0.1);
+  --hm: #c78bff;
+  --hm-soft: rgba(199, 139, 255, 0.12);
+  --radius: 10px;
+  --font: "Segoe UI", system-ui, -apple-system, sans-serif;
+  --chrome-h: 3.1rem;
+  --gap: 0.5rem;
+  --pad: 0.7rem;
+  /* Readable on 4K vertical (~2160×3840) */
+  --walk-size: clamp(1.05rem, 0.55vw + 0.55vh, 1.35rem);
+  --bonus-size: clamp(1.05rem, 0.55vw + 0.55vh, 1.35rem);
+  --body-size: clamp(0.95rem, 0.4vw + 0.4vh, 1.1rem);
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html {
+  scroll-behavior: smooth;
+  font-size: clamp(16px, 0.55vw + 0.45vh, 20px);
+  height: 100%;
+  scroll-padding-top: calc(var(--chrome-h) + 0.5rem);
+}
+body {
+  font-family: var(--font);
+  background: var(--bg-deep);
+  color: var(--text);
+  line-height: 1.45;
+  min-height: 100%;
+  height: 100%;
+  overflow: hidden;
+  background-image: radial-gradient(ellipse 70% 25% at 50% 0%, rgba(42, 100, 160, 0.14), transparent);
+}
+a { color: var(--accent); text-decoration: none; }
+a:hover { color: #7de0ff; text-decoration: underline; }
+.app {
+  display: grid;
+  grid-template-rows: var(--chrome-h) 1fr;
+  height: 100vh; height: 100dvh;
+  max-height: 100vh; max-height: 100dvh;
+}
+.top-chrome {
+  display: flex; align-items: center; gap: 0.65rem;
+  padding: 0 0.7rem;
+  background: rgba(8, 12, 18, 0.97);
+  border-bottom: 1px solid var(--border);
+  z-index: 100; min-height: var(--chrome-h);
+}
+.brand { display: flex; align-items: baseline; gap: 0.55rem; min-width: 0; flex-shrink: 0; }
+.brand-mission {
+  font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase;
+  color: var(--accent); font-weight: 700; white-space: nowrap;
+}
+.brand-name {
+  font-size: 1.1rem; font-weight: 750; color: var(--text);
+  white-space: nowrap; letter-spacing: -0.02em;
+}
+.brand-meta { font-size: 0.75rem; color: var(--text-dim); white-space: nowrap; }
+.chip-nav {
+  display: flex; flex: 1; gap: 0.3rem; overflow-x: auto;
+  scrollbar-width: none; min-width: 0; justify-content: center;
+}
+.chip-nav::-webkit-scrollbar { display: none; }
+.chip-nav a {
+  flex: 0 0 auto; padding: 0.3rem 0.65rem; border-radius: 999px;
+  font-size: 0.78rem; font-weight: 600; color: var(--text-muted);
+  background: var(--bg-panel); border: 1px solid var(--border);
+  text-decoration: none; white-space: nowrap;
+}
+.chip-nav a:hover {
+  color: var(--text); border-color: var(--border-glow);
+  background: #1a2836; text-decoration: none;
+}
+.chip-nav a[href="#map"] { color: var(--accent); border-color: rgba(62, 207, 255, 0.35); }
+.chip-nav a[href="#bonus"] { color: var(--bonus); border-color: rgba(125, 255, 179, 0.3); }
+.chip-nav a[href="#hard-mode"] { color: var(--hm); border-color: rgba(199, 139, 255, 0.3); }
+.chip-nav a[href="#bosses"] { color: #ff9a9a; border-color: rgba(255, 107, 107, 0.3); }
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 0.3rem;
+  padding: 0.42rem 0.85rem; border-radius: 8px; font-weight: 650; font-size: 0.8rem;
+  border: none; cursor: pointer; text-decoration: none; white-space: nowrap; flex-shrink: 0;
+}
+.btn:hover { text-decoration: none; }
+.btn-next {
+  background: linear-gradient(135deg, #1a6a9a, #1ab0e0); color: #fff;
+  box-shadow: 0 2px 12px rgba(26, 140, 200, 0.35);
+}
+.btn-next:hover { color: #fff; filter: brightness(1.08); }
+.btn-wiki, .btn-idx, .btn-prev {
+  background: var(--bg-panel); color: var(--text-muted);
+  border: 1px solid var(--border); padding: 0.42rem 0.65rem;
+}
+.btn-wiki:hover, .btn-idx:hover, .btn-prev:hover {
+  color: var(--accent); border-color: var(--border-glow);
+}
+.chrome-actions { display: flex; gap: 0.35rem; flex-shrink: 0; }
+
+/* Map-dominant workspace */
+.workspace {
+  display: grid;
+  grid-template-columns: minmax(480px, 1.15fr) minmax(0, 1fr);
+  grid-template-rows: 1fr;
+  gap: var(--gap); padding: var(--gap);
+  min-height: 0; height: 100%; overflow: hidden;
+}
+.col-map {
+  display: grid;
+  grid-template-rows: 1fr auto;
+  gap: var(--gap);
+  min-height: 0; min-width: 0;
+}
+.col-main {
+  display: grid;
+  /* objectives compact | walkthrough HUGE | bonus+hm | bosses+tips */
+  grid-template-rows: auto minmax(0, 1.6fr) minmax(0, 1.05fr) minmax(0, 0.75fr);
+  gap: var(--gap); min-height: 0; min-width: 0; overflow: hidden;
+}
+.row-obj { min-height: 0; }
+.row-bonus-hm {
+  display: grid; grid-template-columns: 1.15fr 0.85fr; gap: var(--gap); min-height: 0;
+}
+.row-lower {
+  display: grid; grid-template-columns: 1.15fr 0.85fr; gap: var(--gap); min-height: 0;
+}
+.panel {
+  background: var(--bg-panel); border: 1px solid var(--border); border-radius: var(--radius);
+  padding: var(--pad); display: flex; flex-direction: column; min-height: 0; overflow: hidden;
+}
+.panel-scroll {
+  overflow-y: auto; overflow-x: hidden; min-height: 0; flex: 1; padding-right: 0.3rem;
+  scrollbar-width: thin; scrollbar-color: var(--border) transparent;
+  font-size: var(--body-size);
+}
+.panel-scroll::-webkit-scrollbar { width: 8px; }
+.panel-scroll::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+.panel-title {
+  display: flex; align-items: center; gap: 0.4rem;
+  font-size: 0.82rem; font-weight: 750; letter-spacing: 0.05em; text-transform: uppercase;
+  color: var(--text); margin-bottom: 0.45rem; padding-bottom: 0.35rem;
+  border-bottom: 1px solid var(--border); flex-shrink: 0;
+}
+.panel-title .icon {
+  width: 1.3rem; height: 1.3rem; border-radius: 5px;
+  display: inline-flex; align-items: center; justify-content: center; font-size: 0.75rem;
+}
+.panel.map-panel {
+  border-color: var(--border-glow);
+  background: linear-gradient(180deg, #0e1620 0%, var(--bg-panel) 100%);
+  /* Map takes almost all left column */
+  min-height: 0;
+}
+.panel.objectives { border-top: 2px solid var(--accent); }
+.panel.walkthrough { border-top: 3px solid #5eb8e8; }
+.panel.bonus { border-top: 3px solid var(--bonus); }
+.panel.hard-mode { border-top: 2px solid var(--hm); }
+.panel.bosses { border-top: 2px solid var(--danger); }
+.panel.other { border-top: 2px solid var(--text-muted); }
+
+/* Emphasized reading panels */
+.panel.walkthrough .panel-scroll,
+.panel.walkthrough .wiki-block {
+  font-size: var(--walk-size) !important;
+  line-height: 1.55;
+}
+.panel.bonus .panel-scroll,
+.panel.bonus .wiki-block {
+  font-size: var(--bonus-size) !important;
+  line-height: 1.55;
+}
+.panel.walkthrough .panel-scroll li,
+.panel.bonus .panel-scroll li {
+  margin-bottom: 0.45rem;
+}
+.panel.walkthrough .panel-scroll p,
+.panel.bonus .panel-scroll p {
+  margin-bottom: 0.55rem;
+}
+
+.icon-map { background: var(--accent-soft); color: var(--accent); }
+.icon-obj { background: var(--accent-soft); color: var(--accent); }
+.icon-walk { background: rgba(94, 184, 232, 0.15); color: #5eb8e8; }
+.icon-bonus { background: var(--bonus-soft); color: var(--bonus); }
+.icon-hm { background: var(--hm-soft); color: var(--hm); }
+.icon-boss { background: var(--danger-soft); color: var(--danger); }
+.icon-other { background: rgba(138, 155, 176, 0.15); color: var(--text-muted); }
+
+.map-wrap {
+  flex: 1; min-height: 0; display: flex; flex-direction: column;
+  align-items: center; justify-content: center; gap: 0.4rem;
+}
+.map-frame {
+  flex: 1; min-height: 0; width: 100%;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: 10px; overflow: hidden;
+  border: 2px solid var(--border-glow);
+  box-shadow: 0 0 0 1px rgba(62, 207, 255, 0.1), 0 12px 40px rgba(0, 0, 0, 0.45);
+  background: #05080c; cursor: zoom-in;
+}
+.map-frame img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  image-rendering: auto;
+}
+.map-caption { font-size: 0.72rem; color: var(--text-dim); flex-shrink: 0; }
+.map-missing {
+  color: var(--text-dim); font-size: 1rem; text-align: center; padding: 2rem;
+}
+
+.wiki-block ul, .panel-scroll ul,
+.wiki-block ol, .panel-scroll ol { padding-left: 1.2rem; margin: 0.3rem 0 0.5rem; }
+.wiki-block li, .panel-scroll li { margin-bottom: 0.32rem; }
+.wiki-block p, .panel-scroll p { margin-bottom: 0.45rem; }
+.wiki-block img, .panel-scroll img { vertical-align: middle; max-height: 1.35em; width: auto; }
+.wiki-block table, .panel-scroll table {
+  width: 100%; border-collapse: collapse; font-size: 0.9em; margin: 0.4rem 0;
+}
+.wiki-block th, .wiki-block td, .panel-scroll th, .panel-scroll td {
+  border: 1px solid var(--border); padding: 0.3rem 0.45rem; text-align: left;
+}
+.lede { font-size: 0.92rem; color: var(--text-muted); margin-bottom: 0.35rem; }
+
+/* Collapsed summary */
+details.summary-details {
+  background: var(--bg-panel);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  border-top: 2px solid var(--gold);
+  padding: 0.35rem 0.65rem;
+  flex-shrink: 0;
+}
+details.summary-details summary {
+  cursor: pointer;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--gold);
+  padding: 0.35rem 0;
+  list-style: none;
+}
+details.summary-details summary::-webkit-details-marker { display: none; }
+details.summary-details summary::before {
+  content: "▸ ";
+  color: var(--text-dim);
+}
+details.summary-details[open] summary::before { content: "▾ "; }
+details.summary-details .summary-body {
+  padding: 0.35rem 0 0.55rem;
+  font-size: 0.88rem;
+  color: var(--text-muted);
+  max-height: 18vh;
+  overflow-y: auto;
+}
+
+.boss-note { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.4rem; }
+.boss-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.4rem; }
+.boss-card {
+  background: var(--bg-panel-2); border: 1px solid var(--border);
+  border-radius: 8px; padding: 0.5rem 0.6rem;
+}
+.boss-card-head { font-size: 0.95rem; margin-bottom: 0.2rem; }
+.boss-card-head a { color: #eef6fc; font-weight: 700; }
+.boss-card-head a:hover { color: var(--accent); }
+.boss-elite { font-size: 0.88rem; }
+.elite-label { color: var(--gold); font-weight: 650; margin-right: 0.25rem; }
+.elite-link { color: #ffd78a; font-weight: 650; }
+.elite-link:hover { color: #ffe9b5; }
+.elite-none { color: var(--text-dim); font-style: italic; font-size: 0.85rem; }
+.boss-meta { font-size: 0.78rem; color: var(--text-dim); margin-top: 0.15rem; }
+
+.callout {
+  margin-top: 0.4rem; padding: 0.45rem 0.6rem; border-radius: 6px;
+  font-size: 0.88rem; border-left: 3px solid; line-height: 1.4;
+}
+.callout.tip { background: var(--accent-soft); border-color: var(--accent); color: #b8eaff; }
+.callout.warn { background: var(--danger-soft); border-color: var(--danger); color: #ffb4b4; }
+
+.lightbox {
+  display: none; position: fixed; inset: 0; z-index: 1000; background: rgba(0,0,0,0.94);
+  align-items: center; justify-content: center; padding: 1.5rem; cursor: zoom-out;
+}
+.lightbox.open { display: flex; }
+.lightbox img {
+  max-width: 96vw; max-height: 96vh; border-radius: 8px;
+  border: 2px solid var(--border-glow); object-fit: contain;
+}
+
+@media (min-height: 2400px) {
+  :root {
+    --walk-size: clamp(1.15rem, 0.7vh + 0.3vw, 1.5rem);
+    --bonus-size: clamp(1.15rem, 0.7vh + 0.3vw, 1.5rem);
+    --gap: 0.65rem;
+    --pad: 0.85rem;
+  }
+  .workspace { grid-template-columns: minmax(560px, 1.2fr) minmax(0, 1fr); }
+}
+@media (min-width: 1800px) and (min-height: 2000px) {
+  .workspace { grid-template-columns: minmax(600px, 1.25fr) minmax(0, 1fr); }
+}
+@media (max-height: 1100px) {
+  body { overflow: auto; height: auto; }
+  .app { height: auto; max-height: none; min-height: 100vh; }
+  .workspace {
+    height: auto; overflow: visible; grid-template-columns: 1fr; grid-template-rows: auto;
+  }
+  .col-map { grid-template-rows: auto; }
+  .col-main { overflow: visible; grid-template-rows: auto; }
+  .row-bonus-hm, .row-lower { grid-template-columns: 1fr; }
+  .panel { max-height: none; overflow: visible; }
+  .panel-scroll { overflow: visible; }
+  .map-frame { min-height: 360px; max-height: 55vh; }
+}
+
+    :root { --accent: #e8a84a; --accent-soft: #e8a84a22; }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header class="top-chrome">
+      <div class="brand">
+        <span class="brand-mission">M10</span>
+        <span class="brand-name">Unwaking Waters</span>
+        <span class="brand-meta">Factions · Path choice · Cooperative · —</span>
+      </div>
+      <nav class="chip-nav" aria-label="Sections">
+        <a href="#map">Map</a>
+        <a href="#walkthrough">Walkthrough</a>
+        <a href="#bonus">Bonus</a>
+        <a href="#objectives">Objectives</a>
+        <a href="#hard-mode">Hard Mode</a>
+        <a href="#bosses">Bosses</a>
+        <a href="#other">Tips</a>
+      </nav>
+      <div class="chrome-actions">
+        <a class="btn btn-idx" href="../factions.html">Index</a>
+        <a class="btn btn-prev" href="10_Gyala_Hatchery.html">← Prev</a>
+        <a class="btn btn-wiki" href="https://wiki.guildwars.com/wiki/Unwaking_Waters" target="_blank" rel="noopener">Wiki ↗</a>
+        <a class="btn btn-next" href="12_Raisu_Palace.html">Next: Raisu Palace →</a>
+      </div>
+    </header>
+
+    <div class="workspace">
+      <div class="col-map">
+        <section class="panel map-panel" id="map">
+          <h2 class="panel-title"><span class="icon icon-map">◉</span> Mission Map</h2>
+          <div class="map-wrap">
+            <div class="map-frame" id="mapOpen" title="Click to enlarge">
+              <img src="../maps/factions_11_Unwaking_Waters_map.jpg" alt="Unwaking Waters mission map" />
+            </div>
+            <p class="map-caption">Click to enlarge · Local cache · <a href="https://wiki.guildwars.com/wiki/Unwaking_Waters" target="_blank" rel="noopener">Wiki</a></p>
+        </div>
+        </section>
+
+        <details class="summary-details" id="summary">
+          <summary>Summary (click to expand)</summary>
+          <div class="summary-body">
+            <p>The great dragon Kuunavang has been corrupted by Shiro . Defeat Kuunavang to remove Shiro&#x27;s control and seek its advice on what is to come. This mission features two parties working together to defeat Kuunavang.</p>
+            <p style="margin-top:0.4rem;"><strong>Region:</strong> Path choice · <strong>Mission:</strong> 10 of 13 · <strong>Type:</strong> Cooperative<br/><strong>Path:</strong> Both paths rejoin</p>
+            <p style="margin-top:0.35rem;"><a href="https://wiki.guildwars.com/wiki/Unwaking_Waters" target="_blank" rel="noopener">Full wiki article ↗</a></p>
+          </div>
+        </details>
+      </div>
+
+      <div class="col-main">
+        <section class="panel objectives row-obj" id="objectives">
+          <h2 class="panel-title"><span class="icon icon-obj">✓</span> Objectives</h2>
+          <div class="panel-scroll wiki-block"><p>Defeat <a href="https://wiki.guildwars.com/wiki/Kuunavang" rel="noopener" target="_blank" title="Kuunavang">Kuunavang</a>.
+</p><ul><li>Weaken Kuunavang to destroy the barrier.</li>
+<li>Continue to weaken Kuunavang until the next barrier is destroyed.</li>
+<li>Continue weakening Kuunavang until the last barrier is destroyed.</li>
+<li>Defeat Kuunavang.</li></ul></div>
+        </section>
+
+        <section class="panel walkthrough" id="walkthrough">
+          <h2 class="panel-title"><span class="icon icon-walk">→</span> Walkthrough</h2>
+          <div class="panel-scroll wiki-block"><p>In this mission, you have to defeat the corrupted version of <a href="https://wiki.guildwars.com/wiki/Kuunavang" rel="noopener" target="_blank" title="Kuunavang">Kuunavang</a> in the Harvest Temple in the heart of the Jade Sea's whirlpool. Your path follows a downward spiral blocked by three gates, each powered by the dragon — they can be breached by dealing enough damage to her (the first gate opens when she reaches 75% health, the second at 50%, and the third at 25%). Each gate is blocked by groups of <a href="https://wiki.guildwars.com/wiki/Afflicted" rel="noopener" target="_blank" title="Afflicted">Afflicted</a>, usually led by a <a href="https://wiki.guildwars.com/wiki/Boss" rel="noopener" target="_blank" title="Boss">boss</a>, and Kuunavang cannot move back beyond an opened gate, forcing the parties to pursue her if she flees.
+</p><p>There are several challenges unique to this mission: 
+</p><ul><li>Kuunavang can sometimes be out of melee range during her phases until you reach the temple.</li>
+<li>She is semi-resistant to <a href="https://wiki.guildwars.com/wiki/Interrupt" rel="noopener" target="_blank" title="Interrupt">interrupts</a>, taking sometimes multiple interrupts to interrupt a skill.</li>
+<li>She has several deadly <a href="https://wiki.guildwars.com/wiki/Skill" rel="noopener" target="_blank" title="Skill">skills</a>, notably <a href="https://wiki.guildwars.com/wiki/Corrupted_Dragon_Scales" rel="noopener" target="_blank" title="Corrupted Dragon Scales">Corrupted Dragon Scales</a> (creating six creatures) and <a href="https://wiki.guildwars.com/wiki/Dark_Chain_Lightning" rel="noopener" target="_blank" title="Dark Chain Lightning">Dark Chain Lightning</a> (which hits an initial target for 300 <a href="https://wiki.guildwars.com/wiki/Damage" rel="noopener" target="_blank" title="Damage">damage</a> and will then hit subsequent targets, diminishing in force by 10% with each hit).</li></ul><p>In addition, this is the second two-<a href="https://wiki.guildwars.com/wiki/Party" rel="noopener" target="_blank" title="Party">party</a> mission (after <a href="https://wiki.guildwars.com/wiki/Vizunah_Square" rel="noopener" target="_blank" title="Vizunah Square">Vizunah Square</a>). You will not be able to see the <a class="mw-redirect" href="https://wiki.guildwars.com/wiki/Health_bar" rel="noopener" target="_blank" title="Health bar">health bar</a> of the other party, but skills that affect other <a href="https://wiki.guildwars.com/wiki/Ally" rel="noopener" target="_blank" title="Ally">allies</a> will benefit both groups. If no party joins from the other <a href="https://wiki.guildwars.com/wiki/Outpost" rel="noopener" target="_blank" title="Outpost">outpost</a>, your allies will consist of eight <a href="https://wiki.guildwars.com/wiki/Henchman" rel="noopener" target="_blank" title="Henchman">henchmen</a>. You cannot use <a href="https://wiki.guildwars.com/wiki/Resurrection" rel="noopener" target="_blank" title="Resurrection">resurrect skills</a> on the other party and the two <a href="https://wiki.guildwars.com/wiki/Resurrection_Orb" rel="noopener" target="_blank" title="Resurrection Orb">Resurrection Orbs</a> that can be found during the mission cannot resurrect members of the other party.
+</p><p>You have plenty of time to obtain the Master's reward for the mission: the right <a href="https://wiki.guildwars.com/wiki/Team" rel="noopener" target="_blank" title="Team">team</a> can finish it in less than five minutes, even in <a href="https://wiki.guildwars.com/wiki/Hard_mode" rel="noopener" target="_blank" title="Hard mode">hard mode</a> with henchmen from the other side. Even with henchmen from both sides, you should be able to finish in less than the required fifteen minutes if you proceed carefully.
+</p><h3><span class="mw-headline" id="Reaching_the_temple">Reaching the temple</span></h3><p>After the initial gate opens, clear out the initial Afflicted <a href="https://wiki.guildwars.com/wiki/Mob" rel="noopener" target="_blank" title="Mob">mobs</a> and then attack Kuunavang. Stay spread out to avoid <a class="mw-redirect" href="https://wiki.guildwars.com/wiki/AoE" rel="noopener" target="_blank" title="AoE">AoE</a> damage. Keep attacking until the first gate opens and she leaves; if you have enough firepower, you can damage her enough to open all the remaining gates, and teleport you straight to the temple, skipping all the remaining Afflicted of the mission. 
+</p><p>As you approach the next gate, two more groups of Afflicted <a href="https://wiki.guildwars.com/wiki/Spawn" rel="noopener" target="_blank" title="Spawn">spawn</a> (the composition varies and the number depends on how many <a href="https://wiki.guildwars.com/wiki/Boss" rel="noopener" target="_blank" title="Boss">bosses</a> appear with them). Kill the new mobs and cross the gate to find the first Resurrection Orb, which you might want to save for the final battle. Kuunavang will appear again and you must fight her again to open the next gate (and find the final Resurrection Orb). As you follow the path, two more groups of Afflicted will spawn. You can destroy them and then attack the dragon to drop the last gate <i>or</i> you can wait for Kuunavang to fly back towards you; as long as you stay near the gate, you will not trigger the last group.
+</p><p>Lowering her <a href="https://wiki.guildwars.com/wiki/Health" rel="noopener" target="_blank" title="Health">health</a> to near zero will trigger a <a href="https://wiki.guildwars.com/wiki/Cinematic" rel="noopener" target="_blank" title="Cinematic">cinematic</a>, after which you will be transported to the temple and the final battle.
+</p><p>The biggest danger during this part of the mission is trying to attack Kuunavang and the Afflicted at the same time. If the dragon overlaps with the other foes, retreat quickly to the outside of the path, so you are out of her reach. Finish off the Afflicted before confronting her again.
+</p><h3><span class="mw-headline" id="Harvest_Temple">Harvest Temple</span></h3><p>The final battle takes place in the Harvest Temple against <a href="https://wiki.guildwars.com/wiki/Enraged_Kuunavang" rel="noopener" target="_blank" title="Enraged Kuunavang">Enraged Kuunavang</a> alone. <a class="mw-redirect" href="https://wiki.guildwars.com/wiki/Melee" rel="noopener" target="_blank" title="Melee">Melee</a> characters will finally be able to attack the dragon, but there is no room to maneuver and both parties will be at risk of her massive AoE damage skills, so put up protection skills as quickly as possible. Keep spread out and try to interrupt as many of her skills as possible. If she summons <a href="https://wiki.guildwars.com/wiki/Corrupted_Scale" rel="noopener" target="_blank" title="Corrupted Scale">Corrupted Scale creatures</a>, eliminate them before returning your attention to the dragon; you will need to <a class="mw-redirect" href="https://wiki.guildwars.com/wiki/Call" rel="noopener" target="_blank" title="Call">call</a> them as <a href="https://wiki.guildwars.com/wiki/Target" rel="noopener" target="_blank" title="Target">targets</a>, otherwise heroes and henchmen from both sides will ignore them. Leaders of henchmen-only parties should be prepared to flag and re-flag their party repeatedly to keep them out of harm's way.
+</p><p>The mission ends when you deplete the dragon's health to near zero again.
+</p></div>
+        </section>
+
+        <div class="row-bonus-hm">
+          <section class="panel bonus" id="bonus">
+            <h2 class="panel-title"><span class="icon icon-bonus">★</span> Bonus</h2>
+            <div class="panel-scroll wiki-block"><p class='lede'>See walkthrough and objectives for bonus details (if any).</p></div>
+          </section>
+          <section class="panel hard-mode" id="hard-mode">
+            <h2 class="panel-title"><span class="icon icon-hm">◆</span> Hard Mode</h2>
+            <div class="panel-scroll wiki-block"><p>Defeating Kuunavang in <a href="https://wiki.guildwars.com/wiki/Hard_mode" rel="noopener" target="_blank" title="Hard mode">hard mode</a> is only slightly more difficult, since she is not much stronger. However, the Afflicted mobs are likely to take more time to take down, so proceed more carefully.
+</p></div>
+          </section>
+        </div>
+
+        <div class="row-lower">
+          <section class="panel bosses" id="bosses">
+            <h2 class="panel-title"><span class="icon icon-boss">☠</span> Bosses &amp; Elites</h2>
+            <div class="panel-scroll"><div class='boss-grid'>
+<article class="boss-card">
+  <div class="boss-card-head"><a href="https://wiki.guildwars.com/wiki/The_Afflicted_Maaka" target="_blank" rel="noopener"><strong>The Afflicted Maaka</strong></a></div>
+  <div class="boss-elite"><span class="elite-label">Elite:</span> <a class="elite-link" href="https://wiki.guildwars.com/wiki/Enraged_Smash" target="_blank" rel="noopener">Enraged Smash</a></div>
+  <div class="boss-meta">28 (30)</div>
+</article>
+<article class="boss-card">
+  <div class="boss-card-head"><a href="https://wiki.guildwars.com/wiki/The_Afflicted_Pana" target="_blank" rel="noopener"><strong>The Afflicted Pana</strong></a></div>
+  <div class="boss-elite"><span class="elite-label">Elite:</span> <a class="elite-link" href="https://wiki.guildwars.com/wiki/Broad_Head_Arrow" target="_blank" rel="noopener">Broad Head Arrow</a></div>
+  <div class="boss-meta">28 (30)</div>
+</article>
+<article class="boss-card">
+  <div class="boss-card-head"><a href="https://wiki.guildwars.com/wiki/The_Afflicted_Jingme" target="_blank" rel="noopener"><strong>The Afflicted Jingme</strong></a></div>
+  <div class="boss-elite"><span class="elite-label">Elite:</span> <a class="elite-link" href="https://wiki.guildwars.com/wiki/Ray_of_Judgment" target="_blank" rel="noopener">Ray of Judgment</a></div>
+  <div class="boss-meta">28 (30)</div>
+</article>
+<article class="boss-card">
+  <div class="boss-card-head"><a href="https://wiki.guildwars.com/wiki/The_Afflicted_Lau" target="_blank" rel="noopener"><strong>The Afflicted Lau</strong></a></div>
+  <div class="boss-elite"><span class="elite-label">Elite:</span> <a class="elite-link" href="https://wiki.guildwars.com/wiki/Order_of_Apostasy" target="_blank" rel="noopener">Order of Apostasy</a></div>
+  <div class="boss-meta">24 (30)</div>
+</article>
+<article class="boss-card">
+  <div class="boss-card-head"><a href="https://wiki.guildwars.com/wiki/The_Afflicted_Hsin_Jun" target="_blank" rel="noopener"><strong>The Afflicted Hsin Jun</strong></a></div>
+  <div class="boss-elite"><span class="elite-label">Elite:</span> <a class="elite-link" href="https://wiki.guildwars.com/wiki/Stolen_Speed" target="_blank" rel="noopener">Stolen Speed</a></div>
+  <div class="boss-meta">28 (30)</div>
+</article>
+<article class="boss-card">
+  <div class="boss-card-head"><a href="https://wiki.guildwars.com/wiki/The_Afflicted_Shen" target="_blank" rel="noopener"><strong>The Afflicted Shen</strong></a></div>
+  <div class="boss-elite"><span class="elite-label">Elite:</span> <a class="elite-link" href="https://wiki.guildwars.com/wiki/Mind_Burn" target="_blank" rel="noopener">Mind Burn</a></div>
+  <div class="boss-meta">28 (30)</div>
+</article>
+<article class="boss-card">
+  <div class="boss-card-head"><a href="https://wiki.guildwars.com/wiki/The_Afflicted_Senku" target="_blank" rel="noopener"><strong>The Afflicted Senku</strong></a></div>
+  <div class="boss-elite"><span class="elite-label">Elite:</span> <a class="elite-link" href="https://wiki.guildwars.com/wiki/Shadow_Form" target="_blank" rel="noopener">Shadow Form</a></div>
+  <div class="boss-meta">28 (30)</div>
+</article>
+<article class="boss-card">
+  <div class="boss-card-head"><a href="https://wiki.guildwars.com/wiki/The_Afflicted_Xenxo" target="_blank" rel="noopener"><strong>The Afflicted Xenxo</strong></a></div>
+  <div class="boss-elite"><span class="elite-label">Elite:</span> <a class="elite-link" href="https://wiki.guildwars.com/wiki/Weapon_of_Quickening" target="_blank" rel="noopener">Weapon of Quickening</a></div>
+  <div class="boss-meta">28 (30)</div>
+</article>
+</div></div>
+          </section>
+          <section class="panel other" id="other">
+            <h2 class="panel-title"><span class="icon icon-other">✦</span> Tips &amp; Notes</h2>
+            <div class="panel-scroll"><h3 style='font-size:0.8rem;color:var(--accent);margin:0.3rem 0;'>Skill recommendations</h3><div class='wiki-block'><dl><dt>General recommendations</dt></dl><ul><li><a class="mw-redirect" href="https://wiki.guildwars.com/wiki/Enchantment" rel="noopener" target="_blank" title="Enchantment">Enchantment</a>-based <a href="https://wiki.guildwars.com/wiki/Build" rel="noopener" target="_blank" title="Build">builds</a> are vulnerable to <a href="https://wiki.guildwars.com/wiki/Afflicted_Necromancer" rel="noopener" target="_blank" title="Afflicted Necromancer">Afflicted Necromancers</a>, <a href="https://wiki.guildwars.com/wiki/Afflicted_Mesmer" rel="noopener" target="_blank" title="Afflicted Mesmer">Afflicted Mesmers</a>, and Kuunavang's <a href="https://wiki.guildwars.com/wiki/Corrupted_Breath" rel="noopener" target="_blank" title="Corrupted Breath">Corrupted Breath</a>. Afflicted that deal <a href="https://wiki.guildwars.com/wiki/Physical_damage" rel="noopener" target="_blank" title="Physical damage">physical damage</a> can also remove enchantments when enchanted with Afflicted Necromancer's <a href="https://wiki.guildwars.com/wiki/Order_of_Apostasy" rel="noopener" target="_blank" title="Order of Apostasy">Order of Apostasy</a>.</li>
+<li><a href="https://wiki.guildwars.com/wiki/Barbs" rel="noopener" target="_blank" title="Barbs">Barbs</a> combines well with the physical damage of <a href="https://wiki.guildwars.com/wiki/Ranger" rel="noopener" target="_blank" title="Ranger">ranger</a> henchmen from <a href="https://wiki.guildwars.com/wiki/Unwaking_Waters_(Luxon)" rel="noopener" target="_blank" title="Unwaking Waters (Luxon)">the Luxon outpost</a>.</li>
+<li>If entering from <a href="https://wiki.guildwars.com/wiki/Unwaking_Waters_(Kurzick)" rel="noopener" target="_blank" title="Unwaking Waters (Kurzick)">the Kurzick outpost</a>, consider not bringing <a href="https://wiki.guildwars.com/wiki/Signet_of_Spirits" rel="noopener" target="_blank" title="Signet of Spirits">Signet of Spirits</a>, since <a href="https://wiki.guildwars.com/wiki/Aeson" rel="noopener" target="_blank" title="Aeson">Aeson</a> of the Luxon party (if no player-Luxon party joins) uses it.</li>
+<li><a class="mw-redirect" href="https://wiki.guildwars.com/wiki/Binding_Ritual" rel="noopener" target="_blank" title="Binding Ritual">Binding Rituals</a> such as <a href="https://wiki.guildwars.com/wiki/Shelter" rel="noopener" target="_blank" title="Shelter">Shelter</a> and <a href="https://wiki.guildwars.com/wiki/Displacement" rel="noopener" target="_blank" title="Displacement">Displacement</a> can easily provide protection to both parties provided the caster has a <a href="https://wiki.guildwars.com/wiki/Soul_Twisting" rel="noopener" target="_blank" title="Soul Twisting">Soul Twisting</a>-based build.</li></ul><dl><dt>Confronting Kuunavang</dt></dl><ul><li><a href="https://wiki.guildwars.com/wiki/Ranged_attack" rel="noopener" target="_blank" title="Ranged attack">Ranged attacks</a> and skills are usually easier to consistently deal damage Kuunavang during the first phase of the mission.</li>
+<li><a href="https://wiki.guildwars.com/wiki/Armor-ignoring_damage" rel="noopener" target="_blank" title="Armor-ignoring damage">Armor-ignoring damage</a> and <a href="https://wiki.guildwars.com/wiki/Life_stealing" rel="noopener" target="_blank" title="Life stealing">life stealing</a> bypass Kuunavang's high <a href="https://wiki.guildwars.com/wiki/Armor_rating" rel="noopener" target="_blank" title="Armor rating">armor rating</a>.</li>
+<li>Kuunavang's large amount of health makes <a href="https://wiki.guildwars.com/wiki/Spoil_Victor" rel="noopener" target="_blank" title="Spoil Victor">Spoil Victor</a> especially valuable.</li>
+<li>Bring ways to mitigate her <a href="https://wiki.guildwars.com/wiki/Dark_Chain_Lightning" rel="noopener" target="_blank" title="Dark Chain Lightning">Dark Chain Lightning</a>.
+<ul><li><a href="https://wiki.guildwars.com/wiki/Pain_Inverter" rel="noopener" target="_blank" title="Pain Inverter">Pain Inverter</a> will reflect damage.</li>
+<li><a href="https://wiki.guildwars.com/wiki/Minion" rel="noopener" target="_blank" title="Minion">Minions</a> and <a href="https://wiki.guildwars.com/wiki/Spirit" rel="noopener" target="_blank" title="Spirit">spirits</a> can absorb some of the damage.</li>
+<li>Consider other damage mitigation skills, e.g. <a href="https://wiki.guildwars.com/wiki/Shelter" rel="noopener" target="_blank" title="Shelter">Shelter</a>.</li>
+<li><a class="mw-redirect" href="https://wiki.guildwars.com/wiki/Blindness" rel="noopener" target="_blank" title="Blindness">Blindness</a> prevents her from hitting the first target.</li></ul></li>
+<li><a href="https://wiki.guildwars.com/wiki/Enfeeble" rel="noopener" target="_blank" title="Enfeeble">Enfeeble</a> helps reduce her damage.</li>
+<li><a href="https://wiki.guildwars.com/wiki/Corrupted_Scale" rel="noopener" target="_blank" title="Corrupted Scale">Corrupted Scales</a> are considered spirits:
+<ul><li>They are immune to <a href="https://wiki.guildwars.com/wiki/Hex_spell" rel="noopener" target="_blank" title="Hex spell">hex spells</a> and all <a href="https://wiki.guildwars.com/wiki/Condition" rel="noopener" target="_blank" title="Condition">conditions</a> except for <a href="https://wiki.guildwars.com/wiki/Burning" rel="noopener" target="_blank" title="Burning">burning</a>.</li>
+<li>They are vulnerable to <a href="https://wiki.guildwars.com/wiki/Anti-summon_skill" rel="noopener" target="_blank" title="Anti-summon skill">anti-summon skills</a> (e.g. <a href="https://wiki.guildwars.com/wiki/Banish" rel="noopener" target="_blank" title="Banish">Banish</a> or <a href="https://wiki.guildwars.com/wiki/Consume_Soul" rel="noopener" target="_blank" title="Consume Soul">Consume Soul</a>) and will trigger effects that depend on the presence of spirits.</li></ul></li></ul><dl><dt>Interrupting Kuunavang</dt></dl><ul><li>Kuunavang is partially resistant to <a href="https://wiki.guildwars.com/wiki/Interrupt" rel="noopener" target="_blank" title="Interrupt">interrupts</a>.</li>
+<li>To maximize your chances of preventing the dragon's skill use, take multiple interrupts and <a class="mw-redirect" href="https://wiki.guildwars.com/wiki/Daze" rel="noopener" target="_blank" title="Daze">daze</a> Kuunavang.</li>
+<li>She is also vulnerable to <a href="https://wiki.guildwars.com/wiki/Choking_Gas" rel="noopener" target="_blank" title="Choking Gas">Choking Gas</a>.</li>
+<li>A <a href="https://wiki.guildwars.com/wiki/Dissonance" rel="noopener" target="_blank" title="Dissonance">Dissonance</a> spirit can interrupt Kuunavang every <a href="https://wiki.guildwars.com/wiki/Dissonance_(attack)" rel="noopener" target="_blank" title="Dissonance (attack)">two seconds</a>.</li></ul><dl><dt>Two-party considerations</dt></dl><ul><li>Bring <a class="mw-redirect" href="https://wiki.guildwars.com/wiki/List_of_skills_which_affects_allies" rel="noopener" target="_blank" title="List of skills which affects allies">skills that can affect multiple allies</a>. <a class="mw-redirect" href="https://wiki.guildwars.com/wiki/Ward" rel="noopener" target="_blank" title="Ward">Wards</a> and <a class="mw-redirect" href="https://wiki.guildwars.com/wiki/Well" rel="noopener" target="_blank" title="Well">Wells</a> are especially useful in the small battleground for the final confrontation.</li>
+<li><a href="https://wiki.guildwars.com/wiki/Party_healing" rel="noopener" target="_blank" title="Party healing">Party healing</a> helps, e.g. <a href="https://wiki.guildwars.com/wiki/Heal_Party" rel="noopener" target="_blank" title="Heal Party">Heal Party</a> or <a href="https://wiki.guildwars.com/wiki/Breath_of_the_Great_Dwarf" rel="noopener" target="_blank" title="Breath of the Great Dwarf">Breath of the Great Dwarf</a>.</li></ul></div>
+<h3 style='font-size:0.8rem;color:var(--accent);margin:0.3rem 0;'>Notes</h3><div class='wiki-block'><table cellspacing="3" style="float: right; border: 1px solid #D16E5A; width: 250px; margin: 0 0 1em 1em; line-height: 1.4em; font-size: 0.9em; background: #F9F9F9;">
+<tbody><tr>
+<td><a href="https://wiki.guildwars2.com/wiki/Main_Page" rel="noopener" target="_blank" title="gw2:Main Page"><img alt="Gw2logo.png" data-file-height="479" data-file-width="692" decoding="async" height="28" loading="lazy" src="https://wiki.guildwars.com/images/thumb/b/b1/Gw2logo.png/41px-Gw2logo.png" srcset="/images/thumb/b/b1/Gw2logo.png/61px-Gw2logo.png 1.5x, /images/thumb/b/b1/Gw2logo.png/81px-Gw2logo.png 2x" width="41"/></a>
+</td>
+<td>The <a class="extiw" href="https://wiki.guildwars2.com/wiki/Main_Page" rel="noopener" target="_blank" title="gw2:Main Page">Guild Wars 2 Wiki</a>  has an article on <i><b><a class="extiw" href="https://wiki.guildwars2.com/wiki/Unwaking_Waters" rel="noopener" target="_blank" title="gw2:Unwaking Waters">Unwaking Waters</a></b></i>.
+</td></tr></tbody></table><ul><li>Groups from the Kurzick and Luxon outposts can <i>usually</i> <a href="https://wiki.guildwars.com/wiki/Sync_enter" rel="noopener" target="_blank" title="Sync enter">synchronize their entry</a> by pressing the <i>Enter Mission</i> button at close to the same time.</li>
+<li>You will only encounter three of the Afflicted bosses during the mission. If you are attempting to capture skills you may need to repeat it a number of times.</li>
+<li>Until the first barrier is brought down, enough Afflicted reinforcements will spawn every two minutes (at the barrier) in order to maintain a group size of seven. Similarly, enough reinforcements will spawn at the second barrier to keep the opposition at five foes.
+<ul><li>At each barrier, the composition of the group will remain the same for the remainder of the mission but will differ next time you play.</li>
+<li>These reinforcements do not drop <a class="mw-redirect" href="https://wiki.guildwars.com/wiki/Loot" rel="noopener" target="_blank" title="Loot">loot</a>.</li></ul></li>
+<li>The Kurzick party leader will have the spoken dialogue during the end cinematic unless there is no human player from that side.</li>
+<li>After completing this mission, your party will be taken to <a href="https://wiki.guildwars.com/wiki/Harvest_Temple" rel="noopener" target="_blank" title="Harvest Temple">Harvest Temple</a>.</li>
+<li>If there are players on both sides then skipping the cutscenes without the other party's approval is not possible.</li>
+<li>If you approach her from the upper cliffside she will be in melee range, however if you approach from the lower cliffside closest to her, she will not.</li>
+<li>Completion of this mission will fill in page #9 of the <a href="https://wiki.guildwars.com/wiki/Shiro%27s_Return" rel="noopener" target="_blank" title="Shiro's Return">Shiro's Return</a> <a href="https://wiki.guildwars.com/wiki/Storybook" rel="noopener" target="_blank" title="Storybook">storybook</a>.</li>
+<li>You can increase your <a href="https://wiki.guildwars.com/wiki/Kurzick_faction" rel="noopener" target="_blank" title="Kurzick faction">Kurzick faction cap limit</a> by 7,000 by completing this mission along with <a href="https://wiki.guildwars.com/wiki/Arborstone" rel="noopener" target="_blank" title="Arborstone">Arborstone</a> and <a href="https://wiki.guildwars.com/wiki/The_Eternal_Grove" rel="noopener" target="_blank" title="The Eternal Grove">The Eternal Grove</a>. This increase can only be applied once per account.</li>
+<li>You can increase your <a href="https://wiki.guildwars.com/wiki/Luxon_faction" rel="noopener" target="_blank" title="Luxon faction">Luxon Faction cap limit</a> by 7,000 by completing this mission along with <a href="https://wiki.guildwars.com/wiki/Boreas_Seabed" rel="noopener" target="_blank" title="Boreas Seabed">Boreas Seabed</a> and <a href="https://wiki.guildwars.com/wiki/Gyala_Hatchery" rel="noopener" target="_blank" title="Gyala Hatchery">Gyala Hatchery</a>. This increase can only be applied once per account.</li></ul><div style="margin: 1em; border: solid silver; border-width: 1px 0px; padding: 2px 1em 2px 5em;"><strong class="hiddenlinks" style="position: absolute; margin-left: -4.8em; color: #900;"><a class="image" href="https://wiki.guildwars.com/wiki/File:Bug.png" rel="noopener" target="_blank" title="Bug"><img alt="Bug" data-file-height="32" data-file-width="32" decoding="async" height="18" loading="lazy" src="https://wiki.guildwars.com/images/thumb/7/7d/Bug.png/18px-Bug.png" srcset="/images/thumb/7/7d/Bug.png/27px-Bug.png 1.5x, /images/7/7d/Bug.png 2x" width="18"/></a> <a href="https://wiki.guildwars.com/wiki/Bug" rel="noopener" target="_blank" title="Bug">Bug</a>.</strong> In the end cinematic, the gender of the voice of the lead party member is often reversed (e.g. male Assassins will get a female voice). Also, if the lead party member is female, the character model from another (male) character in the group will be used.</div><p><sup style="white-space:nowrap;">[<a href="https://wiki.guildwars.com/wiki/Talk:Unwaking_Waters" rel="noopener" target="_blank" title="Talk:Unwaking Waters"><span title="that's another story - I'd be willing to test w/ someone else"><i>verification requested</i></span></a>]</sup>
+</p><div style="margin: 1em; border: solid silver; border-width: 1px 0px; padding: 2px 1em 2px 7.5em;"><strong class="hiddenlinks" style="position: absolute; margin-left: -7.3em; color: #900;"><a class="image" href="https://wiki.guildwars.com/wiki/File:Anomaly.png" rel="noopener" target="_blank" title="Anomaly"><img alt="Anomaly" data-file-height="32" data-file-width="32" decoding="async" height="18" loading="lazy" src="https://wiki.guildwars.com/images/thumb/a/a6/Anomaly.png/18px-Anomaly.png" srcset="/images/thumb/a/a6/Anomaly.png/27px-Anomaly.png 1.5x, /images/a/a6/Anomaly.png 2x" width="18"/></a> <a class="mw-redirect" href="https://wiki.guildwars.com/wiki/Anomaly" rel="noopener" target="_blank" title="Anomaly">Anomaly</a>.</strong> Unlike the other henchmen <a href="https://wiki.guildwars.com/wiki/Non-player_character" rel="noopener" target="_blank" title="Non-player character">NPCs</a>, if no party joined from <a href="https://wiki.guildwars.com/wiki/Unwaking_Waters_(Luxon)" rel="noopener" target="_blank" title="Unwaking Waters (Luxon)">Unwaking Waters (Luxon)</a>, <a href="https://wiki.guildwars.com/wiki/Aeson" rel="noopener" target="_blank" title="Aeson">Aeson</a> uses a skill set that is different from the one he uses as a henchman.</div><table class="stdt" style="margin: 5px auto; border: 1px solid #C0C0C0; font-size: 90%; width: 80%; text-align: center;">
+<tbody><tr>
+<th style="background: #7BC; font-size: 110%;"><a class="mw-redirect" href="https://wiki.guildwars.com/wiki/List_of_Factions_missions" rel="noopener" target="_blank" title="List of Factions missions">Factions missions</a>
+</th></tr>
+<tr>
+<td><a href="https://wiki.guildwars.com/wiki/Minister_Cho%27s_Estate" rel="noopener" target="_blank" title="Minister Cho's Estate">Minister Cho's Estate</a> » <a href="https://wiki.guildwars.com/wiki/Zen_Daijun" rel="noopener" target="_blank" title="Zen Daijun">Zen Daijun</a> » <a href="https://wiki.guildwars.com/wiki/Vizunah_Square" rel="noopener" target="_blank" title="Vizunah Square">Vizunah Square</a> » <a href="https://wiki.guildwars.com/wiki/Nahpui_Quarter" rel="noopener" target="_blank" title="Nahpui Quarter">Nahpui Quarter</a> » <a href="https://wiki.guildwars.com/wiki/Tahnnakai_Temple" rel="noopener" target="_blank" title="Tahnnakai Temple">Tahnnakai Temple</a> » <a href="https://wiki.guildwars.com/wiki/Arborstone" rel="noopener" target="_blank" title="Arborstone">Arborstone</a> » <a href="https://wiki.guildwars.com/wiki/Boreas_Seabed" rel="noopener" target="_blank" title="Boreas Seabed">Boreas Seabed</a> » <a href="https://wiki.guildwars.com/wiki/Sunjiang_District" rel="noopener" target="_blank" title="Sunjiang District">Sunjiang District</a> » <a href="https://wiki.guildwars.com/wiki/Gyala_Hatchery" rel="noopener" target="_blank" title="Gyala Hatchery">Gyala Hatchery</a> <i>or</i> <a href="https://wiki.guildwars.com/wiki/The_Eternal_Grove" rel="noopener" target="_blank" title="The Eternal Grove">The Eternal Grove</a> » <a class="mw-selflink selflink">Unwaking Waters</a> » <a href="https://wiki.guildwars.com/wiki/Raisu_Palace" rel="noopener" target="_blank" title="Raisu Palace">Raisu Palace</a> » <a href="https://wiki.guildwars.com/wiki/Imperial_Sanctum" rel="noopener" target="_blank" title="Imperial Sanctum">Imperial Sanctum</a>
+</td></tr>
+<tr>
+<td><i><b><a class="mw-redirect" href="https://wiki.guildwars.com/wiki/Challenge_mission" rel="noopener" target="_blank" title="Challenge mission">Challenge</a></b></i><br/><a href="https://wiki.guildwars.com/wiki/Altrumm_Ruins" rel="noopener" target="_blank" title="Altrumm Ruins">Altrumm Ruins</a> <span style="margin: 0em 0.3em;">•</span> <a href="https://wiki.guildwars.com/wiki/Amatz_Basin" rel="noopener" target="_blank" title="Amatz Basin">Amatz Basin</a> <span style="margin: 0em 0.3em;">•</span> <a href="https://wiki.guildwars.com/wiki/The_Aurios_Mines" rel="noopener" target="_blank" title="The Aurios Mines">The Aurios Mines</a> <span style="margin: 0em 0.3em;">•</span> <a href="https://wiki.guildwars.com/wiki/Dragon%27s_Throat" rel="noopener" target="_blank" title="Dragon's Throat">Dragon's Throat</a> <span style="margin: 0em 0.3em;">•</span> <a href="https://wiki.guildwars.com/wiki/Zos_Shivros_Channel" rel="noopener" target="_blank" title="Zos Shivros Channel">Zos Shivros Channel</a>
+</td></tr>
+<tr>
+<td><i><b><a class="mw-redirect" href="https://wiki.guildwars.com/wiki/Competitive_mission" rel="noopener" target="_blank" title="Competitive mission">Competitive</a></b></i><br/><a href="https://wiki.guildwars.com/wiki/Fort_Aspenwood" rel="noopener" target="_blank" title="Fort Aspenwood">Fort Aspenwood</a> <span style="margin: 0em 0.3em;">•</span> <a href="https://wiki.guildwars.com/wiki/The_Jade_Quarry" rel="noopener" target="_blank" title="The Jade Quarry">The Jade Quarry</a>
+</td></tr>
+<tr>
+<td><i><b><a class="mw-redirect" href="https://wiki.guildwars.com/wiki/Elite_mission" rel="noopener" target="_blank" title="Elite mission">Elite</a></b></i><br/><a href="https://wiki.guildwars.com/wiki/The_Deep" rel="noopener" target="_blank" title="The Deep">The Deep</a> <span style="margin: 0em 0.3em;">•</span> <a href="https://wiki.guildwars.com/wiki/Urgoz%27s_Warren" rel="noopener" target="_blank" title="Urgoz's Warren">Urgoz's Warren</a>
+</td></tr></tbody></table> 
+NewPP limit report
+Cached time: 20260720071051
+Cache expiry: 3600
+Reduced expiry: true
+Complications: [show‐toc]
+CPU time usage: 0.128 seconds
+Real time usage: 0.174 seconds
+Preprocessor visited node count: 1366/1000000
+Post‐expand include size: 17032/2097152 bytes
+Template argument size: 1734/2097152 bytes
+Highest expansion depth: 10/100
+Expensive parser function count: 0/100
+Unstrip recursion depth: 0/20
+Unstrip post‐expand size: 2/5000000 bytes
+ExtLoops count: 0/1000
+
+Transclusion expansion time report (%,ms,calls,template)
+100.00%   86.884      1 -total
+ 41.62%   36.161      1 Template:Location_disambiguation_2
+ 22.45%   19.506      8 Template:Ifexists
+ 11.55%   10.037      1 Template:Mission_rewards
+  8.23%    7.147      1 Template:Mission_infobox
+  5.77%    5.009      6 Template:Cost
+  4.37%    3.801      1 Template:Factions_missions
+  3.75%    3.260      4 Template:W
+  2.85%    2.474      1 Template:Infobox_campaign_row
+  2.83%    2.455      8 Template:Profession_icon_sizes
+ Saved in parser cache with key en_wiki:pcache:idhash:8485-0!canonical and timestamp 20260720071051 and revision id 2717290.</div></div>
+          </section>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="lightbox" id="lightbox" role="dialog" aria-label="Enlarged map">
+    <img src="../maps/factions_11_Unwaking_Waters_map.jpg" alt="Unwaking Waters mission map (enlarged)" />
+  </div>
+  <script>
+    (function () {
+      var open = document.getElementById("mapOpen");
+      var box = document.getElementById("lightbox");
+      if (!open || !box) return;
+      open.addEventListener("click", function () { box.classList.add("open"); });
+      box.addEventListener("click", function () { box.classList.remove("open"); });
+      document.addEventListener("keydown", function (e) {
+        if (e.key === "Escape") box.classList.remove("open");
+      });
+    })();
+  </script>
+
+</body>
+</html>

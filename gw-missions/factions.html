@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Factions Missions — Guide Index</title>
+  <style>
+:root {
+  --bg: #070a0f; --panel: #101820; --panel2: #15202c; --border: #243044;
+  --text: #dce6f0; --muted: #8a9bb0; --dim: #5c6f86; --accent: #3ecfff; --gold: #e8c56a;
+  --font: "Segoe UI", system-ui, -apple-system, sans-serif;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { font-size: clamp(15px, 0.7vw + 0.3vh, 18px); scroll-behavior: smooth; }
+body {
+  font-family: var(--font); background: var(--bg); color: var(--text); line-height: 1.5; min-height: 100vh;
+  background-image:
+    radial-gradient(ellipse 80% 40% at 50% -10%, rgba(42, 110, 170, 0.2), transparent),
+    radial-gradient(ellipse 50% 30% at 100% 80%, rgba(80, 40, 120, 0.08), transparent);
+}
+a { color: var(--accent); text-decoration: none; }
+a:hover { color: #7de0ff; text-decoration: underline; }
+.wrap { max-width: 1100px; margin: 0 auto; padding: 1.5rem 1.25rem 3rem; }
+header.hero { margin-bottom: 1.5rem; padding-bottom: 1.25rem; border-bottom: 1px solid var(--border); }
+.kicker {
+  font-size: 0.75rem; letter-spacing: 0.14em; text-transform: uppercase;
+  color: var(--accent); font-weight: 700; margin-bottom: 0.35rem;
+}
+h1 {
+  font-size: clamp(1.6rem, 2.5vw, 2.2rem); font-weight: 800; letter-spacing: -0.02em;
+  background: linear-gradient(135deg, #e8f4ff, var(--accent));
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+}
+.sub { color: var(--muted); margin-top: 0.5rem; max-width: 52rem; }
+.meta-row { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.9rem; align-items: center; }
+.tag {
+  font-size: 0.72rem; font-weight: 650; letter-spacing: 0.04em; text-transform: uppercase;
+  padding: 0.28rem 0.6rem; border-radius: 999px;
+  background: rgba(62, 207, 255, 0.12); color: var(--accent);
+  border: 1px solid rgba(62, 207, 255, 0.25); text-decoration: none;
+}
+.tag:hover { filter: brightness(1.1); text-decoration: none; }
+.tag.gold { background: rgba(232, 197, 106, 0.12); color: var(--gold); border-color: rgba(232, 197, 106, 0.3); }
+.campaign-switch { display: flex; flex-wrap: wrap; gap: 0.45rem; margin: 1rem 0 1.25rem; }
+.campaign-switch a {
+  font-size: 0.85rem; font-weight: 700; padding: 0.5rem 0.9rem;
+  border-radius: 10px; background: var(--panel); border: 1px solid var(--border);
+  color: var(--muted); text-decoration: none;
+}
+.campaign-switch a:hover { color: var(--text); border-color: #2a4a6a; text-decoration: none; }
+.campaign-switch a.active { color: #0a1018; background: var(--accent); border-color: transparent; }
+.toc { display: flex; flex-wrap: wrap; gap: 0.4rem; margin: 0 0 1.5rem; }
+.toc a {
+  font-size: 0.78rem; font-weight: 600; padding: 0.35rem 0.7rem;
+  border-radius: 8px; background: var(--panel); border: 1px solid var(--border);
+  color: var(--muted); text-decoration: none;
+}
+.toc a:hover { color: var(--text); border-color: #2a4a6a; text-decoration: none; }
+.region { margin-bottom: 1.75rem; }
+.region-title {
+  display: flex; align-items: baseline; gap: 0.75rem;
+  margin-bottom: 0.75rem; padding-bottom: 0.4rem; border-bottom: 1px solid var(--border);
+}
+.region-title h2 { font-size: 1.05rem; font-weight: 750; }
+.region-title span { font-size: 0.78rem; color: var(--dim); }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 0.65rem; }
+.card {
+  display: flex; flex-direction: column; gap: 0.35rem; padding: 0.9rem 1rem;
+  background: var(--panel); border: 1px solid var(--border); border-radius: 12px;
+  text-decoration: none; color: inherit; position: relative; overflow: hidden;
+  transition: border-color 0.15s, transform 0.12s, background 0.15s, box-shadow 0.15s;
+}
+.card::before {
+  content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 3px;
+  background: var(--accent); opacity: 0.7;
+}
+.card:hover {
+  border-color: #2a4a6a; background: var(--panel2); transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.3); text-decoration: none; color: inherit;
+}
+.card-num { font-size: 0.7rem; font-weight: 750; letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent); }
+.card-name { font-size: 1.02rem; font-weight: 700; color: var(--text); line-height: 1.25; }
+.card-region { font-size: 0.78rem; color: var(--dim); }
+.card-extra { font-size: 0.75rem; color: var(--muted); }
+.card-go { margin-top: 0.35rem; font-size: 0.78rem; font-weight: 650; color: var(--accent); }
+.notes {
+  margin-top: 2rem; padding: 1rem 1.1rem; background: var(--panel);
+  border: 1px solid var(--border); border-radius: 12px; font-size: 0.88rem; color: var(--muted);
+}
+.notes h3 { color: var(--gold); font-size: 0.85rem; margin-bottom: 0.45rem; text-transform: uppercase; letter-spacing: 0.06em; }
+.notes ul { padding-left: 1.15rem; }
+.notes li { margin-bottom: 0.3rem; }
+footer { margin-top: 2rem; text-align: center; font-size: 0.75rem; color: var(--dim); }
+
+    :root { --accent: #e8a84a; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header class="hero">
+      <div class="kicker">Guild Wars · Campaign Guide</div>
+      <h1>Factions Missions</h1>
+      <p class="sub">Second-monitor guides for all primary storyline missions in Guild Wars Factions (Cantha).</p>
+      <div class="meta-row">
+        <span class="tag">13 Missions</span>
+        <span class="tag gold">Factions</span>
+        <span class="tag">4K vertical · large map</span>
+        <a class="tag" href="https://wiki.guildwars.com/wiki/List_of_Factions_missions_and_primary_quests" target="_blank" rel="noopener">Wiki list ↗</a>
+      </div>
+    </header>
+    <nav class="campaign-switch" aria-label="Campaigns"><a class="" href="prohecies.html">Prophecies</a><a class="active" href="factions.html">Factions</a><a class="" href="nightfall.html">Nightfall</a></nav>
+    <nav class="toc" aria-label="Regions"><a href="#region-shing-jea-island">Shing Jea Island</a><a href="#region-kaineng-city">Kaineng City</a><a href="#region-echovald-forest">Echovald Forest</a><a href="#region-the-jade-sea">The Jade Sea</a><a href="#region-path-choice">Path choice</a></nav>
+    <section class="region" id="region-shing-jea-island">
+  <div class="region-title">
+    <h2>Shing Jea Island</h2>
+    <span>2 missions</span>
+  </div>
+  <div class="grid"><a class="card" href="factions/1_Minister_Chos_Estate.html">
+  <div class="card-num">Mission 1</div>
+  <div class="card-name">Minister Cho&#x27;s Estate</div>
+  <div class="card-region">Shing Jea Island</div>
+  
+  <div class="card-go">Open guide →</div>
+</a><a class="card" href="factions/2_Zen_Daijun.html">
+  <div class="card-num">Mission 2</div>
+  <div class="card-name">Zen Daijun</div>
+  <div class="card-region">Shing Jea Island</div>
+  
+  <div class="card-go">Open guide →</div>
+</a></div>
+</section><section class="region" id="region-kaineng-city">
+  <div class="region-title">
+    <h2>Kaineng City</h2>
+    <span>6 missions</span>
+  </div>
+  <div class="grid"><a class="card" href="factions/3_Vizunah_Square.html">
+  <div class="card-num">Mission 3</div>
+  <div class="card-name">Vizunah Square</div>
+  <div class="card-region">Kaineng City</div>
+  
+  <div class="card-go">Open guide →</div>
+</a><a class="card" href="factions/4_Nahpui_Quarter.html">
+  <div class="card-num">Mission 4</div>
+  <div class="card-name">Nahpui Quarter</div>
+  <div class="card-region">Kaineng City</div>
+  
+  <div class="card-go">Open guide →</div>
+</a><a class="card" href="factions/5_Tahnnakai_Temple.html">
+  <div class="card-num">Mission 5</div>
+  <div class="card-name">Tahnnakai Temple</div>
+  <div class="card-region">Kaineng City</div>
+  
+  <div class="card-go">Open guide →</div>
+</a><a class="card" href="factions/8_Sunjiang_District.html">
+  <div class="card-num">Mission 8</div>
+  <div class="card-name">Sunjiang District</div>
+  <div class="card-region">Kaineng City</div>
+  
+  <div class="card-go">Open guide →</div>
+</a><a class="card" href="factions/12_Raisu_Palace.html">
+  <div class="card-num">Mission 11</div>
+  <div class="card-name">Raisu Palace</div>
+  <div class="card-region">Kaineng City</div>
+  
+  <div class="card-go">Open guide →</div>
+</a><a class="card" href="factions/13_Imperial_Sanctum.html">
+  <div class="card-num">Mission 12</div>
+  <div class="card-name">Imperial Sanctum</div>
+  <div class="card-region">Kaineng City</div>
+  
+  <div class="card-go">Open guide →</div>
+</a></div>
+</section><section class="region" id="region-echovald-forest">
+  <div class="region-title">
+    <h2>Echovald Forest</h2>
+    <span>2 missions</span>
+  </div>
+  <div class="grid"><a class="card" href="factions/6_Arborstone.html">
+  <div class="card-num">Mission 6</div>
+  <div class="card-name">Arborstone</div>
+  <div class="card-region">Echovald Forest</div>
+  
+  <div class="card-go">Open guide →</div>
+</a><a class="card" href="factions/9_The_Eternal_Grove.html">
+  <div class="card-num">Mission 9a</div>
+  <div class="card-name">The Eternal Grove</div>
+  <div class="card-region">Echovald Forest</div>
+  <div class="card-extra">Kurzick path</div>
+  <div class="card-go">Open guide →</div>
+</a></div>
+</section><section class="region" id="region-the-jade-sea">
+  <div class="region-title">
+    <h2>The Jade Sea</h2>
+    <span>2 missions</span>
+  </div>
+  <div class="grid"><a class="card" href="factions/7_Boreas_Seabed.html">
+  <div class="card-num">Mission 7</div>
+  <div class="card-name">Boreas Seabed</div>
+  <div class="card-region">The Jade Sea</div>
+  
+  <div class="card-go">Open guide →</div>
+</a><a class="card" href="factions/10_Gyala_Hatchery.html">
+  <div class="card-num">Mission 9b</div>
+  <div class="card-name">Gyala Hatchery</div>
+  <div class="card-region">The Jade Sea</div>
+  <div class="card-extra">Luxon path</div>
+  <div class="card-go">Open guide →</div>
+</a></div>
+</section><section class="region" id="region-path-choice">
+  <div class="region-title">
+    <h2>Path choice</h2>
+    <span>1 mission</span>
+  </div>
+  <div class="grid"><a class="card" href="factions/11_Unwaking_Waters.html">
+  <div class="card-num">Mission 10</div>
+  <div class="card-name">Unwaking Waters</div>
+  <div class="card-region">Path choice</div>
+  <div class="card-extra">Both paths rejoin</div>
+  <div class="card-go">Open guide →</div>
+</a></div>
+</section>
+    <div class="notes"><h3>Storyline notes</h3><ul><li>Shing Jea profession quests and secondary training lead into Minister Cho’s Estate.</li><li>Non-Factions characters join at Bejunkan Pier with Welcome to Cantha (before Vizunah Square).</li><li>After Sunjiang District the story forks Kurzick (Eternal Grove) vs Luxon (Gyala Hatchery) — both paths can be completed; only one is required.</li><li>Both paths rejoin at Unwaking Waters, then Taking Back the Palace → Raisu Palace → Imperial Sanctum.</li><li>Challenge, competitive, and elite missions (e.g. Urgoz’s Warren, The Deep) are optional and not listed here.</li></ul></div>
+    <footer>
+      Content adapted from
+      <a href="https://wiki.guildwars.com/wiki/List_of_Factions_missions_and_primary_quests" target="_blank" rel="noopener">Guild Wars Wiki</a>
+      · Maps &amp; text © ArenaNet / NCsoft · Local offline guides
+    </footer>
+  </div>
+</body>
+</html>

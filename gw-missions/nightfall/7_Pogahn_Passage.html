@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Pogahn Passage</title>
+  <style>
+:root {
+  --bg-deep: #070a0f;
+  --bg-panel: #101820;
+  --bg-panel-2: #15202c;
+  --border: #243044;
+  --border-glow: #2a4a6a;
+  --text: #dce6f0;
+  --text-muted: #8a9bb0;
+  --text-dim: #5c6f86;
+  --accent: #3ecfff;
+  --accent-soft: rgba(62, 207, 255, 0.12);
+  --gold: #e8c56a;
+  --gold-soft: rgba(232, 197, 106, 0.12);
+  --bonus: #7dffb3;
+  --bonus-soft: rgba(125, 255, 179, 0.1);
+  --danger: #ff6b6b;
+  --danger-soft: rgba(255, 107, 107, 0.1);
+  --hm: #c78bff;
+  --hm-soft: rgba(199, 139, 255, 0.12);
+  --radius: 10px;
+  --font: "Segoe UI", system-ui, -apple-system, sans-serif;
+  --chrome-h: 3.1rem;
+  --gap: 0.5rem;
+  --pad: 0.7rem;
+  /* Readable on 4K vertical (~2160×3840) */
+  --walk-size: clamp(1.05rem, 0.55vw + 0.55vh, 1.35rem);
+  --bonus-size: clamp(1.05rem, 0.55vw + 0.55vh, 1.35rem);
+  --body-size: clamp(0.95rem, 0.4vw + 0.4vh, 1.1rem);
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html {
+  scroll-behavior: smooth;
+  font-size: clamp(16px, 0.55vw + 0.45vh, 20px);
+  height: 100%;
+  scroll-padding-top: calc(var(--chrome-h) + 0.5rem);
+}
+body {
+  font-family: var(--font);
+  background: var(--bg-deep);
+  color: var(--text);
+  line-height: 1.45;
+  min-height: 100%;
+  height: 100%;
+  overflow: hidden;
+  background-image: radial-gradient(ellipse 70% 25% at 50% 0%, rgba(42, 100, 160, 0.14), transparent);
+}
+a { color: var(--accent); text-decoration: none; }
+a:hover { color: #7de0ff; text-decoration: underline; }
+.app {
+  display: grid;
+  grid-template-rows: var(--chrome-h) 1fr;
+  height: 100vh; height: 100dvh;
+  max-height: 100vh; max-height: 100dvh;
+}
+.top-chrome {
+  display: flex; align-items: center; gap: 0.65rem;
+  padding: 0 0.7rem;
+  background: rgba(8, 12, 18, 0.97);
+  border-bottom: 1px solid var(--border);
+  z-index: 100; min-height: var(--chrome-h);
+}
+.brand { display: flex; align-items: baseline; gap: 0.55rem; min-width: 0; flex-shrink: 0; }
+.brand-mission {
+  font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase;
+  color: var(--accent); font-weight: 700; white-space: nowrap;
+}
+.brand-name {
+  font-size: 1.1rem; font-weight: 750; color: var(--text);
+  white-space: nowrap; letter-spacing: -0.02em;
+}
+.brand-meta { font-size: 0.75rem; color: var(--text-dim); white-space: nowrap; }
+.chip-nav {
+  display: flex; flex: 1; gap: 0.3rem; overflow-x: auto;
+  scrollbar-width: none; min-width: 0; justify-content: center;
+}
+.chip-nav::-webkit-scrollbar { display: none; }
+.chip-nav a {
+  flex: 0 0 auto; padding: 0.3rem 0.65rem; border-radius: 999px;
+  font-size: 0.78rem; font-weight: 600; color: var(--text-muted);
+  background: var(--bg-panel); border: 1px solid var(--border);
+  text-decoration: none; white-space: nowrap;
+}
+.chip-nav a:hover {
+  color: var(--text); border-color: var(--border-glow);
+  background: #1a2836; text-decoration: none;
+}
+.chip-nav a[href="#map"] { color: var(--accent); border-color: rgba(62, 207, 255, 0.35); }
+.chip-nav a[href="#bonus"] { color: var(--bonus); border-color: rgba(125, 255, 179, 0.3); }
+.chip-nav a[href="#hard-mode"] { color: var(--hm); border-color: rgba(199, 139, 255, 0.3); }
+.chip-nav a[href="#bosses"] { color: #ff9a9a; border-color: rgba(255, 107, 107, 0.3); }
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 0.3rem;
+  padding: 0.42rem 0.85rem; border-radius: 8px; font-weight: 650; font-size: 0.8rem;
+  border: none; cursor: pointer; text-decoration: none; white-space: nowrap; flex-shrink: 0;
+}
+.btn:hover { text-decoration: none; }
+.btn-next {
+  background: linear-gradient(135deg, #1a6a9a, #1ab0e0); color: #fff;
+  box-shadow: 0 2px 12px rgba(26, 140, 200, 0.35);
+}
+.btn-next:hover { color: #fff; filter: brightness(1.08); }
+.btn-wiki, .btn-idx, .btn-prev {
+  background: var(--bg-panel); color: var(--text-muted);
+  border: 1px solid var(--border); padding: 0.42rem 0.65rem;
+}
+.btn-wiki:hover, .btn-idx:hover, .btn-prev:hover {
+  color: var(--accent); border-color: var(--border-glow);
+}
+.chrome-actions { display: flex; gap: 0.35rem; flex-shrink: 0; }
+
+/* Map-dominant workspace */
+.workspace {
+  display: grid;
+  grid-template-columns: minmax(480px, 1.15fr) minmax(0, 1fr);
+  grid-template-rows: 1fr;
+  gap: var(--gap); padding: var(--gap);
+  min-height: 0; height: 100%; overflow: hidden;
+}
+.col-map {
+  display: grid;
+  grid-template-rows: 1fr auto;
+  gap: var(--gap);
+  min-height: 0; min-width: 0;
+}
+.col-main {
+  display: grid;
+  /* objectives compact | walkthrough HUGE | bonus+hm | bosses+tips */
+  grid-template-rows: auto minmax(0, 1.6fr) minmax(0, 1.05fr) minmax(0, 0.75fr);
+  gap: var(--gap); min-height: 0; min-width: 0; overflow: hidden;
+}
+.row-obj { min-height: 0; }
+.row-bonus-hm {
+  display: grid; grid-template-columns: 1.15fr 0.85fr; gap: var(--gap); min-height: 0;
+}
+.row-lower {
+  display: grid; grid-template-columns: 1.15fr 0.85fr; gap: var(--gap); min-height: 0;
+}
+.panel {
+  background: var(--bg-panel); border: 1px solid var(--border); border-radius: var(--radius);
+  padding: var(--pad); display: flex; flex-direction: column; min-height: 0; overflow: hidden;
+}
+.panel-scroll {
+  overflow-y: auto; overflow-x: hidden; min-height: 0; flex: 1; padding-right: 0.3rem;
+  scrollbar-width: thin; scrollbar-color: var(--border) transparent;
+  font-size: var(--body-size);
+}
+.panel-scroll::-webkit-scrollbar { width: 8px; }
+.panel-scroll::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+.panel-title {
+  display: flex; align-items: center; gap: 0.4rem;
+  font-size: 0.82rem; font-weight: 750; letter-spacing: 0.05em; text-transform: uppercase;
+  color: var(--text); margin-bottom: 0.45rem; padding-bottom: 0.35rem;
+  border-bottom: 1px solid var(--border); flex-shrink: 0;
+}
+.panel-title .icon {
+  width: 1.3rem; height: 1.3rem; border-radius: 5px;
+  display: inline-flex; align-items: center; justify-content: center; font-size: 0.75rem;
+}
+.panel.map-panel {
+  border-color: var(--border-glow);
+  background: linear-gradient(180deg, #0e1620 0%, var(--bg-panel) 100%);
+  /* Map takes almost all left column */
+  min-height: 0;
+}
+.panel.objectives { border-top: 2px solid var(--accent); }
+.panel.walkthrough { border-top: 3px solid #5eb8e8; }
+.panel.bonus { border-top: 3px solid var(--bonus); }
+.panel.hard-mode { border-top: 2px solid var(--hm); }
+.panel.bosses { border-top: 2px solid var(--danger); }
+.panel.other { border-top: 2px solid var(--text-muted); }
+
+/* Emphasized reading panels */
+.panel.walkthrough .panel-scroll,
+.panel.walkthrough .wiki-block {
+  font-size: var(--walk-size) !important;
+  line-height: 1.55;
+}
+.panel.bonus .panel-scroll,
+.panel.bonus .wiki-block {
+  font-size: var(--bonus-size) !important;
+  line-height: 1.55;
+}
+.panel.walkthrough .panel-scroll li,
+.panel.bonus .panel-scroll li {
+  margin-bottom: 0.45rem;
+}
+.panel.walkthrough .panel-scroll p,
+.panel.bonus .panel-scroll p {
+  margin-bottom: 0.55rem;
+}
+
+.icon-map { background: var(--accent-soft); color: var(--accent); }
+.icon-obj { background: var(--accent-soft); color: var(--accent); }
+.icon-walk { background: rgba(94, 184, 232, 0.15); color: #5eb8e8; }
+.icon-bonus { background: var(--bonus-soft); color: var(--bonus); }
+.icon-hm { background: var(--hm-soft); color: var(--hm); }
+.icon-boss { background: var(--danger-soft); color: var(--danger); }
+.icon-other { background: rgba(138, 155, 176, 0.15); color: var(--text-muted); }
+
+.map-wrap {
+  flex: 1; min-height: 0; display: flex; flex-direction: column;
+  align-items: center; justify-content: center; gap: 0.4rem;
+}
+.map-frame {
+  flex: 1; min-height: 0; width: 100%;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: 10px; overflow: hidden;
+  border: 2px solid var(--border-glow);
+  box-shadow: 0 0 0 1px rgba(62, 207, 255, 0.1), 0 12px 40px rgba(0, 0, 0, 0.45);
+  background: #05080c; cursor: zoom-in;
+}
+.map-frame img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  image-rendering: auto;
+}
+.map-caption { font-size: 0.72rem; color: var(--text-dim); flex-shrink: 0; }
+.map-missing {
+  color: var(--text-dim); font-size: 1rem; text-align: center; padding: 2rem;
+}
+
+.wiki-block ul, .panel-scroll ul,
+.wiki-block ol, .panel-scroll ol { padding-left: 1.2rem; margin: 0.3rem 0 0.5rem; }
+.wiki-block li, .panel-scroll li { margin-bottom: 0.32rem; }
+.wiki-block p, .panel-scroll p { margin-bottom: 0.45rem; }
+.wiki-block img, .panel-scroll img { vertical-align: middle; max-height: 1.35em; width: auto; }
+.wiki-block table, .panel-scroll table {
+  width: 100%; border-collapse: collapse; font-size: 0.9em; margin: 0.4rem 0;
+}
+.wiki-block th, .wiki-block td, .panel-scroll th, .panel-scroll td {
+  border: 1px solid var(--border); padding: 0.3rem 0.45rem; text-align: left;
+}
+.lede { font-size: 0.92rem; color: var(--text-muted); margin-bottom: 0.35rem; }
+
+/* Collapsed summary */
+details.summary-details {
+  background: var(--bg-panel);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  border-top: 2px solid var(--gold);
+  padding: 0.35rem 0.65rem;
+  flex-shrink: 0;
+}
+details.summary-details summary {
+  cursor: pointer;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--gold);
+  padding: 0.35rem 0;
+  list-style: none;
+}
+details.summary-details summary::-webkit-details-marker { display: none; }
+details.summary-details summary::before {
+  content: "▸ ";
+  color: var(--text-dim);
+}
+details.summary-details[open] summary::before { content: "▾ "; }
+details.summary-details .summary-body {
+  padding: 0.35rem 0 0.55rem;
+  font-size: 0.88rem;
+  color: var(--text-muted);
+  max-height: 18vh;
+  overflow-y: auto;
+}
+
+.boss-note { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.4rem; }
+.boss-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.4rem; }
+.boss-card {
+  background: var(--bg-panel-2); border: 1px solid var(--border);
+  border-radius: 8px; padding: 0.5rem 0.6rem;
+}
+.boss-card-head { font-size: 0.95rem; margin-bottom: 0.2rem; }
+.boss-card-head a { color: #eef6fc; font-weight: 700; }
+.boss-card-head a:hover { color: var(--accent); }
+.boss-elite { font-size: 0.88rem; }
+.elite-label { color: var(--gold); font-weight: 650; margin-right: 0.25rem; }
+.elite-link { color: #ffd78a; font-weight: 650; }
+.elite-link:hover { color: #ffe9b5; }
+.elite-none { color: var(--text-dim); font-style: italic; font-size: 0.85rem; }
+.boss-meta { font-size: 0.78rem; color: var(--text-dim); margin-top: 0.15rem; }
+
+.callout {
+  margin-top: 0.4rem; padding: 0.45rem 0.6rem; border-radius: 6px;
+  font-size: 0.88rem; border-left: 3px solid; line-height: 1.4;
+}
+.callout.tip { background: var(--accent-soft); border-color: var(--accent); color: #b8eaff; }
+.callout.warn { background: var(--danger-soft); border-color: var(--danger); color: #ffb4b4; }
+
+.lightbox {
+  display: none; position: fixed; inset: 0; z-index: 1000; background: rgba(0,0,0,0.94);
+  align-items: center; justify-content: center; padding: 1.5rem; cursor: zoom-out;
+}
+.lightbox.open { display: flex; }
+.lightbox img {
+  max-width: 96vw; max-height: 96vh; border-radius: 8px;
+  border: 2px solid var(--border-glow); object-fit: contain;
+}
+
+@media (min-height: 2400px) {
+  :root {
+    --walk-size: clamp(1.15rem, 0.7vh + 0.3vw, 1.5rem);
+    --bonus-size: clamp(1.15rem, 0.7vh + 0.3vw, 1.5rem);
+    --gap: 0.65rem;
+    --pad: 0.85rem;
+  }
+  .workspace { grid-template-columns: minmax(560px, 1.2fr) minmax(0, 1fr); }
+}
+@media (min-width: 1800px) and (min-height: 2000px) {
+  .workspace { grid-template-columns: minmax(600px, 1.25fr) minmax(0, 1fr); }
+}
+@media (max-height: 1100px) {
+  body { overflow: auto; height: auto; }
+  .app { height: auto; max-height: none; min-height: 100vh; }
+  .workspace {
+    height: auto; overflow: visible; grid-template-columns: 1fr; grid-template-rows: auto;
+  }
+  .col-map { grid-template-rows: auto; }
+  .col-main { overflow: visible; grid-template-rows: auto; }
+  .row-bonus-hm, .row-lower { grid-template-columns: 1fr; }
+  .panel { max-height: none; overflow: visible; }
+  .panel-scroll { overflow: visible; }
+  .map-frame { min-height: 360px; max-height: 55vh; }
+}
+
+    :root { --accent: #c78bff; --accent-soft: #c78bff22; }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header class="top-chrome">
+      <div class="brand">
+        <span class="brand-mission">M7a</span>
+        <span class="brand-name">Pogahn Passage</span>
+        <span class="brand-meta">Nightfall · Kourna · Cooperative · —</span>
+      </div>
+      <nav class="chip-nav" aria-label="Sections">
+        <a href="#map">Map</a>
+        <a href="#walkthrough">Walkthrough</a>
+        <a href="#bonus">Bonus</a>
+        <a href="#objectives">Objectives</a>
+        <a href="#hard-mode">Hard Mode</a>
+        <a href="#bosses">Bosses</a>
+        <a href="#other">Tips</a>
+      </nav>
+      <div class="chrome-actions">
+        <a class="btn btn-idx" href="../nightfall.html">Index</a>
+        <a class="btn btn-prev" href="6_Kodonur_Crossroads.html">← Prev</a>
+        <a class="btn btn-wiki" href="https://wiki.guildwars.com/wiki/Pogahn_Passage" target="_blank" rel="noopener">Wiki ↗</a>
+        <a class="btn btn-next" href="8_Rilohn_Refuge.html">Next: Rilohn Refuge →</a>
+      </div>
+    </header>
+
+    <div class="workspace">
+      <div class="col-map">
+        <section class="panel map-panel" id="map">
+          <h2 class="panel-title"><span class="icon icon-map">◉</span> Mission Map</h2>
+          <div class="map-wrap">
+            <div class="map-frame" id="mapOpen" title="Click to enlarge">
+              <img src="../maps/nightfall_07_Pogahn_Passage_map.jpg" alt="Pogahn Passage mission map" />
+            </div>
+            <p class="map-caption">Click to enlarge · Local cache · <a href="https://wiki.guildwars.com/wiki/Pogahn_Passage" target="_blank" rel="noopener">Wiki</a></p>
+        </div>
+        </section>
+
+        <details class="summary-details" id="summary">
+          <summary>Summary (click to expand)</summary>
+          <div class="summary-body">
+            <p>Kormir has been captured! She is to be executed, but with the assistance of Margrid the Sly , you&#x27;ve managed to secure a set of Kournan armor and plan on infiltrating Gandara to rescue her. As her price, Margrid asks that you also help her acquire the Diadem of Lady Glaive from the base&#x27;s vault. After which you will proceed to the prison, break out Kormir, and rush to the docks to escape.</p>
+            <p style="margin-top:0.4rem;"><strong>Region:</strong> Kourna · <strong>Mission:</strong> 7a of 20 · <strong>Type:</strong> Cooperative<br/><strong>Required hero:</strong> Margrid the Sly<br/><strong>Path:</strong> Margrid path</p>
+            <p style="margin-top:0.35rem;"><a href="https://wiki.guildwars.com/wiki/Pogahn_Passage" target="_blank" rel="noopener">Full wiki article ↗</a></p>
+          </div>
+        </details>
+      </div>
+
+      <div class="col-main">
+        <section class="panel objectives row-obj" id="objectives">
+          <h2 class="panel-title"><span class="icon icon-obj">✓</span> Objectives</h2>
+          <div class="panel-scroll wiki-block"><p>Rescue Kormir from Gandara.
+</p><ul><li>Escort Margrid to the Gandaran treasure vault to retrieve the Diadem of Lady Glaive.</li>
+<li>Free Kormir from the Kournan prison.</li>
+<li>Escape from Gandara with Kormir and Shahai.</li>
+<li>Optional: Escort the <a href="https://wiki.guildwars.com/wiki/Sunspear_Prisoner" rel="noopener" target="_blank" title="Sunspear Prisoner">Sunspear prisoners</a> to the prison.</li>
+<li>Optional: Obtain the prison code for entry into the prison.</li>
+<li>Optional: The demon is out of control! You can either help the guards or stand aside and let them fight on their own.</li>
+<li>Optional: Take over gate duty for some guards.</li>
+<li>*<a class="mw-redirect" href="https://wiki.guildwars.com/wiki/Bonus" rel="noopener" target="_blank" title="Bonus">BONUS</a>* Complete optional objectives.</li></ul></div>
+        </section>
+
+        <section class="panel walkthrough" id="walkthrough">
+          <h2 class="panel-title"><span class="icon icon-walk">→</span> Walkthrough</h2>
+          <div class="panel-scroll wiki-block"><p>Your party starts under the <a href="https://wiki.guildwars.com/wiki/Kournan_Guardsman" rel="noopener" target="_blank" title="Kournan Guardsman">Kournan Guardsman</a> effect, disguised as Kournan guards to avoid early confrontations. During this time, players can accomplish the bonus objectives which are very simple.
+</p><p>Proceed to the treasure vault (point 5) to trigger Margrid's dialogue to retrieve the Diadem of Lady Glaive and now head to the prison gate (point 6). <a href="https://wiki.guildwars.com/wiki/Prison_Keeper_Shelkesh" rel="noopener" target="_blank" title="Prison Keeper Shelkesh">Prison Keeper Shelkesh</a> will ask the code to clear passage.
+</p><ul><li>If you acquired the password from the guard at the entrance of the fort, you can pass through unobstructed.</li>
+<li>However, should you not have the password or choose the option to give the wrong password, the 3 hostile Kournans will spawn, and Shelkesh will turn hostile, although he will not move or attack. The gate will open when all 4 foes are dead.</li></ul><p>Upon reaching the prison, kill <a href="https://wiki.guildwars.com/wiki/Jailer_Gahanni" rel="noopener" target="_blank" title="Jailer Gahanni">Jailer Gahanni</a> and the other guards and a <a href="https://wiki.guildwars.com/wiki/Cinematic" rel="noopener" target="_blank" title="Cinematic">cinematic</a> will start (point 7).
+</p><p>Now, you have fifteen minutes to escape by reaching the docks with Kormir and Shahai. The exit can be found in only half the counter's time so there is no need to rush through as the clock may imply. There are two deadly spots:
+</p><ul><li>The second and third Kournan groups after crossing back the bridge: Players will find the second group to be small and static, but a third larger group is on its way towards the bridge. Instead of engaging the second group, wait until the third climbs the stairs and move far ahead from the second group. This will help avoid over-aggroing and having to fight a large mob with two Kournan Priests healing each other. Since <a href="https://wiki.guildwars.com/wiki/Margrid_the_Sly" rel="noopener" target="_blank" title="Margrid the Sly">Margrid the Sly</a> is a required hero, she can be used to lure the third group (<a href="https://wiki.guildwars.com/wiki/Flag" rel="noopener" target="_blank" title="Flag">flag</a> and un-flag), because if a player attempts to pull, Kormir and Shahai will follow, risking mission failure.</li></ul><p>After dispatching these groups, you may either travel north through the fort or south along the docks, both paths rejoin at the dock. 
+</p><ul><li>The final battle at the docks has four static guards and another group behind them lead by <a href="https://wiki.guildwars.com/wiki/Captain_Nebo" rel="noopener" target="_blank" title="Captain Nebo">Captain Nebo</a>, a powerful elementalist boss capable of dealing massive area damage with <a href="https://wiki.guildwars.com/wiki/Fire_Magic" rel="noopener" target="_blank" title="Fire Magic">Fire Magic</a> spells. Lure the four guards first to reduce enemies and only then engage the last group.</li></ul><p>Finally, walk to the end of the dock to complete the mission.
+</p></div>
+        </section>
+
+        <div class="row-bonus-hm">
+          <section class="panel bonus" id="bonus">
+            <h2 class="panel-title"><span class="icon icon-bonus">★</span> Bonus</h2>
+            <div class="panel-scroll wiki-block"><p>These are four tasks that need to be accomplished before Kormir and Shahai's cinematic:
+</p><ul><li>Talk to <a href="https://wiki.guildwars.com/wiki/Guard_Captain_Kahturin" rel="noopener" target="_blank" title="Guard Captain Kahturin">Guard Captain Kahturin</a> to obtain the prison code.</li>
+<li>Talk to <a href="https://wiki.guildwars.com/wiki/Captain_Nahnkos" rel="noopener" target="_blank" title="Captain Nahnkos">Captain Nahnkos</a> to escort <a class="mw-redirect" href="https://wiki.guildwars.com/wiki/Sunspear_Prisoners" rel="noopener" target="_blank" title="Sunspear Prisoners">Sunspear Prisoners</a>, who will assist in battles but are not required to survive.</li>
+<li>Trigger the Kourna Guards dialogue involving the <a href="https://wiki.guildwars.com/wiki/Demon_Spawn" rel="noopener" target="_blank" title="Demon Spawn">Demon Spawn</a>, either helping them or not will count as done.</li>
+<li>Talk to <a href="https://wiki.guildwars.com/wiki/Guard_Linko" rel="noopener" target="_blank" title="Guard Linko">Guard Linko</a> to take over gate duty. You don't need to watch them leave nor stay, just continue with the mission.</li></ul></div>
+          </section>
+          <section class="panel hard-mode" id="hard-mode">
+            <h2 class="panel-title"><span class="icon icon-hm">◆</span> Hard Mode</h2>
+            <div class="panel-scroll wiki-block"><p class='lede'>No dedicated Hard Mode section on the wiki — expect tougher foes and adjusted mechanics. See walkthrough notes.</p></div>
+          </section>
+        </div>
+
+        <div class="row-lower">
+          <section class="panel bosses" id="bosses">
+            <h2 class="panel-title"><span class="icon icon-boss">☠</span> Bosses &amp; Elites</h2>
+            <div class="panel-scroll"><div class='boss-grid'>
+<article class="boss-card">
+  <div class="boss-card-head"><a href="https://wiki.guildwars.com/wiki/Lieutenant_Nali" target="_blank" rel="noopener"><strong>Lieutenant Nali</strong></a></div>
+  <div class="boss-elite"><span class="elite-label">Elite:</span> <a class="elite-link" href="https://wiki.guildwars.com/wiki/Enchanter%27s_Conundrum" target="_blank" rel="noopener">Enchanter&#x27;s Conundrum</a></div>
+  <div class="boss-meta">24 (30)</div>
+</article>
+<article class="boss-card">
+  <div class="boss-card-head"><a href="https://wiki.guildwars.com/wiki/Captain_Nebo" target="_blank" rel="noopener"><strong>Captain Nebo</strong></a></div>
+  <div class="boss-elite"><span class="elite-label">Elite:</span> <a class="elite-link" href="https://wiki.guildwars.com/wiki/Master_of_Magic" target="_blank" rel="noopener">Master of Magic</a></div>
+  <div class="boss-meta">24 (30)</div>
+</article>
+<article class="boss-card">
+  <div class="boss-card-head"><a href="https://wiki.guildwars.com/wiki/Colonel_Kajo" target="_blank" rel="noopener"><strong>Colonel Kajo</strong></a></div>
+  <div class="boss-elite"><span class="elite-label">Elite:</span> <a class="elite-link" href="https://wiki.guildwars.com/wiki/Cautery_Signet" target="_blank" rel="noopener">Cautery Signet</a></div>
+  <div class="boss-meta">24 (30)</div>
+</article>
+</div></div>
+          </section>
+          <section class="panel other" id="other">
+            <h2 class="panel-title"><span class="icon icon-other">✦</span> Tips &amp; Notes</h2>
+            <div class="panel-scroll"><h3 style='font-size:0.8rem;color:var(--accent);margin:0.3rem 0;'>Skill recommendations</h3><div class='wiki-block'><ul><li>If your party has anyone that deals damage via <a href="https://wiki.guildwars.com/wiki/Attack" rel="noopener" target="_blank" title="Attack">attacks</a>, consider bringing skills that <a href="https://wiki.guildwars.com/wiki/Stance#Skills_countering_stances" rel="noopener" target="_blank" title="Stance">remove stances</a>, <a class="mw-redirect" href="https://wiki.guildwars.com/wiki/List_of_skills_which_bypass_blocking" rel="noopener" target="_blank" title="List of skills which bypass blocking">bypass blocking</a> or <a href="https://wiki.guildwars.com/wiki/List_of_blocking_punishment_skills" rel="noopener" target="_blank" title="List of blocking punishment skills">punish blocking</a> to use against the <a href="https://wiki.guildwars.com/wiki/Kournan_Bowman" rel="noopener" target="_blank" title="Kournan Bowman">Kournan Bowman</a>, who use <a href="https://wiki.guildwars.com/wiki/Whirling_Defense" rel="noopener" target="_blank" title="Whirling Defense">Whirling Defense</a>.</li>
+<li>The final elementalist boss is dangerous to the <a class="mw-redirect" href="https://wiki.guildwars.com/wiki/NPC" rel="noopener" target="_blank" title="NPC">NPCs</a> you must keep alive.
+<ul><li><a href="https://wiki.guildwars.com/wiki/Ward_Against_Harm" rel="noopener" target="_blank" title="Ward Against Harm">Ward Against Harm</a> and/or <a href="https://wiki.guildwars.com/wiki/Ward_Against_Elements" rel="noopener" target="_blank" title="Ward Against Elements">Ward Against Elements</a> help reduce the damage, until they move outside the wards. <a href="https://wiki.guildwars.com/wiki/Shelter" rel="noopener" target="_blank" title="Shelter">Shelter</a> and <a href="https://wiki.guildwars.com/wiki/Union" rel="noopener" target="_blank" title="Union">Union</a> will also help keep the NPCs alive</li>
+<li>Interrupts also help against the boss. Since Margrid is required for the mission, equip her with <a href="https://wiki.guildwars.com/wiki/Distracting_Shot" rel="noopener" target="_blank" title="Distracting Shot">Distracting Shot</a> and/or <a href="https://wiki.guildwars.com/wiki/Savage_Shot" rel="noopener" target="_blank" title="Savage Shot">Savage Shot</a> and lock her on the boss to help suppress damage.</li></ul></li>
+<li><a class="mw-redirect" href="https://wiki.guildwars.com/wiki/Enchantment" rel="noopener" target="_blank" title="Enchantment">Enchantment</a>-based <a href="https://wiki.guildwars.com/wiki/Build" rel="noopener" target="_blank" title="Build">builds</a> are vulnerable to enchantment removal by <a href="https://wiki.guildwars.com/wiki/Kournan_Oppressor" rel="noopener" target="_blank" title="Kournan Oppressor">Kournan Oppressors</a> and <a href="https://wiki.guildwars.com/wiki/Kournan_Seer" rel="noopener" target="_blank" title="Kournan Seer">Seers</a>.</li>
+<li><a href="https://wiki.guildwars.com/wiki/List_of_hex_removal_skills" rel="noopener" target="_blank" title="List of hex removal skills">Hex removal skills</a> could be unnecessary; the only <a href="https://wiki.guildwars.com/wiki/Hex_spell" rel="noopener" target="_blank" title="Hex spell">hex spells</a> your party will encounter are <a href="https://wiki.guildwars.com/wiki/Enchanter%27s_Conundrum" rel="noopener" target="_blank" title="Enchanter's Conundrum">Enchanter's Conundrum</a> (the hex that is applied has no impact if your party does not use enchantments) and <a href="https://wiki.guildwars.com/wiki/Life_Siphon" rel="noopener" target="_blank" title="Life Siphon">Life Siphon</a> (ends when its caster dies).</li></ul></div>
+<h3 style='font-size:0.8rem;color:var(--accent);margin:0.3rem 0;'>Notes</h3><div class='wiki-block'><ul><li>Kormir follows the <a href="https://wiki.guildwars.com/wiki/Party" rel="noopener" target="_blank" title="Party">party</a> leader, never <a class="mw-redirect" href="https://wiki.guildwars.com/wiki/Attacks" rel="noopener" target="_blank" title="Attacks">attacks</a> and rarely uses <a href="https://wiki.guildwars.com/wiki/Skill" rel="noopener" target="_blank" title="Skill">skills</a> except for <a href="https://wiki.guildwars.com/wiki/%22Incoming!%22" rel="noopener" target="_blank" title='"Incoming!"'>"Incoming!"</a>. Foes cannot <a href="https://wiki.guildwars.com/wiki/Target" rel="noopener" target="_blank" title="Target">target</a> her but she does take damage from <a href="https://wiki.guildwars.com/wiki/Area_of_effect" rel="noopener" target="_blank" title="Area of effect">area of effect</a> skills.</li>
+<li>Occasionally, Kormir and/or Shahai may get stuck in the prison around the bridge. Make sure they are following as they are required to reach the docks to complete the mission.</li>
+<li>Before entering the fortress gate, you can explore the <a href="https://wiki.guildwars.com/wiki/Gandara,_the_Moon_Fortress" rel="noopener" target="_blank" title="Gandara, the Moon Fortress">Gandara, the Moon Fortress</a> area, which is completely free of foes.</li>
+<li>There is a dialogue sequence between a <a href="https://wiki.guildwars.com/wiki/Kournan_Guard" rel="noopener" target="_blank" title="Kournan Guard">Kournan Guard</a> and a <a href="https://wiki.guildwars.com/wiki/Kournan_Captain" rel="noopener" target="_blank" title="Kournan Captain">Kournan Captain</a> that seems to be reversed, that is, the Guard speaks the Captain's lines, and the Captain, the Guard's.</li>
+<li>Using your keyboard to move around during the end mission cinematic will contribute about 0.1% to the <a class="mw-redirect" href="https://wiki.guildwars.com/wiki/Elonian_Cartographer" rel="noopener" target="_blank" title="Elonian Cartographer">Elonian Cartographer</a> title.</li>
+<li>After completing this mission, your party will be taken to <a href="https://wiki.guildwars.com/wiki/Moddok_Crevice_(outpost)" rel="noopener" target="_blank" title="Moddok Crevice (outpost)">Moddok Crevice</a>.</li>
+<li>Completion of this mission will fill in page #5 in the <a href="https://wiki.guildwars.com/wiki/Night_Falls" rel="noopener" target="_blank" title="Night Falls">Night Falls</a> <a href="https://wiki.guildwars.com/wiki/Storybook" rel="noopener" target="_blank" title="Storybook">storybook</a>.</li></ul><div style="margin: 1em; border: solid silver; border-width: 1px 0px; padding: 2px 1em 2px 5em;"><strong class="hiddenlinks" style="position: absolute; margin-left: -4.8em; color: #900;"><a class="image" href="https://wiki.guildwars.com/wiki/File:Bug.png" rel="noopener" target="_blank" title="Bug"><img alt="Bug" data-file-height="32" data-file-width="32" decoding="async" height="18" loading="lazy" src="https://wiki.guildwars.com/images/thumb/7/7d/Bug.png/18px-Bug.png" srcset="/images/thumb/7/7d/Bug.png/27px-Bug.png 1.5x, /images/7/7d/Bug.png 2x" width="18"/></a> <a href="https://wiki.guildwars.com/wiki/Bug" rel="noopener" target="_blank" title="Bug">Bug</a>.</strong> Sometimes Guard Linko will not show up. In that case you will have to re-do the mission for the bonus.</div><div style="margin: 1em; border: solid silver; border-width: 1px 0px; padding: 2px 1em 2px 5em;"><strong class="hiddenlinks" style="position: absolute; margin-left: -4.8em; color: #900;"><a class="image" href="https://wiki.guildwars.com/wiki/File:Bug.png" rel="noopener" target="_blank" title="Bug"><img alt="Bug" data-file-height="32" data-file-width="32" decoding="async" height="18" loading="lazy" src="https://wiki.guildwars.com/images/thumb/7/7d/Bug.png/18px-Bug.png" srcset="/images/thumb/7/7d/Bug.png/27px-Bug.png 1.5x, /images/7/7d/Bug.png 2x" width="18"/></a> <a href="https://wiki.guildwars.com/wiki/Bug" rel="noopener" target="_blank" title="Bug">Bug</a>.</strong> Mercenary Heroes will always transform into a male Kournan soldier even if they are female.</div><div style="margin: 1em; border: solid silver; border-width: 1px 0px; padding: 2px 1em 2px 5em;"><strong class="hiddenlinks" style="position: absolute; margin-left: -4.8em; color: #900;"><a class="image" href="https://wiki.guildwars.com/wiki/File:Bug.png" rel="noopener" target="_blank" title="Bug"><img alt="Bug" data-file-height="32" data-file-width="32" decoding="async" height="18" loading="lazy" src="https://wiki.guildwars.com/images/thumb/7/7d/Bug.png/18px-Bug.png" srcset="/images/thumb/7/7d/Bug.png/27px-Bug.png 1.5x, /images/7/7d/Bug.png 2x" width="18"/></a> <a href="https://wiki.guildwars.com/wiki/Bug" rel="noopener" target="_blank" title="Bug">Bug</a>.</strong> For some characters the map will not be uncovered during the cinematic, even after moving using the keyboard.</div><div style="margin: 1em; border: solid silver; border-width: 1px 0px; padding: 2px 1em 2px 5em;"><strong class="hiddenlinks" style="position: absolute; margin-left: -4.8em; color: #900;"><a class="image" href="https://wiki.guildwars.com/wiki/File:Bug.png" rel="noopener" target="_blank" title="Bug"><img alt="Bug" data-file-height="32" data-file-width="32" decoding="async" height="18" loading="lazy" src="https://wiki.guildwars.com/images/thumb/7/7d/Bug.png/18px-Bug.png" srcset="/images/thumb/7/7d/Bug.png/27px-Bug.png 1.5x, /images/7/7d/Bug.png 2x" width="18"/></a> <a href="https://wiki.guildwars.com/wiki/Bug" rel="noopener" target="_blank" title="Bug">Bug</a>.</strong> Sometimes the mission will fail when encountering the last group of enemies even without Kormir / Shahai dying and with time still available.</div><div style="margin: 1em; border: solid silver; border-width: 1px 0px; padding: 2px 1em 2px 5em;"><strong class="hiddenlinks" style="position: absolute; margin-left: -4.8em; color: #900;"><a class="image" href="https://wiki.guildwars.com/wiki/File:Bug.png" rel="noopener" target="_blank" title="Bug"><img alt="Bug" data-file-height="32" data-file-width="32" decoding="async" height="18" loading="lazy" src="https://wiki.guildwars.com/images/thumb/7/7d/Bug.png/18px-Bug.png" srcset="/images/thumb/7/7d/Bug.png/27px-Bug.png 1.5x, /images/7/7d/Bug.png 2x" width="18"/></a> <a href="https://wiki.guildwars.com/wiki/Bug" rel="noopener" target="_blank" title="Bug">Bug</a>.</strong> Of the two groups that have to be killed to free Kormir, the northern one will sometimes spawn inside of a prison cell, out of reach of melee attacks for both them and players.</div></div></div>
+          </section>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="lightbox" id="lightbox" role="dialog" aria-label="Enlarged map">
+    <img src="../maps/nightfall_07_Pogahn_Passage_map.jpg" alt="Pogahn Passage mission map (enlarged)" />
+  </div>
+  <script>
+    (function () {
+      var open = document.getElementById("mapOpen");
+      var box = document.getElementById("lightbox");
+      if (!open || !box) return;
+      open.addEventListener("click", function () { box.classList.add("open"); });
+      box.addEventListener("click", function () { box.classList.remove("open"); });
+      document.addEventListener("keydown", function (e) {
+        if (e.key === "Escape") box.classList.remove("open");
+      });
+    })();
+  </script>
+
+</body>
+</html>

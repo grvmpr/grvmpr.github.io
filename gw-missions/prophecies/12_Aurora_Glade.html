@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Aurora Glade</title>
+  <style>
+:root {
+  --bg-deep: #070a0f;
+  --bg-panel: #101820;
+  --bg-panel-2: #15202c;
+  --border: #243044;
+  --border-glow: #2a4a6a;
+  --text: #dce6f0;
+  --text-muted: #8a9bb0;
+  --text-dim: #5c6f86;
+  --accent: #3ecfff;
+  --accent-soft: rgba(62, 207, 255, 0.12);
+  --gold: #e8c56a;
+  --gold-soft: rgba(232, 197, 106, 0.12);
+  --bonus: #7dffb3;
+  --bonus-soft: rgba(125, 255, 179, 0.1);
+  --danger: #ff6b6b;
+  --danger-soft: rgba(255, 107, 107, 0.1);
+  --hm: #c78bff;
+  --hm-soft: rgba(199, 139, 255, 0.12);
+  --radius: 10px;
+  --font: "Segoe UI", system-ui, -apple-system, sans-serif;
+  --chrome-h: 3.1rem;
+  --gap: 0.5rem;
+  --pad: 0.7rem;
+  /* Readable on 4K vertical (~2160×3840) */
+  --walk-size: clamp(1.05rem, 0.55vw + 0.55vh, 1.35rem);
+  --bonus-size: clamp(1.05rem, 0.55vw + 0.55vh, 1.35rem);
+  --body-size: clamp(0.95rem, 0.4vw + 0.4vh, 1.1rem);
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html {
+  scroll-behavior: smooth;
+  font-size: clamp(16px, 0.55vw + 0.45vh, 20px);
+  height: 100%;
+  scroll-padding-top: calc(var(--chrome-h) + 0.5rem);
+}
+body {
+  font-family: var(--font);
+  background: var(--bg-deep);
+  color: var(--text);
+  line-height: 1.45;
+  min-height: 100%;
+  height: 100%;
+  overflow: hidden;
+  background-image: radial-gradient(ellipse 70% 25% at 50% 0%, rgba(42, 100, 160, 0.14), transparent);
+}
+a { color: var(--accent); text-decoration: none; }
+a:hover { color: #7de0ff; text-decoration: underline; }
+.app {
+  display: grid;
+  grid-template-rows: var(--chrome-h) 1fr;
+  height: 100vh; height: 100dvh;
+  max-height: 100vh; max-height: 100dvh;
+}
+.top-chrome {
+  display: flex; align-items: center; gap: 0.65rem;
+  padding: 0 0.7rem;
+  background: rgba(8, 12, 18, 0.97);
+  border-bottom: 1px solid var(--border);
+  z-index: 100; min-height: var(--chrome-h);
+}
+.brand { display: flex; align-items: baseline; gap: 0.55rem; min-width: 0; flex-shrink: 0; }
+.brand-mission {
+  font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase;
+  color: var(--accent); font-weight: 700; white-space: nowrap;
+}
+.brand-name {
+  font-size: 1.1rem; font-weight: 750; color: var(--text);
+  white-space: nowrap; letter-spacing: -0.02em;
+}
+.brand-meta { font-size: 0.75rem; color: var(--text-dim); white-space: nowrap; }
+.chip-nav {
+  display: flex; flex: 1; gap: 0.3rem; overflow-x: auto;
+  scrollbar-width: none; min-width: 0; justify-content: center;
+}
+.chip-nav::-webkit-scrollbar { display: none; }
+.chip-nav a {
+  flex: 0 0 auto; padding: 0.3rem 0.65rem; border-radius: 999px;
+  font-size: 0.78rem; font-weight: 600; color: var(--text-muted);
+  background: var(--bg-panel); border: 1px solid var(--border);
+  text-decoration: none; white-space: nowrap;
+}
+.chip-nav a:hover {
+  color: var(--text); border-color: var(--border-glow);
+  background: #1a2836; text-decoration: none;
+}
+.chip-nav a[href="#map"] { color: var(--accent); border-color: rgba(62, 207, 255, 0.35); }
+.chip-nav a[href="#bonus"] { color: var(--bonus); border-color: rgba(125, 255, 179, 0.3); }
+.chip-nav a[href="#hard-mode"] { color: var(--hm); border-color: rgba(199, 139, 255, 0.3); }
+.chip-nav a[href="#bosses"] { color: #ff9a9a; border-color: rgba(255, 107, 107, 0.3); }
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 0.3rem;
+  padding: 0.42rem 0.85rem; border-radius: 8px; font-weight: 650; font-size: 0.8rem;
+  border: none; cursor: pointer; text-decoration: none; white-space: nowrap; flex-shrink: 0;
+}
+.btn:hover { text-decoration: none; }
+.btn-next {
+  background: linear-gradient(135deg, #1a6a9a, #1ab0e0); color: #fff;
+  box-shadow: 0 2px 12px rgba(26, 140, 200, 0.35);
+}
+.btn-next:hover { color: #fff; filter: brightness(1.08); }
+.btn-wiki, .btn-idx, .btn-prev {
+  background: var(--bg-panel); color: var(--text-muted);
+  border: 1px solid var(--border); padding: 0.42rem 0.65rem;
+}
+.btn-wiki:hover, .btn-idx:hover, .btn-prev:hover {
+  color: var(--accent); border-color: var(--border-glow);
+}
+.chrome-actions { display: flex; gap: 0.35rem; flex-shrink: 0; }
+
+/* Map-dominant workspace */
+.workspace {
+  display: grid;
+  grid-template-columns: minmax(480px, 1.15fr) minmax(0, 1fr);
+  grid-template-rows: 1fr;
+  gap: var(--gap); padding: var(--gap);
+  min-height: 0; height: 100%; overflow: hidden;
+}
+.col-map {
+  display: grid;
+  grid-template-rows: 1fr auto;
+  gap: var(--gap);
+  min-height: 0; min-width: 0;
+}
+.col-main {
+  display: grid;
+  /* objectives compact | walkthrough HUGE | bonus+hm | bosses+tips */
+  grid-template-rows: auto minmax(0, 1.6fr) minmax(0, 1.05fr) minmax(0, 0.75fr);
+  gap: var(--gap); min-height: 0; min-width: 0; overflow: hidden;
+}
+.row-obj { min-height: 0; }
+.row-bonus-hm {
+  display: grid; grid-template-columns: 1.15fr 0.85fr; gap: var(--gap); min-height: 0;
+}
+.row-lower {
+  display: grid; grid-template-columns: 1.15fr 0.85fr; gap: var(--gap); min-height: 0;
+}
+.panel {
+  background: var(--bg-panel); border: 1px solid var(--border); border-radius: var(--radius);
+  padding: var(--pad); display: flex; flex-direction: column; min-height: 0; overflow: hidden;
+}
+.panel-scroll {
+  overflow-y: auto; overflow-x: hidden; min-height: 0; flex: 1; padding-right: 0.3rem;
+  scrollbar-width: thin; scrollbar-color: var(--border) transparent;
+  font-size: var(--body-size);
+}
+.panel-scroll::-webkit-scrollbar { width: 8px; }
+.panel-scroll::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+.panel-title {
+  display: flex; align-items: center; gap: 0.4rem;
+  font-size: 0.82rem; font-weight: 750; letter-spacing: 0.05em; text-transform: uppercase;
+  color: var(--text); margin-bottom: 0.45rem; padding-bottom: 0.35rem;
+  border-bottom: 1px solid var(--border); flex-shrink: 0;
+}
+.panel-title .icon {
+  width: 1.3rem; height: 1.3rem; border-radius: 5px;
+  display: inline-flex; align-items: center; justify-content: center; font-size: 0.75rem;
+}
+.panel.map-panel {
+  border-color: var(--border-glow);
+  background: linear-gradient(180deg, #0e1620 0%, var(--bg-panel) 100%);
+  /* Map takes almost all left column */
+  min-height: 0;
+}
+.panel.objectives { border-top: 2px solid var(--accent); }
+.panel.walkthrough { border-top: 3px solid #5eb8e8; }
+.panel.bonus { border-top: 3px solid var(--bonus); }
+.panel.hard-mode { border-top: 2px solid var(--hm); }
+.panel.bosses { border-top: 2px solid var(--danger); }
+.panel.other { border-top: 2px solid var(--text-muted); }
+
+/* Emphasized reading panels */
+.panel.walkthrough .panel-scroll,
+.panel.walkthrough .wiki-block {
+  font-size: var(--walk-size) !important;
+  line-height: 1.55;
+}
+.panel.bonus .panel-scroll,
+.panel.bonus .wiki-block {
+  font-size: var(--bonus-size) !important;
+  line-height: 1.55;
+}
+.panel.walkthrough .panel-scroll li,
+.panel.bonus .panel-scroll li {
+  margin-bottom: 0.45rem;
+}
+.panel.walkthrough .panel-scroll p,
+.panel.bonus .panel-scroll p {
+  margin-bottom: 0.55rem;
+}
+
+.icon-map { background: var(--accent-soft); color: var(--accent); }
+.icon-obj { background: var(--accent-soft); color: var(--accent); }
+.icon-walk { background: rgba(94, 184, 232, 0.15); color: #5eb8e8; }
+.icon-bonus { background: var(--bonus-soft); color: var(--bonus); }
+.icon-hm { background: var(--hm-soft); color: var(--hm); }
+.icon-boss { background: var(--danger-soft); color: var(--danger); }
+.icon-other { background: rgba(138, 155, 176, 0.15); color: var(--text-muted); }
+
+.map-wrap {
+  flex: 1; min-height: 0; display: flex; flex-direction: column;
+  align-items: center; justify-content: center; gap: 0.4rem;
+}
+.map-frame {
+  flex: 1; min-height: 0; width: 100%;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: 10px; overflow: hidden;
+  border: 2px solid var(--border-glow);
+  box-shadow: 0 0 0 1px rgba(62, 207, 255, 0.1), 0 12px 40px rgba(0, 0, 0, 0.45);
+  background: #05080c; cursor: zoom-in;
+}
+.map-frame img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  image-rendering: auto;
+}
+.map-caption { font-size: 0.72rem; color: var(--text-dim); flex-shrink: 0; }
+.map-missing {
+  color: var(--text-dim); font-size: 1rem; text-align: center; padding: 2rem;
+}
+
+.wiki-block ul, .panel-scroll ul,
+.wiki-block ol, .panel-scroll ol { padding-left: 1.2rem; margin: 0.3rem 0 0.5rem; }
+.wiki-block li, .panel-scroll li { margin-bottom: 0.32rem; }
+.wiki-block p, .panel-scroll p { margin-bottom: 0.45rem; }
+.wiki-block img, .panel-scroll img { vertical-align: middle; max-height: 1.35em; width: auto; }
+.wiki-block table, .panel-scroll table {
+  width: 100%; border-collapse: collapse; font-size: 0.9em; margin: 0.4rem 0;
+}
+.wiki-block th, .wiki-block td, .panel-scroll th, .panel-scroll td {
+  border: 1px solid var(--border); padding: 0.3rem 0.45rem; text-align: left;
+}
+.lede { font-size: 0.92rem; color: var(--text-muted); margin-bottom: 0.35rem; }
+
+/* Collapsed summary */
+details.summary-details {
+  background: var(--bg-panel);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  border-top: 2px solid var(--gold);
+  padding: 0.35rem 0.65rem;
+  flex-shrink: 0;
+}
+details.summary-details summary {
+  cursor: pointer;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--gold);
+  padding: 0.35rem 0;
+  list-style: none;
+}
+details.summary-details summary::-webkit-details-marker { display: none; }
+details.summary-details summary::before {
+  content: "▸ ";
+  color: var(--text-dim);
+}
+details.summary-details[open] summary::before { content: "▾ "; }
+details.summary-details .summary-body {
+  padding: 0.35rem 0 0.55rem;
+  font-size: 0.88rem;
+  color: var(--text-muted);
+  max-height: 18vh;
+  overflow-y: auto;
+}
+
+.boss-note { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.4rem; }
+.boss-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.4rem; }
+.boss-card {
+  background: var(--bg-panel-2); border: 1px solid var(--border);
+  border-radius: 8px; padding: 0.5rem 0.6rem;
+}
+.boss-card-head { font-size: 0.95rem; margin-bottom: 0.2rem; }
+.boss-card-head a { color: #eef6fc; font-weight: 700; }
+.boss-card-head a:hover { color: var(--accent); }
+.boss-elite { font-size: 0.88rem; }
+.elite-label { color: var(--gold); font-weight: 650; margin-right: 0.25rem; }
+.elite-link { color: #ffd78a; font-weight: 650; }
+.elite-link:hover { color: #ffe9b5; }
+.elite-none { color: var(--text-dim); font-style: italic; font-size: 0.85rem; }
+.boss-meta { font-size: 0.78rem; color: var(--text-dim); margin-top: 0.15rem; }
+
+.callout {
+  margin-top: 0.4rem; padding: 0.45rem 0.6rem; border-radius: 6px;
+  font-size: 0.88rem; border-left: 3px solid; line-height: 1.4;
+}
+.callout.tip { background: var(--accent-soft); border-color: var(--accent); color: #b8eaff; }
+.callout.warn { background: var(--danger-soft); border-color: var(--danger); color: #ffb4b4; }
+
+.lightbox {
+  display: none; position: fixed; inset: 0; z-index: 1000; background: rgba(0,0,0,0.94);
+  align-items: center; justify-content: center; padding: 1.5rem; cursor: zoom-out;
+}
+.lightbox.open { display: flex; }
+.lightbox img {
+  max-width: 96vw; max-height: 96vh; border-radius: 8px;
+  border: 2px solid var(--border-glow); object-fit: contain;
+}
+
+@media (min-height: 2400px) {
+  :root {
+    --walk-size: clamp(1.15rem, 0.7vh + 0.3vw, 1.5rem);
+    --bonus-size: clamp(1.15rem, 0.7vh + 0.3vw, 1.5rem);
+    --gap: 0.65rem;
+    --pad: 0.85rem;
+  }
+  .workspace { grid-template-columns: minmax(560px, 1.2fr) minmax(0, 1fr); }
+}
+@media (min-width: 1800px) and (min-height: 2000px) {
+  .workspace { grid-template-columns: minmax(600px, 1.25fr) minmax(0, 1fr); }
+}
+@media (max-height: 1100px) {
+  body { overflow: auto; height: auto; }
+  .app { height: auto; max-height: none; min-height: 100vh; }
+  .workspace {
+    height: auto; overflow: visible; grid-template-columns: 1fr; grid-template-rows: auto;
+  }
+  .col-map { grid-template-rows: auto; }
+  .col-main { overflow: visible; grid-template-rows: auto; }
+  .row-bonus-hm, .row-lower { grid-template-columns: 1fr; }
+  .panel { max-height: none; overflow: visible; }
+  .panel-scroll { overflow: visible; }
+  .map-frame { min-height: 360px; max-height: 55vh; }
+}
+
+    :root { --accent: #3ecfff; --accent-soft: #3ecfff22; }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header class="top-chrome">
+      <div class="brand">
+        <span class="brand-mission">M12</span>
+        <span class="brand-name">Aurora Glade</span>
+        <span class="brand-meta">Prophecies · Maguuma Jungle · Cooperative · Medium</span>
+      </div>
+      <nav class="chip-nav" aria-label="Sections">
+        <a href="#map">Map</a>
+        <a href="#walkthrough">Walkthrough</a>
+        <a href="#bonus">Bonus</a>
+        <a href="#objectives">Objectives</a>
+        <a href="#hard-mode">Hard Mode</a>
+        <a href="#bosses">Bosses</a>
+        <a href="#other">Tips</a>
+      </nav>
+      <div class="chrome-actions">
+        <a class="btn btn-idx" href="../prohecies.html">Index</a>
+        <a class="btn btn-prev" href="11_Bloodstone_Fen.html">← Prev</a>
+        <a class="btn btn-wiki" href="https://wiki.guildwars.com/wiki/Aurora_Glade" target="_blank" rel="noopener">Wiki ↗</a>
+        <a class="btn btn-next" href="13_Riverside_Province.html">Next: Riverside Province →</a>
+      </div>
+    </header>
+
+    <div class="workspace">
+      <div class="col-map">
+        <section class="panel map-panel" id="map">
+          <h2 class="panel-title"><span class="icon icon-map">◉</span> Mission Map</h2>
+          <div class="map-wrap">
+            <div class="map-frame" id="mapOpen" title="Click to enlarge">
+              <img src="../maps/prophecies_12_Aurora_Glade_map.jpg" alt="Aurora Glade mission map" />
+            </div>
+            <p class="map-caption">Click to enlarge · Local cache · <a href="https://wiki.guildwars.com/wiki/Aurora_Glade" target="_blank" rel="noopener">Wiki</a></p>
+        </div>
+        </section>
+
+        <details class="summary-details" id="summary">
+          <summary>Summary (click to expand)</summary>
+          <div class="summary-body">
+            <p>The Shining Blade &#x27;s plan to reassemble the portal to the Henge of Denravi has been betrayed to the White Mantle , who have been slaughtering all who stand in their way as they try to claim it. Should the Shining Blade succeed, they will gain a new, hidden base of operations to strike back at the Mantle. Fail, and not only will the Henge be lost to the Shining Blade, but their resistance movement will collapse as well.</p>
+            <p style="margin-top:0.4rem;"><strong>Region:</strong> Maguuma Jungle · <strong>Mission:</strong> 12 of 25 · <strong>Type:</strong> Cooperative</p>
+            <p style="margin-top:0.35rem;"><a href="https://wiki.guildwars.com/wiki/Aurora_Glade" target="_blank" rel="noopener">Full wiki article ↗</a></p>
+          </div>
+        </details>
+      </div>
+
+      <div class="col-main">
+        <section class="panel objectives row-obj" id="objectives">
+          <h2 class="panel-title"><span class="icon icon-obj">✓</span> Objectives</h2>
+          <div class="panel-scroll wiki-block"><p>Gain access to the <a href="https://wiki.guildwars.com/wiki/Henge_of_Denravi" rel="noopener" target="_blank" title="Henge of Denravi">Henge of Denravi</a>.
+</p><ul><li>Get to the <a href="https://wiki.guildwars.com/wiki/Henge_Portal" rel="noopener" target="_blank" title="Henge Portal">Henge Portal</a>.</li>
+<li>Attune the Henge Portal before the White Mantle do.</li>
+<li>ADDED: Attune the <a href="https://wiki.guildwars.com/wiki/Thorn_Pedestal" rel="noopener" target="_blank" title="Thorn Pedestal">thorn pedestal</a> to clear the vine gate.</li>
+<li>ADDED: Attune both thorn pedestals to clear the vine gate.</li>
+<li>ADDED: Kill the <a href="https://wiki.guildwars.com/wiki/Henge_Guardian" rel="noopener" target="_blank" title="Henge Guardian">Henge Guardian</a>.</li>
+<li>*BONUS* Assassinate the <a href="https://wiki.guildwars.com/wiki/Demagogue" rel="noopener" target="_blank" title="Demagogue">Demagogue</a>.</li></ul></div>
+        </section>
+
+        <section class="panel walkthrough" id="walkthrough">
+          <h2 class="panel-title"><span class="icon icon-walk">→</span> Walkthrough</h2>
+          <div class="panel-scroll wiki-block"><p>The first part of this mission is typical: hack and slash through the usual Maguuma Jungle foes and bosses. Things change drastically when you reach the Druids.
+</p><p>The goal of the mission is to attune a set of three thorn pedestals simultaneously, while preventing the White Mantle from doing the same thing. Attuning the set clears the Vine Gate, giving your party access to the Henge Guardian; defeating it completes the mission.
+</p><p>There are two types of pedestals: 
+</p><ul><li><i>Spawn-pedestals</i> are attended by a single Druid. Talk to the Druid once to enable the pedestal to produce crystals; click on the pedestal to get a crystal. That pedestal will not produce a crystal until the currently-carried one is dropped or used.</li>
+<li><i>Attunement-pedestals</i> are empty until your party or the Mantle add a crystal; they also have a beam of light pointing upwards. The light is <i>white</i> when the pedestal is empty; it changes to <i>blue</i> when your team claims it; and it becomes <i>red</i> when the Mantle attune it.</li></ul><p>If you drop a crystal, it will break and you must grab a new one (and you will drop it anytime you switch weapons or shadowstep). As with any bundle, while carrying crystals, you do not gain the benefit of any of your weapon mods. 
+</p><p>When you attune the southernmost pedestal, it opens a vine-gate allowing you to proceed northward.  (The Mantle do not attempt to attune this pedestal.) After following the path, you will find <a href="https://wiki.guildwars.com/wiki/Less_Longbow" rel="noopener" target="_blank" title="Less Longbow">Less Longbow</a>: dispose of his attackers and talk to him to unlock the Bonus.
+</p><p>East of Less is another area with three thorn-pedestals. One is a spawn-pedestal, one attunement-pedestal has already been claimed by the Mantle, and the third will be unclaimed. There are several ways to proceed at this point. Generally, you want to defeat the two groups of Mantle (including a Boss), visit the spawn-pedestal, talk to the Druid, grab a crystal, claim the right attunement-pedestal and eventually claim the leftmost pedestal, which opens another vine-gate at the eastern end of the area.
+</p><p>Once this gate opens, the race is on between your team and the White Mantle to claim the three pedestals in the large area to the East. Get another crystal, attune the left pedestal. Be prepared to rush to the Mantle's spawn-pedestal just beyond the gate. 
+</p><h3><span class="mw-headline" id="Method_1:_Kill_all_the_Mantle_at_the_left_shrine">Method 1: Kill all the Mantle at the left shrine</span></h3><p>This works with a single player. Pick up a crystal and go to the left-most (east) pedestal; you should arrive as the Mantle are leaving. Attune the pedestal, then flag your party around it. As the Mantle return to reclaim this pedestal first, grab another crystal, and then go to the pedestal at the far right (south-west) side. Alternate between claiming the left and right pedestals, as the Mantle will usually succeed in capturing your AI-held pedestal; however, if you have a good team, you might return from capturing the right-hand pedestal to find that your party has prevented the Mantle from recapturing their original pedestal. Each time the Mantle return to the left pedestal your party will kill the runner's escort. Eventually the only Mantle left will be the runner. You will know this when you no longer see your party taking damage. (Be careful not to capture all of the pedestals at once!) Rejoin your party and kill the runner. Kill the Demagogue and claim any remaining pedestals.
+</p><p>Remember that killing the runner gives the Mantle an advantage: a living runner will have to return to grab a crystal, while reinforcement runners spawn near their team's crystal-supply pedestal. It also means that you might have to confront two teams of Mantle (the original escorts and the new runner's team).
+</p><p>Your build should include a <a class="mw-redirect" href="https://wiki.guildwars.com/wiki/Speed_Boost" rel="noopener" target="_blank" title="Speed Boost">Speed Boost</a> (or you could use a <a href="https://wiki.guildwars.com/wiki/Birthday_Cupcake" rel="noopener" target="_blank" title="Birthday Cupcake">Birthday Cupcake</a> or <a class="mw-redirect" href="https://wiki.guildwars.com/wiki/Rock_Candy" rel="noopener" target="_blank" title="Rock Candy">Rock Candy</a>) for the first part and one of the following: a <a href="https://wiki.guildwars.com/wiki/Snare_(tactic)" rel="noopener" target="_blank" title="Snare (tactic)">Snare</a>, <a href="https://wiki.guildwars.com/wiki/Crippled" rel="noopener" target="_blank" title="Crippled">crippling skill</a> or a <a href="https://wiki.guildwars.com/wiki/Spike" rel="noopener" target="_blank" title="Spike">Spike</a> for dealing with the White Knight runner. <a href="https://wiki.guildwars.com/wiki/Signet_of_Spirits" rel="noopener" target="_blank" title="Signet of Spirits">Signet of Spirits</a> is an ideal choice, since it distracts your opponents while doing noticeable damage.
+</p><p>If using <a href="https://wiki.guildwars.com/wiki/Hero" rel="noopener" target="_blank" title="Hero">heroes</a> and/or <a href="https://wiki.guildwars.com/wiki/Henchman" rel="noopener" target="_blank" title="Henchman">henchmen</a>, position their flags such that they are, behind the left-most pedestal (towards the Druid) but still in range of it; this way the number of White Mantle encountered at once will not overwhelm them (especially true in Hard mode). After the heroes/henchmen fight off the first wave, spread their flags out.
+</p><p>A frequently successful variation is to attune the bottom (west) pedestal (closest to the crystal spawn point) and the pedestal at the far right (south-west) side alternately while having the party flagged slightly west of the center. Alternatively, particularly in Hard Mode when the runner moves faster, you could flag your party in Guard mode along the runner's return route from the left (east) pedestal in order to <a href="https://wiki.guildwars.com/wiki/Body_block" rel="noopener" target="_blank" title="Body block">body block</a> them without killing them, and give you more time to capture the remaining pedestals.
+</p><h3><span class="mw-headline" id="Method_2:_Running_the_crystals">Method 2: Running the crystals</span></h3><p>This approach needs at least two human players in the party, with three players being preferred. Using this method, you can complete this objective without engaging the White Mantle contingent at all (excepting the Demagogue for the bonus). Simply run a crystal to each of the three pedestals. You should have some <a href="https://wiki.guildwars.com/wiki/Speed_boost" rel="noopener" target="_blank" title="Speed boost">speed boosts</a> in your skillbar to allow you to outrun the White Mantle teams; each time they claim a pedestal, another team immediately heads out to claim the next. 
+</p><p>Just remember to keep at least one pedestal claimed to avoid failing the mission.
+</p><p>You should have two or three players standing by the druid and the crystals. One player should pick up a crystal and run to the nearest thorn pedestal. As soon as it is set in place, a new crystal will spawn, which the second player should grab and head to the next pedestal. If you only have two runners, the first runner should return to the crystal spawn point while the second runner is out. Either way, once the crystal spawns again, repeat the process. If this is coordinated properly, you should have no trouble at all.
+</p><p>To make sure the White Mantle do not capture any pedestals, you can station the balance of your party (including any heroes/henchmen) at the chokepoint in the center pathway.
+</p><p>Note that this method can be used, with slight modification, to easily gain mission and bonus.  Have two people run crystals, the second waiting by the crystal spawn point to pick it up the moment the other has attuned a pedestal.  It is important that these two do not attune the last pedestal until the bonus is gained.  A third person, or the rest of the party, kills the Demagogue.  This can easily be done by following the south wall, you should not need to kill any White Mantle other than him if you take this path.  Now the most important part: do not <a href="https://wiki.guildwars.com/wiki/Aggro" rel="noopener" target="_blank" title="Aggro">aggro</a> the White Mantle runners.  Two non-buffed runners can easily keep the portals attuned without hindering the White Mantle.  If a third human player is not present, then this method can be done using only two.  The Demagogue slayer (with the bulk of the team) retraces steps and becomes the second runner after the bonus has been gained.
+</p><p>It can be accomplished with a single 33% speed-boosted runner while the bulk of the team circles counter clockwise, keeping right arm against the outer wall, to kill the Damagogue.  Do not engage or aggro any of the other White Mantle.  The runner attunes the nearby shrine, then the team grabs the next crystal and attunes the far right shrine on its way around.  The Runner then attunes the left shrine, comes back, and attunes whatever shrine has been recaptured.  It is unlikely but possible the runner can outrace the team killing the Demogogue, make sure not to cap the last shrine until the bonus is complete.
+</p><h3><span class="mw-headline" id="Alternatively:_Push_The_White_Mantle_Garrison">Alternatively: Push The White Mantle Garrison</span></h3><p>Proceed to the White Mantle garrison (where the <a href="https://wiki.guildwars.com/wiki/Demagogue" rel="noopener" target="_blank" title="Demagogue">Demagogue</a> is located) directly Southeast off the main entrance of the <a href="https://wiki.guildwars.com/wiki/Henge_Portal" rel="noopener" target="_blank" title="Henge Portal">Henge Portal</a> - Defeat the whole White Mantle army coming from the garrison, then proceed with the <a href="https://wiki.guildwars.com/wiki/Thorn_Pedestal" rel="noopener" target="_blank" title="Thorn Pedestal">Thorn Pedestal</a> and attune the <a href="https://wiki.guildwars.com/wiki/Henge_Portal" rel="noopener" target="_blank" title="Henge Portal">Henge Portal</a> with no White Mantle taking the <a href="https://wiki.guildwars.com/wiki/Rune_Crystal" rel="noopener" target="_blank" title="Rune Crystal">Rune Crystal</a> from you. (It is a bonus objective as well which is a plus) 
+</p><div style="margin: 1em; border: solid silver; border-width: 1px 0px; padding: 2px 1em 2px 7.5em;"><strong class="hiddenlinks" style="position: absolute; margin-left: -7.3em; color: #900;"><a class="image" href="https://wiki.guildwars.com/wiki/File:Anomaly.png" rel="noopener" target="_blank" title="Anomaly"><img alt="Anomaly" data-file-height="32" data-file-width="32" decoding="async" height="18" loading="lazy" src="https://wiki.guildwars.com/images/thumb/a/a6/Anomaly.png/18px-Anomaly.png" srcset="/images/thumb/a/a6/Anomaly.png/27px-Anomaly.png 1.5x, /images/a/a6/Anomaly.png 2x" width="18"/></a> <a class="mw-redirect" href="https://wiki.guildwars.com/wiki/Anomaly" rel="noopener" target="_blank" title="Anomaly">Anomaly</a>.</strong><a href="https://wiki.guildwars.com/wiki/Summoned_creature" rel="noopener" target="_blank" title="Summoned creature">Summoned creatures</a> will not be <a href="https://wiki.guildwars.com/wiki/Teleport" rel="noopener" target="_blank" title="Teleport">teleported</a> with the party. Allies from <a href="https://wiki.guildwars.com/wiki/Summoning_stone" rel="noopener" target="_blank" title="Summoning stone">summoning stones</a> will remain alive and cannot be re-summoned in the next area.</div><h3><span class="mw-headline" id="The_Guardian">The Guardian</span></h3><p>Regardless of which of the above methods you use, when you finally claim all three pedestals, a <a href="https://wiki.guildwars.com/wiki/Cinematic" rel="noopener" target="_blank" title="Cinematic">cinematic</a> will play showing your party being teleported to the Henge. Make your way through the token resistance there to confront the <a href="https://wiki.guildwars.com/wiki/Henge_Guardian" rel="noopener" target="_blank" title="Henge Guardian">Henge Guardian</a>. He is flanked by two <a href="https://wiki.guildwars.com/wiki/Root_Behemoth" rel="noopener" target="_blank" title="Root Behemoth">Root Behemoths</a> that can wear down your party if they are not eliminated quickly. When you take out all three of them, the mission ends. The best way of killing them is by using <a href="https://wiki.guildwars.com/wiki/Damage_over_time" rel="noopener" target="_blank" title="Damage over time">damage over time</a> spells such as <a href="https://wiki.guildwars.com/wiki/Fire_Storm" rel="noopener" target="_blank" title="Fire Storm">Fire Storm</a>, as the enemies are stationary.
+</p></div>
+        </section>
+
+        <div class="row-bonus-hm">
+          <section class="panel bonus" id="bonus">
+            <h2 class="panel-title"><span class="icon icon-bonus">★</span> Bonus</h2>
+            <div class="panel-scroll wiki-block"><p>Just before you enter the area with the three pedestals, you will see a Shining Blade warrior named <a href="https://wiki.guildwars.com/wiki/Less_Longbow" rel="noopener" target="_blank" title="Less Longbow">Less Longbow</a> near two White Mantle Knights. As you approach (to within 2 aggro circles), the Mantle will engage him in combat if Less is close enough. You will have to join the fight and save Less. If Less dies the bonus cannot be completed. To avoid this, it is possible to flag heroes/henchmen ahead; use the <a class="mw-redirect" href="https://wiki.guildwars.com/wiki/Mission_map" rel="noopener" target="_blank" title="Mission map">mission map</a> to position them before triggering. After the two Knights are dead, speak to Less to trigger the bonus. <i>Note: to receive credit for the bonus, you must speak to this NPC before you kill the Demagogue. Less must complete the dialogue before the Demagogue is killed to receive the bonus.</i> (However, once you have done so, you will receive credit even if he dies later.)
+</p><div style="margin: 1em; border: solid silver; border-width: 1px 0px; padding: 2px 1em 2px 7.5em;"><strong class="hiddenlinks" style="position: absolute; margin-left: -7.3em; color: #900;"><a class="image" href="https://wiki.guildwars.com/wiki/File:Anomaly.png" rel="noopener" target="_blank" title="Anomaly"><img alt="Anomaly" data-file-height="32" data-file-width="32" decoding="async" height="18" loading="lazy" src="https://wiki.guildwars.com/images/thumb/a/a6/Anomaly.png/18px-Anomaly.png" srcset="/images/thumb/a/a6/Anomaly.png/27px-Anomaly.png 1.5x, /images/a/a6/Anomaly.png 2x" width="18"/></a> <a class="mw-redirect" href="https://wiki.guildwars.com/wiki/Anomaly" rel="noopener" target="_blank" title="Anomaly">Anomaly</a>.</strong>Less will start attacking the White Mantle Knights once he is within compass range; however, the knights themselves will not do anything until the player gets close. If the player stays far outside aggro range, Less will kill both of the knights without risk to himself.</div><p>The Demagogue is located in the White Mantle starting area, on the other side of the arena with the three pedestals. You must kill him before placing the last crystal in the pedestal. The troops stationed here are also the ones that will run the crystals out to claim the pedestals, so if you killed them all previously using Method 1 described above, he will be alone. Otherwise, you will need to deal with them in addition to the Demagogue himself.
+</p><p>If you do not want to fight all of them, in fact any of them, one approach is to head to the pedestal on the far right from the entrance, where you will find a path that leads past the bulk of his forces. From there, provided you hug the side furthest from them you can eliminate the Demagogue and if you are lucky, his troops will not aggro.  Tread mindfully near the wall to make sure following Heroes and Henchmen stay close.  The Demagogue group might as well take a crystal and attune the right pedestal on their way.
+</p><p>If you are having trouble holding the pedestals, one method is to keep your heroes/henchmen at one pedestal (preferably the one to the far right) and then capture 2 and keep 2 at all times, that way when the runners capture one you will still have another and can easily regain it until all the White Mantle are dead.
+</p><p>If you are only going for the bonus, you can effectively skip the shuffling and take the back route directly to the Demagogue. The following method works very well even with hero/henchmen parties, especially in <a href="https://wiki.guildwars.com/wiki/Hard_mode" rel="noopener" target="_blank" title="Hard mode">hard mode</a>:  
+Grab the crystal from the Thorn Pedestal, and place it in the center shrine's pedestal.  
+Run back and grab another crystal, and take it to the one on the far right. Without running skills, you will still have a few seconds to spare.  
+Taking the back route, avoid the rest of the troops and go straight to the Demagogue. You will be able to kill him with just enough time to spare; you will fail the mission, but you will get the bonus.  
+This is a very simple and reliable method. It works even better if you bring party-wide <a href="https://wiki.guildwars.com/wiki/Speed_boost" rel="noopener" target="_blank" title="Speed boost">speed boosts</a> (such as <a href="https://wiki.guildwars.com/wiki/%22Fall_Back!%22" rel="noopener" target="_blank" title='"Fall Back!"'>"Fall Back!"</a>) and <a href="https://wiki.guildwars.com/wiki/Interrupt" rel="noopener" target="_blank" title="Interrupt">interrupts</a> or <a href="https://wiki.guildwars.com/wiki/Knock_down" rel="noopener" target="_blank" title="Knock down">knock downs</a> to prevent him from activating <a href="https://wiki.guildwars.com/wiki/Healing_Signet" rel="noopener" target="_blank" title="Healing Signet">Healing Signet</a>.
+</p></div>
+          </section>
+          <section class="panel hard-mode" id="hard-mode">
+            <h2 class="panel-title"><span class="icon icon-hm">◆</span> Hard Mode</h2>
+            <div class="panel-scroll wiki-block"><ul><li>Spread your team out to avoid standing in Energy Surge and Searing Heat, and deal with the White Mantle Sycophants and Savants first in enemy groups.
+<ul><li>If there's a White Mantle Abbot in the group, consider dealing with them first while merely disabling the Sycophants and Savants until then. Searing Heat especially is easy to interrupt due to its long and somewhat distinct casting animation.</li></ul></li>
+<li>Before and after the Henge Portal section the only enemies that should be particularly hard with a competent team are the <a href="https://wiki.guildwars.com/wiki/Moss_Scarab" rel="noopener" target="_blank" title="Moss Scarab">Moss Scarabs</a>, due to their large groups.</li>
+<li>The large amounts of White Mantle foes at the Henge Portal and their increased movement speed makes capturing the shrines without killing them all significantly more difficult.
+<ul><li>To prevent them from overwhelming the party do not kill the runner, instead <a href="https://wiki.guildwars.com/wiki/Snare_(tactic)" rel="noopener" target="_blank" title="Snare (tactic)">snare</a> them and try to kill a few of the White Mantle accompanying them, withdrawing with the whole party after the runner gets out of <a href="https://wiki.guildwars.com/wiki/Earshot" rel="noopener" target="_blank" title="Earshot">Earshot</a> to get a new crystal yourself. When only two or fewer enemies accompany the runner it should be safe to kill the runner and the rest, and then the Demagogue and also attune the shrines.</li></ul></li></ul></div>
+          </section>
+        </div>
+
+        <div class="row-lower">
+          <section class="panel bosses" id="bosses">
+            <h2 class="panel-title"><span class="icon icon-boss">☠</span> Bosses &amp; Elites</h2>
+            <div class="panel-scroll"><div class='boss-grid'>
+<article class="boss-card">
+  <div class="boss-card-head"><a href="https://wiki.guildwars.com/wiki/Henge_Guardian" target="_blank" rel="noopener"><strong>Henge Guardian</strong></a></div>
+  <div class="boss-elite"><span class="elite-none">Elite: None / not listed</span></div>
+  <div class="boss-meta">20 (29)</div>
+</article>
+<article class="boss-card">
+  <div class="boss-card-head"><a href="https://wiki.guildwars.com/wiki/Holt_the_Iron_Boot_Heel" target="_blank" rel="noopener"><strong>Holt the Iron Boot Heel</strong></a></div>
+  <div class="boss-elite"><span class="elite-none">Elite: None / not listed</span></div>
+  <div class="boss-meta">20 (29)</div>
+</article>
+<article class="boss-card">
+  <div class="boss-card-head"><a href="https://wiki.guildwars.com/wiki/Cuthbert_the_Chaste" target="_blank" rel="noopener"><strong>Cuthbert the Chaste</strong></a></div>
+  <div class="boss-elite"><span class="elite-none">Elite: None / not listed</span></div>
+  <div class="boss-meta">20 (29)</div>
+</article>
+<article class="boss-card">
+  <div class="boss-card-head"><a href="https://wiki.guildwars.com/wiki/Garr_the_Merciful" target="_blank" rel="noopener"><strong>Garr the Merciful</strong></a></div>
+  <div class="boss-elite"><span class="elite-none">Elite: None / not listed</span></div>
+  <div class="boss-meta">20 (29)</div>
+</article>
+<article class="boss-card">
+  <div class="boss-card-head"><a href="https://wiki.guildwars.com/wiki/Kenric_the_Believer" target="_blank" rel="noopener"><strong>Kenric the Believer</strong></a></div>
+  <div class="boss-elite"><span class="elite-none">Elite: None / not listed</span></div>
+  <div class="boss-meta">20 (29)</div>
+</article>
+<article class="boss-card">
+  <div class="boss-card-head"><a href="https://wiki.guildwars.com/wiki/Lars_the_Obeisant" target="_blank" rel="noopener"><strong>Lars the Obeisant</strong></a></div>
+  <div class="boss-elite"><span class="elite-none">Elite: None / not listed</span></div>
+  <div class="boss-meta">20 (29)</div>
+</article>
+<article class="boss-card">
+  <div class="boss-card-head"><a href="https://wiki.guildwars.com/wiki/Manton_the_Indulgent" target="_blank" rel="noopener"><strong>Manton the Indulgent</strong></a></div>
+  <div class="boss-elite"><span class="elite-none">Elite: None / not listed</span></div>
+  <div class="boss-meta">20 (29)</div>
+</article>
+<article class="boss-card">
+  <div class="boss-card-head"><a href="https://wiki.guildwars.com/wiki/Tree_of_Vitality" target="_blank" rel="noopener"><strong>Tree of Vitality</strong></a></div>
+  <div class="boss-elite"><span class="elite-none">Elite: None / not listed</span></div>
+  <div class="boss-meta">18 (28)</div>
+</article>
+<article class="boss-card">
+  <div class="boss-card-head"><a href="https://wiki.guildwars.com/wiki/Chott_Stormsinger" target="_blank" rel="noopener"><strong>Chott Stormsinger</strong></a></div>
+  <div class="boss-elite"><span class="elite-none">Elite: None / not listed</span></div>
+  <div class="boss-meta">18 (28)</div>
+</article>
+<article class="boss-card">
+  <div class="boss-card-head"><a href="https://wiki.guildwars.com/wiki/Wydd_Kindlerun" target="_blank" rel="noopener"><strong>Wydd Kindlerun</strong></a></div>
+  <div class="boss-elite"><span class="elite-none">Elite: None / not listed</span></div>
+  <div class="boss-meta">18 (28)</div>
+</article>
+<article class="boss-card">
+  <div class="boss-card-head"><a href="https://wiki.guildwars.com/wiki/Grook_Plugalug" target="_blank" rel="noopener"><strong>Grook Plugalug</strong></a></div>
+  <div class="boss-elite"><span class="elite-none">Elite: None / not listed</span></div>
+  <div class="boss-meta">18 (28)</div>
+</article>
+</div></div>
+          </section>
+          <section class="panel other" id="other">
+            <h2 class="panel-title"><span class="icon icon-other">✦</span> Tips &amp; Notes</h2>
+            <div class="panel-scroll"><h3 style='font-size:0.8rem;color:var(--accent);margin:0.3rem 0;'>Skill recommendations</h3><div class='wiki-block'><ul><li><a href="https://wiki.guildwars.com/wiki/Snare_(tactic)" rel="noopener" target="_blank" title="Snare (tactic)">Snares</a> help considerably in slowing down the runners (although many players report success without them).</li>
+<li><a href="https://wiki.guildwars.com/wiki/Area_of_effect" rel="noopener" target="_blank" title="Area of effect">Area of effect</a> skills come in handy, as White Mantle groups tend to clump. They can also be used against the Henge Guardian and his Behemoths.</li>
+<li><a href="https://wiki.guildwars.com/wiki/Signet_of_Spirits" rel="noopener" target="_blank" title="Signet of Spirits">Signet of Spirits</a> builds on player character allows for damage dealing at the same time as running.</li>
+<li><a href="https://wiki.guildwars.com/wiki/White_Mantle_Seeker" rel="noopener" target="_blank" title="White Mantle Seeker">White Mantle Seekers</a> use <a href="https://wiki.guildwars.com/wiki/Dryder%27s_Defenses" rel="noopener" target="_blank" title="Dryder's Defenses">Dryder's Defenses</a> to block attacks. This can make it difficult to hit them with attacks if they are carrying the crystals. Use <a href="https://wiki.guildwars.com/wiki/Stance" rel="noopener" target="_blank" title="Stance">stance</a> removal skills to end it or non-attack skills.</li></ul></div>
+<h3 style='font-size:0.8rem;color:var(--accent);margin:0.3rem 0;'>Notes</h3><div class='wiki-block'><table cellspacing="3" style="float: right; border: 1px solid #D16E5A; width: 250px; margin: 0 0 1em 1em; line-height: 1.4em; font-size: 0.9em; background: #F9F9F9;">
+<tbody><tr>
+<td><a href="https://wiki.guildwars2.com/wiki/Main_Page" rel="noopener" target="_blank" title="gw2:Main Page"><img alt="Gw2logo.png" data-file-height="479" data-file-width="692" decoding="async" height="28" loading="lazy" src="https://wiki.guildwars.com/images/thumb/b/b1/Gw2logo.png/41px-Gw2logo.png" srcset="/images/thumb/b/b1/Gw2logo.png/61px-Gw2logo.png 1.5x, /images/thumb/b/b1/Gw2logo.png/81px-Gw2logo.png 2x" width="41"/></a>
+</td>
+<td>The <a class="extiw" href="https://wiki.guildwars2.com/wiki/Main_Page" rel="noopener" target="_blank" title="gw2:Main Page">Guild Wars 2 Wiki</a>  has an article on <i><b><a class="extiw" href="https://wiki.guildwars2.com/wiki/Aurora%27s_Remains" rel="noopener" target="_blank" title="gw2:Aurora's Remains">Aurora's Remains</a></b></i>.
+</td></tr></tbody></table><ul><li>Sometimes <a href="https://wiki.guildwars.com/wiki/Less_Longbow" rel="noopener" target="_blank" title="Less Longbow">Less Longbow</a> will not be under attack when you find him. When he is under attack, preventing his death will give you a <a href="https://wiki.guildwars.com/wiki/Morale_Boost" rel="noopener" target="_blank" title="Morale Boost">Morale Boost</a>.
+<ul><li>This is one of only a few Morale Boosts that also apply to <a href="https://wiki.guildwars.com/wiki/Animal_companion" rel="noopener" target="_blank" title="Animal companion">Animal companions</a>.</li></ul></li>
+<li>You can also use the crystals located near the Demagogue.</li>
+<li>Complete exploration of the mission area will add approximately 1.0% to the Tyrian <a href="https://wiki.guildwars.com/wiki/Cartographer" rel="noopener" target="_blank" title="Cartographer">Cartographer</a> title. The first 0.7% can be explored before the cinematic that teleports you to the last bit of the mission, leaving 0.3% to be explored before you kill the <a href="https://wiki.guildwars.com/wiki/Henge_Guardian" rel="noopener" target="_blank" title="Henge Guardian">Henge Guardian</a>.</li>
+<li>Placing all crystals before killing the <a href="https://wiki.guildwars.com/wiki/Demagogue" rel="noopener" target="_blank" title="Demagogue">Demagogue</a> will start the end <a href="https://wiki.guildwars.com/wiki/Cinematic" rel="noopener" target="_blank" title="Cinematic">cinematic</a>, preventing bonus completion.</li>
+<li>After completing this mission, your party will be <a href="https://wiki.guildwars.com/wiki/Teleport" rel="noopener" target="_blank" title="Teleport">teleported</a> to <a href="https://wiki.guildwars.com/wiki/Henge_of_Denravi" rel="noopener" target="_blank" title="Henge of Denravi">Henge of Denravi</a>.</li>
+<li>Although Less Longbow refers to him as a <i>champion</i>, the Demagogue is not a boss: he does not give a morale boost when killed and you cannot cap skills from him.</li>
+<li>Completion of this mission will fill in page #5 of <a href="https://wiki.guildwars.com/wiki/The_Flameseeker_Prophecies" rel="noopener" target="_blank" title="The Flameseeker Prophecies">The Flameseeker Prophecies</a> <a href="https://wiki.guildwars.com/wiki/Storybook" rel="noopener" target="_blank" title="Storybook">storybook</a>.</li></ul></div></div>
+          </section>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="lightbox" id="lightbox" role="dialog" aria-label="Enlarged map">
+    <img src="../maps/prophecies_12_Aurora_Glade_map.jpg" alt="Aurora Glade mission map (enlarged)" />
+  </div>
+  <script>
+    (function () {
+      var open = document.getElementById("mapOpen");
+      var box = document.getElementById("lightbox");
+      if (!open || !box) return;
+      open.addEventListener("click", function () { box.classList.add("open"); });
+      box.addEventListener("click", function () { box.classList.remove("open"); });
+      document.addEventListener("keydown", function (e) {
+        if (e.key === "Escape") box.classList.remove("open");
+      });
+    })();
+  </script>
+
+</body>
+</html>

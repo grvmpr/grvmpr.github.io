@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Dasha Vestibule</title>
+  <style>
+:root {
+  --bg-deep: #070a0f;
+  --bg-panel: #101820;
+  --bg-panel-2: #15202c;
+  --border: #243044;
+  --border-glow: #2a4a6a;
+  --text: #dce6f0;
+  --text-muted: #8a9bb0;
+  --text-dim: #5c6f86;
+  --accent: #3ecfff;
+  --accent-soft: rgba(62, 207, 255, 0.12);
+  --gold: #e8c56a;
+  --gold-soft: rgba(232, 197, 106, 0.12);
+  --bonus: #7dffb3;
+  --bonus-soft: rgba(125, 255, 179, 0.1);
+  --danger: #ff6b6b;
+  --danger-soft: rgba(255, 107, 107, 0.1);
+  --hm: #c78bff;
+  --hm-soft: rgba(199, 139, 255, 0.12);
+  --radius: 10px;
+  --font: "Segoe UI", system-ui, -apple-system, sans-serif;
+  --chrome-h: 3.1rem;
+  --gap: 0.5rem;
+  --pad: 0.7rem;
+  /* Readable on 4K vertical (~2160×3840) */
+  --walk-size: clamp(1.05rem, 0.55vw + 0.55vh, 1.35rem);
+  --bonus-size: clamp(1.05rem, 0.55vw + 0.55vh, 1.35rem);
+  --body-size: clamp(0.95rem, 0.4vw + 0.4vh, 1.1rem);
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html {
+  scroll-behavior: smooth;
+  font-size: clamp(16px, 0.55vw + 0.45vh, 20px);
+  height: 100%;
+  scroll-padding-top: calc(var(--chrome-h) + 0.5rem);
+}
+body {
+  font-family: var(--font);
+  background: var(--bg-deep);
+  color: var(--text);
+  line-height: 1.45;
+  min-height: 100%;
+  height: 100%;
+  overflow: hidden;
+  background-image: radial-gradient(ellipse 70% 25% at 50% 0%, rgba(42, 100, 160, 0.14), transparent);
+}
+a { color: var(--accent); text-decoration: none; }
+a:hover { color: #7de0ff; text-decoration: underline; }
+.app {
+  display: grid;
+  grid-template-rows: var(--chrome-h) 1fr;
+  height: 100vh; height: 100dvh;
+  max-height: 100vh; max-height: 100dvh;
+}
+.top-chrome {
+  display: flex; align-items: center; gap: 0.65rem;
+  padding: 0 0.7rem;
+  background: rgba(8, 12, 18, 0.97);
+  border-bottom: 1px solid var(--border);
+  z-index: 100; min-height: var(--chrome-h);
+}
+.brand { display: flex; align-items: baseline; gap: 0.55rem; min-width: 0; flex-shrink: 0; }
+.brand-mission {
+  font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase;
+  color: var(--accent); font-weight: 700; white-space: nowrap;
+}
+.brand-name {
+  font-size: 1.1rem; font-weight: 750; color: var(--text);
+  white-space: nowrap; letter-spacing: -0.02em;
+}
+.brand-meta { font-size: 0.75rem; color: var(--text-dim); white-space: nowrap; }
+.chip-nav {
+  display: flex; flex: 1; gap: 0.3rem; overflow-x: auto;
+  scrollbar-width: none; min-width: 0; justify-content: center;
+}
+.chip-nav::-webkit-scrollbar { display: none; }
+.chip-nav a {
+  flex: 0 0 auto; padding: 0.3rem 0.65rem; border-radius: 999px;
+  font-size: 0.78rem; font-weight: 600; color: var(--text-muted);
+  background: var(--bg-panel); border: 1px solid var(--border);
+  text-decoration: none; white-space: nowrap;
+}
+.chip-nav a:hover {
+  color: var(--text); border-color: var(--border-glow);
+  background: #1a2836; text-decoration: none;
+}
+.chip-nav a[href="#map"] { color: var(--accent); border-color: rgba(62, 207, 255, 0.35); }
+.chip-nav a[href="#bonus"] { color: var(--bonus); border-color: rgba(125, 255, 179, 0.3); }
+.chip-nav a[href="#hard-mode"] { color: var(--hm); border-color: rgba(199, 139, 255, 0.3); }
+.chip-nav a[href="#bosses"] { color: #ff9a9a; border-color: rgba(255, 107, 107, 0.3); }
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 0.3rem;
+  padding: 0.42rem 0.85rem; border-radius: 8px; font-weight: 650; font-size: 0.8rem;
+  border: none; cursor: pointer; text-decoration: none; white-space: nowrap; flex-shrink: 0;
+}
+.btn:hover { text-decoration: none; }
+.btn-next {
+  background: linear-gradient(135deg, #1a6a9a, #1ab0e0); color: #fff;
+  box-shadow: 0 2px 12px rgba(26, 140, 200, 0.35);
+}
+.btn-next:hover { color: #fff; filter: brightness(1.08); }
+.btn-wiki, .btn-idx, .btn-prev {
+  background: var(--bg-panel); color: var(--text-muted);
+  border: 1px solid var(--border); padding: 0.42rem 0.65rem;
+}
+.btn-wiki:hover, .btn-idx:hover, .btn-prev:hover {
+  color: var(--accent); border-color: var(--border-glow);
+}
+.chrome-actions { display: flex; gap: 0.35rem; flex-shrink: 0; }
+
+/* Map-dominant workspace */
+.workspace {
+  display: grid;
+  grid-template-columns: minmax(480px, 1.15fr) minmax(0, 1fr);
+  grid-template-rows: 1fr;
+  gap: var(--gap); padding: var(--gap);
+  min-height: 0; height: 100%; overflow: hidden;
+}
+.col-map {
+  display: grid;
+  grid-template-rows: 1fr auto;
+  gap: var(--gap);
+  min-height: 0; min-width: 0;
+}
+.col-main {
+  display: grid;
+  /* objectives compact | walkthrough HUGE | bonus+hm | bosses+tips */
+  grid-template-rows: auto minmax(0, 1.6fr) minmax(0, 1.05fr) minmax(0, 0.75fr);
+  gap: var(--gap); min-height: 0; min-width: 0; overflow: hidden;
+}
+.row-obj { min-height: 0; }
+.row-bonus-hm {
+  display: grid; grid-template-columns: 1.15fr 0.85fr; gap: var(--gap); min-height: 0;
+}
+.row-lower {
+  display: grid; grid-template-columns: 1.15fr 0.85fr; gap: var(--gap); min-height: 0;
+}
+.panel {
+  background: var(--bg-panel); border: 1px solid var(--border); border-radius: var(--radius);
+  padding: var(--pad); display: flex; flex-direction: column; min-height: 0; overflow: hidden;
+}
+.panel-scroll {
+  overflow-y: auto; overflow-x: hidden; min-height: 0; flex: 1; padding-right: 0.3rem;
+  scrollbar-width: thin; scrollbar-color: var(--border) transparent;
+  font-size: var(--body-size);
+}
+.panel-scroll::-webkit-scrollbar { width: 8px; }
+.panel-scroll::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+.panel-title {
+  display: flex; align-items: center; gap: 0.4rem;
+  font-size: 0.82rem; font-weight: 750; letter-spacing: 0.05em; text-transform: uppercase;
+  color: var(--text); margin-bottom: 0.45rem; padding-bottom: 0.35rem;
+  border-bottom: 1px solid var(--border); flex-shrink: 0;
+}
+.panel-title .icon {
+  width: 1.3rem; height: 1.3rem; border-radius: 5px;
+  display: inline-flex; align-items: center; justify-content: center; font-size: 0.75rem;
+}
+.panel.map-panel {
+  border-color: var(--border-glow);
+  background: linear-gradient(180deg, #0e1620 0%, var(--bg-panel) 100%);
+  /* Map takes almost all left column */
+  min-height: 0;
+}
+.panel.objectives { border-top: 2px solid var(--accent); }
+.panel.walkthrough { border-top: 3px solid #5eb8e8; }
+.panel.bonus { border-top: 3px solid var(--bonus); }
+.panel.hard-mode { border-top: 2px solid var(--hm); }
+.panel.bosses { border-top: 2px solid var(--danger); }
+.panel.other { border-top: 2px solid var(--text-muted); }
+
+/* Emphasized reading panels */
+.panel.walkthrough .panel-scroll,
+.panel.walkthrough .wiki-block {
+  font-size: var(--walk-size) !important;
+  line-height: 1.55;
+}
+.panel.bonus .panel-scroll,
+.panel.bonus .wiki-block {
+  font-size: var(--bonus-size) !important;
+  line-height: 1.55;
+}
+.panel.walkthrough .panel-scroll li,
+.panel.bonus .panel-scroll li {
+  margin-bottom: 0.45rem;
+}
+.panel.walkthrough .panel-scroll p,
+.panel.bonus .panel-scroll p {
+  margin-bottom: 0.55rem;
+}
+
+.icon-map { background: var(--accent-soft); color: var(--accent); }
+.icon-obj { background: var(--accent-soft); color: var(--accent); }
+.icon-walk { background: rgba(94, 184, 232, 0.15); color: #5eb8e8; }
+.icon-bonus { background: var(--bonus-soft); color: var(--bonus); }
+.icon-hm { background: var(--hm-soft); color: var(--hm); }
+.icon-boss { background: var(--danger-soft); color: var(--danger); }
+.icon-other { background: rgba(138, 155, 176, 0.15); color: var(--text-muted); }
+
+.map-wrap {
+  flex: 1; min-height: 0; display: flex; flex-direction: column;
+  align-items: center; justify-content: center; gap: 0.4rem;
+}
+.map-frame {
+  flex: 1; min-height: 0; width: 100%;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: 10px; overflow: hidden;
+  border: 2px solid var(--border-glow);
+  box-shadow: 0 0 0 1px rgba(62, 207, 255, 0.1), 0 12px 40px rgba(0, 0, 0, 0.45);
+  background: #05080c; cursor: zoom-in;
+}
+.map-frame img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  image-rendering: auto;
+}
+.map-caption { font-size: 0.72rem; color: var(--text-dim); flex-shrink: 0; }
+.map-missing {
+  color: var(--text-dim); font-size: 1rem; text-align: center; padding: 2rem;
+}
+
+.wiki-block ul, .panel-scroll ul,
+.wiki-block ol, .panel-scroll ol { padding-left: 1.2rem; margin: 0.3rem 0 0.5rem; }
+.wiki-block li, .panel-scroll li { margin-bottom: 0.32rem; }
+.wiki-block p, .panel-scroll p { margin-bottom: 0.45rem; }
+.wiki-block img, .panel-scroll img { vertical-align: middle; max-height: 1.35em; width: auto; }
+.wiki-block table, .panel-scroll table {
+  width: 100%; border-collapse: collapse; font-size: 0.9em; margin: 0.4rem 0;
+}
+.wiki-block th, .wiki-block td, .panel-scroll th, .panel-scroll td {
+  border: 1px solid var(--border); padding: 0.3rem 0.45rem; text-align: left;
+}
+.lede { font-size: 0.92rem; color: var(--text-muted); margin-bottom: 0.35rem; }
+
+/* Collapsed summary */
+details.summary-details {
+  background: var(--bg-panel);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  border-top: 2px solid var(--gold);
+  padding: 0.35rem 0.65rem;
+  flex-shrink: 0;
+}
+details.summary-details summary {
+  cursor: pointer;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--gold);
+  padding: 0.35rem 0;
+  list-style: none;
+}
+details.summary-details summary::-webkit-details-marker { display: none; }
+details.summary-details summary::before {
+  content: "▸ ";
+  color: var(--text-dim);
+}
+details.summary-details[open] summary::before { content: "▾ "; }
+details.summary-details .summary-body {
+  padding: 0.35rem 0 0.55rem;
+  font-size: 0.88rem;
+  color: var(--text-muted);
+  max-height: 18vh;
+  overflow-y: auto;
+}
+
+.boss-note { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.4rem; }
+.boss-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.4rem; }
+.boss-card {
+  background: var(--bg-panel-2); border: 1px solid var(--border);
+  border-radius: 8px; padding: 0.5rem 0.6rem;
+}
+.boss-card-head { font-size: 0.95rem; margin-bottom: 0.2rem; }
+.boss-card-head a { color: #eef6fc; font-weight: 700; }
+.boss-card-head a:hover { color: var(--accent); }
+.boss-elite { font-size: 0.88rem; }
+.elite-label { color: var(--gold); font-weight: 650; margin-right: 0.25rem; }
+.elite-link { color: #ffd78a; font-weight: 650; }
+.elite-link:hover { color: #ffe9b5; }
+.elite-none { color: var(--text-dim); font-style: italic; font-size: 0.85rem; }
+.boss-meta { font-size: 0.78rem; color: var(--text-dim); margin-top: 0.15rem; }
+
+.callout {
+  margin-top: 0.4rem; padding: 0.45rem 0.6rem; border-radius: 6px;
+  font-size: 0.88rem; border-left: 3px solid; line-height: 1.4;
+}
+.callout.tip { background: var(--accent-soft); border-color: var(--accent); color: #b8eaff; }
+.callout.warn { background: var(--danger-soft); border-color: var(--danger); color: #ffb4b4; }
+
+.lightbox {
+  display: none; position: fixed; inset: 0; z-index: 1000; background: rgba(0,0,0,0.94);
+  align-items: center; justify-content: center; padding: 1.5rem; cursor: zoom-out;
+}
+.lightbox.open { display: flex; }
+.lightbox img {
+  max-width: 96vw; max-height: 96vh; border-radius: 8px;
+  border: 2px solid var(--border-glow); object-fit: contain;
+}
+
+@media (min-height: 2400px) {
+  :root {
+    --walk-size: clamp(1.15rem, 0.7vh + 0.3vw, 1.5rem);
+    --bonus-size: clamp(1.15rem, 0.7vh + 0.3vw, 1.5rem);
+    --gap: 0.65rem;
+    --pad: 0.85rem;
+  }
+  .workspace { grid-template-columns: minmax(560px, 1.2fr) minmax(0, 1fr); }
+}
+@media (min-width: 1800px) and (min-height: 2000px) {
+  .workspace { grid-template-columns: minmax(600px, 1.25fr) minmax(0, 1fr); }
+}
+@media (max-height: 1100px) {
+  body { overflow: auto; height: auto; }
+  .app { height: auto; max-height: none; min-height: 100vh; }
+  .workspace {
+    height: auto; overflow: visible; grid-template-columns: 1fr; grid-template-rows: auto;
+  }
+  .col-map { grid-template-rows: auto; }
+  .col-main { overflow: visible; grid-template-rows: auto; }
+  .row-bonus-hm, .row-lower { grid-template-columns: 1fr; }
+  .panel { max-height: none; overflow: visible; }
+  .panel-scroll { overflow: visible; }
+  .map-frame { min-height: 360px; max-height: 55vh; }
+}
+
+    :root { --accent: #c78bff; --accent-soft: #c78bff22; }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header class="top-chrome">
+      <div class="brand">
+        <span class="brand-mission">M10a</span>
+        <span class="brand-name">Dasha Vestibule</span>
+        <span class="brand-meta">Nightfall · Vabbi · Cooperative · Medium</span>
+      </div>
+      <nav class="chip-nav" aria-label="Sections">
+        <a href="#map">Map</a>
+        <a href="#walkthrough">Walkthrough</a>
+        <a href="#bonus">Bonus</a>
+        <a href="#objectives">Objectives</a>
+        <a href="#hard-mode">Hard Mode</a>
+        <a href="#bosses">Bosses</a>
+        <a href="#other">Tips</a>
+      </nav>
+      <div class="chrome-actions">
+        <a class="btn btn-idx" href="../nightfall.html">Index</a>
+        <a class="btn btn-prev" href="10_Tihark_Orchard.html">← Prev</a>
+        <a class="btn btn-wiki" href="https://wiki.guildwars.com/wiki/Dasha_Vestibule" target="_blank" rel="noopener">Wiki ↗</a>
+        <a class="btn btn-next" href="12_Dzagonur_Bastion.html">Next: Dzagonur Bastion →</a>
+      </div>
+    </header>
+
+    <div class="workspace">
+      <div class="col-map">
+        <section class="panel map-panel" id="map">
+          <h2 class="panel-title"><span class="icon icon-map">◉</span> Mission Map</h2>
+          <div class="map-wrap">
+            <div class="map-frame" id="mapOpen" title="Click to enlarge">
+              <img src="../maps/nightfall_11_Dasha_Vestibule_map.jpg" alt="Dasha Vestibule mission map" />
+            </div>
+            <p class="map-caption">Click to enlarge · Local cache · <a href="https://wiki.guildwars.com/wiki/Dasha_Vestibule" target="_blank" rel="noopener">Wiki</a></p>
+        </div>
+        </section>
+
+        <details class="summary-details" id="summary">
+          <summary>Summary (click to expand)</summary>
+          <div class="summary-body">
+            <p>The merchant princes have taken refuge within the Hidden City with heavy defenses such as Djinn guardians, traps and locked gates. In order to reach the princes, the party must travel with Goren and Margrid the Sly and complete three trials to unlock the door to the inner sanctum.</p>
+            <p style="margin-top:0.4rem;"><strong>Region:</strong> Vabbi · <strong>Mission:</strong> 10a of 20 · <strong>Type:</strong> Cooperative<br/><strong>Required hero:</strong> Margrid the Sly<br/><strong>Path:</strong> Margrid path</p>
+            <p style="margin-top:0.35rem;"><a href="https://wiki.guildwars.com/wiki/Dasha_Vestibule" target="_blank" rel="noopener">Full wiki article ↗</a></p>
+          </div>
+        </details>
+      </div>
+
+      <div class="col-main">
+        <section class="panel objectives row-obj" id="objectives">
+          <h2 class="panel-title"><span class="icon icon-obj">✓</span> Objectives</h2>
+          <div class="panel-scroll wiki-block"><p>Gain access to the vault's inner sanctum and rescue the two princes.
+</p><ul><li>Complete the trial in each chamber to open the way into the inner sanctum. [0...3] of 3 trials completed.</li>
+<li>Defeat the <a href="https://wiki.guildwars.com/wiki/Eternal_Guardian" rel="noopener" target="_blank" title="Eternal Guardian">Eternal Guardians</a> to complete the Trial of Eternity.</li>
+<li>Answer the riddles posed by the Divine Djinn to pass the Trial of Divinity.</li>
+<li>Solve the crystal key puzzle to complete the Trial of Wisdom.</li>
+<li>Defeat the enraged djinn to reach the two princes.</li>
+<li>Goren must survive.</li>
+<li>*<a class="mw-redirect" href="https://wiki.guildwars.com/wiki/Bonus" rel="noopener" target="_blank" title="Bonus">Bonus</a>* Help Margrid collect the <a href="https://wiki.guildwars.com/wiki/Treasure_of_Ahdashim" rel="noopener" target="_blank" title="Treasure of Ahdashim">Treasure of Ahdashim</a>.</li>
+<li>[0...3] of 3 treasures found.</li></ul></div>
+        </section>
+
+        <section class="panel walkthrough" id="walkthrough">
+          <h2 class="panel-title"><span class="icon icon-walk">→</span> Walkthrough</h2>
+          <div class="panel-scroll wiki-block"><p>Talk to the <a href="https://wiki.guildwars.com/wiki/Lock_of_Ahdashim" rel="noopener" target="_blank" title="Lock of Ahdashim">Lock of Ahdashim</a> in the <a href="https://wiki.guildwars.com/wiki/Dasha_Vestibule_(outpost)" rel="noopener" target="_blank" title="Dasha Vestibule (outpost)">Dasha Vestibule</a> outpost to start the mission. <a href="https://wiki.guildwars.com/wiki/Goren" rel="noopener" target="_blank" title="Goren">Goren</a> will be in the starting area; speak to him and he will join the party. He will need to survive the mission. The entrance to the three chambers has a number of groups of Djinn. Tackle them one group at a time. When fighting groups of Djinn, the <a href="https://wiki.guildwars.com/wiki/Ruby_Djinn" rel="noopener" target="_blank" title="Ruby Djinn">Ruby Djinns</a> using <a href="https://wiki.guildwars.com/wiki/Searing_Flames" rel="noopener" target="_blank" title="Searing Flames">Searing Flames</a> should be a priority target as they can deal massive amounts of damage to the party. Proceed towards the far wall where you will find three paths. The central path leads to the Trial of Eternity, the left the Trial of Divinity, and the right leads to the Trial of Wisdom. The only path open at this time is the Trial of Eternity.
+</p><h3><span class="mw-headline" id="Trial_of_Eternity">Trial of Eternity</span></h3><p>There are six Eternal Guardians which produce global environmental effects for this trial. Defeating a guardian will remove its effect. Complete the trial by defeating all six guardians.
+</p><p>The guardians may produce one of three environmental effects. The guardians at the base of the stairs produce lesser effects than those further back. These effects are as follows:
+</p><table cellpadding="3" cellspacing="0" rules="all" style="margin: 0.25em; border: 1px solid #000;">
+<tbody><tr>
+<td><b>Name</b>
+</td>
+<td><b>Lesser effect</b>
+</td>
+<td><b>Greater effect</b>
+</td></tr>
+<tr>
+<td><a href="https://wiki.guildwars.com/wiki/Eternal_Suffering" rel="noopener" target="_blank" title="Eternal Suffering">Eternal Suffering</a>
+</td>
+<td>-1 <a href="https://wiki.guildwars.com/wiki/Health_degeneration" rel="noopener" target="_blank" title="Health degeneration">health degeneration</a>
+</td>
+<td>-2 health degeneration
+</td></tr>
+<tr>
+<td><a href="https://wiki.guildwars.com/wiki/Eternal_Lethargy" rel="noopener" target="_blank" title="Eternal Lethargy">Eternal Lethargy</a>
+</td>
+<td>Move 10% slower
+</td>
+<td>Move 20% slower
+</td></tr>
+<tr>
+<td><a href="https://wiki.guildwars.com/wiki/Eternal_Languor" rel="noopener" target="_blank" title="Eternal Languor">Eternal Languor</a>
+</td>
+<td>Skills <a class="mw-redirect" href="https://wiki.guildwars.com/wiki/Recharge" rel="noopener" target="_blank" title="Recharge">recharge</a> 10% slower
+</td>
+<td>Skills recharge 20% slower
+</td></tr></tbody></table><p>Note that when you reach the stairs, the left path is slightly more difficult, as the guardians of the sapphire chest will <a href="https://wiki.guildwars.com/wiki/Spawn" rel="noopener" target="_blank" title="Spawn">spawn</a> once the party gets close to the chest and augment the group of Djinn and guardians already there. Either <a href="https://wiki.guildwars.com/wiki/Pull" rel="noopener" target="_blank" title="Pull">pull</a> the Djinns away from the chest or take the path to the right. This requires defeating the <a href="https://wiki.guildwars.com/wiki/Ruby_of_Ahdashim" rel="noopener" target="_blank" title="Ruby of Ahdashim">Ruby of Ahdashim</a> which is needed for the bonus.
+</p><p>Upon completing the trial, the door to the Trial of Divinity will open.
+</p><h3><span class="mw-headline" id="Trial_of_Divinity">Trial of Divinity</span></h3><p>There are two traps placed just after the left turn in the entrance corridor to this trial (one fire, and one water). It is imperative that you pull the Djinn away from the traps to battle them, in order to avoid accidentally being caught in the traps.
+</p><p>Towards the back of the room stands a row of <a href="https://wiki.guildwars.com/wiki/Divine_Guardian" rel="noopener" target="_blank" title="Divine Guardian">Divine Guardians</a>. They will ask questions regarding the <a href="https://wiki.guildwars.com/wiki/Gods_of_Tyria" rel="noopener" target="_blank" title="Gods of Tyria">Gods of Tyria</a>, and you must choose the answer that fits the clue the best. The clues change during each run of the mission, but the answers are always the same. From left to right, the correct answers are as follows:
+</p><ol><li><a href="https://wiki.guildwars.com/wiki/Balthazar" rel="noopener" target="_blank" title="Balthazar">Balthazar</a></li>
+<li><a href="https://wiki.guildwars.com/wiki/Dwayna" rel="noopener" target="_blank" title="Dwayna">Dwayna</a></li>
+<li><a href="https://wiki.guildwars.com/wiki/Grenth" rel="noopener" target="_blank" title="Grenth">Grenth</a></li>
+<li><a href="https://wiki.guildwars.com/wiki/Lyssa" rel="noopener" target="_blank" title="Lyssa">Lyssa</a></li>
+<li><a href="https://wiki.guildwars.com/wiki/Melandru" rel="noopener" target="_blank" title="Melandru">Melandru</a></li>
+<li><a href="https://wiki.guildwars.com/wiki/Abaddon" rel="noopener" target="_blank" title="Abaddon">Abaddon</a></li></ol><p>If you give the wrong answer, a group of foes will spawn around you, but the Divine Guardian will still count as completed.
+</p><p>After answering all six questions (one way or the other), the door to the Trial of Wisdom will open.
+</p><h3><span class="mw-headline" id="Trial_of_Wisdom">Trial of Wisdom</span></h3><p>Like the Trial of Divinity, the first turn is greeted with a pair of Djinn and a pair of water traps. Pull the Djinn away from the traps to battle before proceeding.
+</p><p>The main chamber includes four <a href="https://wiki.guildwars.com/wiki/Thunder_of_Ahdashim" rel="noopener" target="_blank" title="Thunder of Ahdashim">Thunder of Ahdashim</a> — these are essentially <a href="https://wiki.guildwars.com/wiki/Diamond_Djinn" rel="noopener" target="_blank" title="Diamond Djinn">Diamond Djinn</a> that use <a href="https://wiki.guildwars.com/wiki/Quake_Of_Ahdashim" rel="noopener" target="_blank" title="Quake Of Ahdashim">Quake Of Ahdashim</a>, a skill that knocks down and damages characters in the area. Since it also destroys any crystal keys they may be carrying, you should kill them before attempting the puzzle.
+</p><p>The puzzle itself involves two <a href="https://wiki.guildwars.com/wiki/Crystal_Key" rel="noopener" target="_blank" title="Crystal Key">Crystal Keys</a>, four obelisks numbered 2, 3, 5, and 7 (the first four prime numbers), and six pedestals numbered 6, 10, 14, 15, 21, and 35. Your objective is to activate (using the keys) two of these pedestals whose numbers are divisible by the numbers on the obelisks. As you place a key, the matching obelisks will display keys (meaning they are activated). Make sure you do not overlap. Proper combinations are suggested below. 
+</p><p>Incorrectly matching pedestals resets the puzzles and spawns new Ahdashim. After completing this puzzle, the final set of doors (leading to the end-bosses) will open.
+</p><p>There are three combinations that work, each matching pedestal pairs the same distance from the center:
+</p><ul><li>Edge pair: 6 &amp; 35</li>
+<li>Off-center pair: 10 &amp; 21</li>
+<li>Center pair: 14 &amp; 15.</li></ul><h3><span class="mw-headline" id="Central_Chamber">Central Chamber</span></h3><p>If doing the bonus, don't forget to pick up the Sapphire Treasure as you make your way to the final room.
+</p><p>The final stage of the mission contains three Djinn bosses. Luckily, each boss may be pulled and fought separately from the others. The mission ends after defeating the last one.
+</p><ul><li>Most groups find <a href="https://wiki.guildwars.com/wiki/Kormab,_Burning_Heart" rel="noopener" target="_blank" title="Kormab, Burning Heart">Kormab</a> (the elementalist boss) to be the most dangerous. Kormab uses several <a class="mw-redirect" href="https://wiki.guildwars.com/wiki/AoE" rel="noopener" target="_blank" title="AoE">AoE</a> spells and can quickly <a href="https://wiki.guildwars.com/wiki/Wipe" rel="noopener" target="_blank" title="Wipe">wipe</a> out clustered parties; be sure to spread before taking him on. Alternatively, you can shut down his offense (e.g. using <a href="https://wiki.guildwars.com/wiki/Interrupt" rel="noopener" target="_blank" title="Interrupt">interrupts</a>) or use anti-caster hexes (e.g. <a href="https://wiki.guildwars.com/wiki/Backfire" rel="noopener" target="_blank" title="Backfire">Backfire</a>). <a href="https://wiki.guildwars.com/wiki/Pain_Inverter" rel="noopener" target="_blank" title="Pain Inverter">Pain Inverter</a> is also very effective.</li></ul><ul><li>Goren must stay alive, so make sure he does not rush ahead into the group of bosses while you are pulling.</li></ul><ul><li>If you want to capture skills, be sure to pull the relevant Djinn first or second; the mission ends as soon as the third boss dies.</li></ul></div>
+        </section>
+
+        <div class="row-bonus-hm">
+          <section class="panel bonus" id="bonus">
+            <h2 class="panel-title"><span class="icon icon-bonus">★</span> Bonus</h2>
+            <div class="panel-scroll wiki-block"><p>The bonus requires you to pick up three treasures from various chests: each chest is located in one of the trial areas and the key is held by a Djinn of Ahdashim with a similar name. Very little extra effort is required for the bonus: if you follow the standard mission order (Eternity→Divinity→Wisdom), you will pick up each key before you come across the corresponding chest.
+</p><p>There are only two complications: as you approach each chest, a group of three Djinn will pop up (including a Ruby Djinn), but these are no harder than any of the other groups you encounter. There is a fire trap in the left trial room behind the Diamond chest, so be careful. You must also pick up the third treasure before you kill the third Djinn boss in the final room.
+</p><p>The chests and keys appear as follows:
+</p><dl><dd><table cellpadding="3" cellspacing="0" rules="all" style="margin: 0.25em; border: 1px solid silver;">
+<tbody><tr style="background:lightgray;">
+<th>Trial</th>
+<th>Chest</th>
+<th>Nearby key
+</th></tr>
+<tr>
+<td>Eternity
+</td>
+<td>Sapphire
+</td>
+<td><a href="https://wiki.guildwars.com/wiki/Ruby_Key" rel="noopener" target="_blank" title="Ruby Key">Ruby Key</a>
+</td></tr>
+<tr>
+<td>Divinity
+</td>
+<td>Diamond
+</td>
+<td><a href="https://wiki.guildwars.com/wiki/Diamond_Key" rel="noopener" target="_blank" title="Diamond Key">Diamond Key</a>
+</td></tr>
+<tr>
+<td>Wisdom
+</td>
+<td>Ruby
+</td>
+<td><a href="https://wiki.guildwars.com/wiki/Sapphire_Key" rel="noopener" target="_blank" title="Sapphire Key">Sapphire Key</a>
+</td></tr></tbody></table></dd></dl></div>
+          </section>
+          <section class="panel hard-mode" id="hard-mode">
+            <h2 class="panel-title"><span class="icon icon-hm">◆</span> Hard Mode</h2>
+            <div class="panel-scroll wiki-block"><p>The key to victory will depend on how you make good use of Margrid. Rangers have 30 extra armor against elemental damage and are the best suited for these occasions. Since she is a required hero, use one of the first three individual hero flags to position her in the party composition. The hardest enemies in this mission are the Ruby Djinns and the Elementalist boss which spam Searing Flames, to reduce their damage output, disable their elite with skills like <a href="https://wiki.guildwars.com/wiki/Distracting_Shot" rel="noopener" target="_blank" title="Distracting Shot">Distracting Shot</a>, <a href="https://wiki.guildwars.com/wiki/Magebane_Shot" rel="noopener" target="_blank" title="Magebane Shot">Magebane Shot</a> and <a href="https://wiki.guildwars.com/wiki/Diversion" rel="noopener" target="_blank" title="Diversion">Diversion</a>. Due to the Roaring Ethers energy removal, your hero will need a generous energy base pool in order to use skills, e.g.:30~40 and a good spec in Expertise. Once the Elementalist foe has been killed, only the Dervish Djinns will remain. Flagging this hero ahead of the main team is essential to survival, she can be placed just over the aggro bubble or a bit ahead, so that all foes target lock on her rather the entire team. At the central room, eliminate the enemies that cause environmental effects to remove pressure and make sure to use this hero to trigger the chest pop-ups. While performing this technique, it is vital to pay close attention to the radar and watch enemy positioning, make sure your projectile attacks and skills will not be obstructed by the walls of each narrow corridor.
+</p></div>
+          </section>
+        </div>
+
+        <div class="row-lower">
+          <section class="panel bosses" id="bosses">
+            <h2 class="panel-title"><span class="icon icon-boss">☠</span> Bosses &amp; Elites</h2>
+            <div class="panel-scroll"><div class='boss-grid'>
+<article class="boss-card">
+  <div class="boss-card-head"><a href="https://wiki.guildwars.com/wiki/Kormab,_Burning_Heart" target="_blank" rel="noopener"><strong>Kormab, Burning Heart</strong></a></div>
+  <div class="boss-elite"><span class="elite-label">Elite:</span> <a class="elite-link" href="https://wiki.guildwars.com/wiki/Searing_Flames" target="_blank" rel="noopener">Searing Flames</a></div>
+  <div class="boss-meta">28 (30)</div>
+</article>
+<article class="boss-card">
+  <div class="boss-card-head"><a href="https://wiki.guildwars.com/wiki/Shakor_Firespear" target="_blank" rel="noopener"><strong>Shakor Firespear</strong></a></div>
+  <div class="boss-elite"><span class="elite-label">Elite:</span> <a class="elite-link" href="https://wiki.guildwars.com/wiki/Angelic_Bond" target="_blank" rel="noopener">Angelic Bond</a></div>
+  <div class="boss-meta">28 (30)</div>
+</article>
+<article class="boss-card">
+  <div class="boss-card-head"><a href="https://wiki.guildwars.com/wiki/Hajok_Earthguardian_(Djinn)" target="_blank" rel="noopener"><strong>Hajok Earthguardian</strong></a></div>
+  <div class="boss-elite"><span class="elite-label">Elite:</span> <a class="elite-link" href="https://wiki.guildwars.com/wiki/Zealous_Vow" target="_blank" rel="noopener">Zealous Vow</a></div>
+  <div class="boss-meta">28 (30)</div>
+</article>
+</div></div>
+          </section>
+          <section class="panel other" id="other">
+            <h2 class="panel-title"><span class="icon icon-other">✦</span> Tips &amp; Notes</h2>
+            <div class="panel-scroll"><h3 style='font-size:0.8rem;color:var(--accent);margin:0.3rem 0;'>Skill recommendations</h3><div class='wiki-block'><ul><li>The <a href="https://wiki.guildwars.com/wiki/Ruby_Djinn" rel="noopener" target="_blank" title="Ruby Djinn">Ruby Djinns</a> and <a href="https://wiki.guildwars.com/wiki/Roaring_Ether_(Vabbi)" rel="noopener" target="_blank" title="Roaring Ether (Vabbi)">Roaring Ethers</a> have strong AoE skills. There are a number of ways to counter:
+<ul><li><a href="https://wiki.guildwars.com/wiki/Pain_Inverter" rel="noopener" target="_blank" title="Pain Inverter">Pain Inverter</a> kills them quickly.</li>
+<li>They can be <a href="https://wiki.guildwars.com/wiki/Interrupt" rel="noopener" target="_blank" title="Interrupt">interrupted</a>, <a href="https://wiki.guildwars.com/wiki/Dazed" rel="noopener" target="_blank" title="Dazed">dazed</a>, or <a class="mw-redirect" href="https://wiki.guildwars.com/wiki/Knocked_down" rel="noopener" target="_blank" title="Knocked down">knocked down</a>.</li>
+<li>The Djinni are vulnerable to <a href="https://wiki.guildwars.com/wiki/Cold_damage" rel="noopener" target="_blank" title="Cold damage">cold damage</a>, making <a href="https://wiki.guildwars.com/wiki/Winter" rel="noopener" target="_blank" title="Winter">Winter</a> a good choice.</li>
+<li><a href="https://wiki.guildwars.com/wiki/Burning" rel="noopener" target="_blank" title="Burning">Burning</a> (caused by <a href="https://wiki.guildwars.com/wiki/Searing_Flames" rel="noopener" target="_blank" title="Searing Flames">Searing Flames</a>) can be countered with <a href="https://wiki.guildwars.com/wiki/Extinguish" rel="noopener" target="_blank" title="Extinguish">Extinguish</a> or <a href="https://wiki.guildwars.com/wiki/Breath_of_the_Great_Dwarf" rel="noopener" target="_blank" title="Breath of the Great Dwarf">Breath of the Great Dwarf</a>.</li></ul></li>
+<li><a href="https://wiki.guildwars.com/wiki/Frozen_Soil" rel="noopener" target="_blank" title="Frozen Soil">Frozen Soil</a> or interrupts (e.g. <a href="https://wiki.guildwars.com/wiki/Complicate" rel="noopener" target="_blank" title="Complicate">Complicate</a>) can be useful to counter the Roaring Ethers' <a href="https://wiki.guildwars.com/wiki/Resurrection_Signet" rel="noopener" target="_blank" title="Resurrection Signet">Resurrection Signets</a>.</li>
+<li>Protection skills are very useful, including <a href="https://wiki.guildwars.com/wiki/Protective_Spirit" rel="noopener" target="_blank" title="Protective Spirit">Protective Spirit</a> and <a href="https://wiki.guildwars.com/wiki/Shelter" rel="noopener" target="_blank" title="Shelter">Shelter</a>; henchman <a href="https://wiki.guildwars.com/wiki/Kihm" rel="noopener" target="_blank" title="Kihm">Kihm</a> uses Protective Spirit.</li>
+<li><a href="https://wiki.guildwars.com/wiki/Bonder" rel="noopener" target="_blank" title="Bonder">Bonders</a> are very effective; none of the foes can remove <a class="mw-redirect" href="https://wiki.guildwars.com/wiki/Enchantment" rel="noopener" target="_blank" title="Enchantment">enchantments</a>.</li>
+<li>Very few of the <a href="https://wiki.guildwars.com/wiki/Foe" rel="noopener" target="_blank" title="Foe">foes</a> are <a href="https://wiki.guildwars.com/wiki/Fleshy" rel="noopener" target="_blank" title="Fleshy">fleshy</a> (just the Ethers); avoid skills that exploit <a href="https://wiki.guildwars.com/wiki/Corpse" rel="noopener" target="_blank" title="Corpse">corpses</a> or inflict <a href="https://wiki.guildwars.com/wiki/Bleeding" rel="noopener" target="_blank" title="Bleeding">Bleeding</a>, <a href="https://wiki.guildwars.com/wiki/Disease" rel="noopener" target="_blank" title="Disease">Disease</a>, and <a href="https://wiki.guildwars.com/wiki/Poison" rel="noopener" target="_blank" title="Poison">Poison</a>.</li></ul></div>
+<h3 style='font-size:0.8rem;color:var(--accent);margin:0.3rem 0;'>Notes</h3><div class='wiki-block'><ul><li>For most of the mission, <a href="https://wiki.guildwars.com/wiki/Goren" rel="noopener" target="_blank" title="Goren">Goren</a> should sustain little damage. The most dangerous times are if you try to run away, as Goren will usually be last to follow and thus be the focus of enemy fire. This is especially true in the Central Chamber fight where the bosses may deal lethal damage to Goren should you need to flee. Traps also have a possibility to deal substantial damage to Goren if not careful.</li>
+<li>After completing this mission, your party will be taken to <a href="https://wiki.guildwars.com/wiki/The_Kodash_Bazaar" rel="noopener" target="_blank" title="The Kodash Bazaar">the Kodash Bazaar</a>.</li>
+<li>Completion of this mission will fill in page #9 in the <a href="https://wiki.guildwars.com/wiki/Night_Falls" rel="noopener" target="_blank" title="Night Falls">Night Falls</a> <a href="https://wiki.guildwars.com/wiki/Storybook" rel="noopener" target="_blank" title="Storybook">storybook</a>.</li></ul></div></div>
+          </section>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="lightbox" id="lightbox" role="dialog" aria-label="Enlarged map">
+    <img src="../maps/nightfall_11_Dasha_Vestibule_map.jpg" alt="Dasha Vestibule mission map (enlarged)" />
+  </div>
+  <script>
+    (function () {
+      var open = document.getElementById("mapOpen");
+      var box = document.getElementById("lightbox");
+      if (!open || !box) return;
+      open.addEventListener("click", function () { box.classList.add("open"); });
+      box.addEventListener("click", function () { box.classList.remove("open"); });
+      document.addEventListener("keydown", function (e) {
+        if (e.key === "Escape") box.classList.remove("open");
+      });
+    })();
+  </script>
+
+</body>
+</html>

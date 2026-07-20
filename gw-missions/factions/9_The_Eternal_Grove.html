@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>The Eternal Grove</title>
+  <style>
+:root {
+  --bg-deep: #070a0f;
+  --bg-panel: #101820;
+  --bg-panel-2: #15202c;
+  --border: #243044;
+  --border-glow: #2a4a6a;
+  --text: #dce6f0;
+  --text-muted: #8a9bb0;
+  --text-dim: #5c6f86;
+  --accent: #3ecfff;
+  --accent-soft: rgba(62, 207, 255, 0.12);
+  --gold: #e8c56a;
+  --gold-soft: rgba(232, 197, 106, 0.12);
+  --bonus: #7dffb3;
+  --bonus-soft: rgba(125, 255, 179, 0.1);
+  --danger: #ff6b6b;
+  --danger-soft: rgba(255, 107, 107, 0.1);
+  --hm: #c78bff;
+  --hm-soft: rgba(199, 139, 255, 0.12);
+  --radius: 10px;
+  --font: "Segoe UI", system-ui, -apple-system, sans-serif;
+  --chrome-h: 3.1rem;
+  --gap: 0.5rem;
+  --pad: 0.7rem;
+  /* Readable on 4K vertical (~2160×3840) */
+  --walk-size: clamp(1.05rem, 0.55vw + 0.55vh, 1.35rem);
+  --bonus-size: clamp(1.05rem, 0.55vw + 0.55vh, 1.35rem);
+  --body-size: clamp(0.95rem, 0.4vw + 0.4vh, 1.1rem);
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html {
+  scroll-behavior: smooth;
+  font-size: clamp(16px, 0.55vw + 0.45vh, 20px);
+  height: 100%;
+  scroll-padding-top: calc(var(--chrome-h) + 0.5rem);
+}
+body {
+  font-family: var(--font);
+  background: var(--bg-deep);
+  color: var(--text);
+  line-height: 1.45;
+  min-height: 100%;
+  height: 100%;
+  overflow: hidden;
+  background-image: radial-gradient(ellipse 70% 25% at 50% 0%, rgba(42, 100, 160, 0.14), transparent);
+}
+a { color: var(--accent); text-decoration: none; }
+a:hover { color: #7de0ff; text-decoration: underline; }
+.app {
+  display: grid;
+  grid-template-rows: var(--chrome-h) 1fr;
+  height: 100vh; height: 100dvh;
+  max-height: 100vh; max-height: 100dvh;
+}
+.top-chrome {
+  display: flex; align-items: center; gap: 0.65rem;
+  padding: 0 0.7rem;
+  background: rgba(8, 12, 18, 0.97);
+  border-bottom: 1px solid var(--border);
+  z-index: 100; min-height: var(--chrome-h);
+}
+.brand { display: flex; align-items: baseline; gap: 0.55rem; min-width: 0; flex-shrink: 0; }
+.brand-mission {
+  font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase;
+  color: var(--accent); font-weight: 700; white-space: nowrap;
+}
+.brand-name {
+  font-size: 1.1rem; font-weight: 750; color: var(--text);
+  white-space: nowrap; letter-spacing: -0.02em;
+}
+.brand-meta { font-size: 0.75rem; color: var(--text-dim); white-space: nowrap; }
+.chip-nav {
+  display: flex; flex: 1; gap: 0.3rem; overflow-x: auto;
+  scrollbar-width: none; min-width: 0; justify-content: center;
+}
+.chip-nav::-webkit-scrollbar { display: none; }
+.chip-nav a {
+  flex: 0 0 auto; padding: 0.3rem 0.65rem; border-radius: 999px;
+  font-size: 0.78rem; font-weight: 600; color: var(--text-muted);
+  background: var(--bg-panel); border: 1px solid var(--border);
+  text-decoration: none; white-space: nowrap;
+}
+.chip-nav a:hover {
+  color: var(--text); border-color: var(--border-glow);
+  background: #1a2836; text-decoration: none;
+}
+.chip-nav a[href="#map"] { color: var(--accent); border-color: rgba(62, 207, 255, 0.35); }
+.chip-nav a[href="#bonus"] { color: var(--bonus); border-color: rgba(125, 255, 179, 0.3); }
+.chip-nav a[href="#hard-mode"] { color: var(--hm); border-color: rgba(199, 139, 255, 0.3); }
+.chip-nav a[href="#bosses"] { color: #ff9a9a; border-color: rgba(255, 107, 107, 0.3); }
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 0.3rem;
+  padding: 0.42rem 0.85rem; border-radius: 8px; font-weight: 650; font-size: 0.8rem;
+  border: none; cursor: pointer; text-decoration: none; white-space: nowrap; flex-shrink: 0;
+}
+.btn:hover { text-decoration: none; }
+.btn-next {
+  background: linear-gradient(135deg, #1a6a9a, #1ab0e0); color: #fff;
+  box-shadow: 0 2px 12px rgba(26, 140, 200, 0.35);
+}
+.btn-next:hover { color: #fff; filter: brightness(1.08); }
+.btn-wiki, .btn-idx, .btn-prev {
+  background: var(--bg-panel); color: var(--text-muted);
+  border: 1px solid var(--border); padding: 0.42rem 0.65rem;
+}
+.btn-wiki:hover, .btn-idx:hover, .btn-prev:hover {
+  color: var(--accent); border-color: var(--border-glow);
+}
+.chrome-actions { display: flex; gap: 0.35rem; flex-shrink: 0; }
+
+/* Map-dominant workspace */
+.workspace {
+  display: grid;
+  grid-template-columns: minmax(480px, 1.15fr) minmax(0, 1fr);
+  grid-template-rows: 1fr;
+  gap: var(--gap); padding: var(--gap);
+  min-height: 0; height: 100%; overflow: hidden;
+}
+.col-map {
+  display: grid;
+  grid-template-rows: 1fr auto;
+  gap: var(--gap);
+  min-height: 0; min-width: 0;
+}
+.col-main {
+  display: grid;
+  /* objectives compact | walkthrough HUGE | bonus+hm | bosses+tips */
+  grid-template-rows: auto minmax(0, 1.6fr) minmax(0, 1.05fr) minmax(0, 0.75fr);
+  gap: var(--gap); min-height: 0; min-width: 0; overflow: hidden;
+}
+.row-obj { min-height: 0; }
+.row-bonus-hm {
+  display: grid; grid-template-columns: 1.15fr 0.85fr; gap: var(--gap); min-height: 0;
+}
+.row-lower {
+  display: grid; grid-template-columns: 1.15fr 0.85fr; gap: var(--gap); min-height: 0;
+}
+.panel {
+  background: var(--bg-panel); border: 1px solid var(--border); border-radius: var(--radius);
+  padding: var(--pad); display: flex; flex-direction: column; min-height: 0; overflow: hidden;
+}
+.panel-scroll {
+  overflow-y: auto; overflow-x: hidden; min-height: 0; flex: 1; padding-right: 0.3rem;
+  scrollbar-width: thin; scrollbar-color: var(--border) transparent;
+  font-size: var(--body-size);
+}
+.panel-scroll::-webkit-scrollbar { width: 8px; }
+.panel-scroll::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+.panel-title {
+  display: flex; align-items: center; gap: 0.4rem;
+  font-size: 0.82rem; font-weight: 750; letter-spacing: 0.05em; text-transform: uppercase;
+  color: var(--text); margin-bottom: 0.45rem; padding-bottom: 0.35rem;
+  border-bottom: 1px solid var(--border); flex-shrink: 0;
+}
+.panel-title .icon {
+  width: 1.3rem; height: 1.3rem; border-radius: 5px;
+  display: inline-flex; align-items: center; justify-content: center; font-size: 0.75rem;
+}
+.panel.map-panel {
+  border-color: var(--border-glow);
+  background: linear-gradient(180deg, #0e1620 0%, var(--bg-panel) 100%);
+  /* Map takes almost all left column */
+  min-height: 0;
+}
+.panel.objectives { border-top: 2px solid var(--accent); }
+.panel.walkthrough { border-top: 3px solid #5eb8e8; }
+.panel.bonus { border-top: 3px solid var(--bonus); }
+.panel.hard-mode { border-top: 2px solid var(--hm); }
+.panel.bosses { border-top: 2px solid var(--danger); }
+.panel.other { border-top: 2px solid var(--text-muted); }
+
+/* Emphasized reading panels */
+.panel.walkthrough .panel-scroll,
+.panel.walkthrough .wiki-block {
+  font-size: var(--walk-size) !important;
+  line-height: 1.55;
+}
+.panel.bonus .panel-scroll,
+.panel.bonus .wiki-block {
+  font-size: var(--bonus-size) !important;
+  line-height: 1.55;
+}
+.panel.walkthrough .panel-scroll li,
+.panel.bonus .panel-scroll li {
+  margin-bottom: 0.45rem;
+}
+.panel.walkthrough .panel-scroll p,
+.panel.bonus .panel-scroll p {
+  margin-bottom: 0.55rem;
+}
+
+.icon-map { background: var(--accent-soft); color: var(--accent); }
+.icon-obj { background: var(--accent-soft); color: var(--accent); }
+.icon-walk { background: rgba(94, 184, 232, 0.15); color: #5eb8e8; }
+.icon-bonus { background: var(--bonus-soft); color: var(--bonus); }
+.icon-hm { background: var(--hm-soft); color: var(--hm); }
+.icon-boss { background: var(--danger-soft); color: var(--danger); }
+.icon-other { background: rgba(138, 155, 176, 0.15); color: var(--text-muted); }
+
+.map-wrap {
+  flex: 1; min-height: 0; display: flex; flex-direction: column;
+  align-items: center; justify-content: center; gap: 0.4rem;
+}
+.map-frame {
+  flex: 1; min-height: 0; width: 100%;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: 10px; overflow: hidden;
+  border: 2px solid var(--border-glow);
+  box-shadow: 0 0 0 1px rgba(62, 207, 255, 0.1), 0 12px 40px rgba(0, 0, 0, 0.45);
+  background: #05080c; cursor: zoom-in;
+}
+.map-frame img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  image-rendering: auto;
+}
+.map-caption { font-size: 0.72rem; color: var(--text-dim); flex-shrink: 0; }
+.map-missing {
+  color: var(--text-dim); font-size: 1rem; text-align: center; padding: 2rem;
+}
+
+.wiki-block ul, .panel-scroll ul,
+.wiki-block ol, .panel-scroll ol { padding-left: 1.2rem; margin: 0.3rem 0 0.5rem; }
+.wiki-block li, .panel-scroll li { margin-bottom: 0.32rem; }
+.wiki-block p, .panel-scroll p { margin-bottom: 0.45rem; }
+.wiki-block img, .panel-scroll img { vertical-align: middle; max-height: 1.35em; width: auto; }
+.wiki-block table, .panel-scroll table {
+  width: 100%; border-collapse: collapse; font-size: 0.9em; margin: 0.4rem 0;
+}
+.wiki-block th, .wiki-block td, .panel-scroll th, .panel-scroll td {
+  border: 1px solid var(--border); padding: 0.3rem 0.45rem; text-align: left;
+}
+.lede { font-size: 0.92rem; color: var(--text-muted); margin-bottom: 0.35rem; }
+
+/* Collapsed summary */
+details.summary-details {
+  background: var(--bg-panel);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  border-top: 2px solid var(--gold);
+  padding: 0.35rem 0.65rem;
+  flex-shrink: 0;
+}
+details.summary-details summary {
+  cursor: pointer;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--gold);
+  padding: 0.35rem 0;
+  list-style: none;
+}
+details.summary-details summary::-webkit-details-marker { display: none; }
+details.summary-details summary::before {
+  content: "▸ ";
+  color: var(--text-dim);
+}
+details.summary-details[open] summary::before { content: "▾ "; }
+details.summary-details .summary-body {
+  padding: 0.35rem 0 0.55rem;
+  font-size: 0.88rem;
+  color: var(--text-muted);
+  max-height: 18vh;
+  overflow-y: auto;
+}
+
+.boss-note { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.4rem; }
+.boss-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.4rem; }
+.boss-card {
+  background: var(--bg-panel-2); border: 1px solid var(--border);
+  border-radius: 8px; padding: 0.5rem 0.6rem;
+}
+.boss-card-head { font-size: 0.95rem; margin-bottom: 0.2rem; }
+.boss-card-head a { color: #eef6fc; font-weight: 700; }
+.boss-card-head a:hover { color: var(--accent); }
+.boss-elite { font-size: 0.88rem; }
+.elite-label { color: var(--gold); font-weight: 650; margin-right: 0.25rem; }
+.elite-link { color: #ffd78a; font-weight: 650; }
+.elite-link:hover { color: #ffe9b5; }
+.elite-none { color: var(--text-dim); font-style: italic; font-size: 0.85rem; }
+.boss-meta { font-size: 0.78rem; color: var(--text-dim); margin-top: 0.15rem; }
+
+.callout {
+  margin-top: 0.4rem; padding: 0.45rem 0.6rem; border-radius: 6px;
+  font-size: 0.88rem; border-left: 3px solid; line-height: 1.4;
+}
+.callout.tip { background: var(--accent-soft); border-color: var(--accent); color: #b8eaff; }
+.callout.warn { background: var(--danger-soft); border-color: var(--danger); color: #ffb4b4; }
+
+.lightbox {
+  display: none; position: fixed; inset: 0; z-index: 1000; background: rgba(0,0,0,0.94);
+  align-items: center; justify-content: center; padding: 1.5rem; cursor: zoom-out;
+}
+.lightbox.open { display: flex; }
+.lightbox img {
+  max-width: 96vw; max-height: 96vh; border-radius: 8px;
+  border: 2px solid var(--border-glow); object-fit: contain;
+}
+
+@media (min-height: 2400px) {
+  :root {
+    --walk-size: clamp(1.15rem, 0.7vh + 0.3vw, 1.5rem);
+    --bonus-size: clamp(1.15rem, 0.7vh + 0.3vw, 1.5rem);
+    --gap: 0.65rem;
+    --pad: 0.85rem;
+  }
+  .workspace { grid-template-columns: minmax(560px, 1.2fr) minmax(0, 1fr); }
+}
+@media (min-width: 1800px) and (min-height: 2000px) {
+  .workspace { grid-template-columns: minmax(600px, 1.25fr) minmax(0, 1fr); }
+}
+@media (max-height: 1100px) {
+  body { overflow: auto; height: auto; }
+  .app { height: auto; max-height: none; min-height: 100vh; }
+  .workspace {
+    height: auto; overflow: visible; grid-template-columns: 1fr; grid-template-rows: auto;
+  }
+  .col-map { grid-template-rows: auto; }
+  .col-main { overflow: visible; grid-template-rows: auto; }
+  .row-bonus-hm, .row-lower { grid-template-columns: 1fr; }
+  .panel { max-height: none; overflow: visible; }
+  .panel-scroll { overflow: visible; }
+  .map-frame { min-height: 360px; max-height: 55vh; }
+}
+
+    :root { --accent: #e8a84a; --accent-soft: #e8a84a22; }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header class="top-chrome">
+      <div class="brand">
+        <span class="brand-mission">M9a</span>
+        <span class="brand-name">The Eternal Grove</span>
+        <span class="brand-meta">Factions · Echovald Forest · Cooperative · Medium</span>
+      </div>
+      <nav class="chip-nav" aria-label="Sections">
+        <a href="#map">Map</a>
+        <a href="#walkthrough">Walkthrough</a>
+        <a href="#bonus">Bonus</a>
+        <a href="#objectives">Objectives</a>
+        <a href="#hard-mode">Hard Mode</a>
+        <a href="#bosses">Bosses</a>
+        <a href="#other">Tips</a>
+      </nav>
+      <div class="chrome-actions">
+        <a class="btn btn-idx" href="../factions.html">Index</a>
+        <a class="btn btn-prev" href="8_Sunjiang_District.html">← Prev</a>
+        <a class="btn btn-wiki" href="https://wiki.guildwars.com/wiki/The_Eternal_Grove" target="_blank" rel="noopener">Wiki ↗</a>
+        <a class="btn btn-next" href="10_Gyala_Hatchery.html">Next: Gyala Hatchery →</a>
+      </div>
+    </header>
+
+    <div class="workspace">
+      <div class="col-map">
+        <section class="panel map-panel" id="map">
+          <h2 class="panel-title"><span class="icon icon-map">◉</span> Mission Map</h2>
+          <div class="map-wrap">
+            <div class="map-frame" id="mapOpen" title="Click to enlarge">
+              <img src="../maps/factions_09_The_Eternal_Grove_map.jpg" alt="The Eternal Grove mission map" />
+            </div>
+            <p class="map-caption">Click to enlarge · Local cache · <a href="https://wiki.guildwars.com/wiki/The_Eternal_Grove" target="_blank" rel="noopener">Wiki</a></p>
+        </div>
+        </section>
+
+        <details class="summary-details" id="summary">
+          <summary>Summary (click to expand)</summary>
+          <div class="summary-body">
+            <p>Protect the Forever Trees in the Eternal Grove by ensuring that the Tree Singers are able to complete their ritual through the Luxon and Afflicted attacks.</p>
+            <p style="margin-top:0.4rem;"><strong>Region:</strong> Echovald Forest · <strong>Mission:</strong> 9a of 13 · <strong>Type:</strong> Cooperative<br/><strong>Path:</strong> Kurzick path</p>
+            <p style="margin-top:0.35rem;"><a href="https://wiki.guildwars.com/wiki/The_Eternal_Grove" target="_blank" rel="noopener">Full wiki article ↗</a></p>
+          </div>
+        </details>
+      </div>
+
+      <div class="col-main">
+        <section class="panel objectives row-obj" id="objectives">
+          <h2 class="panel-title"><span class="icon icon-obj">✓</span> Objectives</h2>
+          <div class="panel-scroll wiki-block"><p>Protect the Forever Trees by keeping the Tree Singers alive. You have [12...0] of 12 Tree Singers remaining.
+</p><ul><li>ADDED: Defeat the Afflicted forces. You have [12...0] group[s] remaining.</li></ul></div>
+        </section>
+
+        <section class="panel walkthrough" id="walkthrough">
+          <h2 class="panel-title"><span class="icon icon-walk">→</span> Walkthrough</h2>
+          <div class="panel-scroll wiki-block"><p>As you enter this mission note the additional health display which shows the health status of the three Forever Trees. The trees are located at the points 1, 2 and 3 on the map. There are four <a href="https://wiki.guildwars.com/wiki/Tree_Singer" rel="noopener" target="_blank" title="Tree Singer">Tree Singers</a> grouped around each tree - each singer contributes for one quarter of the tree's health. As the singers take damage the tree will also take damage. If a singer dies the tree is permanently damaged by a quarter; however seeing the bar go down by a quarter does not mean a Tree Singer has died - several could merely be injured, making it look as if one has died. If all four singers of one tree are dead the tree will be also. Only one Tree Singer/tree needs to survive the mission to complete it.
+</p><p><a href="https://wiki.guildwars.com/wiki/Baron_Mirek_Vasburg" rel="noopener" target="_blank" title="Baron Mirek Vasburg">Baron Mirek Vasburg</a>, <a href="https://wiki.guildwars.com/wiki/Danika" rel="noopener" target="_blank" title="Danika">Danika</a>, and <a href="https://wiki.guildwars.com/wiki/Mhenlo" rel="noopener" target="_blank" title="Mhenlo">Mhenlo</a> are present as stationary allies. Danika and Mhenlo will heal the <a href="https://wiki.guildwars.com/wiki/Party" rel="noopener" target="_blank" title="Party">party</a>, but you will have no control over them whatsoever and they cannot be <a href="https://wiki.guildwars.com/wiki/Resurrect" rel="noopener" target="_blank" title="Resurrect">resurrected</a>. Their death does not result in a failure of the mission. Danika <a href="https://wiki.guildwars.com/wiki/Spawn" rel="noopener" target="_blank" title="Spawn">spawns</a> at the beginning of the mission and is stationed in the middle of the grove. Mhenlo spawns after the intermediate <a href="https://wiki.guildwars.com/wiki/Cinematic" rel="noopener" target="_blank" title="Cinematic">cinematic</a> and is stationed at the north gate.
+</p><p>Three Juggernauts are available to assist you after they have been transformed, and they can be ordered to follow you or defend a spot (talking to them once will set them to follow you, talking to them again will make them defend where they are). While close to a Juggernaut, you will benefit from the <a href="https://wiki.guildwars.com/wiki/Aura_of_the_Juggernaut" rel="noopener" target="_blank" title="Aura of the Juggernaut">Aura of the Juggernaut</a> (which boosts your energy regeneration).
+</p><p>The hill has only two entrances through which opponents can get to the Tree Singers, and is covered by the <a href="https://wiki.guildwars.com/wiki/Aura_of_the_Grove" rel="noopener" target="_blank" title="Aura of the Grove">Aura of the Grove</a> environmental effect, which provides a speed boost while in the area. A good tactic for the first part is for the party to split up into two balanced groups of 4 players (or <a href="https://wiki.guildwars.com/wiki/Hero" rel="noopener" target="_blank" title="Hero">heroes</a>, if available; note that this split team tactic is very difficult with <a href="https://wiki.guildwars.com/wiki/Henchman" rel="noopener" target="_blank" title="Henchman">henchmen</a>), one guarding each gate. Most of the foes in the mission will approach the hill but it is sometimes advantageous or necessary to leave it and engage them outside.
+</p><p>During the second stage of the mission you will be joined by a handful of Luxons plus any that were left alive from the first stage.
+</p><h3><span class="mw-headline" id="Luxon_attack">Luxon attack</span></h3><p>Protecting the Tree Singers while taking out the <a href="https://wiki.guildwars.com/wiki/Siege_Turtle" rel="noopener" target="_blank" title="Siege Turtle">Siege Turtles</a> is the goal for this stage.
+</p><p>Luxons will attack from all sides, coming down the paths from the north, west and south. Take care not to let any <a href="https://wiki.guildwars.com/wiki/Luxon_Elementalist" rel="noopener" target="_blank" title="Luxon Elementalist">Luxon Elementalists</a> or <a href="https://wiki.guildwars.com/wiki/Luxon_Warrior" rel="noopener" target="_blank" title="Luxon Warrior">Luxon Warriors</a> slip through to the Tree Singers, as they can kill the Tree Singers quickly. <a href="https://wiki.guildwars.com/wiki/Luxon_Ranger" rel="noopener" target="_blank" title="Luxon Ranger">Luxon Rangers</a> are a comparatively minor threat. At six timed points during this stage, a Siege Turtle will approach from a side path, its arrival announced by Baron Mirek Vasburg. The order of arrival is west, south, north, south, north and west. They will start firing at the Tree Singers if they reach the small hills, marked with <big><b>X</b></big> on the map, but the Tree Singers can survive a minimal bombardment and the turtles will soon redirect their fire on a <a href="https://wiki.guildwars.com/wiki/Kurzick" rel="noopener" target="_blank" title="Kurzick">Kurzick</a> team attacking them. Don't let the Luxon Rangers distract you from protecting the Grove - the turtles are the primary threat. Killing the rangers and the two turtles to the west will trigger the cinematic and arrival of the Afflicted. You can optionally leave the rangers and turtles alive to the north and south, as they become additional allies during the Afflicted attack. 
+</p><p>If you run a split defense, position your teams at the base of the stairs, to intercept the Luxons as early as possible and minimize travel to the Siege Turtles when they arrive. Otherwise stay in the central area to avoid lengthy runs between Luxon siege positions and only go out of the fort for quick hit-and-run attacks on the turtles.
+</p><p>With heroes, the most effective way to do this is to have a team of three guarding the north entrance. Ideally, this team should consist of a minion master, a healer (skills like heal area will help) and a nuker. Position them quite far forward. Use the minimap and learn the positions of the two entrances so you can re-flag even when they're not visible (they're between the patches of green - zooming in can help). Your team (you plus four heroes) should have high damage output. A team speed boost isn't necessary, but it will definitely help. Your team guards the southern entrance. Dispatch the incoming groups as quickly as possible and constantly look for incoming siege turtles. When you see one, run towards it, kill it, then run straight back to base. Don't be tempted to mop up any other enemies you see running around. Speed is of utmost priority here - use heavy AoE damage and kill the turtles and their guards as quickly as possible. The less time you spend outside the base, the better. It can help if you create spirits dotting the map as these will distract and slow down enemies. 
+</p><p>When you see a siege turtle heading towards the northern entrance (this should be the second wave), move your defensive team to the other (southern) gate while you head out north to kill the turtle and any mobs you come across en-route. Again, run back when it's killed. Keep flagging your defensive/base team to whatever entrance is needed while you dispatch the turtles. You may need to help them from time to time, particularly if they're under attack from elementalists. 
+</p><p>Grab the Juggernauts as soon as they become available and set them to follow you. With a split defense it is recommended to use two for the south team, one for the north. With them set to follow they will automatically return to you if killed.
+</p><p>There is little doubt that the master's award for this mission is among the hardest in the campaign. It may take several attempts to learn the attack patterns and, with heroes, learn where you need to flag them for optimal positioning. However, it is achievable for teams with balanced skill builds. Thankfully, if you can survive the Luxon attack with all the Tree Singers still alive then the hardest bit is over and the next stage shouldn't pose too many problems.
+</p><h3><span class="mw-headline" id="Afflicted_attack">Afflicted attack</span></h3><p>After you have beaten the Luxons, you will be attacked by waves of the more dangerous Afflicted. The Afflicted have no siege attack so you can stay inside the grove. The good news is that the Afflicted will focus more on you and your allies than the Tree Singers, meaning it's easier to simply keep your party together and move between the gates. Splitting your group (especially if you're the only player) is still possible but much more dangerous. The afflicted come in large groups and can very easily overwhelm a group of 3-4 heroes, after which they're free to flank the remaining party members or down the Tree Singers. 
+</p><p>The strategy here is similar to the first stage. Split your team to defend the two gates. There's no reason to leave the base. In the case of this mission, the best defence is NOT offence! If you decide to push out, Afflicted can and will get into your base and start attacking the Tree Singers. The stronger team should help the weaker one as soon as they're finished with their group. 
+</p><p>If you still want to split your team: the south gate is generally a bit tougher than the north, so if you have a disparity in the two teams, send the better one to the south. (Watch out in particular for the Afflicted Monk's <a href="https://wiki.guildwars.com/wiki/Ray_of_Judgment" rel="noopener" target="_blank" title="Ray of Judgment">Ray of Judgment</a>, and the Afflicted Elementalist's <a href="https://wiki.guildwars.com/wiki/Mind_Burn" rel="noopener" target="_blank" title="Mind Burn">Mind Burn</a>.) Position your teams well inside the gates, behind the <a class="mw-redirect" href="https://wiki.guildwars.com/wiki/NPC" rel="noopener" target="_blank" title="NPC">NPC</a> defenders, closer to the NPC healers and the other team. Don't go through the gates unless mopping up. Poor positioning at this stage can lead to mission failure.
+</p><p>The Afflicted will always attack both gates simultaneously, but the strength of the waves varies. The first couple of waves are tougher on the southern gate, while the last few are tougher on the north gate. With the second wave, the southern gate will be attacked by <a href="https://wiki.guildwars.com/wiki/The_Afflicted_Maaka" rel="noopener" target="_blank" title="The Afflicted Maaka">the Afflicted Maaka</a>. If you run a split team, the northern gate will usually be clear quickly, while the southern team may struggle to stay alive. In that case, the northern team should hurry to assist them. In the final wave two warriors will attempt to sneak in the southern door while the north is attacked by <a href="https://wiki.guildwars.com/wiki/The_Afflicted_Xenxo" rel="noopener" target="_blank" title="The Afflicted Xenxo">the Afflicted Xenxo</a> and <a href="https://wiki.guildwars.com/wiki/The_Afflicted_Senku" rel="noopener" target="_blank" title="The Afflicted Senku">Senku</a>, so make sure they are killed first before converging on the two <a href="https://wiki.guildwars.com/wiki/Boss" rel="noopener" target="_blank" title="Boss">bosses</a>.
+</p></div>
+        </section>
+
+        <div class="row-bonus-hm">
+          <section class="panel bonus" id="bonus">
+            <h2 class="panel-title"><span class="icon icon-bonus">★</span> Bonus</h2>
+            <div class="panel-scroll wiki-block"><p class='lede'>See walkthrough and objectives for bonus details (if any).</p></div>
+          </section>
+          <section class="panel hard-mode" id="hard-mode">
+            <h2 class="panel-title"><span class="icon icon-hm">◆</span> Hard Mode</h2>
+            <div class="panel-scroll wiki-block"><p class='lede'>No dedicated Hard Mode section on the wiki — expect tougher foes and adjusted mechanics. See walkthrough notes.</p></div>
+          </section>
+        </div>
+
+        <div class="row-lower">
+          <section class="panel bosses" id="bosses">
+            <h2 class="panel-title"><span class="icon icon-boss">☠</span> Bosses &amp; Elites</h2>
+            <div class="panel-scroll"><div class='boss-grid'>
+<article class="boss-card">
+  <div class="boss-card-head"><a href="https://wiki.guildwars.com/wiki/The_Afflicted_Maaka" target="_blank" rel="noopener"><strong>The Afflicted Maaka</strong></a></div>
+  <div class="boss-elite"><span class="elite-label">Elite:</span> <a class="elite-link" href="https://wiki.guildwars.com/wiki/Enraged_Smash" target="_blank" rel="noopener">Enraged Smash</a></div>
+  <div class="boss-meta">28</div>
+</article>
+<article class="boss-card">
+  <div class="boss-card-head"><a href="https://wiki.guildwars.com/wiki/The_Afflicted_Senku" target="_blank" rel="noopener"><strong>The Afflicted Senku</strong></a></div>
+  <div class="boss-elite"><span class="elite-label">Elite:</span> <a class="elite-link" href="https://wiki.guildwars.com/wiki/Shadow_Form" target="_blank" rel="noopener">Shadow Form</a></div>
+  <div class="boss-meta">28</div>
+</article>
+<article class="boss-card">
+  <div class="boss-card-head"><a href="https://wiki.guildwars.com/wiki/The_Afflicted_Xenxo" target="_blank" rel="noopener"><strong>The Afflicted Xenxo</strong></a></div>
+  <div class="boss-elite"><span class="elite-label">Elite:</span> <a class="elite-link" href="https://wiki.guildwars.com/wiki/Weapon_of_Quickening" target="_blank" rel="noopener">Weapon of Quickening</a></div>
+  <div class="boss-meta">28</div>
+</article>
+</div></div>
+          </section>
+          <section class="panel other" id="other">
+            <h2 class="panel-title"><span class="icon icon-other">✦</span> Tips &amp; Notes</h2>
+            <div class="panel-scroll"><h3 style='font-size:0.8rem;color:var(--accent);margin:0.3rem 0;'>Skill recommendations</h3><div class='wiki-block'><ul><li>A <a href="https://wiki.guildwars.com/wiki/Minion_master" rel="noopener" target="_blank" title="Minion master">minion master</a> can provide fodder against Luxon or Afflicted <a href="https://wiki.guildwars.com/wiki/Mob" rel="noopener" target="_blank" title="Mob">mobs</a>; better still, they can help block the gates from enemy incursions.
+<ul><li>At the start of the mission, you can make use of the exploitable corpses left behind by Ex-Redemptor Berta, Klaus, and Lieber as they become Juggernauts.</li>
+<li><a href="https://wiki.guildwars.com/wiki/Blood_of_the_Master" rel="noopener" target="_blank" title="Blood of the Master">Blood of the Master</a> helps to keep minions alive between the waves.</li></ul></li>
+<li><a href="https://wiki.guildwars.com/wiki/Trap" rel="noopener" target="_blank" title="Trap">Trapping</a> at the entrances to the hill area can be effective.</li>
+<li>Bring offensive <a href="https://wiki.guildwars.com/wiki/Area_of_effect" rel="noopener" target="_blank" title="Area of effect">area of effect</a> (AoE) skills, since mobs will cluster on the stairways and at the gates. However, killing several Afflicted at the same time can cause an AoE <a href="https://wiki.guildwars.com/wiki/Spike" rel="noopener" target="_blank" title="Spike">spike</a> from multiple <a href="https://wiki.guildwars.com/wiki/Afflicted_Soul_Explosion" rel="noopener" target="_blank" title="Afflicted Soul Explosion">Afflicted Soul Explosions</a>.</li>
+<li>A ritualist with <a href="https://wiki.guildwars.com/wiki/Life" rel="noopener" target="_blank" title="Life">Life</a> and <a href="https://wiki.guildwars.com/wiki/Recuperation" rel="noopener" target="_blank" title="Recuperation">Recuperation</a> stationed in the center of the grove will be able to heal all the Tree Singers simultaneously as well as supporting the team.</li>
+<li>A single well-timed <a href="https://wiki.guildwars.com/wiki/Pain_Inverter" rel="noopener" target="_blank" title="Pain Inverter">Pain Inverter</a> can instantly kill a turtle, even in hard mode.</li>
+<li><a class="mw-redirect" href="https://wiki.guildwars.com/wiki/Enchantment" rel="noopener" target="_blank" title="Enchantment">Enchantment</a>-based <a href="https://wiki.guildwars.com/wiki/Build" rel="noopener" target="_blank" title="Build">builds</a> are vulnerable to enchantment removal by <a href="https://wiki.guildwars.com/wiki/Afflicted_Necromancer" rel="noopener" target="_blank" title="Afflicted Necromancer">Afflicted Necromancers</a> and <a href="https://wiki.guildwars.com/wiki/Afflicted_Mesmer" rel="noopener" target="_blank" title="Afflicted Mesmer">Mesmers</a>. Afflicted that deal <a href="https://wiki.guildwars.com/wiki/Physical_damage" rel="noopener" target="_blank" title="Physical damage">physical damage</a> can also remove enchantments when enchanted with Afflicted Necromancer's <a href="https://wiki.guildwars.com/wiki/Order_of_Apostasy" rel="noopener" target="_blank" title="Order of Apostasy">Order of Apostasy</a>.</li></ul><dl><dt>Split team strategy</dt></dl><ul><li>Bring <a class="mw-redirect" href="https://wiki.guildwars.com/wiki/Party_range" rel="noopener" target="_blank" title="Party range">party range</a> skills (such as <a href="https://wiki.guildwars.com/wiki/Heal_Party" rel="noopener" target="_blank" title="Heal Party">Heal Party</a> or <a href="https://wiki.guildwars.com/wiki/Light_of_Deliverance" rel="noopener" target="_blank" title="Light of Deliverance">Light of Deliverance</a>).</li>
+<li>Necromancer <a href="https://wiki.guildwars.com/wiki/Orders_build" rel="noopener" target="_blank" title="Orders build">orders skills</a> can be helpful.</li>
+<li>Offensive <a href="https://wiki.guildwars.com/wiki/Binding_ritual" rel="noopener" target="_blank" title="Binding ritual">binding ritual</a> spirits can be set at each gate by the same caster, as they are far enough apart.</li>
+<li>Defensive spirits such as <a href="https://wiki.guildwars.com/wiki/Shelter" rel="noopener" target="_blank" title="Shelter">Shelter</a> can be placed between the gates and reach allies at both gates, making it an ideal location for a <a href="https://wiki.guildwars.com/wiki/Soul_Twisting" rel="noopener" target="_blank" title="Soul Twisting">Soul Twisting</a> Ritualist. Heroes will typically require manual control to place spirits in this position.</li></ul></div>
+<h3 style='font-size:0.8rem;color:var(--accent);margin:0.3rem 0;'>Notes</h3><div class='wiki-block'><ul><li>It is possible to gain about 2% toward the Canthan <a href="https://wiki.guildwars.com/wiki/Cartographer" rel="noopener" target="_blank" title="Cartographer">Cartographer</a> title track here just by exploring. Flag your NPCs around the trees and explore.</li>
+<li>The mission won't advance to the Afflicted phase if there are still Luxons alive in all three groups outside the gates. You can take advantage of this to explore the map, then kill the Western group completely when you wish to proceed.</li>
+<li>Pet - Elder <a href="https://wiki.guildwars.com/wiki/Reef_Lurker" rel="noopener" target="_blank" title="Reef Lurker">Reef Lurker</a> as allies won't attack, yet the <a href="https://wiki.guildwars.com/wiki/Luxon_Soldier" rel="noopener" target="_blank" title="Luxon Soldier">Luxon Soldiers</a> still use pet attack skills.
+<ul><li>Occasionally, if the Luxon Soldiers die before their pets, the pets will become invulnerable until the corpse of the Luxon Soldier disappears.</li></ul></li>
+<li>When the final group containing the bosses dies, remaining Afflicted from other groups will immediately die as well and the mission will complete.</li>
+<li>If a Juggernaut dies, it will revive at the Forever Tree that spawned it, provided at least one Tree Singer remains alive at the tree.</li>
+<li>The western Siege Turtle and its group are within longbow range of the western Forever Tree.</li>
+<li>Completion of this mission will fill in page #7 of the <a href="https://wiki.guildwars.com/wiki/Shiro%27s_Return" rel="noopener" target="_blank" title="Shiro's Return">Shiro's Return</a> <a href="https://wiki.guildwars.com/wiki/Storybook" rel="noopener" target="_blank" title="Storybook">storybook</a>.</li>
+<li>After completion, your party will be <a href="https://wiki.guildwars.com/wiki/Teleport" rel="noopener" target="_blank" title="Teleport">teleported</a> to <a href="https://wiki.guildwars.com/wiki/Vasburg_Armory" rel="noopener" target="_blank" title="Vasburg Armory">Vasburg Armory</a>.</li>
+<li>You can increase your <a href="https://wiki.guildwars.com/wiki/Kurzick_faction" rel="noopener" target="_blank" title="Kurzick faction">Kurzick faction cap limit</a> by 7,000 by completing this mission along with <a href="https://wiki.guildwars.com/wiki/Arborstone" rel="noopener" target="_blank" title="Arborstone">Arborstone</a> and <a href="https://wiki.guildwars.com/wiki/Unwaking_Waters" rel="noopener" target="_blank" title="Unwaking Waters">Unwaking Waters</a>. This increase can only be applied once per account.</li>
+<li><a href="https://wiki.guildwars.com/wiki/Siege_Turtle" rel="noopener" target="_blank" title="Siege Turtle">Siege Turtles</a> and <a href="https://wiki.guildwars.com/wiki/Luxon_Ranger" rel="noopener" target="_blank" title="Luxon Ranger">Luxon Rangers</a> on the small hills from groups before the final group will remain hostile after the intermediate cinematic. The Afflicted will still attack them and vice-versa.</li></ul><div style="margin: 1em; border: solid silver; border-width: 1px 0px; padding: 2px 1em 2px 5em;"><strong class="hiddenlinks" style="position: absolute; margin-left: -4.8em; color: #900;"><a class="image" href="https://wiki.guildwars.com/wiki/File:Bug.png" rel="noopener" target="_blank" title="Bug"><img alt="Bug" data-file-height="32" data-file-width="32" decoding="async" height="18" loading="lazy" src="https://wiki.guildwars.com/images/thumb/7/7d/Bug.png/18px-Bug.png" srcset="/images/thumb/7/7d/Bug.png/27px-Bug.png 1.5x, /images/7/7d/Bug.png 2x" width="18"/></a> <a href="https://wiki.guildwars.com/wiki/Bug" rel="noopener" target="_blank" title="Bug">Bug</a>.</strong>As the first wave of Luxon approach from the west, the party can intercept these enemies as a large group. Killing the Siege Turtle before it has reached its destination may prevent the mission from continuing onto the Afflicted stage, however.</div><div style="margin: 1em; border: solid silver; border-width: 1px 0px; padding: 2px 1em 2px 7.5em;"><strong class="hiddenlinks" style="position: absolute; margin-left: -7.3em; color: #900;"><a class="image" href="https://wiki.guildwars.com/wiki/File:Anomaly.png" rel="noopener" target="_blank" title="Anomaly"><img alt="Anomaly" data-file-height="32" data-file-width="32" decoding="async" height="18" loading="lazy" src="https://wiki.guildwars.com/images/thumb/a/a6/Anomaly.png/18px-Anomaly.png" srcset="/images/thumb/a/a6/Anomaly.png/27px-Anomaly.png 1.5x, /images/a/a6/Anomaly.png 2x" width="18"/></a> <a class="mw-redirect" href="https://wiki.guildwars.com/wiki/Anomaly" rel="noopener" target="_blank" title="Anomaly">Anomaly</a>.</strong>Sometimes not all the Luxons turn friendly when the Afflicted phase begins. If there are both friendly and foe Luxons left in the same group they will spend the phase fighting each other.</div><table class="stdt" style="margin: 5px auto; border: 1px solid #C0C0C0; font-size: 90%; width: 80%; text-align: center;">
+<tbody><tr>
+<th style="background: #7BC; font-size: 110%;"><a class="mw-redirect" href="https://wiki.guildwars.com/wiki/List_of_Factions_missions" rel="noopener" target="_blank" title="List of Factions missions">Factions missions</a>
+</th></tr>
+<tr>
+<td><a href="https://wiki.guildwars.com/wiki/Minister_Cho%27s_Estate" rel="noopener" target="_blank" title="Minister Cho's Estate">Minister Cho's Estate</a> » <a href="https://wiki.guildwars.com/wiki/Zen_Daijun" rel="noopener" target="_blank" title="Zen Daijun">Zen Daijun</a> » <a href="https://wiki.guildwars.com/wiki/Vizunah_Square" rel="noopener" target="_blank" title="Vizunah Square">Vizunah Square</a> » <a href="https://wiki.guildwars.com/wiki/Nahpui_Quarter" rel="noopener" target="_blank" title="Nahpui Quarter">Nahpui Quarter</a> » <a href="https://wiki.guildwars.com/wiki/Tahnnakai_Temple" rel="noopener" target="_blank" title="Tahnnakai Temple">Tahnnakai Temple</a> » <a href="https://wiki.guildwars.com/wiki/Arborstone" rel="noopener" target="_blank" title="Arborstone">Arborstone</a> » <a href="https://wiki.guildwars.com/wiki/Boreas_Seabed" rel="noopener" target="_blank" title="Boreas Seabed">Boreas Seabed</a> » <a href="https://wiki.guildwars.com/wiki/Sunjiang_District" rel="noopener" target="_blank" title="Sunjiang District">Sunjiang District</a> » <a href="https://wiki.guildwars.com/wiki/Gyala_Hatchery" rel="noopener" target="_blank" title="Gyala Hatchery">Gyala Hatchery</a> <i>or</i> <a class="mw-selflink selflink">The Eternal Grove</a> » <a href="https://wiki.guildwars.com/wiki/Unwaking_Waters" rel="noopener" target="_blank" title="Unwaking Waters">Unwaking Waters</a> » <a href="https://wiki.guildwars.com/wiki/Raisu_Palace" rel="noopener" target="_blank" title="Raisu Palace">Raisu Palace</a> » <a href="https://wiki.guildwars.com/wiki/Imperial_Sanctum" rel="noopener" target="_blank" title="Imperial Sanctum">Imperial Sanctum</a>
+</td></tr>
+<tr>
+<td><i><b><a class="mw-redirect" href="https://wiki.guildwars.com/wiki/Challenge_mission" rel="noopener" target="_blank" title="Challenge mission">Challenge</a></b></i><br/><a href="https://wiki.guildwars.com/wiki/Altrumm_Ruins" rel="noopener" target="_blank" title="Altrumm Ruins">Altrumm Ruins</a> <span style="margin: 0em 0.3em;">•</span> <a href="https://wiki.guildwars.com/wiki/Amatz_Basin" rel="noopener" target="_blank" title="Amatz Basin">Amatz Basin</a> <span style="margin: 0em 0.3em;">•</span> <a href="https://wiki.guildwars.com/wiki/The_Aurios_Mines" rel="noopener" target="_blank" title="The Aurios Mines">The Aurios Mines</a> <span style="margin: 0em 0.3em;">•</span> <a href="https://wiki.guildwars.com/wiki/Dragon%27s_Throat" rel="noopener" target="_blank" title="Dragon's Throat">Dragon's Throat</a> <span style="margin: 0em 0.3em;">•</span> <a href="https://wiki.guildwars.com/wiki/Zos_Shivros_Channel" rel="noopener" target="_blank" title="Zos Shivros Channel">Zos Shivros Channel</a>
+</td></tr>
+<tr>
+<td><i><b><a class="mw-redirect" href="https://wiki.guildwars.com/wiki/Competitive_mission" rel="noopener" target="_blank" title="Competitive mission">Competitive</a></b></i><br/><a href="https://wiki.guildwars.com/wiki/Fort_Aspenwood" rel="noopener" target="_blank" title="Fort Aspenwood">Fort Aspenwood</a> <span style="margin: 0em 0.3em;">•</span> <a href="https://wiki.guildwars.com/wiki/The_Jade_Quarry" rel="noopener" target="_blank" title="The Jade Quarry">The Jade Quarry</a>
+</td></tr>
+<tr>
+<td><i><b><a class="mw-redirect" href="https://wiki.guildwars.com/wiki/Elite_mission" rel="noopener" target="_blank" title="Elite mission">Elite</a></b></i><br/><a href="https://wiki.guildwars.com/wiki/The_Deep" rel="noopener" target="_blank" title="The Deep">The Deep</a> <span style="margin: 0em 0.3em;">•</span> <a href="https://wiki.guildwars.com/wiki/Urgoz%27s_Warren" rel="noopener" target="_blank" title="Urgoz's Warren">Urgoz's Warren</a>
+</td></tr></tbody></table> 
+NewPP limit report
+Cached time: 20260720094451
+Cache expiry: 3600
+Reduced expiry: true
+Complications: [show‐toc]
+CPU time usage: 0.107 seconds
+Real time usage: 0.156 seconds
+Preprocessor visited node count: 1254/1000000
+Post‐expand include size: 13957/2097152 bytes
+Template argument size: 1571/2097152 bytes
+Highest expansion depth: 10/100
+Expensive parser function count: 0/100
+Unstrip recursion depth: 0/20
+Unstrip post‐expand size: 0/5000000 bytes
+ExtLoops count: 0/1000
+
+Transclusion expansion time report (%,ms,calls,template)
+100.00%   85.938      1 -total
+ 40.32%   34.651      1 Template:Location_disambiguation_2
+ 21.97%   18.881      8 Template:Ifexists
+ 12.94%   11.121      1 Template:Mission_rewards
+  9.76%    8.389      1 Template:Mission_infobox
+  6.82%    5.864      6 Template:Cost
+  5.34%    4.592      1 Template:Factions_missions
+  4.86%    4.178      4 Template:R
+  3.37%    2.897      1 Template:Infobox_campaign_row
+  3.18%    2.729      8 Template:Profession_icon_sizes
+ Saved in parser cache with key en_wiki:pcache:idhash:8469-0!canonical and timestamp 20260720094450 and revision id 2721138.</div></div>
+          </section>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="lightbox" id="lightbox" role="dialog" aria-label="Enlarged map">
+    <img src="../maps/factions_09_The_Eternal_Grove_map.jpg" alt="The Eternal Grove mission map (enlarged)" />
+  </div>
+  <script>
+    (function () {
+      var open = document.getElementById("mapOpen");
+      var box = document.getElementById("lightbox");
+      if (!open || !box) return;
+      open.addEventListener("click", function () { box.classList.add("open"); });
+      box.addEventListener("click", function () { box.classList.remove("open"); });
+      document.addEventListener("keydown", function (e) {
+        if (e.key === "Escape") box.classList.remove("open");
+      });
+    })();
+  </script>
+
+</body>
+</html>

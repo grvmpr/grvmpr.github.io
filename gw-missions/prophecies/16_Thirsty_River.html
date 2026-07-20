@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Thirsty River</title>
+  <style>
+:root {
+  --bg-deep: #070a0f;
+  --bg-panel: #101820;
+  --bg-panel-2: #15202c;
+  --border: #243044;
+  --border-glow: #2a4a6a;
+  --text: #dce6f0;
+  --text-muted: #8a9bb0;
+  --text-dim: #5c6f86;
+  --accent: #3ecfff;
+  --accent-soft: rgba(62, 207, 255, 0.12);
+  --gold: #e8c56a;
+  --gold-soft: rgba(232, 197, 106, 0.12);
+  --bonus: #7dffb3;
+  --bonus-soft: rgba(125, 255, 179, 0.1);
+  --danger: #ff6b6b;
+  --danger-soft: rgba(255, 107, 107, 0.1);
+  --hm: #c78bff;
+  --hm-soft: rgba(199, 139, 255, 0.12);
+  --radius: 10px;
+  --font: "Segoe UI", system-ui, -apple-system, sans-serif;
+  --chrome-h: 3.1rem;
+  --gap: 0.5rem;
+  --pad: 0.7rem;
+  /* Readable on 4K vertical (~2160×3840) */
+  --walk-size: clamp(1.05rem, 0.55vw + 0.55vh, 1.35rem);
+  --bonus-size: clamp(1.05rem, 0.55vw + 0.55vh, 1.35rem);
+  --body-size: clamp(0.95rem, 0.4vw + 0.4vh, 1.1rem);
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html {
+  scroll-behavior: smooth;
+  font-size: clamp(16px, 0.55vw + 0.45vh, 20px);
+  height: 100%;
+  scroll-padding-top: calc(var(--chrome-h) + 0.5rem);
+}
+body {
+  font-family: var(--font);
+  background: var(--bg-deep);
+  color: var(--text);
+  line-height: 1.45;
+  min-height: 100%;
+  height: 100%;
+  overflow: hidden;
+  background-image: radial-gradient(ellipse 70% 25% at 50% 0%, rgba(42, 100, 160, 0.14), transparent);
+}
+a { color: var(--accent); text-decoration: none; }
+a:hover { color: #7de0ff; text-decoration: underline; }
+.app {
+  display: grid;
+  grid-template-rows: var(--chrome-h) 1fr;
+  height: 100vh; height: 100dvh;
+  max-height: 100vh; max-height: 100dvh;
+}
+.top-chrome {
+  display: flex; align-items: center; gap: 0.65rem;
+  padding: 0 0.7rem;
+  background: rgba(8, 12, 18, 0.97);
+  border-bottom: 1px solid var(--border);
+  z-index: 100; min-height: var(--chrome-h);
+}
+.brand { display: flex; align-items: baseline; gap: 0.55rem; min-width: 0; flex-shrink: 0; }
+.brand-mission {
+  font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase;
+  color: var(--accent); font-weight: 700; white-space: nowrap;
+}
+.brand-name {
+  font-size: 1.1rem; font-weight: 750; color: var(--text);
+  white-space: nowrap; letter-spacing: -0.02em;
+}
+.brand-meta { font-size: 0.75rem; color: var(--text-dim); white-space: nowrap; }
+.chip-nav {
+  display: flex; flex: 1; gap: 0.3rem; overflow-x: auto;
+  scrollbar-width: none; min-width: 0; justify-content: center;
+}
+.chip-nav::-webkit-scrollbar { display: none; }
+.chip-nav a {
+  flex: 0 0 auto; padding: 0.3rem 0.65rem; border-radius: 999px;
+  font-size: 0.78rem; font-weight: 600; color: var(--text-muted);
+  background: var(--bg-panel); border: 1px solid var(--border);
+  text-decoration: none; white-space: nowrap;
+}
+.chip-nav a:hover {
+  color: var(--text); border-color: var(--border-glow);
+  background: #1a2836; text-decoration: none;
+}
+.chip-nav a[href="#map"] { color: var(--accent); border-color: rgba(62, 207, 255, 0.35); }
+.chip-nav a[href="#bonus"] { color: var(--bonus); border-color: rgba(125, 255, 179, 0.3); }
+.chip-nav a[href="#hard-mode"] { color: var(--hm); border-color: rgba(199, 139, 255, 0.3); }
+.chip-nav a[href="#bosses"] { color: #ff9a9a; border-color: rgba(255, 107, 107, 0.3); }
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 0.3rem;
+  padding: 0.42rem 0.85rem; border-radius: 8px; font-weight: 650; font-size: 0.8rem;
+  border: none; cursor: pointer; text-decoration: none; white-space: nowrap; flex-shrink: 0;
+}
+.btn:hover { text-decoration: none; }
+.btn-next {
+  background: linear-gradient(135deg, #1a6a9a, #1ab0e0); color: #fff;
+  box-shadow: 0 2px 12px rgba(26, 140, 200, 0.35);
+}
+.btn-next:hover { color: #fff; filter: brightness(1.08); }
+.btn-wiki, .btn-idx, .btn-prev {
+  background: var(--bg-panel); color: var(--text-muted);
+  border: 1px solid var(--border); padding: 0.42rem 0.65rem;
+}
+.btn-wiki:hover, .btn-idx:hover, .btn-prev:hover {
+  color: var(--accent); border-color: var(--border-glow);
+}
+.chrome-actions { display: flex; gap: 0.35rem; flex-shrink: 0; }
+
+/* Map-dominant workspace */
+.workspace {
+  display: grid;
+  grid-template-columns: minmax(480px, 1.15fr) minmax(0, 1fr);
+  grid-template-rows: 1fr;
+  gap: var(--gap); padding: var(--gap);
+  min-height: 0; height: 100%; overflow: hidden;
+}
+.col-map {
+  display: grid;
+  grid-template-rows: 1fr auto;
+  gap: var(--gap);
+  min-height: 0; min-width: 0;
+}
+.col-main {
+  display: grid;
+  /* objectives compact | walkthrough HUGE | bonus+hm | bosses+tips */
+  grid-template-rows: auto minmax(0, 1.6fr) minmax(0, 1.05fr) minmax(0, 0.75fr);
+  gap: var(--gap); min-height: 0; min-width: 0; overflow: hidden;
+}
+.row-obj { min-height: 0; }
+.row-bonus-hm {
+  display: grid; grid-template-columns: 1.15fr 0.85fr; gap: var(--gap); min-height: 0;
+}
+.row-lower {
+  display: grid; grid-template-columns: 1.15fr 0.85fr; gap: var(--gap); min-height: 0;
+}
+.panel {
+  background: var(--bg-panel); border: 1px solid var(--border); border-radius: var(--radius);
+  padding: var(--pad); display: flex; flex-direction: column; min-height: 0; overflow: hidden;
+}
+.panel-scroll {
+  overflow-y: auto; overflow-x: hidden; min-height: 0; flex: 1; padding-right: 0.3rem;
+  scrollbar-width: thin; scrollbar-color: var(--border) transparent;
+  font-size: var(--body-size);
+}
+.panel-scroll::-webkit-scrollbar { width: 8px; }
+.panel-scroll::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+.panel-title {
+  display: flex; align-items: center; gap: 0.4rem;
+  font-size: 0.82rem; font-weight: 750; letter-spacing: 0.05em; text-transform: uppercase;
+  color: var(--text); margin-bottom: 0.45rem; padding-bottom: 0.35rem;
+  border-bottom: 1px solid var(--border); flex-shrink: 0;
+}
+.panel-title .icon {
+  width: 1.3rem; height: 1.3rem; border-radius: 5px;
+  display: inline-flex; align-items: center; justify-content: center; font-size: 0.75rem;
+}
+.panel.map-panel {
+  border-color: var(--border-glow);
+  background: linear-gradient(180deg, #0e1620 0%, var(--bg-panel) 100%);
+  /* Map takes almost all left column */
+  min-height: 0;
+}
+.panel.objectives { border-top: 2px solid var(--accent); }
+.panel.walkthrough { border-top: 3px solid #5eb8e8; }
+.panel.bonus { border-top: 3px solid var(--bonus); }
+.panel.hard-mode { border-top: 2px solid var(--hm); }
+.panel.bosses { border-top: 2px solid var(--danger); }
+.panel.other { border-top: 2px solid var(--text-muted); }
+
+/* Emphasized reading panels */
+.panel.walkthrough .panel-scroll,
+.panel.walkthrough .wiki-block {
+  font-size: var(--walk-size) !important;
+  line-height: 1.55;
+}
+.panel.bonus .panel-scroll,
+.panel.bonus .wiki-block {
+  font-size: var(--bonus-size) !important;
+  line-height: 1.55;
+}
+.panel.walkthrough .panel-scroll li,
+.panel.bonus .panel-scroll li {
+  margin-bottom: 0.45rem;
+}
+.panel.walkthrough .panel-scroll p,
+.panel.bonus .panel-scroll p {
+  margin-bottom: 0.55rem;
+}
+
+.icon-map { background: var(--accent-soft); color: var(--accent); }
+.icon-obj { background: var(--accent-soft); color: var(--accent); }
+.icon-walk { background: rgba(94, 184, 232, 0.15); color: #5eb8e8; }
+.icon-bonus { background: var(--bonus-soft); color: var(--bonus); }
+.icon-hm { background: var(--hm-soft); color: var(--hm); }
+.icon-boss { background: var(--danger-soft); color: var(--danger); }
+.icon-other { background: rgba(138, 155, 176, 0.15); color: var(--text-muted); }
+
+.map-wrap {
+  flex: 1; min-height: 0; display: flex; flex-direction: column;
+  align-items: center; justify-content: center; gap: 0.4rem;
+}
+.map-frame {
+  flex: 1; min-height: 0; width: 100%;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: 10px; overflow: hidden;
+  border: 2px solid var(--border-glow);
+  box-shadow: 0 0 0 1px rgba(62, 207, 255, 0.1), 0 12px 40px rgba(0, 0, 0, 0.45);
+  background: #05080c; cursor: zoom-in;
+}
+.map-frame img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  image-rendering: auto;
+}
+.map-caption { font-size: 0.72rem; color: var(--text-dim); flex-shrink: 0; }
+.map-missing {
+  color: var(--text-dim); font-size: 1rem; text-align: center; padding: 2rem;
+}
+
+.wiki-block ul, .panel-scroll ul,
+.wiki-block ol, .panel-scroll ol { padding-left: 1.2rem; margin: 0.3rem 0 0.5rem; }
+.wiki-block li, .panel-scroll li { margin-bottom: 0.32rem; }
+.wiki-block p, .panel-scroll p { margin-bottom: 0.45rem; }
+.wiki-block img, .panel-scroll img { vertical-align: middle; max-height: 1.35em; width: auto; }
+.wiki-block table, .panel-scroll table {
+  width: 100%; border-collapse: collapse; font-size: 0.9em; margin: 0.4rem 0;
+}
+.wiki-block th, .wiki-block td, .panel-scroll th, .panel-scroll td {
+  border: 1px solid var(--border); padding: 0.3rem 0.45rem; text-align: left;
+}
+.lede { font-size: 0.92rem; color: var(--text-muted); margin-bottom: 0.35rem; }
+
+/* Collapsed summary */
+details.summary-details {
+  background: var(--bg-panel);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  border-top: 2px solid var(--gold);
+  padding: 0.35rem 0.65rem;
+  flex-shrink: 0;
+}
+details.summary-details summary {
+  cursor: pointer;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--gold);
+  padding: 0.35rem 0;
+  list-style: none;
+}
+details.summary-details summary::-webkit-details-marker { display: none; }
+details.summary-details summary::before {
+  content: "▸ ";
+  color: var(--text-dim);
+}
+details.summary-details[open] summary::before { content: "▾ "; }
+details.summary-details .summary-body {
+  padding: 0.35rem 0 0.55rem;
+  font-size: 0.88rem;
+  color: var(--text-muted);
+  max-height: 18vh;
+  overflow-y: auto;
+}
+
+.boss-note { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.4rem; }
+.boss-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.4rem; }
+.boss-card {
+  background: var(--bg-panel-2); border: 1px solid var(--border);
+  border-radius: 8px; padding: 0.5rem 0.6rem;
+}
+.boss-card-head { font-size: 0.95rem; margin-bottom: 0.2rem; }
+.boss-card-head a { color: #eef6fc; font-weight: 700; }
+.boss-card-head a:hover { color: var(--accent); }
+.boss-elite { font-size: 0.88rem; }
+.elite-label { color: var(--gold); font-weight: 650; margin-right: 0.25rem; }
+.elite-link { color: #ffd78a; font-weight: 650; }
+.elite-link:hover { color: #ffe9b5; }
+.elite-none { color: var(--text-dim); font-style: italic; font-size: 0.85rem; }
+.boss-meta { font-size: 0.78rem; color: var(--text-dim); margin-top: 0.15rem; }
+
+.callout {
+  margin-top: 0.4rem; padding: 0.45rem 0.6rem; border-radius: 6px;
+  font-size: 0.88rem; border-left: 3px solid; line-height: 1.4;
+}
+.callout.tip { background: var(--accent-soft); border-color: var(--accent); color: #b8eaff; }
+.callout.warn { background: var(--danger-soft); border-color: var(--danger); color: #ffb4b4; }
+
+.lightbox {
+  display: none; position: fixed; inset: 0; z-index: 1000; background: rgba(0,0,0,0.94);
+  align-items: center; justify-content: center; padding: 1.5rem; cursor: zoom-out;
+}
+.lightbox.open { display: flex; }
+.lightbox img {
+  max-width: 96vw; max-height: 96vh; border-radius: 8px;
+  border: 2px solid var(--border-glow); object-fit: contain;
+}
+
+@media (min-height: 2400px) {
+  :root {
+    --walk-size: clamp(1.15rem, 0.7vh + 0.3vw, 1.5rem);
+    --bonus-size: clamp(1.15rem, 0.7vh + 0.3vw, 1.5rem);
+    --gap: 0.65rem;
+    --pad: 0.85rem;
+  }
+  .workspace { grid-template-columns: minmax(560px, 1.2fr) minmax(0, 1fr); }
+}
+@media (min-width: 1800px) and (min-height: 2000px) {
+  .workspace { grid-template-columns: minmax(600px, 1.25fr) minmax(0, 1fr); }
+}
+@media (max-height: 1100px) {
+  body { overflow: auto; height: auto; }
+  .app { height: auto; max-height: none; min-height: 100vh; }
+  .workspace {
+    height: auto; overflow: visible; grid-template-columns: 1fr; grid-template-rows: auto;
+  }
+  .col-map { grid-template-rows: auto; }
+  .col-main { overflow: visible; grid-template-rows: auto; }
+  .row-bonus-hm, .row-lower { grid-template-columns: 1fr; }
+  .panel { max-height: none; overflow: visible; }
+  .panel-scroll { overflow: visible; }
+  .map-frame { min-height: 360px; max-height: 55vh; }
+}
+
+    :root { --accent: #3ecfff; --accent-soft: #3ecfff22; }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header class="top-chrome">
+      <div class="brand">
+        <span class="brand-mission">M16</span>
+        <span class="brand-name">Thirsty River</span>
+        <span class="brand-meta">Prophecies · Crystal Desert · Cooperative · Medium</span>
+      </div>
+      <nav class="chip-nav" aria-label="Sections">
+        <a href="#map">Map</a>
+        <a href="#walkthrough">Walkthrough</a>
+        <a href="#bonus">Bonus</a>
+        <a href="#objectives">Objectives</a>
+        <a href="#hard-mode">Hard Mode</a>
+        <a href="#bosses">Bosses</a>
+        <a href="#other">Tips</a>
+      </nav>
+      <div class="chrome-actions">
+        <a class="btn btn-idx" href="../prohecies.html">Index</a>
+        <a class="btn btn-prev" href="15_Dunes_of_Despair.html">← Prev</a>
+        <a class="btn btn-wiki" href="https://wiki.guildwars.com/wiki/Thirsty_River" target="_blank" rel="noopener">Wiki ↗</a>
+        <a class="btn btn-next" href="17_Elona_Reach.html">Next: Elona Reach →</a>
+      </div>
+    </header>
+
+    <div class="workspace">
+      <div class="col-map">
+        <section class="panel map-panel" id="map">
+          <h2 class="panel-title"><span class="icon icon-map">◉</span> Mission Map</h2>
+          <div class="map-wrap">
+            <div class="map-frame" id="mapOpen" title="Click to enlarge">
+              <img src="../maps/prophecies_16_Thirsty_River_map.jpg" alt="Thirsty River mission map" />
+            </div>
+            <p class="map-caption">Click to enlarge · Local cache · <a href="https://wiki.guildwars.com/wiki/Thirsty_River" target="_blank" rel="noopener">Wiki</a></p>
+        </div>
+        </section>
+
+        <details class="summary-details" id="summary">
+          <summary>Summary (click to expand)</summary>
+          <div class="summary-body">
+            <p>* Dunes of Despair and Elona Reach must also be completed before Augury Rock.</p>
+            <p style="margin-top:0.4rem;"><strong>Region:</strong> Crystal Desert · <strong>Mission:</strong> 16 of 25 · <strong>Type:</strong> Cooperative</p>
+            <p style="margin-top:0.35rem;"><a href="https://wiki.guildwars.com/wiki/Thirsty_River" target="_blank" rel="noopener">Full wiki article ↗</a></p>
+          </div>
+        </details>
+      </div>
+
+      <div class="col-main">
+        <section class="panel objectives row-obj" id="objectives">
+          <h2 class="panel-title"><span class="icon icon-obj">✓</span> Objectives</h2>
+          <div class="panel-scroll wiki-block"><p>Annihilate the opposing enemy teams.
+</p><ul><li>Defeat <a href="https://wiki.guildwars.com/wiki/Goss_Aleessh" rel="noopener" target="_blank" title="Goss Aleessh">Goss Aleessh</a>'s team.</li>
+<li>Defeat <a href="https://wiki.guildwars.com/wiki/Issah_Sshay" rel="noopener" target="_blank" title="Issah Sshay">Issah Sshay</a>'s team.</li>
+<li>Defeat <a href="https://wiki.guildwars.com/wiki/Hessper_Sasso" rel="noopener" target="_blank" title="Hessper Sasso">Hessper Sasso</a>'s team.</li>
+<li>Defeat <a href="https://wiki.guildwars.com/wiki/Josso_Essher" rel="noopener" target="_blank" title="Josso Essher">Josso Essher</a>'s team.</li>
+<li>Defeat <a href="https://wiki.guildwars.com/wiki/Custodian_Phebus" rel="noopener" target="_blank" title="Custodian Phebus">Lyssha Suss</a>'s team.<small>[<a class="extiw" href="https://en.wikipedia.org/wiki/Sic" rel="noopener" target="_blank" title="w:Sic"><span title="w:Sic"><i>sic</i></span></a>]</small></li>
+<li>Defeat <a href="https://wiki.guildwars.com/wiki/Custodian_Hulgar" rel="noopener" target="_blank" title="Custodian Hulgar">Kesskah Shissh</a>'s team.<small>[<a class="extiw" href="https://en.wikipedia.org/wiki/Sic" rel="noopener" target="_blank" title="w:Sic"><span title="w:Sic"><i>sic</i></span></a>]</small></li>
+<li>*BONUS* Cleanse the area before <a href="https://wiki.guildwars.com/wiki/King_Khimaar" rel="noopener" target="_blank" title="King Khimaar">King Khimaar</a>'s spirit is driven away.</li></ul></div>
+        </section>
+
+        <section class="panel walkthrough" id="walkthrough">
+          <h2 class="panel-title"><span class="icon icon-walk">→</span> Walkthrough</h2>
+          <div class="panel-scroll wiki-block"><div class="thumb tright"><div class="thumbinner" style="width:242px;"><a class="image" href="https://wiki.guildwars.com/wiki/File:Thirsty_River_Tablet.jpg" rel="noopener" target="_blank"><img alt="" class="thumbimage" data-file-height="230" data-file-width="240" decoding="async" height="230" loading="lazy" src="https://wiki.guildwars.com/images/5/53/Thirsty_River_Tablet.jpg" width="240"/></a> <div class="thumbcaption"><div class="magnify"><a class="internal" href="https://wiki.guildwars.com/wiki/File:Thirsty_River_Tablet.jpg" rel="noopener" target="_blank" title="Enlarge"></a></div>The rune in <a href="https://wiki.guildwars.com/wiki/Augury_Rock" rel="noopener" target="_blank" title="Augury Rock">Augury Rock</a> that represents Thirsty River.</div></div></div><p>Before you fight the six teams mentioned in the objectives, there is an opportunity to gain <a href="https://wiki.guildwars.com/wiki/Morale_Boost" rel="noopener" target="_blank" title="Morale Boost">Morale Boosts</a> by killing the five <a href="https://wiki.guildwars.com/wiki/Sand_Giant" rel="noopener" target="_blank" title="Sand Giant">Sand Giants</a> which grant a 2% boost each. These Sand Giants are not mission critical.
+</p><p>The mission has three more sections, each with some Forgotten, a boss and a priest. A timer starts and at every two minutes mark, if the priest of a group is still alive, all defeated foes are resurrected; thus timing is highly important. Focus your firepower on the Priest first but if your party shows difficulty, pull back to prevent being instantly swarmed by the respawned foes. Defeating all foes opens the gate to the next section. Between sections, the timer stops and will reset when the next gate is opened, allowing enough time to regenerate and recharge before tackling the next area. Remember that if the Ghostly Hero dies, the mission is over. If you're unsure whether your healers can keep him alive, leave him behind the gate by talking to him once.
+</p><ol><li>Talk to the Ghostly Hero and enter the first section which has a single group led by <a href="https://wiki.guildwars.com/wiki/Goss_Aleessh" rel="noopener" target="_blank" title="Goss Aleessh">Goss Aleessh</a>. Be wary of the Forgotten's <a href="https://wiki.guildwars.com/wiki/Chaos_Storm" rel="noopener" target="_blank" title="Chaos Storm">Chaos Storms</a>, as it tends to confuse Hero and Henchmen AI, making them run in-and-out of the effect repeatedly.</li>
+<li>Section two has two groups, one headed by <a href="https://wiki.guildwars.com/wiki/Issah_Sshay" rel="noopener" target="_blank" title="Issah Sshay">Issah Sshay</a> and the other by <a href="https://wiki.guildwars.com/wiki/Hessper_Sasso" rel="noopener" target="_blank" title="Hessper Sasso">Hessper Sasso</a>. Finish off one group at a time. After defeating the first boss, wait until the 2 minute timer mark has passed, then continue. There is little space to fight so instead of rushing ahead, wait by the recently opened gate as both groups have patrols headed towards it. In particular, sticking to the left wall can let one avoid the groups connected to Hesper Sasso entirely, making it easier to kill the Elementalist groups undisturbed.</li>
+<li>The third section has three groups. <a href="https://wiki.guildwars.com/wiki/Custodian_Hulgar" rel="noopener" target="_blank" title="Custodian Hulgar">Custodian Hulgar</a> is to the right, <a href="https://wiki.guildwars.com/wiki/Josso_Essher" rel="noopener" target="_blank" title="Josso Essher">Josso Essher</a> to the left, and <a href="https://wiki.guildwars.com/wiki/Custodian_Phebus" rel="noopener" target="_blank" title="Custodian Phebus">Custodian Phebus</a> in between. In this section the right group will attack <a href="https://wiki.guildwars.com/wiki/King_Khimaar" rel="noopener" target="_blank" title="King Khimaar">King Khimaar</a>. Of the six groups, Josso's (<a href="https://wiki.guildwars.com/wiki/Word_of_Healing" rel="noopener" target="_blank" title="Word of Healing">Word of Healing</a>) is the most difficult as you will be facing two monks. Only groups from Custodian Hulgar will enter the center as long as no one wanders too close to the other groups.</li></ol></div>
+        </section>
+
+        <div class="row-bonus-hm">
+          <section class="panel bonus" id="bonus">
+            <h2 class="panel-title"><span class="icon icon-bonus">★</span> Bonus</h2>
+            <div class="panel-scroll wiki-block"><p>The bonus requires keeping <a href="https://wiki.guildwars.com/wiki/King_Khimaar" rel="noopener" target="_blank" title="King Khimaar">King Khimaar</a> alive in the third (and final) area. This is complicated by three factors that can cause you to fail the bonus: first, as soon as you enter the area, Custodian Hulgar's group will start attacking him. If he survives, he is also at risk from other foes in the area, especially if you draw them away from their original locations. Finally, if you take more than ten minutes to clear the area, the king will leave (usually at least one 2 minute cycle is needed per group, leaving only two possible extra cycles).
+</p><p>Accordingly, immediately send your party to protect the king (e.g. by flagging heroes and henchmen) and clear the central area of all foes before going after any of the other groups. Be prepared to return to protect the king if any foes respawn and head in his direction.
+</p></div>
+          </section>
+          <section class="panel hard-mode" id="hard-mode">
+            <h2 class="panel-title"><span class="icon icon-hm">◆</span> Hard Mode</h2>
+            <div class="panel-scroll wiki-block"><p>Besides increasing the level of all foes, Hard mode also adds a few skills to all non-boss enemies. In the Sand Giant section the Devourers will add effective area damage through <a href="https://wiki.guildwars.com/wiki/Barrage" rel="noopener" target="_blank" title="Barrage">Barrage</a> while the Sand Giants become a bit more tanky through <a href="https://wiki.guildwars.com/wiki/Vampiric_Touch" rel="noopener" target="_blank" title="Vampiric Touch">Vampiric Touch</a>. 
+</p><p>For the Forgotten section, the Mesmers gain <a href="https://wiki.guildwars.com/wiki/Power_Drain" rel="noopener" target="_blank" title="Power Drain">Power Drain</a> to interrupt while the Necromancers can remove enchantments due to <a href="https://wiki.guildwars.com/wiki/Strip_Enchantment" rel="noopener" target="_blank" title="Strip Enchantment">Strip Enchantment</a>. For the Bonus, it becomes much more important to avoid drawing foes to Khimaar and to protect him quickly. Not only can they kill him much quicker, but their increased movement speed means that one of the patrols from either the Ranger boss or the Monk boss area will very likely encounter the backline of the party if they haven't moved forwards.
+</p></div>
+          </section>
+        </div>
+
+        <div class="row-lower">
+          <section class="panel bosses" id="bosses">
+            <h2 class="panel-title"><span class="icon icon-boss">☠</span> Bosses &amp; Elites</h2>
+            <div class="panel-scroll"><div class='boss-grid'>
+<article class="boss-card">
+  <div class="boss-card-head"><a href="https://wiki.guildwars.com/wiki/Custodian_Hulgar" target="_blank" rel="noopener"><strong>Custodian Hulgar</strong></a></div>
+  <div class="boss-elite"><span class="elite-label">Elite:</span> <a class="elite-link" href="https://wiki.guildwars.com/wiki/Warrior%27s_Endurance" target="_blank" rel="noopener">Warrior&#x27;s Endurance</a></div>
+  <div class="boss-meta">24 (30)</div>
+</article>
+<article class="boss-card">
+  <div class="boss-card-head"><a href="https://wiki.guildwars.com/wiki/Custodian_Phebus" target="_blank" rel="noopener"><strong>Custodian Phebus</strong></a></div>
+  <div class="boss-elite"><span class="elite-label">Elite:</span> <a class="elite-link" href="https://wiki.guildwars.com/wiki/Marksman%27s_Wager" target="_blank" rel="noopener">Marksman&#x27;s Wager</a></div>
+  <div class="boss-meta">24 (30)</div>
+</article>
+<article class="boss-card">
+  <div class="boss-card-head"><a href="https://wiki.guildwars.com/wiki/Josso_Essher" target="_blank" rel="noopener"><strong>Josso Essher</strong></a></div>
+  <div class="boss-elite"><span class="elite-label">Elite:</span> <a class="elite-link" href="https://wiki.guildwars.com/wiki/Word_of_Healing" target="_blank" rel="noopener">Word of Healing</a></div>
+  <div class="boss-meta">24 (30)</div>
+</article>
+<article class="boss-card">
+  <div class="boss-card-head"><a href="https://wiki.guildwars.com/wiki/Hessper_Sasso" target="_blank" rel="noopener"><strong>Hessper Sasso</strong></a></div>
+  <div class="boss-elite"><span class="elite-label">Elite:</span> <a class="elite-link" href="https://wiki.guildwars.com/wiki/Order_of_the_Vampire" target="_blank" rel="noopener">Order of the Vampire</a></div>
+  <div class="boss-meta">24 (30)</div>
+</article>
+<article class="boss-card">
+  <div class="boss-card-head"><a href="https://wiki.guildwars.com/wiki/Goss_Aleessh" target="_blank" rel="noopener"><strong>Goss Aleessh</strong></a></div>
+  <div class="boss-elite"><span class="elite-label">Elite:</span> <a class="elite-link" href="https://wiki.guildwars.com/wiki/Mantra_of_Recovery" target="_blank" rel="noopener">Mantra of Recovery</a></div>
+  <div class="boss-meta">24 (30)</div>
+</article>
+<article class="boss-card">
+  <div class="boss-card-head"><a href="https://wiki.guildwars.com/wiki/Issah_Sshay" target="_blank" rel="noopener"><strong>Issah Sshay</strong></a></div>
+  <div class="boss-elite"><span class="elite-label">Elite:</span> <a class="elite-link" href="https://wiki.guildwars.com/wiki/Ether_Renewal" target="_blank" rel="noopener">Ether Renewal</a></div>
+  <div class="boss-meta">24 (30)</div>
+</article>
+</div></div>
+          </section>
+          <section class="panel other" id="other">
+            <h2 class="panel-title"><span class="icon icon-other">✦</span> Tips &amp; Notes</h2>
+            <div class="panel-scroll"><h3 style='font-size:0.8rem;color:var(--accent);margin:0.3rem 0;'>Skill recommendations</h3><div class='wiki-block'><ul><li><a href="https://wiki.guildwars.com/wiki/Area_of_effect" rel="noopener" target="_blank" title="Area of effect">Area of effect</a> skills as all sections are tight.</li>
+<li><a class="mw-redirect" href="https://wiki.guildwars.com/wiki/Anti-caster" rel="noopener" target="_blank" title="Anti-caster">Anti-caster</a> skills, such as <a href="https://wiki.guildwars.com/wiki/Scourge_Healing" rel="noopener" target="_blank" title="Scourge Healing">Scourge Healing</a>, <a href="https://wiki.guildwars.com/wiki/Backfire" rel="noopener" target="_blank" title="Backfire">Backfire</a>, and <a href="https://wiki.guildwars.com/wiki/Broad_Head_Arrow" rel="noopener" target="_blank" title="Broad Head Arrow">Broad Head Arrow</a>.</li>
+<li><a href="https://wiki.guildwars.com/wiki/Technobabble" rel="noopener" target="_blank" title="Technobabble">Technobabble</a> can prove useful to daze both the Priest and the boss at once (if used properly).</li>
+<li>A <a href="https://wiki.guildwars.com/wiki/Minion_master" rel="noopener" target="_blank" title="Minion master">minion master</a> helps <a href="https://wiki.guildwars.com/wiki/Corpse_control" rel="noopener" target="_blank" title="Corpse control">corpse control</a> as enemies use <a href="https://wiki.guildwars.com/wiki/Consume_Corpse" rel="noopener" target="_blank" title="Consume Corpse">Consume Corpse</a> to heal themselves and dodge players attacks.</li>
+<li><a href="https://wiki.guildwars.com/wiki/Blind" rel="noopener" target="_blank" title="Blind">Blind</a> skills to use against warriors and rangers but not versus Sand Giants as they use <a href="https://wiki.guildwars.com/wiki/Plague_Touch" rel="noopener" target="_blank" title="Plague Touch">Plague Touch</a>.</li>
+<li>Spike Builds can be especially good to quickly kill <a href="https://wiki.guildwars.com/wiki/Enemy_Priest" rel="noopener" target="_blank" title="Enemy Priest">Enemy Priest</a> such as <a href="https://wiki.guildwars.com/wiki/Star_Burst" rel="noopener" target="_blank" title="Star Burst">Star Burst</a>, <a href="https://wiki.guildwars.com/wiki/Mind_Blast" rel="noopener" target="_blank" title="Mind Blast">Mind Blast</a>, <a href="https://wiki.guildwars.com/wiki/Lightning_Surge" rel="noopener" target="_blank" title="Lightning Surge">Lightning Surge</a> Nuker, <a href="https://wiki.guildwars.com/wiki/Moebius_Strike" rel="noopener" target="_blank" title="Moebius Strike">Moebius Strike</a>, <a href="https://wiki.guildwars.com/wiki/Way_of_the_Assassin" rel="noopener" target="_blank" title="Way of the Assassin">Way of the Assassin</a> Dagger Spam, <a href="https://wiki.guildwars.com/wiki/Strike_as_One" rel="noopener" target="_blank" title="Strike as One">Strike as One</a> Packmaster</li></ul></div>
+<h3 style='font-size:0.8rem;color:var(--accent);margin:0.3rem 0;'>Notes</h3><div class='wiki-block'><ul><li>The groups led by the different bosses are hostile toward each other, and it is possible to have two enemy teams engage in combat if pulled correctly.</li>
+<li>Lyssha Suss and Kesskah Shissh are not present in the mission. Their teams are actually headed by Custodian Phebus and Custodian Hulgar, respectively.</li>
+<li>Consistent with the rest of the game, respawning enemies do not yield any <a href="https://wiki.guildwars.com/wiki/Experience" rel="noopener" target="_blank" title="Experience">experience</a> or <a href="https://wiki.guildwars.com/wiki/Drop" rel="noopener" target="_blank" title="Drop">drops</a>. However, they do leave exploitable <a href="https://wiki.guildwars.com/wiki/Corpse" rel="noopener" target="_blank" title="Corpse">corpses</a>.</li>
+<li>Completion of this mission will fill in page #9 of <a href="https://wiki.guildwars.com/wiki/The_Flameseeker_Prophecies" rel="noopener" target="_blank" title="The Flameseeker Prophecies">The Flameseeker Prophecies</a> <a href="https://wiki.guildwars.com/wiki/Storybook" rel="noopener" target="_blank" title="Storybook">storybook</a>.</li></ul><div style="margin: 1em; border: solid silver; border-width: 1px 0px; padding: 2px 1em 2px 7.5em;"><strong class="hiddenlinks" style="position: absolute; margin-left: -7.3em; color: #900;"><a class="image" href="https://wiki.guildwars.com/wiki/File:Anomaly.png" rel="noopener" target="_blank" title="Anomaly"><img alt="Anomaly" data-file-height="32" data-file-width="32" decoding="async" height="18" loading="lazy" src="https://wiki.guildwars.com/images/thumb/a/a6/Anomaly.png/18px-Anomaly.png" srcset="/images/thumb/a/a6/Anomaly.png/27px-Anomaly.png 1.5x, /images/a/a6/Anomaly.png 2x" width="18"/></a> <a class="mw-redirect" href="https://wiki.guildwars.com/wiki/Anomaly" rel="noopener" target="_blank" title="Anomaly">Anomaly</a>.</strong>The Morale Boost granted upon killing a <a href="https://wiki.guildwars.com/wiki/Sand_Giant" rel="noopener" target="_blank" title="Sand Giant">Sand Giant</a> also affects <a href="https://wiki.guildwars.com/wiki/Animal_companion" rel="noopener" target="_blank" title="Animal companion">animal companions</a>.</div><div style="margin: 1em; border: solid silver; border-width: 1px 0px; padding: 2px 1em 2px 5em;"><strong class="hiddenlinks" style="position: absolute; margin-left: -4.8em; color: #900;"><a class="image" href="https://wiki.guildwars.com/wiki/File:Bug.png" rel="noopener" target="_blank" title="Bug"><img alt="Bug" data-file-height="32" data-file-width="32" decoding="async" height="18" loading="lazy" src="https://wiki.guildwars.com/images/thumb/7/7d/Bug.png/18px-Bug.png" srcset="/images/thumb/7/7d/Bug.png/27px-Bug.png 1.5x, /images/7/7d/Bug.png 2x" width="18"/></a> <a href="https://wiki.guildwars.com/wiki/Bug" rel="noopener" target="_blank" title="Bug">Bug</a>.</strong>In the last round, Lyssha Suss's (Custodian Phebus's) team may be tagged as <i>Defeated</i> without even having been engaged. If this happens, the player can ignore this group and finish the mission by just killing the other two teams.</div><div style="margin: 1em; border: solid silver; border-width: 1px 0px; padding: 2px 1em 2px 5em;"><strong class="hiddenlinks" style="position: absolute; margin-left: -4.8em; color: #900;"><a class="image" href="https://wiki.guildwars.com/wiki/File:Bug.png" rel="noopener" target="_blank" title="Bug"><img alt="Bug" data-file-height="32" data-file-width="32" decoding="async" height="18" loading="lazy" src="https://wiki.guildwars.com/images/thumb/7/7d/Bug.png/18px-Bug.png" srcset="/images/thumb/7/7d/Bug.png/27px-Bug.png 1.5x, /images/7/7d/Bug.png 2x" width="18"/></a> <a href="https://wiki.guildwars.com/wiki/Bug" rel="noopener" target="_blank" title="Bug">Bug</a>.</strong>Sometimes, a chest will spawn at the entrance to <a href="https://wiki.guildwars.com/wiki/Issah_Sshay" rel="noopener" target="_blank" title="Issah Sshay">Issah Sshay</a>'s chamber which the Ghostly Hero may become stuck on.  If this happens the team must resign and begin the mission again. </div><div style="margin: 1em; border: solid silver; border-width: 1px 0px; padding: 2px 1em 2px 5em;"><strong class="hiddenlinks" style="position: absolute; margin-left: -4.8em; color: #900;"><a class="image" href="https://wiki.guildwars.com/wiki/File:Bug.png" rel="noopener" target="_blank" title="Bug"><img alt="Bug" data-file-height="32" data-file-width="32" decoding="async" height="18" loading="lazy" src="https://wiki.guildwars.com/images/thumb/7/7d/Bug.png/18px-Bug.png" srcset="/images/thumb/7/7d/Bug.png/27px-Bug.png 1.5x, /images/7/7d/Bug.png 2x" width="18"/></a> <a href="https://wiki.guildwars.com/wiki/Bug" rel="noopener" target="_blank" title="Bug">Bug</a>.</strong>If you pull enemies to the Ghostly Hero before he opens the first gate, he may spend too long fighting them and never open the gate. </div><h4><span class="mw-headline" id="Cartography">Cartography</span></h4><ul><li>Complete exploration during this mission contributes approximately 0.7% to the Tyrian <a href="https://wiki.guildwars.com/wiki/Cartographer" rel="noopener" target="_blank" title="Cartographer">Cartographer</a> title.</li></ul><h4><span class="mw-headline" id="Farming">Farming</span></h4><ul><li>This mission can be used for levelling up your character or your heroes. A <a href="https://wiki.guildwars.com/wiki/Scroll_of_Hunter%27s_Insight" rel="noopener" target="_blank" title="Scroll of Hunter's Insight">Scroll of Hunter's Insight</a> will increase the experience gained as you will be killing bosses on a regular basis.</li></ul></div></div>
+          </section>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="lightbox" id="lightbox" role="dialog" aria-label="Enlarged map">
+    <img src="../maps/prophecies_16_Thirsty_River_map.jpg" alt="Thirsty River mission map (enlarged)" />
+  </div>
+  <script>
+    (function () {
+      var open = document.getElementById("mapOpen");
+      var box = document.getElementById("lightbox");
+      if (!open || !box) return;
+      open.addEventListener("click", function () { box.classList.add("open"); });
+      box.addEventListener("click", function () { box.classList.remove("open"); });
+      document.addEventListener("keydown", function (e) {
+        if (e.key === "Escape") box.classList.remove("open");
+      });
+    })();
+  </script>
+
+</body>
+</html>

@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Tahnnakai Temple</title>
+  <style>
+:root {
+  --bg-deep: #070a0f;
+  --bg-panel: #101820;
+  --bg-panel-2: #15202c;
+  --border: #243044;
+  --border-glow: #2a4a6a;
+  --text: #dce6f0;
+  --text-muted: #8a9bb0;
+  --text-dim: #5c6f86;
+  --accent: #3ecfff;
+  --accent-soft: rgba(62, 207, 255, 0.12);
+  --gold: #e8c56a;
+  --gold-soft: rgba(232, 197, 106, 0.12);
+  --bonus: #7dffb3;
+  --bonus-soft: rgba(125, 255, 179, 0.1);
+  --danger: #ff6b6b;
+  --danger-soft: rgba(255, 107, 107, 0.1);
+  --hm: #c78bff;
+  --hm-soft: rgba(199, 139, 255, 0.12);
+  --radius: 10px;
+  --font: "Segoe UI", system-ui, -apple-system, sans-serif;
+  --chrome-h: 3.1rem;
+  --gap: 0.5rem;
+  --pad: 0.7rem;
+  /* Readable on 4K vertical (~2160×3840) */
+  --walk-size: clamp(1.05rem, 0.55vw + 0.55vh, 1.35rem);
+  --bonus-size: clamp(1.05rem, 0.55vw + 0.55vh, 1.35rem);
+  --body-size: clamp(0.95rem, 0.4vw + 0.4vh, 1.1rem);
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html {
+  scroll-behavior: smooth;
+  font-size: clamp(16px, 0.55vw + 0.45vh, 20px);
+  height: 100%;
+  scroll-padding-top: calc(var(--chrome-h) + 0.5rem);
+}
+body {
+  font-family: var(--font);
+  background: var(--bg-deep);
+  color: var(--text);
+  line-height: 1.45;
+  min-height: 100%;
+  height: 100%;
+  overflow: hidden;
+  background-image: radial-gradient(ellipse 70% 25% at 50% 0%, rgba(42, 100, 160, 0.14), transparent);
+}
+a { color: var(--accent); text-decoration: none; }
+a:hover { color: #7de0ff; text-decoration: underline; }
+.app {
+  display: grid;
+  grid-template-rows: var(--chrome-h) 1fr;
+  height: 100vh; height: 100dvh;
+  max-height: 100vh; max-height: 100dvh;
+}
+.top-chrome {
+  display: flex; align-items: center; gap: 0.65rem;
+  padding: 0 0.7rem;
+  background: rgba(8, 12, 18, 0.97);
+  border-bottom: 1px solid var(--border);
+  z-index: 100; min-height: var(--chrome-h);
+}
+.brand { display: flex; align-items: baseline; gap: 0.55rem; min-width: 0; flex-shrink: 0; }
+.brand-mission {
+  font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase;
+  color: var(--accent); font-weight: 700; white-space: nowrap;
+}
+.brand-name {
+  font-size: 1.1rem; font-weight: 750; color: var(--text);
+  white-space: nowrap; letter-spacing: -0.02em;
+}
+.brand-meta { font-size: 0.75rem; color: var(--text-dim); white-space: nowrap; }
+.chip-nav {
+  display: flex; flex: 1; gap: 0.3rem; overflow-x: auto;
+  scrollbar-width: none; min-width: 0; justify-content: center;
+}
+.chip-nav::-webkit-scrollbar { display: none; }
+.chip-nav a {
+  flex: 0 0 auto; padding: 0.3rem 0.65rem; border-radius: 999px;
+  font-size: 0.78rem; font-weight: 600; color: var(--text-muted);
+  background: var(--bg-panel); border: 1px solid var(--border);
+  text-decoration: none; white-space: nowrap;
+}
+.chip-nav a:hover {
+  color: var(--text); border-color: var(--border-glow);
+  background: #1a2836; text-decoration: none;
+}
+.chip-nav a[href="#map"] { color: var(--accent); border-color: rgba(62, 207, 255, 0.35); }
+.chip-nav a[href="#bonus"] { color: var(--bonus); border-color: rgba(125, 255, 179, 0.3); }
+.chip-nav a[href="#hard-mode"] { color: var(--hm); border-color: rgba(199, 139, 255, 0.3); }
+.chip-nav a[href="#bosses"] { color: #ff9a9a; border-color: rgba(255, 107, 107, 0.3); }
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 0.3rem;
+  padding: 0.42rem 0.85rem; border-radius: 8px; font-weight: 650; font-size: 0.8rem;
+  border: none; cursor: pointer; text-decoration: none; white-space: nowrap; flex-shrink: 0;
+}
+.btn:hover { text-decoration: none; }
+.btn-next {
+  background: linear-gradient(135deg, #1a6a9a, #1ab0e0); color: #fff;
+  box-shadow: 0 2px 12px rgba(26, 140, 200, 0.35);
+}
+.btn-next:hover { color: #fff; filter: brightness(1.08); }
+.btn-wiki, .btn-idx, .btn-prev {
+  background: var(--bg-panel); color: var(--text-muted);
+  border: 1px solid var(--border); padding: 0.42rem 0.65rem;
+}
+.btn-wiki:hover, .btn-idx:hover, .btn-prev:hover {
+  color: var(--accent); border-color: var(--border-glow);
+}
+.chrome-actions { display: flex; gap: 0.35rem; flex-shrink: 0; }
+
+/* Map-dominant workspace */
+.workspace {
+  display: grid;
+  grid-template-columns: minmax(480px, 1.15fr) minmax(0, 1fr);
+  grid-template-rows: 1fr;
+  gap: var(--gap); padding: var(--gap);
+  min-height: 0; height: 100%; overflow: hidden;
+}
+.col-map {
+  display: grid;
+  grid-template-rows: 1fr auto;
+  gap: var(--gap);
+  min-height: 0; min-width: 0;
+}
+.col-main {
+  display: grid;
+  /* objectives compact | walkthrough HUGE | bonus+hm | bosses+tips */
+  grid-template-rows: auto minmax(0, 1.6fr) minmax(0, 1.05fr) minmax(0, 0.75fr);
+  gap: var(--gap); min-height: 0; min-width: 0; overflow: hidden;
+}
+.row-obj { min-height: 0; }
+.row-bonus-hm {
+  display: grid; grid-template-columns: 1.15fr 0.85fr; gap: var(--gap); min-height: 0;
+}
+.row-lower {
+  display: grid; grid-template-columns: 1.15fr 0.85fr; gap: var(--gap); min-height: 0;
+}
+.panel {
+  background: var(--bg-panel); border: 1px solid var(--border); border-radius: var(--radius);
+  padding: var(--pad); display: flex; flex-direction: column; min-height: 0; overflow: hidden;
+}
+.panel-scroll {
+  overflow-y: auto; overflow-x: hidden; min-height: 0; flex: 1; padding-right: 0.3rem;
+  scrollbar-width: thin; scrollbar-color: var(--border) transparent;
+  font-size: var(--body-size);
+}
+.panel-scroll::-webkit-scrollbar { width: 8px; }
+.panel-scroll::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+.panel-title {
+  display: flex; align-items: center; gap: 0.4rem;
+  font-size: 0.82rem; font-weight: 750; letter-spacing: 0.05em; text-transform: uppercase;
+  color: var(--text); margin-bottom: 0.45rem; padding-bottom: 0.35rem;
+  border-bottom: 1px solid var(--border); flex-shrink: 0;
+}
+.panel-title .icon {
+  width: 1.3rem; height: 1.3rem; border-radius: 5px;
+  display: inline-flex; align-items: center; justify-content: center; font-size: 0.75rem;
+}
+.panel.map-panel {
+  border-color: var(--border-glow);
+  background: linear-gradient(180deg, #0e1620 0%, var(--bg-panel) 100%);
+  /* Map takes almost all left column */
+  min-height: 0;
+}
+.panel.objectives { border-top: 2px solid var(--accent); }
+.panel.walkthrough { border-top: 3px solid #5eb8e8; }
+.panel.bonus { border-top: 3px solid var(--bonus); }
+.panel.hard-mode { border-top: 2px solid var(--hm); }
+.panel.bosses { border-top: 2px solid var(--danger); }
+.panel.other { border-top: 2px solid var(--text-muted); }
+
+/* Emphasized reading panels */
+.panel.walkthrough .panel-scroll,
+.panel.walkthrough .wiki-block {
+  font-size: var(--walk-size) !important;
+  line-height: 1.55;
+}
+.panel.bonus .panel-scroll,
+.panel.bonus .wiki-block {
+  font-size: var(--bonus-size) !important;
+  line-height: 1.55;
+}
+.panel.walkthrough .panel-scroll li,
+.panel.bonus .panel-scroll li {
+  margin-bottom: 0.45rem;
+}
+.panel.walkthrough .panel-scroll p,
+.panel.bonus .panel-scroll p {
+  margin-bottom: 0.55rem;
+}
+
+.icon-map { background: var(--accent-soft); color: var(--accent); }
+.icon-obj { background: var(--accent-soft); color: var(--accent); }
+.icon-walk { background: rgba(94, 184, 232, 0.15); color: #5eb8e8; }
+.icon-bonus { background: var(--bonus-soft); color: var(--bonus); }
+.icon-hm { background: var(--hm-soft); color: var(--hm); }
+.icon-boss { background: var(--danger-soft); color: var(--danger); }
+.icon-other { background: rgba(138, 155, 176, 0.15); color: var(--text-muted); }
+
+.map-wrap {
+  flex: 1; min-height: 0; display: flex; flex-direction: column;
+  align-items: center; justify-content: center; gap: 0.4rem;
+}
+.map-frame {
+  flex: 1; min-height: 0; width: 100%;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: 10px; overflow: hidden;
+  border: 2px solid var(--border-glow);
+  box-shadow: 0 0 0 1px rgba(62, 207, 255, 0.1), 0 12px 40px rgba(0, 0, 0, 0.45);
+  background: #05080c; cursor: zoom-in;
+}
+.map-frame img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  image-rendering: auto;
+}
+.map-caption { font-size: 0.72rem; color: var(--text-dim); flex-shrink: 0; }
+.map-missing {
+  color: var(--text-dim); font-size: 1rem; text-align: center; padding: 2rem;
+}
+
+.wiki-block ul, .panel-scroll ul,
+.wiki-block ol, .panel-scroll ol { padding-left: 1.2rem; margin: 0.3rem 0 0.5rem; }
+.wiki-block li, .panel-scroll li { margin-bottom: 0.32rem; }
+.wiki-block p, .panel-scroll p { margin-bottom: 0.45rem; }
+.wiki-block img, .panel-scroll img { vertical-align: middle; max-height: 1.35em; width: auto; }
+.wiki-block table, .panel-scroll table {
+  width: 100%; border-collapse: collapse; font-size: 0.9em; margin: 0.4rem 0;
+}
+.wiki-block th, .wiki-block td, .panel-scroll th, .panel-scroll td {
+  border: 1px solid var(--border); padding: 0.3rem 0.45rem; text-align: left;
+}
+.lede { font-size: 0.92rem; color: var(--text-muted); margin-bottom: 0.35rem; }
+
+/* Collapsed summary */
+details.summary-details {
+  background: var(--bg-panel);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  border-top: 2px solid var(--gold);
+  padding: 0.35rem 0.65rem;
+  flex-shrink: 0;
+}
+details.summary-details summary {
+  cursor: pointer;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--gold);
+  padding: 0.35rem 0;
+  list-style: none;
+}
+details.summary-details summary::-webkit-details-marker { display: none; }
+details.summary-details summary::before {
+  content: "▸ ";
+  color: var(--text-dim);
+}
+details.summary-details[open] summary::before { content: "▾ "; }
+details.summary-details .summary-body {
+  padding: 0.35rem 0 0.55rem;
+  font-size: 0.88rem;
+  color: var(--text-muted);
+  max-height: 18vh;
+  overflow-y: auto;
+}
+
+.boss-note { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.4rem; }
+.boss-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.4rem; }
+.boss-card {
+  background: var(--bg-panel-2); border: 1px solid var(--border);
+  border-radius: 8px; padding: 0.5rem 0.6rem;
+}
+.boss-card-head { font-size: 0.95rem; margin-bottom: 0.2rem; }
+.boss-card-head a { color: #eef6fc; font-weight: 700; }
+.boss-card-head a:hover { color: var(--accent); }
+.boss-elite { font-size: 0.88rem; }
+.elite-label { color: var(--gold); font-weight: 650; margin-right: 0.25rem; }
+.elite-link { color: #ffd78a; font-weight: 650; }
+.elite-link:hover { color: #ffe9b5; }
+.elite-none { color: var(--text-dim); font-style: italic; font-size: 0.85rem; }
+.boss-meta { font-size: 0.78rem; color: var(--text-dim); margin-top: 0.15rem; }
+
+.callout {
+  margin-top: 0.4rem; padding: 0.45rem 0.6rem; border-radius: 6px;
+  font-size: 0.88rem; border-left: 3px solid; line-height: 1.4;
+}
+.callout.tip { background: var(--accent-soft); border-color: var(--accent); color: #b8eaff; }
+.callout.warn { background: var(--danger-soft); border-color: var(--danger); color: #ffb4b4; }
+
+.lightbox {
+  display: none; position: fixed; inset: 0; z-index: 1000; background: rgba(0,0,0,0.94);
+  align-items: center; justify-content: center; padding: 1.5rem; cursor: zoom-out;
+}
+.lightbox.open { display: flex; }
+.lightbox img {
+  max-width: 96vw; max-height: 96vh; border-radius: 8px;
+  border: 2px solid var(--border-glow); object-fit: contain;
+}
+
+@media (min-height: 2400px) {
+  :root {
+    --walk-size: clamp(1.15rem, 0.7vh + 0.3vw, 1.5rem);
+    --bonus-size: clamp(1.15rem, 0.7vh + 0.3vw, 1.5rem);
+    --gap: 0.65rem;
+    --pad: 0.85rem;
+  }
+  .workspace { grid-template-columns: minmax(560px, 1.2fr) minmax(0, 1fr); }
+}
+@media (min-width: 1800px) and (min-height: 2000px) {
+  .workspace { grid-template-columns: minmax(600px, 1.25fr) minmax(0, 1fr); }
+}
+@media (max-height: 1100px) {
+  body { overflow: auto; height: auto; }
+  .app { height: auto; max-height: none; min-height: 100vh; }
+  .workspace {
+    height: auto; overflow: visible; grid-template-columns: 1fr; grid-template-rows: auto;
+  }
+  .col-map { grid-template-rows: auto; }
+  .col-main { overflow: visible; grid-template-rows: auto; }
+  .row-bonus-hm, .row-lower { grid-template-columns: 1fr; }
+  .panel { max-height: none; overflow: visible; }
+  .panel-scroll { overflow: visible; }
+  .map-frame { min-height: 360px; max-height: 55vh; }
+}
+
+    :root { --accent: #e8a84a; --accent-soft: #e8a84a22; }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header class="top-chrome">
+      <div class="brand">
+        <span class="brand-mission">M5</span>
+        <span class="brand-name">Tahnnakai Temple</span>
+        <span class="brand-meta">Factions · Kaineng City · Cooperative · Medium</span>
+      </div>
+      <nav class="chip-nav" aria-label="Sections">
+        <a href="#map">Map</a>
+        <a href="#walkthrough">Walkthrough</a>
+        <a href="#bonus">Bonus</a>
+        <a href="#objectives">Objectives</a>
+        <a href="#hard-mode">Hard Mode</a>
+        <a href="#bosses">Bosses</a>
+        <a href="#other">Tips</a>
+      </nav>
+      <div class="chrome-actions">
+        <a class="btn btn-idx" href="../factions.html">Index</a>
+        <a class="btn btn-prev" href="4_Nahpui_Quarter.html">← Prev</a>
+        <a class="btn btn-wiki" href="https://wiki.guildwars.com/wiki/Tahnnakai_Temple" target="_blank" rel="noopener">Wiki ↗</a>
+        <a class="btn btn-next" href="6_Arborstone.html">Next: Arborstone →</a>
+      </div>
+    </header>
+
+    <div class="workspace">
+      <div class="col-map">
+        <section class="panel map-panel" id="map">
+          <h2 class="panel-title"><span class="icon icon-map">◉</span> Mission Map</h2>
+          <div class="map-wrap">
+            <div class="map-frame" id="mapOpen" title="Click to enlarge">
+              <img src="../maps/factions_05_Tahnnakai_Temple_map.jpg" alt="Tahnnakai Temple mission map" />
+            </div>
+            <p class="map-caption">Click to enlarge · Local cache · <a href="https://wiki.guildwars.com/wiki/Tahnnakai_Temple" target="_blank" rel="noopener">Wiki</a></p>
+        </div>
+        </section>
+
+        <details class="summary-details" id="summary">
+          <summary>Summary (click to expand)</summary>
+          <div class="summary-body">
+            <p>Free the spirits of the heroes of ancient Cantha . Get to Vizu before she is consumed by Shiro .</p>
+            <p style="margin-top:0.4rem;"><strong>Region:</strong> Kaineng City · <strong>Mission:</strong> 5 of 13 · <strong>Type:</strong> Cooperative</p>
+            <p style="margin-top:0.35rem;"><a href="https://wiki.guildwars.com/wiki/Tahnnakai_Temple" target="_blank" rel="noopener">Full wiki article ↗</a></p>
+          </div>
+        </details>
+      </div>
+
+      <div class="col-main">
+        <section class="panel objectives row-obj" id="objectives">
+          <h2 class="panel-title"><span class="icon icon-obj">✓</span> Objectives</h2>
+          <div class="panel-scroll wiki-block"><p>Stop the Spirit Binder from consuming <a href="https://wiki.guildwars.com/wiki/Vizu" rel="noopener" target="_blank" title="Vizu">Vizu</a>.
+</p><ul><li>You have freed [0...8] soul[s] out of 8.</li>
+<li><a href="https://wiki.guildwars.com/wiki/Master_Togo" rel="noopener" target="_blank" title="Master Togo">Togo</a> must survive.</li>
+<li><a href="https://wiki.guildwars.com/wiki/Mhenlo" rel="noopener" target="_blank" title="Mhenlo">Mhenlo</a> must survive.</li></ul></div>
+        </section>
+
+        <section class="panel walkthrough" id="walkthrough">
+          <h2 class="panel-title"><span class="icon icon-walk">→</span> Walkthrough</h2>
+          <div class="panel-scroll wiki-block"><p>Your goal is to defeat eight bosses in eight separate rooms, representing souls that have been bound by Shiro. As each soul is released, it will open the door to the next room, and you continue until your reach the eighth and final room. The mission fails if either Togo or Mhenlo die or if the party <a href="https://wiki.guildwars.com/wiki/Wipe" rel="noopener" target="_blank" title="Wipe">wipes</a>.
+</p><p>This can be one of the harder Factions missions, especially when using only <a href="https://wiki.guildwars.com/wiki/Hero" rel="noopener" target="_blank" title="Hero">heroes</a> and <a class="mw-redirect" href="https://wiki.guildwars.com/wiki/Henchmen" rel="noopener" target="_blank" title="Henchmen">henchmen</a>, particularly when trying to earn the <a class="mw-redirect" href="https://wiki.guildwars.com/wiki/Master%27s_Reward" rel="noopener" target="_blank" title="Master's Reward">Master's Reward</a>. Although the mission is timed and Togo keeps urging the party to hurry, take your time: as you defeat each of the bosses below, the countdown clock is set back; as long as your progress is steady, there is more than enough time to finish.
+</p><p>One of the main problems solo players will encounter when pulling is that Mhenlo and Togo will follow them, often resulting in their deaths and mission failure. A solution to this is to use a <a href="https://wiki.guildwars.com/wiki/Bow" rel="noopener" target="_blank" title="Bow">bow</a> (a flatbow or longbow) or heroes to pull. Flag a high-armour hero (e. g. Warrior) to aggro range of a mob while you hold back in safety to lure them to you. Using spells like Protective Spirit and Mantra of Flame helps here. If you are playing as a melee character, pulling can be especially dangerous if you have the rest of your party flagged further back. In this case it may be easier if you simply do not front line and hold back to ensure their safety (you can mop up any enemies that rush forwards). A minion master can provide the front line and an effective meat shield - use bridges and walls as choke points. 
+</p><p>Another solution to avoid Mhenlo and Togo getting killed is to stuck them in the start room using <a href="https://wiki.guildwars.com/wiki/Recall" rel="noopener" target="_blank" title="Recall">Recall</a>, which is especially useful in hard mode. Clear room 1 (Kitah) as usual, as soon as you enter room 2 (Naku), flag your heroes on the bottom of the stairs and use Recall on one of them. Walk back to the start room to the Portal which leads to the outpost to the corner farthest away from the rest of your party. Note that if you have other human players in the party, they need to stand still, otherwise Mhenlo and Togo won't follow you. You can then end recall and unflag your heroes - Mhenlo's and Togo's names should be now gray in the party list and they won't follow any longer.
+</p><p>In general, keep the party apart to avoid damage from <a href="https://wiki.guildwars.com/wiki/Area_of_effect" rel="noopener" target="_blank" title="Area of effect">area of effect</a> (AoE) skills (particularly from <a href="https://wiki.guildwars.com/wiki/Temple_Guardian" rel="noopener" target="_blank" title="Temple Guardian">Temple Guardians</a>, <a href="https://wiki.guildwars.com/wiki/Afflicted_Elementalist" rel="noopener" target="_blank" title="Afflicted Elementalist">Afflicted Elementalists</a>, and <a href="https://wiki.guildwars.com/wiki/Afflicted_Monk" rel="noopener" target="_blank" title="Afflicted Monk">Monks</a>). Typically, the trick is to keep most of the party back, <a href="https://wiki.guildwars.com/wiki/Pull" rel="noopener" target="_blank" title="Pull">pull</a> enemies with a long range weapon like a staff or a long bow, and retreat. The <a href="https://wiki.guildwars.com/wiki/Afflicted" rel="noopener" target="_blank" title="Afflicted">Afflicted</a> will then chase that party member, bunching up and allowing the party to use AoE skills against them.
+</p><p>In some of the rooms, the Afflicted may be <a href="https://wiki.guildwars.com/wiki/Patrol" rel="noopener" target="_blank" title="Patrol">patrolling</a> or move into a different formation after the party enters. This may seem like they have detected the party, which is not the case. Stay calm, fall back and keep the same tactics: do not rush in and pull them carefully to avoid <a href="https://wiki.guildwars.com/wiki/Aggro" rel="noopener" target="_blank" title="Aggro">aggroing</a> too many enemies.
+</p><p>In the first seven rooms, you only need to kill the boss to trigger the opening of the gate. However, you should still kill everything, since it is nearly impossible to get Togo and Mhenlo through the rooms safely.
+</p><dl><dt>Room 1 - <a href="https://wiki.guildwars.com/wiki/Bound_Kitah" rel="noopener" target="_blank" title="Bound Kitah">Kitah</a></dt></dl><p>Fight the 2 pairs of Temple Guardians separately from the main group. If you're careful you should be able to sneak past the first group of Temple Guardians. As with all Afflicted groups, concentrate on their monks and powerful Ritualists first.
+</p><dl><dt>Room 2 - <a href="https://wiki.guildwars.com/wiki/Bound_Naku" rel="noopener" target="_blank" title="Bound Naku">Naku</a></dt></dl><p>The groups to the left, right and center can be pulled separately. This is most easily accomplished by pulling the right group first and back into the walkway, then the center and finally the left.
+</p><dl><dt>Room 3 - <a href="https://wiki.guildwars.com/wiki/Bound_Teinai" rel="noopener" target="_blank" title="Bound Teinai">Teinai</a></dt></dl><p>All the enemies in this room, with the exception of Teinai herself, form one large group. You can pull the Afflicted to the corner near the entrance and kill them there, before fighting Teinai. Be wary of her <a href="https://wiki.guildwars.com/wiki/Sliver_Armor" rel="noopener" target="_blank" title="Sliver Armor">Sliver Armor</a> and <a href="https://wiki.guildwars.com/wiki/Star_Burst" rel="noopener" target="_blank" title="Star Burst">Star Burst</a> which can kill multiple characters in seconds.
+</p><dl><dt>Room 4 - <a href="https://wiki.guildwars.com/wiki/Bound_Karei" rel="noopener" target="_blank" title="Bound Karei">Karei</a></dt></dl><p>Like in the first room, fight the Temple Guardians separately from the main group before killing the boss.
+</p><dl><dt>Room 5 - <a href="https://wiki.guildwars.com/wiki/Bound_Jaizhanju" rel="noopener" target="_blank" title="Bound Jaizhanju">Jaizhanju</a></dt></dl><p>The group to the right can be pulled independently of the main group. Additionally, pulling can make the enemy warriors rush out of range of their healers. Two doors lead to the next room. While it is sufficient to kill the group guarding one door, the other will join in while the players fight in the next group, therefore it is easier to kill both beforehand.
+</p><dl><dt>Room 6 - <a href="https://wiki.guildwars.com/wiki/Bound_Zojun" rel="noopener" target="_blank" title="Bound Zojun">Zojun</a></dt></dl><p>It is easier to pull the Temple Guardians separately if taking the left door. After the party enters, any remaining enemies from the previous room will rush in, and a couple of small Afflicted groups will move towards the two sets of stairs. Wait until they move out, then kill those first, then pull and kill the Temple Guardians, then the main group. You can use the wall just beyond the stairs to hide behind. With careful manipulation of enemy aggro, you can get them all to bunch up by the corner for easy AoE damage.
+</p><dl><dt>Room 7 - <a href="https://wiki.guildwars.com/wiki/Bound_Kaolai" rel="noopener" target="_blank" title="Bound Kaolai">Kaolai</a></dt></dl><p>Beware of the patrols rushing in on you in this room and watch out for the high powered elementalists. Keep in mind that the boss is a Ritualist that uses <a href="https://wiki.guildwars.com/wiki/Restoration" rel="noopener" target="_blank" title="Restoration">Restoration</a>, an AoE resurrect. This is arguably the hardest room. The elementalists are lethal and will decimate unprepared teams frighteningly quickly. Set up protective spirits (a <a href="https://wiki.guildwars.com/wiki/Soul_Twisting" rel="noopener" target="_blank" title="Soul Twisting">Soul Twisting</a> ritualist can be useful here) and use a hero (preferably with protective spirit) to pull the enemies towards your group. Try and flag your heroes out as much as possible. The group leader should be careful if engaging because of Togo and Mhenlo. With a bit of luck, you'll get the enemies running into your team one-by-one and die.  
+</p><dl><dt>Room 8 - <a href="https://wiki.guildwars.com/wiki/Bound_Vizu" rel="noopener" target="_blank" title="Bound Vizu">Vizu</a></dt></dl><p>Single Afflicted Rangers patrol this circular room clockwise and counter-clockwise. They, as well as the pairs of Temple Guardians protecting the bridges to the center, do not need to be killed to finish the mission. However, do take care of those patrols that might <a href="https://wiki.guildwars.com/wiki/Aggro" rel="noopener" target="_blank" title="Aggro">aggro</a> on your <a class="mw-redirect" href="https://wiki.guildwars.com/wiki/Backline" rel="noopener" target="_blank" title="Backline">backline</a> while engaging the boss group. While fighting the last group, it is advisable to have your melee fighters pull the big enemy group onto the bridge and body block them there, thus protecting your backline. All enemies in the center need to be killed to finish the mission (even those that might not initially aggro with the rest of the group) - killing Vizu does not automatically end the mission. Also, watch out for powerful AoE. Sometimes your group will get mobbed and cannot advance beyond the bridge, and will be torn to pieces by AoE in seconds, try <a href="https://wiki.guildwars.com/wiki/Hero_flag" rel="noopener" target="_blank" title="Hero flag">flagging</a> heroes and henchman around for less damage to your party.
+</p></div>
+        </section>
+
+        <div class="row-bonus-hm">
+          <section class="panel bonus" id="bonus">
+            <h2 class="panel-title"><span class="icon icon-bonus">★</span> Bonus</h2>
+            <div class="panel-scroll wiki-block"><p class='lede'>See walkthrough and objectives for bonus details (if any).</p></div>
+          </section>
+          <section class="panel hard-mode" id="hard-mode">
+            <h2 class="panel-title"><span class="icon icon-hm">◆</span> Hard Mode</h2>
+            <div class="panel-scroll wiki-block"><p class='lede'>No dedicated Hard Mode section on the wiki — expect tougher foes and adjusted mechanics. See walkthrough notes.</p></div>
+          </section>
+        </div>
+
+        <div class="row-lower">
+          <section class="panel bosses" id="bosses">
+            <h2 class="panel-title"><span class="icon icon-boss">☠</span> Bosses &amp; Elites</h2>
+            <div class="panel-scroll"><div class='boss-grid'>
+<article class="boss-card">
+  <div class="boss-card-head"><a href="https://wiki.guildwars.com/wiki/Bound_Jaizhanju" target="_blank" rel="noopener"><strong>Bound Jaizhanju</strong></a></div>
+  <div class="boss-elite"><span class="elite-label">Elite:</span> <a class="elite-link" href="https://wiki.guildwars.com/wiki/Auspicious_Parry" target="_blank" rel="noopener">Auspicious Parry</a></div>
+  <div class="boss-meta">24 (28)</div>
+</article>
+<article class="boss-card">
+  <div class="boss-card-head"><a href="https://wiki.guildwars.com/wiki/Bound_Zojun" target="_blank" rel="noopener"><strong>Bound Zojun</strong></a></div>
+  <div class="boss-elite"><span class="elite-label">Elite:</span> <a class="elite-link" href="https://wiki.guildwars.com/wiki/Famine" target="_blank" rel="noopener">Famine</a></div>
+  <div class="boss-meta">24 (28)</div>
+</article>
+<article class="boss-card">
+  <div class="boss-card-head"><a href="https://wiki.guildwars.com/wiki/Bound_Karei" target="_blank" rel="noopener"><strong>Bound Karei</strong></a></div>
+  <div class="boss-elite"><span class="elite-label">Elite:</span> <a class="elite-link" href="https://wiki.guildwars.com/wiki/Spell_Breaker" target="_blank" rel="noopener">Spell Breaker</a></div>
+  <div class="boss-meta">24 (28)</div>
+</article>
+<article class="boss-card">
+  <div class="boss-card-head"><a href="https://wiki.guildwars.com/wiki/Bound_Naku" target="_blank" rel="noopener"><strong>Bound Naku</strong></a></div>
+  <div class="boss-elite"><span class="elite-label">Elite:</span> <a class="elite-link" href="https://wiki.guildwars.com/wiki/Wail_of_Doom" target="_blank" rel="noopener">Wail of Doom</a></div>
+  <div class="boss-meta">24 (28)</div>
+</article>
+<article class="boss-card">
+  <div class="boss-card-head"><a href="https://wiki.guildwars.com/wiki/Bound_Kitah" target="_blank" rel="noopener"><strong>Bound Kitah</strong></a></div>
+  <div class="boss-elite"><span class="elite-label">Elite:</span> <a class="elite-link" href="https://wiki.guildwars.com/wiki/Arcane_Languor" target="_blank" rel="noopener">Arcane Languor</a></div>
+  <div class="boss-meta">24 (28)</div>
+</article>
+<article class="boss-card">
+  <div class="boss-card-head"><a href="https://wiki.guildwars.com/wiki/Bound_Teinai" target="_blank" rel="noopener"><strong>Bound Teinai</strong></a></div>
+  <div class="boss-elite"><span class="elite-label">Elite:</span> <a class="elite-link" href="https://wiki.guildwars.com/wiki/Star_Burst" target="_blank" rel="noopener">Star Burst</a></div>
+  <div class="boss-meta">24 (28)</div>
+</article>
+<article class="boss-card">
+  <div class="boss-card-head"><a href="https://wiki.guildwars.com/wiki/Bound_Vizu" target="_blank" rel="noopener"><strong>Bound Vizu</strong></a></div>
+  <div class="boss-elite"><span class="elite-label">Elite:</span> <a class="elite-link" href="https://wiki.guildwars.com/wiki/Shroud_of_Silence" target="_blank" rel="noopener">Shroud of Silence</a></div>
+  <div class="boss-meta">24 (28)</div>
+</article>
+<article class="boss-card">
+  <div class="boss-card-head"><a href="https://wiki.guildwars.com/wiki/Bound_Kaolai" target="_blank" rel="noopener"><strong>Bound Kaolai</strong></a></div>
+  <div class="boss-elite"><span class="elite-label">Elite:</span> <a class="elite-link" href="https://wiki.guildwars.com/wiki/Defiant_Was_Xinrae" target="_blank" rel="noopener">Defiant Was Xinrae</a></div>
+  <div class="boss-meta">24 (28)</div>
+</article>
+</div></div>
+          </section>
+          <section class="panel other" id="other">
+            <h2 class="panel-title"><span class="icon icon-other">✦</span> Tips &amp; Notes</h2>
+            <div class="panel-scroll"><h3 style='font-size:0.8rem;color:var(--accent);margin:0.3rem 0;'>Skill recommendations</h3><div class='wiki-block'><ul><li>Skills that deal AoE damage work well here since there are plenty of clumped-together enemies; however, many <a href="https://wiki.guildwars.com/wiki/Afflicted_Soul_Explosion" rel="noopener" target="_blank" title="Afflicted Soul Explosion">Afflicted Soul Explosions</a> may trigger at the same time because of the AoE damage.</li>
+<li>Since you kill a boss in each room (approximately once every 3 minutes), you can take <a href="https://wiki.guildwars.com/wiki/Resurrection_Signet" rel="noopener" target="_blank" title="Resurrection Signet">Resurrection Signets</a> or <a href="https://wiki.guildwars.com/wiki/Sunspear_Rebirth_Signet" rel="noopener" target="_blank" title="Sunspear Rebirth Signet">Sunspear Rebirth Signets</a> instead of <a href="https://wiki.guildwars.com/wiki/Hard_resurrection" rel="noopener" target="_blank" title="Hard resurrection">hard resurrection</a> skills.</li>
+<li><a href="https://wiki.guildwars.com/wiki/Minion_master" rel="noopener" target="_blank" title="Minion master">Minion masters</a> will have plenty of <a href="https://wiki.guildwars.com/wiki/Corpse" rel="noopener" target="_blank" title="Corpse">corpses</a>; their minions form valuable <a href="https://wiki.guildwars.com/wiki/Meat_shield" rel="noopener" target="_blank" title="Meat shield">meat shields</a> to reduce the chances of Afflicted Soul Explosions affecting party members.</li>
+<li><a href="https://wiki.guildwars.com/wiki/Elementalist" rel="noopener" target="_blank" title="Elementalist">Elementalists</a> can combine <a href="https://wiki.guildwars.com/wiki/Glyph_of_Sacrifice" rel="noopener" target="_blank" title="Glyph of Sacrifice">Glyph of Sacrifice</a> with <a href="https://wiki.guildwars.com/wiki/Meteor_Shower" rel="noopener" target="_blank" title="Meteor Shower">Meteor Shower</a> to target the bosses in each room for fast damage and <a href="https://wiki.guildwars.com/wiki/Knock_down" rel="noopener" target="_blank" title="Knock down">knock downs</a>; killing the boss recharges both skills, negating the added delay from the glyph.</li>
+<li><a href="https://wiki.guildwars.com/wiki/Pain_Inverter" rel="noopener" target="_blank" title="Pain Inverter">Pain Inverter</a> is useful against the AoE damage of the <a href="https://wiki.guildwars.com/wiki/Temple_Guardian" rel="noopener" target="_blank" title="Temple Guardian">Temple Guardians</a>.</li>
+<li>Consider bringing <a href="https://wiki.guildwars.com/wiki/Mantra_of_Flame" rel="noopener" target="_blank" title="Mantra of Flame">Mantra of Flame</a> or <a href="https://wiki.guildwars.com/wiki/Elemental_damage#Skills_that_protect_against_elemental_damage" rel="noopener" target="_blank" title="Elemental damage">skills that protect against elemental damage</a>, since <a href="https://wiki.guildwars.com/wiki/Afflicted_Ranger" rel="noopener" target="_blank" title="Afflicted Ranger">Afflicted Rangers</a>, <a href="https://wiki.guildwars.com/wiki/Afflicted_Elementalist" rel="noopener" target="_blank" title="Afflicted Elementalist">Afflicted Elementalists</a>, and Temple Guardians have skills that deal <a href="https://wiki.guildwars.com/wiki/Fire_damage" rel="noopener" target="_blank" title="Fire damage">fire damage</a>.</li>
+<li>The touch skills of <a href="https://wiki.guildwars.com/wiki/Ursan_Blessing" rel="noopener" target="_blank" title="Ursan Blessing">Ursan</a>, <a href="https://wiki.guildwars.com/wiki/Volfen_Blessing" rel="noopener" target="_blank" title="Volfen Blessing">Volfen</a> or <a href="https://wiki.guildwars.com/wiki/Raven_Blessing" rel="noopener" target="_blank" title="Raven Blessing">Raven Blessing</a> work through blindness, Aegis and Sliver Armor. <a href="https://wiki.guildwars.com/wiki/Asuran_Scan" rel="noopener" target="_blank" title="Asuran Scan">Asuran Scan</a> is also an option since Afflicted in this mission cannot remove hexes, but remember that Karei and Kitah have hex removal skills, so it may have to be <a href="https://wiki.guildwars.com/wiki/Cover" rel="noopener" target="_blank" title="Cover">covered</a> or reapplied against those two bosses.</li>
+<li><a class="mw-redirect" href="https://wiki.guildwars.com/wiki/Enchantment" rel="noopener" target="_blank" title="Enchantment">Enchantment</a>-based <a href="https://wiki.guildwars.com/wiki/Build" rel="noopener" target="_blank" title="Build">builds</a> are vulnerable to enchantment removal by <a href="https://wiki.guildwars.com/wiki/Afflicted_Necromancer" rel="noopener" target="_blank" title="Afflicted Necromancer">Afflicted Necromancers</a> and <a href="https://wiki.guildwars.com/wiki/Afflicted_Mesmer" rel="noopener" target="_blank" title="Afflicted Mesmer">Mesmers</a>. Afflicted that deal <a href="https://wiki.guildwars.com/wiki/Physical_damage" rel="noopener" target="_blank" title="Physical damage">physical damage</a> can also remove enchantments when enchanted with Afflicted Necromancer's <a href="https://wiki.guildwars.com/wiki/Order_of_Apostasy" rel="noopener" target="_blank" title="Order of Apostasy">Order of Apostasy</a>.</li>
+<li>Condition removal is helpful for the Afflicted Rangers, who will cause blindness.</li></ul></div>
+<h3 style='font-size:0.8rem;color:var(--accent);margin:0.3rem 0;'>Notes</h3><div class='wiki-block'><ul><li>Though all of the Bound bosses except Naku and Vizu have skills named after them (e.g., <a href="https://wiki.guildwars.com/wiki/Jaizhenju_Strike" rel="noopener" target="_blank" title="Jaizhenju Strike">Jaizhenju Strike</a>), none of them use any of their namesake skills.</li>
+<li>If you wish to capture Vizu's elite, <a href="https://wiki.guildwars.com/wiki/Shroud_of_Silence" rel="noopener" target="_blank" title="Shroud of Silence">Shroud of Silence</a>, you must defeat her before killing off her <a href="https://wiki.guildwars.com/wiki/Mob" rel="noopener" target="_blank" title="Mob">mob</a>, as the <a href="https://wiki.guildwars.com/wiki/Cinematic" rel="noopener" target="_blank" title="Cinematic">cinematic</a> will start almost immediately after the mob is defeated.</li>
+<li>The countdown timer for Vizu to be consumed by <a class="mw-redirect" href="https://wiki.guildwars.com/wiki/Shiro" rel="noopener" target="_blank" title="Shiro">Shiro</a> stays in front of all NPC messages, possibly hindering the reading of the message.  This can be avoided by rearranging the <a href="https://wiki.guildwars.com/wiki/User_interface" rel="noopener" target="_blank" title="User interface">user interface</a> through the interface tab of the F11 menu.</li>
+<li>The bound spirits do not instantly open the gates when freed, but instead speak some lines of dialogue when you run over to them, and finally cast a spell to open the gates.  As this takes valuable minutes in a mission with somewhat tight time constraints, it may be advantageous to kill the bosses before you've eliminated their entire party, and kill off the remaining <a href="https://wiki.guildwars.com/wiki/Mob" rel="noopener" target="_blank" title="Mob">mobs</a> while they are dawdling about.</li>
+<li>Completion of this mission will fill in page #3 of the <a href="https://wiki.guildwars.com/wiki/Shiro%27s_Return" rel="noopener" target="_blank" title="Shiro's Return">Shiro's Return</a> <a href="https://wiki.guildwars.com/wiki/Storybook" rel="noopener" target="_blank" title="Storybook">storybook</a>.</li></ul><div style="margin: 1em; border: solid silver; border-width: 1px 0px; padding: 2px 1em 2px 5em;"><strong class="hiddenlinks" style="position: absolute; margin-left: -4.8em; color: #900;"><a class="image" href="https://wiki.guildwars.com/wiki/File:Bug.png" rel="noopener" target="_blank" title="Bug"><img alt="Bug" data-file-height="32" data-file-width="32" decoding="async" height="18" loading="lazy" src="https://wiki.guildwars.com/images/thumb/7/7d/Bug.png/18px-Bug.png" srcset="/images/thumb/7/7d/Bug.png/27px-Bug.png 1.5x, /images/7/7d/Bug.png 2x" width="18"/></a> <a href="https://wiki.guildwars.com/wiki/Bug" rel="noopener" target="_blank" title="Bug">Bug</a>.</strong>Sometimes the released spirits can get stuck on an object, allied <a href="https://wiki.guildwars.com/wiki/Spirit" rel="noopener" target="_blank" title="Spirit">spirit</a>, or <a href="https://wiki.guildwars.com/wiki/Minion" rel="noopener" target="_blank" title="Minion">minion</a> and therefore cannot reach the door to unlock the next area. NPC allies such as <a href="https://wiki.guildwars.com/wiki/Master_Togo" rel="noopener" target="_blank" title="Master Togo">Master Togo</a> and <a class="mw-redirect" href="https://wiki.guildwars.com/wiki/Brother_Mhenlo" rel="noopener" target="_blank" title="Brother Mhenlo">Brother Mhenlo</a> can get in the way too. You have time to wait for your spirits to expire, you can move the party to adjust the minion's position, and (sometimes) moving the party will also distract the spirit past the obstacle. There is no work-around if the spirit is completely stuck on a corner or chest. Should that happen, you must restart the mission.</div><div style="margin: 1em; border: solid silver; border-width: 1px 0px; padding: 2px 1em 2px 5em;"><strong class="hiddenlinks" style="position: absolute; margin-left: -4.8em; color: #900;"><a class="image" href="https://wiki.guildwars.com/wiki/File:Bug.png" rel="noopener" target="_blank" title="Bug"><img alt="Bug" data-file-height="32" data-file-width="32" decoding="async" height="18" loading="lazy" src="https://wiki.guildwars.com/images/thumb/7/7d/Bug.png/18px-Bug.png" srcset="/images/thumb/7/7d/Bug.png/27px-Bug.png 1.5x, /images/7/7d/Bug.png 2x" width="18"/></a> <a href="https://wiki.guildwars.com/wiki/Bug" rel="noopener" target="_blank" title="Bug">Bug</a>.</strong>If a chest spawns in the far corner of Bound Jaizhanju's area, the item from it can drop in an unreachable area inside the pipe.</div><table class="stdt" style="margin: 5px auto; border: 1px solid #C0C0C0; font-size: 90%; width: 80%; text-align: center;">
+<tbody><tr>
+<th style="background: #7BC; font-size: 110%;"><a class="mw-redirect" href="https://wiki.guildwars.com/wiki/List_of_Factions_missions" rel="noopener" target="_blank" title="List of Factions missions">Factions missions</a>
+</th></tr>
+<tr>
+<td><a href="https://wiki.guildwars.com/wiki/Minister_Cho%27s_Estate" rel="noopener" target="_blank" title="Minister Cho's Estate">Minister Cho's Estate</a> » <a href="https://wiki.guildwars.com/wiki/Zen_Daijun" rel="noopener" target="_blank" title="Zen Daijun">Zen Daijun</a> » <a href="https://wiki.guildwars.com/wiki/Vizunah_Square" rel="noopener" target="_blank" title="Vizunah Square">Vizunah Square</a> » <a href="https://wiki.guildwars.com/wiki/Nahpui_Quarter" rel="noopener" target="_blank" title="Nahpui Quarter">Nahpui Quarter</a> » <a class="mw-selflink selflink">Tahnnakai Temple</a> » <a href="https://wiki.guildwars.com/wiki/Arborstone" rel="noopener" target="_blank" title="Arborstone">Arborstone</a> » <a href="https://wiki.guildwars.com/wiki/Boreas_Seabed" rel="noopener" target="_blank" title="Boreas Seabed">Boreas Seabed</a> » <a href="https://wiki.guildwars.com/wiki/Sunjiang_District" rel="noopener" target="_blank" title="Sunjiang District">Sunjiang District</a> » <a href="https://wiki.guildwars.com/wiki/Gyala_Hatchery" rel="noopener" target="_blank" title="Gyala Hatchery">Gyala Hatchery</a> <i>or</i> <a href="https://wiki.guildwars.com/wiki/The_Eternal_Grove" rel="noopener" target="_blank" title="The Eternal Grove">The Eternal Grove</a> » <a href="https://wiki.guildwars.com/wiki/Unwaking_Waters" rel="noopener" target="_blank" title="Unwaking Waters">Unwaking Waters</a> » <a href="https://wiki.guildwars.com/wiki/Raisu_Palace" rel="noopener" target="_blank" title="Raisu Palace">Raisu Palace</a> » <a href="https://wiki.guildwars.com/wiki/Imperial_Sanctum" rel="noopener" target="_blank" title="Imperial Sanctum">Imperial Sanctum</a>
+</td></tr>
+<tr>
+<td><i><b><a class="mw-redirect" href="https://wiki.guildwars.com/wiki/Challenge_mission" rel="noopener" target="_blank" title="Challenge mission">Challenge</a></b></i><br/><a href="https://wiki.guildwars.com/wiki/Altrumm_Ruins" rel="noopener" target="_blank" title="Altrumm Ruins">Altrumm Ruins</a> <span style="margin: 0em 0.3em;">•</span> <a href="https://wiki.guildwars.com/wiki/Amatz_Basin" rel="noopener" target="_blank" title="Amatz Basin">Amatz Basin</a> <span style="margin: 0em 0.3em;">•</span> <a href="https://wiki.guildwars.com/wiki/The_Aurios_Mines" rel="noopener" target="_blank" title="The Aurios Mines">The Aurios Mines</a> <span style="margin: 0em 0.3em;">•</span> <a href="https://wiki.guildwars.com/wiki/Dragon%27s_Throat" rel="noopener" target="_blank" title="Dragon's Throat">Dragon's Throat</a> <span style="margin: 0em 0.3em;">•</span> <a href="https://wiki.guildwars.com/wiki/Zos_Shivros_Channel" rel="noopener" target="_blank" title="Zos Shivros Channel">Zos Shivros Channel</a>
+</td></tr>
+<tr>
+<td><i><b><a class="mw-redirect" href="https://wiki.guildwars.com/wiki/Competitive_mission" rel="noopener" target="_blank" title="Competitive mission">Competitive</a></b></i><br/><a href="https://wiki.guildwars.com/wiki/Fort_Aspenwood" rel="noopener" target="_blank" title="Fort Aspenwood">Fort Aspenwood</a> <span style="margin: 0em 0.3em;">•</span> <a href="https://wiki.guildwars.com/wiki/The_Jade_Quarry" rel="noopener" target="_blank" title="The Jade Quarry">The Jade Quarry</a>
+</td></tr>
+<tr>
+<td><i><b><a class="mw-redirect" href="https://wiki.guildwars.com/wiki/Elite_mission" rel="noopener" target="_blank" title="Elite mission">Elite</a></b></i><br/><a href="https://wiki.guildwars.com/wiki/The_Deep" rel="noopener" target="_blank" title="The Deep">The Deep</a> <span style="margin: 0em 0.3em;">•</span> <a href="https://wiki.guildwars.com/wiki/Urgoz%27s_Warren" rel="noopener" target="_blank" title="Urgoz's Warren">Urgoz's Warren</a>
+</td></tr></tbody></table> 
+NewPP limit report
+Cached time: 20260720044020
+Cache expiry: 3600
+Reduced expiry: true
+Complications: [show‐toc]
+CPU time usage: 0.108 seconds
+Real time usage: 0.155 seconds
+Preprocessor visited node count: 1164/1000000
+Post‐expand include size: 12357/2097152 bytes
+Template argument size: 1574/2097152 bytes
+Highest expansion depth: 10/100
+Expensive parser function count: 0/100
+Unstrip recursion depth: 0/20
+Unstrip post‐expand size: 2/5000000 bytes
+ExtLoops count: 0/1000
+
+Transclusion expansion time report (%,ms,calls,template)
+100.00%   88.902      1 -total
+ 43.10%   38.316      1 Template:Location_disambiguation_2
+ 24.14%   21.458      8 Template:Ifexists
+ 12.68%   11.277      1 Template:Mission_rewards
+  9.83%    8.735      1 Template:Mission_infobox
+  6.69%    5.950      6 Template:Cost
+  5.60%    4.977      1 Template:Factions_missions
+  4.70%    4.174      3 Template:Mo
+  3.38%    3.008      1 Template:Infobox_campaign_row
+  3.23%    2.869      8 Template:Profession_icon_sizes
+ Saved in parser cache with key en_wiki:pcache:idhash:6582-0!canonical and timestamp 20260720044020 and revision id 2703540.</div></div>
+          </section>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="lightbox" id="lightbox" role="dialog" aria-label="Enlarged map">
+    <img src="../maps/factions_05_Tahnnakai_Temple_map.jpg" alt="Tahnnakai Temple mission map (enlarged)" />
+  </div>
+  <script>
+    (function () {
+      var open = document.getElementById("mapOpen");
+      var box = document.getElementById("lightbox");
+      if (!open || !box) return;
+      open.addEventListener("click", function () { box.classList.add("open"); });
+      box.addEventListener("click", function () { box.classList.remove("open"); });
+      document.addEventListener("keydown", function (e) {
+        if (e.key === "Escape") box.classList.remove("open");
+      });
+    })();
+  </script>
+
+</body>
+</html>

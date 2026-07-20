@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Vizunah Square</title>
+  <style>
+:root {
+  --bg-deep: #070a0f;
+  --bg-panel: #101820;
+  --bg-panel-2: #15202c;
+  --border: #243044;
+  --border-glow: #2a4a6a;
+  --text: #dce6f0;
+  --text-muted: #8a9bb0;
+  --text-dim: #5c6f86;
+  --accent: #3ecfff;
+  --accent-soft: rgba(62, 207, 255, 0.12);
+  --gold: #e8c56a;
+  --gold-soft: rgba(232, 197, 106, 0.12);
+  --bonus: #7dffb3;
+  --bonus-soft: rgba(125, 255, 179, 0.1);
+  --danger: #ff6b6b;
+  --danger-soft: rgba(255, 107, 107, 0.1);
+  --hm: #c78bff;
+  --hm-soft: rgba(199, 139, 255, 0.12);
+  --radius: 10px;
+  --font: "Segoe UI", system-ui, -apple-system, sans-serif;
+  --chrome-h: 3.1rem;
+  --gap: 0.5rem;
+  --pad: 0.7rem;
+  /* Readable on 4K vertical (~2160×3840) */
+  --walk-size: clamp(1.05rem, 0.55vw + 0.55vh, 1.35rem);
+  --bonus-size: clamp(1.05rem, 0.55vw + 0.55vh, 1.35rem);
+  --body-size: clamp(0.95rem, 0.4vw + 0.4vh, 1.1rem);
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html {
+  scroll-behavior: smooth;
+  font-size: clamp(16px, 0.55vw + 0.45vh, 20px);
+  height: 100%;
+  scroll-padding-top: calc(var(--chrome-h) + 0.5rem);
+}
+body {
+  font-family: var(--font);
+  background: var(--bg-deep);
+  color: var(--text);
+  line-height: 1.45;
+  min-height: 100%;
+  height: 100%;
+  overflow: hidden;
+  background-image: radial-gradient(ellipse 70% 25% at 50% 0%, rgba(42, 100, 160, 0.14), transparent);
+}
+a { color: var(--accent); text-decoration: none; }
+a:hover { color: #7de0ff; text-decoration: underline; }
+.app {
+  display: grid;
+  grid-template-rows: var(--chrome-h) 1fr;
+  height: 100vh; height: 100dvh;
+  max-height: 100vh; max-height: 100dvh;
+}
+.top-chrome {
+  display: flex; align-items: center; gap: 0.65rem;
+  padding: 0 0.7rem;
+  background: rgba(8, 12, 18, 0.97);
+  border-bottom: 1px solid var(--border);
+  z-index: 100; min-height: var(--chrome-h);
+}
+.brand { display: flex; align-items: baseline; gap: 0.55rem; min-width: 0; flex-shrink: 0; }
+.brand-mission {
+  font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase;
+  color: var(--accent); font-weight: 700; white-space: nowrap;
+}
+.brand-name {
+  font-size: 1.1rem; font-weight: 750; color: var(--text);
+  white-space: nowrap; letter-spacing: -0.02em;
+}
+.brand-meta { font-size: 0.75rem; color: var(--text-dim); white-space: nowrap; }
+.chip-nav {
+  display: flex; flex: 1; gap: 0.3rem; overflow-x: auto;
+  scrollbar-width: none; min-width: 0; justify-content: center;
+}
+.chip-nav::-webkit-scrollbar { display: none; }
+.chip-nav a {
+  flex: 0 0 auto; padding: 0.3rem 0.65rem; border-radius: 999px;
+  font-size: 0.78rem; font-weight: 600; color: var(--text-muted);
+  background: var(--bg-panel); border: 1px solid var(--border);
+  text-decoration: none; white-space: nowrap;
+}
+.chip-nav a:hover {
+  color: var(--text); border-color: var(--border-glow);
+  background: #1a2836; text-decoration: none;
+}
+.chip-nav a[href="#map"] { color: var(--accent); border-color: rgba(62, 207, 255, 0.35); }
+.chip-nav a[href="#bonus"] { color: var(--bonus); border-color: rgba(125, 255, 179, 0.3); }
+.chip-nav a[href="#hard-mode"] { color: var(--hm); border-color: rgba(199, 139, 255, 0.3); }
+.chip-nav a[href="#bosses"] { color: #ff9a9a; border-color: rgba(255, 107, 107, 0.3); }
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 0.3rem;
+  padding: 0.42rem 0.85rem; border-radius: 8px; font-weight: 650; font-size: 0.8rem;
+  border: none; cursor: pointer; text-decoration: none; white-space: nowrap; flex-shrink: 0;
+}
+.btn:hover { text-decoration: none; }
+.btn-next {
+  background: linear-gradient(135deg, #1a6a9a, #1ab0e0); color: #fff;
+  box-shadow: 0 2px 12px rgba(26, 140, 200, 0.35);
+}
+.btn-next:hover { color: #fff; filter: brightness(1.08); }
+.btn-wiki, .btn-idx, .btn-prev {
+  background: var(--bg-panel); color: var(--text-muted);
+  border: 1px solid var(--border); padding: 0.42rem 0.65rem;
+}
+.btn-wiki:hover, .btn-idx:hover, .btn-prev:hover {
+  color: var(--accent); border-color: var(--border-glow);
+}
+.chrome-actions { display: flex; gap: 0.35rem; flex-shrink: 0; }
+
+/* Map-dominant workspace */
+.workspace {
+  display: grid;
+  grid-template-columns: minmax(480px, 1.15fr) minmax(0, 1fr);
+  grid-template-rows: 1fr;
+  gap: var(--gap); padding: var(--gap);
+  min-height: 0; height: 100%; overflow: hidden;
+}
+.col-map {
+  display: grid;
+  grid-template-rows: 1fr auto;
+  gap: var(--gap);
+  min-height: 0; min-width: 0;
+}
+.col-main {
+  display: grid;
+  /* objectives compact | walkthrough HUGE | bonus+hm | bosses+tips */
+  grid-template-rows: auto minmax(0, 1.6fr) minmax(0, 1.05fr) minmax(0, 0.75fr);
+  gap: var(--gap); min-height: 0; min-width: 0; overflow: hidden;
+}
+.row-obj { min-height: 0; }
+.row-bonus-hm {
+  display: grid; grid-template-columns: 1.15fr 0.85fr; gap: var(--gap); min-height: 0;
+}
+.row-lower {
+  display: grid; grid-template-columns: 1.15fr 0.85fr; gap: var(--gap); min-height: 0;
+}
+.panel {
+  background: var(--bg-panel); border: 1px solid var(--border); border-radius: var(--radius);
+  padding: var(--pad); display: flex; flex-direction: column; min-height: 0; overflow: hidden;
+}
+.panel-scroll {
+  overflow-y: auto; overflow-x: hidden; min-height: 0; flex: 1; padding-right: 0.3rem;
+  scrollbar-width: thin; scrollbar-color: var(--border) transparent;
+  font-size: var(--body-size);
+}
+.panel-scroll::-webkit-scrollbar { width: 8px; }
+.panel-scroll::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+.panel-title {
+  display: flex; align-items: center; gap: 0.4rem;
+  font-size: 0.82rem; font-weight: 750; letter-spacing: 0.05em; text-transform: uppercase;
+  color: var(--text); margin-bottom: 0.45rem; padding-bottom: 0.35rem;
+  border-bottom: 1px solid var(--border); flex-shrink: 0;
+}
+.panel-title .icon {
+  width: 1.3rem; height: 1.3rem; border-radius: 5px;
+  display: inline-flex; align-items: center; justify-content: center; font-size: 0.75rem;
+}
+.panel.map-panel {
+  border-color: var(--border-glow);
+  background: linear-gradient(180deg, #0e1620 0%, var(--bg-panel) 100%);
+  /* Map takes almost all left column */
+  min-height: 0;
+}
+.panel.objectives { border-top: 2px solid var(--accent); }
+.panel.walkthrough { border-top: 3px solid #5eb8e8; }
+.panel.bonus { border-top: 3px solid var(--bonus); }
+.panel.hard-mode { border-top: 2px solid var(--hm); }
+.panel.bosses { border-top: 2px solid var(--danger); }
+.panel.other { border-top: 2px solid var(--text-muted); }
+
+/* Emphasized reading panels */
+.panel.walkthrough .panel-scroll,
+.panel.walkthrough .wiki-block {
+  font-size: var(--walk-size) !important;
+  line-height: 1.55;
+}
+.panel.bonus .panel-scroll,
+.panel.bonus .wiki-block {
+  font-size: var(--bonus-size) !important;
+  line-height: 1.55;
+}
+.panel.walkthrough .panel-scroll li,
+.panel.bonus .panel-scroll li {
+  margin-bottom: 0.45rem;
+}
+.panel.walkthrough .panel-scroll p,
+.panel.bonus .panel-scroll p {
+  margin-bottom: 0.55rem;
+}
+
+.icon-map { background: var(--accent-soft); color: var(--accent); }
+.icon-obj { background: var(--accent-soft); color: var(--accent); }
+.icon-walk { background: rgba(94, 184, 232, 0.15); color: #5eb8e8; }
+.icon-bonus { background: var(--bonus-soft); color: var(--bonus); }
+.icon-hm { background: var(--hm-soft); color: var(--hm); }
+.icon-boss { background: var(--danger-soft); color: var(--danger); }
+.icon-other { background: rgba(138, 155, 176, 0.15); color: var(--text-muted); }
+
+.map-wrap {
+  flex: 1; min-height: 0; display: flex; flex-direction: column;
+  align-items: center; justify-content: center; gap: 0.4rem;
+}
+.map-frame {
+  flex: 1; min-height: 0; width: 100%;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: 10px; overflow: hidden;
+  border: 2px solid var(--border-glow);
+  box-shadow: 0 0 0 1px rgba(62, 207, 255, 0.1), 0 12px 40px rgba(0, 0, 0, 0.45);
+  background: #05080c; cursor: zoom-in;
+}
+.map-frame img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  image-rendering: auto;
+}
+.map-caption { font-size: 0.72rem; color: var(--text-dim); flex-shrink: 0; }
+.map-missing {
+  color: var(--text-dim); font-size: 1rem; text-align: center; padding: 2rem;
+}
+
+.wiki-block ul, .panel-scroll ul,
+.wiki-block ol, .panel-scroll ol { padding-left: 1.2rem; margin: 0.3rem 0 0.5rem; }
+.wiki-block li, .panel-scroll li { margin-bottom: 0.32rem; }
+.wiki-block p, .panel-scroll p { margin-bottom: 0.45rem; }
+.wiki-block img, .panel-scroll img { vertical-align: middle; max-height: 1.35em; width: auto; }
+.wiki-block table, .panel-scroll table {
+  width: 100%; border-collapse: collapse; font-size: 0.9em; margin: 0.4rem 0;
+}
+.wiki-block th, .wiki-block td, .panel-scroll th, .panel-scroll td {
+  border: 1px solid var(--border); padding: 0.3rem 0.45rem; text-align: left;
+}
+.lede { font-size: 0.92rem; color: var(--text-muted); margin-bottom: 0.35rem; }
+
+/* Collapsed summary */
+details.summary-details {
+  background: var(--bg-panel);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  border-top: 2px solid var(--gold);
+  padding: 0.35rem 0.65rem;
+  flex-shrink: 0;
+}
+details.summary-details summary {
+  cursor: pointer;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--gold);
+  padding: 0.35rem 0;
+  list-style: none;
+}
+details.summary-details summary::-webkit-details-marker { display: none; }
+details.summary-details summary::before {
+  content: "▸ ";
+  color: var(--text-dim);
+}
+details.summary-details[open] summary::before { content: "▾ "; }
+details.summary-details .summary-body {
+  padding: 0.35rem 0 0.55rem;
+  font-size: 0.88rem;
+  color: var(--text-muted);
+  max-height: 18vh;
+  overflow-y: auto;
+}
+
+.boss-note { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.4rem; }
+.boss-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.4rem; }
+.boss-card {
+  background: var(--bg-panel-2); border: 1px solid var(--border);
+  border-radius: 8px; padding: 0.5rem 0.6rem;
+}
+.boss-card-head { font-size: 0.95rem; margin-bottom: 0.2rem; }
+.boss-card-head a { color: #eef6fc; font-weight: 700; }
+.boss-card-head a:hover { color: var(--accent); }
+.boss-elite { font-size: 0.88rem; }
+.elite-label { color: var(--gold); font-weight: 650; margin-right: 0.25rem; }
+.elite-link { color: #ffd78a; font-weight: 650; }
+.elite-link:hover { color: #ffe9b5; }
+.elite-none { color: var(--text-dim); font-style: italic; font-size: 0.85rem; }
+.boss-meta { font-size: 0.78rem; color: var(--text-dim); margin-top: 0.15rem; }
+
+.callout {
+  margin-top: 0.4rem; padding: 0.45rem 0.6rem; border-radius: 6px;
+  font-size: 0.88rem; border-left: 3px solid; line-height: 1.4;
+}
+.callout.tip { background: var(--accent-soft); border-color: var(--accent); color: #b8eaff; }
+.callout.warn { background: var(--danger-soft); border-color: var(--danger); color: #ffb4b4; }
+
+.lightbox {
+  display: none; position: fixed; inset: 0; z-index: 1000; background: rgba(0,0,0,0.94);
+  align-items: center; justify-content: center; padding: 1.5rem; cursor: zoom-out;
+}
+.lightbox.open { display: flex; }
+.lightbox img {
+  max-width: 96vw; max-height: 96vh; border-radius: 8px;
+  border: 2px solid var(--border-glow); object-fit: contain;
+}
+
+@media (min-height: 2400px) {
+  :root {
+    --walk-size: clamp(1.15rem, 0.7vh + 0.3vw, 1.5rem);
+    --bonus-size: clamp(1.15rem, 0.7vh + 0.3vw, 1.5rem);
+    --gap: 0.65rem;
+    --pad: 0.85rem;
+  }
+  .workspace { grid-template-columns: minmax(560px, 1.2fr) minmax(0, 1fr); }
+}
+@media (min-width: 1800px) and (min-height: 2000px) {
+  .workspace { grid-template-columns: minmax(600px, 1.25fr) minmax(0, 1fr); }
+}
+@media (max-height: 1100px) {
+  body { overflow: auto; height: auto; }
+  .app { height: auto; max-height: none; min-height: 100vh; }
+  .workspace {
+    height: auto; overflow: visible; grid-template-columns: 1fr; grid-template-rows: auto;
+  }
+  .col-map { grid-template-rows: auto; }
+  .col-main { overflow: visible; grid-template-rows: auto; }
+  .row-bonus-hm, .row-lower { grid-template-columns: 1fr; }
+  .panel { max-height: none; overflow: visible; }
+  .panel-scroll { overflow: visible; }
+  .map-frame { min-height: 360px; max-height: 55vh; }
+}
+
+    :root { --accent: #e8a84a; --accent-soft: #e8a84a22; }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header class="top-chrome">
+      <div class="brand">
+        <span class="brand-mission">M3</span>
+        <span class="brand-name">Vizunah Square</span>
+        <span class="brand-meta">Factions · Kaineng City · Cooperative · Medium</span>
+      </div>
+      <nav class="chip-nav" aria-label="Sections">
+        <a href="#map">Map</a>
+        <a href="#walkthrough">Walkthrough</a>
+        <a href="#bonus">Bonus</a>
+        <a href="#objectives">Objectives</a>
+        <a href="#hard-mode">Hard Mode</a>
+        <a href="#bosses">Bosses</a>
+        <a href="#other">Tips</a>
+      </nav>
+      <div class="chrome-actions">
+        <a class="btn btn-idx" href="../factions.html">Index</a>
+        <a class="btn btn-prev" href="2_Zen_Daijun.html">← Prev</a>
+        <a class="btn btn-wiki" href="https://wiki.guildwars.com/wiki/Vizunah_Square" target="_blank" rel="noopener">Wiki ↗</a>
+        <a class="btn btn-next" href="4_Nahpui_Quarter.html">Next: Nahpui Quarter →</a>
+      </div>
+    </header>
+
+    <div class="workspace">
+      <div class="col-map">
+        <section class="panel map-panel" id="map">
+          <h2 class="panel-title"><span class="icon icon-map">◉</span> Mission Map</h2>
+          <div class="map-wrap">
+            <div class="map-frame" id="mapOpen" title="Click to enlarge">
+              <img src="../maps/factions_03_Vizunah_Square_map.jpg" alt="Vizunah Square mission map" />
+            </div>
+            <p class="map-caption">Click to enlarge · Local cache · <a href="https://wiki.guildwars.com/wiki/Vizunah_Square" target="_blank" rel="noopener">Wiki</a></p>
+        </div>
+        </section>
+
+        <details class="summary-details" id="summary">
+          <summary>Summary (click to expand)</summary>
+          <div class="summary-body">
+            <p>In Vizunah Square , a party of characters from outside Cantha accompanied by Mhenlo meet with a party of Canthan native characters with Master Togo . Together the parties fight through droves of afflicted to find the source of the plague in Kaineng City.</p>
+            <p style="margin-top:0.4rem;"><strong>Region:</strong> Kaineng City · <strong>Mission:</strong> 3 of 13 · <strong>Type:</strong> Cooperative</p>
+            <p style="margin-top:0.35rem;"><a href="https://wiki.guildwars.com/wiki/Vizunah_Square" target="_blank" rel="noopener">Full wiki article ↗</a></p>
+          </div>
+        </details>
+      </div>
+
+      <div class="col-main">
+        <section class="panel objectives row-obj" id="objectives">
+          <h2 class="panel-title"><span class="icon icon-obj">✓</span> Objectives</h2>
+          <div class="panel-scroll wiki-block"><p>Locate the source of the plague in Kaineng City.<br/>
+Find Togo in Vizunah Square. <i>(If your party is from Vizunah Square (Foreign Quarter).)</i><br/>
+Hold out until Mhenlo 's party arrives. <i>(If your party is from Vizunah Square (Local Quarter).)</i><br/>
+Travel with Mhenlo and Togo in search of the plague's source.<br/>
+Defeat <a href="https://wiki.guildwars.com/wiki/Shiro%27ken" rel="noopener" target="_blank" title="Shiro'ken">Shiro's Construct</a>.<br/>
+</p><ul><li>Mhenlo must survive.</li>
+<li>Togo must survive.</li></ul></div>
+        </section>
+
+        <section class="panel walkthrough" id="walkthrough">
+          <h2 class="panel-title"><span class="icon icon-walk">→</span> Walkthrough</h2>
+          <div class="panel-scroll wiki-block"><p>The local and foreign parties start at separate locations. The local party, together with Master Togo, will enter an area where they will be faced with <a href="https://wiki.guildwars.com/wiki/Spawn" rel="noopener" target="_blank" title="Spawn">spawning</a> Afflicted. The foreign party, with Mhenlo, will need to fight several groups of <a href="https://wiki.guildwars.com/wiki/Am_Fah" rel="noopener" target="_blank" title="Am Fah">Am Fah</a> enemies first to make their way to the meet up point. Since Master Togo has to be kept alive, a common reason to fail the mission is for the local party to become overwhelmed and Togo dies, before the foreign party arrives. To prevent this, the local party should place more emphasis on healing compared to the foreign one. Once the two groups meet, <a href="https://wiki.guildwars.com/wiki/Healer" rel="noopener" target="_blank" title="Healer">healers</a> from both parties are able to heal both <a href="https://wiki.guildwars.com/wiki/Non-player_character" rel="noopener" target="_blank" title="Non-player character">NPCs</a>. 
+</p><p>After the first large battle, the mission follows a linear path, including two other large fights at Afflicted spawning points. During these fights, multiple waves of Afflicted spawn (and respawn) from three separate points. The <a href="https://wiki.guildwars.com/wiki/Afflicted_Soul_Explosion" rel="noopener" target="_blank" title="Afflicted Soul Explosion">Afflicted Soul Explosion</a> can overwhelm parties in these situations. Eliminating the afflicted bosses will stop the respawning of Afflicted and cause the opening of the nearby gate, allowing continuation of the mission. Spread apart and try to intercept the spawns with three "mini-parties" instead of fighting them all in one big melee.
+</p><p><i>Note that while you can heal members of the other group, you cannot resurrect them. Each party has to provide for their own means of <a href="https://wiki.guildwars.com/wiki/Resurrection" rel="noopener" target="_blank" title="Resurrection">resurrection</a>.</i>
+</p><p><i>This mission has numerous bugs, some forcing a restart. See the <a href="#Notes" rel="noopener" target="_blank">notes</a> for details.</i>
+</p></div>
+        </section>
+
+        <div class="row-bonus-hm">
+          <section class="panel bonus" id="bonus">
+            <h2 class="panel-title"><span class="icon icon-bonus">★</span> Bonus</h2>
+            <div class="panel-scroll wiki-block"><p class='lede'>See walkthrough and objectives for bonus details (if any).</p></div>
+          </section>
+          <section class="panel hard-mode" id="hard-mode">
+            <h2 class="panel-title"><span class="icon icon-hm">◆</span> Hard Mode</h2>
+            <div class="panel-scroll wiki-block"><p class='lede'>No dedicated Hard Mode section on the wiki — expect tougher foes and adjusted mechanics. See walkthrough notes.</p></div>
+          </section>
+        </div>
+
+        <div class="row-lower">
+          <section class="panel bosses" id="bosses">
+            <h2 class="panel-title"><span class="icon icon-boss">☠</span> Bosses &amp; Elites</h2>
+            <div class="panel-scroll"><div class='boss-grid'>
+<article class="boss-card">
+  <div class="boss-card-head"><a href="https://wiki.guildwars.com/wiki/The_Afflicted_Ako" target="_blank" rel="noopener"><strong>The Afflicted Ako</strong></a></div>
+  <div class="boss-elite"><span class="elite-label">Elite:</span> <a class="elite-link" href="https://wiki.guildwars.com/wiki/Enraged_Smash" target="_blank" rel="noopener">Enraged Smash</a></div>
+  <div class="boss-meta">24 (30)</div>
+</article>
+<article class="boss-card">
+  <div class="boss-card-head"><a href="https://wiki.guildwars.com/wiki/The_Afflicted_Huan_(Ranger)" target="_blank" rel="noopener"><strong>The Afflicted Huan</strong></a></div>
+  <div class="boss-elite"><span class="elite-label">Elite:</span> <a class="elite-link" href="https://wiki.guildwars.com/wiki/Broad_Head_Arrow" target="_blank" rel="noopener">Broad Head Arrow</a></div>
+  <div class="boss-meta">24 (30)</div>
+</article>
+<article class="boss-card">
+  <div class="boss-card-head"><a href="https://wiki.guildwars.com/wiki/The_Afflicted_Miju" target="_blank" rel="noopener"><strong>The Afflicted Miju</strong></a></div>
+  <div class="boss-elite"><span class="elite-label">Elite:</span> <a class="elite-link" href="https://wiki.guildwars.com/wiki/Ray_of_Judgment" target="_blank" rel="noopener">Ray of Judgment</a></div>
+  <div class="boss-meta">24 (30)</div>
+</article>
+<article class="boss-card">
+  <div class="boss-card-head"><a href="https://wiki.guildwars.com/wiki/The_Afflicted_Thu" target="_blank" rel="noopener"><strong>The Afflicted Thu</strong></a></div>
+  <div class="boss-elite"><span class="elite-label">Elite:</span> <a class="elite-link" href="https://wiki.guildwars.com/wiki/Order_of_Apostasy" target="_blank" rel="noopener">Order of Apostasy</a></div>
+  <div class="boss-meta">24 (30)</div>
+</article>
+<article class="boss-card">
+  <div class="boss-card-head"><a href="https://wiki.guildwars.com/wiki/The_Afflicted_Li_Yun" target="_blank" rel="noopener"><strong>The Afflicted Li Yun</strong></a></div>
+  <div class="boss-elite"><span class="elite-label">Elite:</span> <a class="elite-link" href="https://wiki.guildwars.com/wiki/Stolen_Speed" target="_blank" rel="noopener">Stolen Speed</a></div>
+  <div class="boss-meta">24 (30)</div>
+</article>
+<article class="boss-card">
+  <div class="boss-card-head"><a href="https://wiki.guildwars.com/wiki/The_Afflicted_Kam" target="_blank" rel="noopener"><strong>The Afflicted Kam</strong></a></div>
+  <div class="boss-elite"><span class="elite-label">Elite:</span> <a class="elite-link" href="https://wiki.guildwars.com/wiki/Mind_Burn" target="_blank" rel="noopener">Mind Burn</a></div>
+  <div class="boss-meta">24 (30)</div>
+</article>
+<article class="boss-card">
+  <div class="boss-card-head"><a href="https://wiki.guildwars.com/wiki/The_Afflicted_Soon_Kim" target="_blank" rel="noopener"><strong>The Afflicted Soon Kim</strong></a></div>
+  <div class="boss-elite"><span class="elite-label">Elite:</span> <a class="elite-link" href="https://wiki.guildwars.com/wiki/Shadow_Form" target="_blank" rel="noopener">Shadow Form</a></div>
+  <div class="boss-meta">24 (30)</div>
+</article>
+<article class="boss-card">
+  <div class="boss-card-head"><a href="https://wiki.guildwars.com/wiki/The_Afflicted_Hakaru" target="_blank" rel="noopener"><strong>The Afflicted Hakaru</strong></a></div>
+  <div class="boss-elite"><span class="elite-label">Elite:</span> <a class="elite-link" href="https://wiki.guildwars.com/wiki/Weapon_of_Quickening" target="_blank" rel="noopener">Weapon of Quickening</a></div>
+  <div class="boss-meta">24 (30)</div>
+</article>
+</div></div>
+          </section>
+          <section class="panel other" id="other">
+            <h2 class="panel-title"><span class="icon icon-other">✦</span> Tips &amp; Notes</h2>
+            <div class="panel-scroll"><h3 style='font-size:0.8rem;color:var(--accent);margin:0.3rem 0;'>Skill recommendations</h3><div class='wiki-block'><ul><li>Bring <a class="mw-redirect" href="https://wiki.guildwars.com/wiki/List_of_skills_which_affects_allies" rel="noopener" target="_blank" title="List of skills which affects allies">skills that can affect multiple allies</a>, since there will be 16 characters (from the two parties) plus Togo and Mhenlo.</li>
+<li><a href="https://wiki.guildwars.com/wiki/Area_of_effect" rel="noopener" target="_blank" title="Area of effect">Area of effect</a> skills are very helpful because the fighting is tight and packed. <a class="mw-redirect" href="https://wiki.guildwars.com/wiki/Ward" rel="noopener" target="_blank" title="Ward">Wards</a>, <a class="mw-redirect" href="https://wiki.guildwars.com/wiki/Well" rel="noopener" target="_blank" title="Well">wells</a>, and <a href="https://wiki.guildwars.com/wiki/Point_blank_area_of_effect" rel="noopener" target="_blank" title="Point blank area of effect">point blank area of effect</a> skills are very effective in this mission. Area of effect skills that inflict damage can cause many <a href="https://wiki.guildwars.com/wiki/Afflicted_Soul_Explosion" rel="noopener" target="_blank" title="Afflicted Soul Explosion">Afflicted Soul Explosions</a> to trigger at the same time.</li>
+<li>There are enough exploitable <a href="https://wiki.guildwars.com/wiki/Corpse" rel="noopener" target="_blank" title="Corpse">corpses</a> to support several <a href="https://wiki.guildwars.com/wiki/Minion_master" rel="noopener" target="_blank" title="Minion master">minion masters</a>; however, remember that the <a href="https://wiki.guildwars.com/wiki/Sacrifice" rel="noopener" target="_blank" title="Sacrifice">sacrifice</a> from <a href="https://wiki.guildwars.com/wiki/Blood_of_the_Master" rel="noopener" target="_blank" title="Blood of the Master">Blood of the Master</a> is determined by the total number of allied minions.</li>
+<li><a href="https://wiki.guildwars.com/wiki/%22I_Will_Avenge_You!%22" rel="noopener" target="_blank" title='"I Will Avenge You!"'>"I Will Avenge You!"</a> will benefit from the deaths of Canthan Guards and Peasants; it can provide a near-continuous <a href="https://wiki.guildwars.com/wiki/Buff" rel="noopener" target="_blank" title="Buff">buff</a> during the mission.</li>
+<li><a href="https://wiki.guildwars.com/wiki/Speed_boost" rel="noopener" target="_blank" title="Speed boost">Speed boosts</a> (e.g. <a href="https://wiki.guildwars.com/wiki/%22Fall_Back!%22" rel="noopener" target="_blank" title='"Fall Back!"'>"Fall Back!"</a>) are helpful for two reasons: the mission is timed and often party members will find themselves running from one fight to another.</li>
+<li><a href="https://wiki.guildwars.com/wiki/Afflicted_Ritualist" rel="noopener" target="_blank" title="Afflicted Ritualist">Afflicted Ritualists</a> can slow progress, especially in <a href="https://wiki.guildwars.com/wiki/Hard_mode" rel="noopener" target="_blank" title="Hard mode">hard mode</a> since they are potent healers who can resurrect their allies. Bring <a href="https://wiki.guildwars.com/wiki/Shutdown" rel="noopener" target="_blank" title="Shutdown">shutdowns</a> or other anti-caster skills.</li>
+<li>If entering from Local Quarter, consider not bringing <a href="https://wiki.guildwars.com/wiki/Signet_of_Spirits" rel="noopener" target="_blank" title="Signet of Spirits">Signet of Spirits</a>, since <a href="https://wiki.guildwars.com/wiki/Chiyo" rel="noopener" target="_blank" title="Chiyo">Chiyo</a> of the Foreign Quarter party (if no player-Foreign Quarter party joins) uses it.</li>
+<li><a class="mw-redirect" href="https://wiki.guildwars.com/wiki/Enchantment" rel="noopener" target="_blank" title="Enchantment">Enchantment</a>-based <a href="https://wiki.guildwars.com/wiki/Build" rel="noopener" target="_blank" title="Build">builds</a> are vulnerable to enchantment removal by <a href="https://wiki.guildwars.com/wiki/Afflicted_Necromancer" rel="noopener" target="_blank" title="Afflicted Necromancer">Afflicted Necromancers</a> and <a href="https://wiki.guildwars.com/wiki/Afflicted_Mesmer" rel="noopener" target="_blank" title="Afflicted Mesmer">Mesmers</a>. Afflicted that deal <a href="https://wiki.guildwars.com/wiki/Physical_damage" rel="noopener" target="_blank" title="Physical damage">physical damage</a> can also remove enchantments when enchanted with Afflicted Necromancer's <a href="https://wiki.guildwars.com/wiki/Order_of_Apostasy" rel="noopener" target="_blank" title="Order of Apostasy">Order of Apostasy</a>.</li></ul></div>
+<h3 style='font-size:0.8rem;color:var(--accent);margin:0.3rem 0;'>Notes</h3><div class='wiki-block'><ul><li>When a boss is killed, the subsequent <a href="https://wiki.guildwars.com/wiki/Morale_Boost" rel="noopener" target="_blank" title="Morale Boost">Morale Boost</a> is only awarded to the party that inflicted the killing blow.</li>
+<li>You will have to fight some of the Canthan civilians, who have been infected by the plague. On dying, they will spawn an Afflicted creature; such spawned Afflicted, while technically hostile to the party, will not attack you and will generally try to flee. However, you'll usually end up killing them anyway as any NPCs in your party will attack them.</li>
+<li>The death that occurs during the end cinematic does not halt progress of the <a href="https://wiki.guildwars.com/wiki/Survivor" rel="noopener" target="_blank" title="Survivor">Survivor</a> title track.</li>
+<li>Completion of this mission will fill in page #1 of the <a href="https://wiki.guildwars.com/wiki/Shiro%27s_Return" rel="noopener" target="_blank" title="Shiro's Return">Shiro's Return</a> <a href="https://wiki.guildwars.com/wiki/Storybook" rel="noopener" target="_blank" title="Storybook">storybook</a>.</li>
+<li>On completion of this mission, your party will appear in <a href="https://wiki.guildwars.com/wiki/Dragon%27s_Throat_(outpost)" rel="noopener" target="_blank" title="Dragon's Throat (outpost)">Dragon's Throat</a>.</li>
+<li>A large chunk of the inaccessible southeast corner can be explored for Canthan <a href="https://wiki.guildwars.com/wiki/Cartographer" rel="noopener" target="_blank" title="Cartographer">Cartographer</a> by viewing the mission cinematic. (Talk to <a href="https://wiki.guildwars.com/wiki/Guardsman_Chow" rel="noopener" target="_blank" title="Guardsman Chow">Guardsman Chow</a> in the Foreign Quarter to replay it.)</li>
+<li>It is possible for Togo to die before you reach him the first time, thus failing the mission.</li>
+<li>The Foreign Quarter party need only defeat the first four Am Fah at the start of the mission, and then simply wait and leave Mhenlo to run his scripted path to reach Master Togo alone. All of the other foes on the route are <a href="https://wiki.guildwars.com/wiki/Popup" rel="noopener" target="_blank" title="Popup">popups</a> and are not triggered by Mhenlo. When he walks to the bottom, the cinematic teleports the Foreign Quarter party down into the square.</li>
+<li>Some Afflicted may spawn without weapons.</li></ul><div style="margin: 1em; border: solid silver; border-width: 1px 0px; padding: 2px 1em 2px 5em;"><strong class="hiddenlinks" style="position: absolute; margin-left: -4.8em; color: #900;"><a class="image" href="https://wiki.guildwars.com/wiki/File:Bug.png" rel="noopener" target="_blank" title="Bug"><img alt="Bug" data-file-height="32" data-file-width="32" decoding="async" height="18" loading="lazy" src="https://wiki.guildwars.com/images/thumb/7/7d/Bug.png/18px-Bug.png" srcset="/images/thumb/7/7d/Bug.png/27px-Bug.png 1.5x, /images/7/7d/Bug.png 2x" width="18"/></a> <a href="https://wiki.guildwars.com/wiki/Bug" rel="noopener" target="_blank" title="Bug">Bug</a>.</strong>This mission highlights many deficiencies in the NPC pathfinding <a href="https://wiki.guildwars.com/wiki/AI" rel="noopener" target="_blank" title="AI">AI</a>:
+<ul><li>It is possible for a henchman-only party to get stuck behind a chest, forcing you to either restart the mission or continue alone. If the henchman party is starting from the Foreign Quarter, this can happen before they reach the first meeting point. It is possible for Togo or Mhenlo to get stuck in the same way.</li>
+<li>It is possible for Togo to just get stuck for no reason, which causes the last fight to fail to initialize, making the final battle of the mission impossible to complete.</li>
+<li>If you bring <a href="https://wiki.guildwars.com/wiki/Minion" rel="noopener" target="_blank" title="Minion">minions</a>, Mhenlo can get distracted in healing them, causing him not to reach his waypoints. A sign that this has happened is Togo standing still some distance behind the party. If this happens, try moving back towards Togo; when Mhenlo gets close enough, the missed waypoint will trigger and Togo will start moving again.</li></ul></div><div style="margin: 1em; border: solid silver; border-width: 1px 0px; padding: 2px 1em 2px 7.5em;"><strong class="hiddenlinks" style="position: absolute; margin-left: -7.3em; color: #900;"><a class="image" href="https://wiki.guildwars.com/wiki/File:Anomaly.png" rel="noopener" target="_blank" title="Anomaly"><img alt="Anomaly" data-file-height="32" data-file-width="32" decoding="async" height="18" loading="lazy" src="https://wiki.guildwars.com/images/thumb/a/a6/Anomaly.png/18px-Anomaly.png" srcset="/images/thumb/a/a6/Anomaly.png/27px-Anomaly.png 1.5x, /images/a/a6/Anomaly.png 2x" width="18"/></a> <a class="mw-redirect" href="https://wiki.guildwars.com/wiki/Anomaly" rel="noopener" target="_blank" title="Anomaly">Anomaly</a>.</strong> If your party has a monk maintaining <a href="https://wiki.guildwars.com/wiki/Unyielding_Aura" rel="noopener" target="_blank" title="Unyielding Aura">Unyielding Aura</a>, Shiro won't <a href="https://wiki.guildwars.com/wiki/Wipe" rel="noopener" target="_blank" title="Wipe">wipe</a> the whole party. If the party leader is resurrected by this means, they will not appear in the proper place for the <a href="https://wiki.guildwars.com/wiki/Cinematic" rel="noopener" target="_blank" title="Cinematic">cinematics</a>.</div></div></div>
+          </section>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="lightbox" id="lightbox" role="dialog" aria-label="Enlarged map">
+    <img src="../maps/factions_03_Vizunah_Square_map.jpg" alt="Vizunah Square mission map (enlarged)" />
+  </div>
+  <script>
+    (function () {
+      var open = document.getElementById("mapOpen");
+      var box = document.getElementById("lightbox");
+      if (!open || !box) return;
+      open.addEventListener("click", function () { box.classList.add("open"); });
+      box.addEventListener("click", function () { box.classList.remove("open"); });
+      document.addEventListener("keydown", function (e) {
+        if (e.key === "Escape") box.classList.remove("open");
+      });
+    })();
+  </script>
+
+</body>
+</html>

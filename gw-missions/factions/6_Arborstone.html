@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Arborstone</title>
+  <style>
+:root {
+  --bg-deep: #070a0f;
+  --bg-panel: #101820;
+  --bg-panel-2: #15202c;
+  --border: #243044;
+  --border-glow: #2a4a6a;
+  --text: #dce6f0;
+  --text-muted: #8a9bb0;
+  --text-dim: #5c6f86;
+  --accent: #3ecfff;
+  --accent-soft: rgba(62, 207, 255, 0.12);
+  --gold: #e8c56a;
+  --gold-soft: rgba(232, 197, 106, 0.12);
+  --bonus: #7dffb3;
+  --bonus-soft: rgba(125, 255, 179, 0.1);
+  --danger: #ff6b6b;
+  --danger-soft: rgba(255, 107, 107, 0.1);
+  --hm: #c78bff;
+  --hm-soft: rgba(199, 139, 255, 0.12);
+  --radius: 10px;
+  --font: "Segoe UI", system-ui, -apple-system, sans-serif;
+  --chrome-h: 3.1rem;
+  --gap: 0.5rem;
+  --pad: 0.7rem;
+  /* Readable on 4K vertical (~2160×3840) */
+  --walk-size: clamp(1.05rem, 0.55vw + 0.55vh, 1.35rem);
+  --bonus-size: clamp(1.05rem, 0.55vw + 0.55vh, 1.35rem);
+  --body-size: clamp(0.95rem, 0.4vw + 0.4vh, 1.1rem);
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html {
+  scroll-behavior: smooth;
+  font-size: clamp(16px, 0.55vw + 0.45vh, 20px);
+  height: 100%;
+  scroll-padding-top: calc(var(--chrome-h) + 0.5rem);
+}
+body {
+  font-family: var(--font);
+  background: var(--bg-deep);
+  color: var(--text);
+  line-height: 1.45;
+  min-height: 100%;
+  height: 100%;
+  overflow: hidden;
+  background-image: radial-gradient(ellipse 70% 25% at 50% 0%, rgba(42, 100, 160, 0.14), transparent);
+}
+a { color: var(--accent); text-decoration: none; }
+a:hover { color: #7de0ff; text-decoration: underline; }
+.app {
+  display: grid;
+  grid-template-rows: var(--chrome-h) 1fr;
+  height: 100vh; height: 100dvh;
+  max-height: 100vh; max-height: 100dvh;
+}
+.top-chrome {
+  display: flex; align-items: center; gap: 0.65rem;
+  padding: 0 0.7rem;
+  background: rgba(8, 12, 18, 0.97);
+  border-bottom: 1px solid var(--border);
+  z-index: 100; min-height: var(--chrome-h);
+}
+.brand { display: flex; align-items: baseline; gap: 0.55rem; min-width: 0; flex-shrink: 0; }
+.brand-mission {
+  font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase;
+  color: var(--accent); font-weight: 700; white-space: nowrap;
+}
+.brand-name {
+  font-size: 1.1rem; font-weight: 750; color: var(--text);
+  white-space: nowrap; letter-spacing: -0.02em;
+}
+.brand-meta { font-size: 0.75rem; color: var(--text-dim); white-space: nowrap; }
+.chip-nav {
+  display: flex; flex: 1; gap: 0.3rem; overflow-x: auto;
+  scrollbar-width: none; min-width: 0; justify-content: center;
+}
+.chip-nav::-webkit-scrollbar { display: none; }
+.chip-nav a {
+  flex: 0 0 auto; padding: 0.3rem 0.65rem; border-radius: 999px;
+  font-size: 0.78rem; font-weight: 600; color: var(--text-muted);
+  background: var(--bg-panel); border: 1px solid var(--border);
+  text-decoration: none; white-space: nowrap;
+}
+.chip-nav a:hover {
+  color: var(--text); border-color: var(--border-glow);
+  background: #1a2836; text-decoration: none;
+}
+.chip-nav a[href="#map"] { color: var(--accent); border-color: rgba(62, 207, 255, 0.35); }
+.chip-nav a[href="#bonus"] { color: var(--bonus); border-color: rgba(125, 255, 179, 0.3); }
+.chip-nav a[href="#hard-mode"] { color: var(--hm); border-color: rgba(199, 139, 255, 0.3); }
+.chip-nav a[href="#bosses"] { color: #ff9a9a; border-color: rgba(255, 107, 107, 0.3); }
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 0.3rem;
+  padding: 0.42rem 0.85rem; border-radius: 8px; font-weight: 650; font-size: 0.8rem;
+  border: none; cursor: pointer; text-decoration: none; white-space: nowrap; flex-shrink: 0;
+}
+.btn:hover { text-decoration: none; }
+.btn-next {
+  background: linear-gradient(135deg, #1a6a9a, #1ab0e0); color: #fff;
+  box-shadow: 0 2px 12px rgba(26, 140, 200, 0.35);
+}
+.btn-next:hover { color: #fff; filter: brightness(1.08); }
+.btn-wiki, .btn-idx, .btn-prev {
+  background: var(--bg-panel); color: var(--text-muted);
+  border: 1px solid var(--border); padding: 0.42rem 0.65rem;
+}
+.btn-wiki:hover, .btn-idx:hover, .btn-prev:hover {
+  color: var(--accent); border-color: var(--border-glow);
+}
+.chrome-actions { display: flex; gap: 0.35rem; flex-shrink: 0; }
+
+/* Map-dominant workspace */
+.workspace {
+  display: grid;
+  grid-template-columns: minmax(480px, 1.15fr) minmax(0, 1fr);
+  grid-template-rows: 1fr;
+  gap: var(--gap); padding: var(--gap);
+  min-height: 0; height: 100%; overflow: hidden;
+}
+.col-map {
+  display: grid;
+  grid-template-rows: 1fr auto;
+  gap: var(--gap);
+  min-height: 0; min-width: 0;
+}
+.col-main {
+  display: grid;
+  /* objectives compact | walkthrough HUGE | bonus+hm | bosses+tips */
+  grid-template-rows: auto minmax(0, 1.6fr) minmax(0, 1.05fr) minmax(0, 0.75fr);
+  gap: var(--gap); min-height: 0; min-width: 0; overflow: hidden;
+}
+.row-obj { min-height: 0; }
+.row-bonus-hm {
+  display: grid; grid-template-columns: 1.15fr 0.85fr; gap: var(--gap); min-height: 0;
+}
+.row-lower {
+  display: grid; grid-template-columns: 1.15fr 0.85fr; gap: var(--gap); min-height: 0;
+}
+.panel {
+  background: var(--bg-panel); border: 1px solid var(--border); border-radius: var(--radius);
+  padding: var(--pad); display: flex; flex-direction: column; min-height: 0; overflow: hidden;
+}
+.panel-scroll {
+  overflow-y: auto; overflow-x: hidden; min-height: 0; flex: 1; padding-right: 0.3rem;
+  scrollbar-width: thin; scrollbar-color: var(--border) transparent;
+  font-size: var(--body-size);
+}
+.panel-scroll::-webkit-scrollbar { width: 8px; }
+.panel-scroll::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+.panel-title {
+  display: flex; align-items: center; gap: 0.4rem;
+  font-size: 0.82rem; font-weight: 750; letter-spacing: 0.05em; text-transform: uppercase;
+  color: var(--text); margin-bottom: 0.45rem; padding-bottom: 0.35rem;
+  border-bottom: 1px solid var(--border); flex-shrink: 0;
+}
+.panel-title .icon {
+  width: 1.3rem; height: 1.3rem; border-radius: 5px;
+  display: inline-flex; align-items: center; justify-content: center; font-size: 0.75rem;
+}
+.panel.map-panel {
+  border-color: var(--border-glow);
+  background: linear-gradient(180deg, #0e1620 0%, var(--bg-panel) 100%);
+  /* Map takes almost all left column */
+  min-height: 0;
+}
+.panel.objectives { border-top: 2px solid var(--accent); }
+.panel.walkthrough { border-top: 3px solid #5eb8e8; }
+.panel.bonus { border-top: 3px solid var(--bonus); }
+.panel.hard-mode { border-top: 2px solid var(--hm); }
+.panel.bosses { border-top: 2px solid var(--danger); }
+.panel.other { border-top: 2px solid var(--text-muted); }
+
+/* Emphasized reading panels */
+.panel.walkthrough .panel-scroll,
+.panel.walkthrough .wiki-block {
+  font-size: var(--walk-size) !important;
+  line-height: 1.55;
+}
+.panel.bonus .panel-scroll,
+.panel.bonus .wiki-block {
+  font-size: var(--bonus-size) !important;
+  line-height: 1.55;
+}
+.panel.walkthrough .panel-scroll li,
+.panel.bonus .panel-scroll li {
+  margin-bottom: 0.45rem;
+}
+.panel.walkthrough .panel-scroll p,
+.panel.bonus .panel-scroll p {
+  margin-bottom: 0.55rem;
+}
+
+.icon-map { background: var(--accent-soft); color: var(--accent); }
+.icon-obj { background: var(--accent-soft); color: var(--accent); }
+.icon-walk { background: rgba(94, 184, 232, 0.15); color: #5eb8e8; }
+.icon-bonus { background: var(--bonus-soft); color: var(--bonus); }
+.icon-hm { background: var(--hm-soft); color: var(--hm); }
+.icon-boss { background: var(--danger-soft); color: var(--danger); }
+.icon-other { background: rgba(138, 155, 176, 0.15); color: var(--text-muted); }
+
+.map-wrap {
+  flex: 1; min-height: 0; display: flex; flex-direction: column;
+  align-items: center; justify-content: center; gap: 0.4rem;
+}
+.map-frame {
+  flex: 1; min-height: 0; width: 100%;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: 10px; overflow: hidden;
+  border: 2px solid var(--border-glow);
+  box-shadow: 0 0 0 1px rgba(62, 207, 255, 0.1), 0 12px 40px rgba(0, 0, 0, 0.45);
+  background: #05080c; cursor: zoom-in;
+}
+.map-frame img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  image-rendering: auto;
+}
+.map-caption { font-size: 0.72rem; color: var(--text-dim); flex-shrink: 0; }
+.map-missing {
+  color: var(--text-dim); font-size: 1rem; text-align: center; padding: 2rem;
+}
+
+.wiki-block ul, .panel-scroll ul,
+.wiki-block ol, .panel-scroll ol { padding-left: 1.2rem; margin: 0.3rem 0 0.5rem; }
+.wiki-block li, .panel-scroll li { margin-bottom: 0.32rem; }
+.wiki-block p, .panel-scroll p { margin-bottom: 0.45rem; }
+.wiki-block img, .panel-scroll img { vertical-align: middle; max-height: 1.35em; width: auto; }
+.wiki-block table, .panel-scroll table {
+  width: 100%; border-collapse: collapse; font-size: 0.9em; margin: 0.4rem 0;
+}
+.wiki-block th, .wiki-block td, .panel-scroll th, .panel-scroll td {
+  border: 1px solid var(--border); padding: 0.3rem 0.45rem; text-align: left;
+}
+.lede { font-size: 0.92rem; color: var(--text-muted); margin-bottom: 0.35rem; }
+
+/* Collapsed summary */
+details.summary-details {
+  background: var(--bg-panel);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  border-top: 2px solid var(--gold);
+  padding: 0.35rem 0.65rem;
+  flex-shrink: 0;
+}
+details.summary-details summary {
+  cursor: pointer;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--gold);
+  padding: 0.35rem 0;
+  list-style: none;
+}
+details.summary-details summary::-webkit-details-marker { display: none; }
+details.summary-details summary::before {
+  content: "▸ ";
+  color: var(--text-dim);
+}
+details.summary-details[open] summary::before { content: "▾ "; }
+details.summary-details .summary-body {
+  padding: 0.35rem 0 0.55rem;
+  font-size: 0.88rem;
+  color: var(--text-muted);
+  max-height: 18vh;
+  overflow-y: auto;
+}
+
+.boss-note { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.4rem; }
+.boss-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.4rem; }
+.boss-card {
+  background: var(--bg-panel-2); border: 1px solid var(--border);
+  border-radius: 8px; padding: 0.5rem 0.6rem;
+}
+.boss-card-head { font-size: 0.95rem; margin-bottom: 0.2rem; }
+.boss-card-head a { color: #eef6fc; font-weight: 700; }
+.boss-card-head a:hover { color: var(--accent); }
+.boss-elite { font-size: 0.88rem; }
+.elite-label { color: var(--gold); font-weight: 650; margin-right: 0.25rem; }
+.elite-link { color: #ffd78a; font-weight: 650; }
+.elite-link:hover { color: #ffe9b5; }
+.elite-none { color: var(--text-dim); font-style: italic; font-size: 0.85rem; }
+.boss-meta { font-size: 0.78rem; color: var(--text-dim); margin-top: 0.15rem; }
+
+.callout {
+  margin-top: 0.4rem; padding: 0.45rem 0.6rem; border-radius: 6px;
+  font-size: 0.88rem; border-left: 3px solid; line-height: 1.4;
+}
+.callout.tip { background: var(--accent-soft); border-color: var(--accent); color: #b8eaff; }
+.callout.warn { background: var(--danger-soft); border-color: var(--danger); color: #ffb4b4; }
+
+.lightbox {
+  display: none; position: fixed; inset: 0; z-index: 1000; background: rgba(0,0,0,0.94);
+  align-items: center; justify-content: center; padding: 1.5rem; cursor: zoom-out;
+}
+.lightbox.open { display: flex; }
+.lightbox img {
+  max-width: 96vw; max-height: 96vh; border-radius: 8px;
+  border: 2px solid var(--border-glow); object-fit: contain;
+}
+
+@media (min-height: 2400px) {
+  :root {
+    --walk-size: clamp(1.15rem, 0.7vh + 0.3vw, 1.5rem);
+    --bonus-size: clamp(1.15rem, 0.7vh + 0.3vw, 1.5rem);
+    --gap: 0.65rem;
+    --pad: 0.85rem;
+  }
+  .workspace { grid-template-columns: minmax(560px, 1.2fr) minmax(0, 1fr); }
+}
+@media (min-width: 1800px) and (min-height: 2000px) {
+  .workspace { grid-template-columns: minmax(600px, 1.25fr) minmax(0, 1fr); }
+}
+@media (max-height: 1100px) {
+  body { overflow: auto; height: auto; }
+  .app { height: auto; max-height: none; min-height: 100vh; }
+  .workspace {
+    height: auto; overflow: visible; grid-template-columns: 1fr; grid-template-rows: auto;
+  }
+  .col-map { grid-template-rows: auto; }
+  .col-main { overflow: visible; grid-template-rows: auto; }
+  .row-bonus-hm, .row-lower { grid-template-columns: 1fr; }
+  .panel { max-height: none; overflow: visible; }
+  .panel-scroll { overflow: visible; }
+  .map-frame { min-height: 360px; max-height: 55vh; }
+}
+
+    :root { --accent: #e8a84a; --accent-soft: #e8a84a22; }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header class="top-chrome">
+      <div class="brand">
+        <span class="brand-mission">M6</span>
+        <span class="brand-name">Arborstone</span>
+        <span class="brand-meta">Factions · Echovald Forest · Cooperative · Medium</span>
+      </div>
+      <nav class="chip-nav" aria-label="Sections">
+        <a href="#map">Map</a>
+        <a href="#walkthrough">Walkthrough</a>
+        <a href="#bonus">Bonus</a>
+        <a href="#objectives">Objectives</a>
+        <a href="#hard-mode">Hard Mode</a>
+        <a href="#bosses">Bosses</a>
+        <a href="#other">Tips</a>
+      </nav>
+      <div class="chrome-actions">
+        <a class="btn btn-idx" href="../factions.html">Index</a>
+        <a class="btn btn-prev" href="5_Tahnnakai_Temple.html">← Prev</a>
+        <a class="btn btn-wiki" href="https://wiki.guildwars.com/wiki/Arborstone" target="_blank" rel="noopener">Wiki ↗</a>
+        <a class="btn btn-next" href="7_Boreas_Seabed.html">Next: Boreas Seabed →</a>
+      </div>
+    </header>
+
+    <div class="workspace">
+      <div class="col-map">
+        <section class="panel map-panel" id="map">
+          <h2 class="panel-title"><span class="icon icon-map">◉</span> Mission Map</h2>
+          <div class="map-wrap">
+            <div class="map-frame" id="mapOpen" title="Click to enlarge">
+              <img src="../maps/factions_06_Arborstone_map.jpg" alt="Arborstone mission map" />
+            </div>
+            <p class="map-caption">Click to enlarge · Local cache · <a href="https://wiki.guildwars.com/wiki/Arborstone" target="_blank" rel="noopener">Wiki</a></p>
+        </div>
+        </section>
+
+        <details class="summary-details" id="summary">
+          <summary>Summary (click to expand)</summary>
+          <div class="summary-body">
+            <p>Retrieve the urn of Saint Viktor and safely leave Cathedral zu Heltzer .</p>
+            <p style="margin-top:0.4rem;"><strong>Region:</strong> Echovald Forest · <strong>Mission:</strong> 6 of 13 · <strong>Type:</strong> Cooperative</p>
+            <p style="margin-top:0.35rem;"><a href="https://wiki.guildwars.com/wiki/Arborstone" target="_blank" rel="noopener">Full wiki article ↗</a></p>
+          </div>
+        </details>
+      </div>
+
+      <div class="col-main">
+        <section class="panel objectives row-obj" id="objectives">
+          <h2 class="panel-title"><span class="icon icon-obj">✓</span> Objectives</h2>
+          <div class="panel-scroll wiki-block"><p>Retrieve the sacred <a href="https://wiki.guildwars.com/wiki/Urn_of_Saint_Viktor" rel="noopener" target="_blank" title="Urn of Saint Viktor">Urn of Saint Viktor</a> and deliver it to <a href="https://wiki.guildwars.com/wiki/Mhenlo" rel="noopener" target="_blank" title="Mhenlo">Mhenlo</a>.
+</p><ul><li>Escort <a href="https://wiki.guildwars.com/wiki/Danika" rel="noopener" target="_blank" title="Danika">Danika</a> to the door of the cathedral so she can open it.</li>
+<li>Clear the cathedral of the guardians binding the Urn of Saint Viktor. You have [5...0] group[s] of guardians remaining.</li>
+<li>Collect the Urn of Saint Viktor</li>
+<li>ADDED: Make your way out of the cathedral! Defeat the guardian <a href="https://wiki.guildwars.com/wiki/Stone_Soul" rel="noopener" target="_blank" title="Stone Soul">Stone Souls</a>.</li>
+<li>ADDED: Protect Danika so that she can open the door.</li>
+<li>Mhenlo must survive.</li></ul></div>
+        </section>
+
+        <section class="panel walkthrough" id="walkthrough">
+          <h2 class="panel-title"><span class="icon icon-walk">→</span> Walkthrough</h2>
+          <div class="panel-scroll wiki-block"><p>Head southwest across the bridge, turn left and follow the path down to the Cathedral doors. Avoid standing beneath giant mushrooms which emit the <a href="https://wiki.guildwars.com/wiki/Stone_Spores" rel="noopener" target="_blank" title="Stone Spores">Stone Spores</a> effect. You will find mixed groups of <a href="https://wiki.guildwars.com/wiki/Warden" rel="noopener" target="_blank" title="Warden">Wardens</a> throughout this area. When Danika gets in range of the doors, she will open them. (Note that if there are <a href="https://wiki.guildwars.com/wiki/Minion_master" rel="noopener" target="_blank" title="Minion master">minion masters</a> in the party, she may become distracted by their minions and attempt to heal them instead.)
+</p><p>After a short dialog, Danika will open the gate, allowing the party into the cathedral. In order to pick up the Urn of Saint Viktor, the five groups of Wardens must first be defeated. Take advantage of the terrain - the water provides <a href="https://wiki.guildwars.com/wiki/Blessed_Water" rel="noopener" target="_blank" title="Blessed Water">Blessed Water</a> which lengthens <a class="mw-redirect" href="https://wiki.guildwars.com/wiki/Enchantment" rel="noopener" target="_blank" title="Enchantment">enchantments</a>, and the walls can be used as <a href="https://wiki.guildwars.com/wiki/Line_of_sight" rel="noopener" target="_blank" title="Line of sight">cover</a> from the rangers. The group at the top of the stairs will also include two Wardens of Earth and a boss (either <a href="https://wiki.guildwars.com/wiki/Ryver_Mossplanter" rel="noopener" target="_blank" title="Ryver Mossplanter">Ryver Mossplanter</a> or <a href="https://wiki.guildwars.com/wiki/Milefaun_Mindflayer" rel="noopener" target="_blank" title="Milefaun Mindflayer">Milefaun Mindflayer</a>).
+</p><p><i>Picking up the urn will trigger a <a href="https://wiki.guildwars.com/wiki/Cinematic" rel="noopener" target="_blank" title="Cinematic">cinematic</a>, and Mhenlo will become trapped outside the building, leaving the party and Danika to escape through the collapsing cathedral. From here on fragments of the building fall at a regular rate, causing minor damage to the whole party and <a href="https://wiki.guildwars.com/wiki/Interrupt" rel="noopener" target="_blank" title="Interrupt">interrupting</a> skills and attacks. Several areas are in a near-constant state of collapse, players should make sure that neither Danika nor heroes are left unattended in these areas (i.e. avoid dropping the urn in the middle of these areas).</i>
+</p><p>When the cinematic ends, <a href="https://wiki.guildwars.com/wiki/Stone_Rain" rel="noopener" target="_blank" title="Stone Rain">Stone Rains</a> and <a href="https://wiki.guildwars.com/wiki/Stone_Reaper" rel="noopener" target="_blank" title="Stone Reaper">Stone Reapers</a> will <a href="https://wiki.guildwars.com/wiki/Spawn" rel="noopener" target="_blank" title="Spawn">spawn</a> in front of the group. After clearing these foes out, Danika will make a short speech and when she is finished she will then follow the bearer of the urn. There are now three possible routes to the cathedral exit, all with some hidden groups of Oni and the <a href="https://wiki.guildwars.com/wiki/Cathedral_Collapse" rel="noopener" target="_blank" title="Cathedral Collapse">Cathedral Collapse</a> effect:
+</p><ul><li>The southern route (purple path on the wiki map) is mainly populated by balanced teams of <a href="https://wiki.guildwars.com/wiki/Dredge" rel="noopener" target="_blank" title="Dredge">Dredge</a>, which can be quite difficult to defeat. Except for <a href="https://wiki.guildwars.com/wiki/Dredge_Gardener" rel="noopener" target="_blank" title="Dredge Gardener">Dredge Gardeners</a>, all the Dredge have an interrupt skill and each melee Dredge also has a <a href="https://wiki.guildwars.com/wiki/Knock_down" rel="noopener" target="_blank" title="Knock down">knock down</a> skill, which can be problematic with Cathedral Collapse also interrupting your party. The narrow corridors leave little room for maneuver.</li>
+<li>The middle route (yellow path on the wiki map) is primarily populated by Wardens. This is the most straightforward route.</li>
+<li>The northern route (green path on the wiki map) is populated by <a href="https://wiki.guildwars.com/wiki/Stone_Scale_Kirin" rel="noopener" target="_blank" title="Stone Scale Kirin">Stone Scale Kirin</a>, <a href="https://wiki.guildwars.com/wiki/Dragon_Moss" rel="noopener" target="_blank" title="Dragon Moss">Dragon Mosses</a>, and large groups of <a href="https://wiki.guildwars.com/wiki/Undergrowth" rel="noopener" target="_blank" title="Undergrowth">Undergrowths</a>.</li></ul><dl><dt>Middle route</dt></dl><p>Head up the stairs past the defeated Warden boss. At the end of the stairs, a pair of hidden Stone Reapers will come to life. A few wardens will patrol along the platform too. If you linger here, another group of Warden will come at you from the right. Head left along the platform and clear out the groups upto the staircase. (The left side of the cathedral hall is less dangerous than the right, due to the placement of the collapsing ceiling triggers.)
+</p><p>The stairway itself is under a near permanent Cathedral Collapse effect, so either lure Wardens off the staircase, or run down to the lower area (either way, don't drop the urn on the staircase). At the bottom of the stairs are two hidden Stone Rains. Make your way slowly through the Wardens towards the southeast staircase.
+</p><p>There are two hidden groups of Oni on the staircase out of the main hall. When combined with the Cathedral Collapse effect, the Oni can become difficult to fight. The first group appears as you fight the last Wardens in the room, and the second appear right at the top of the stairs. For the second group there is a small patch on the topmost part of the stairs which is not collapsing. You should be standing on it when the Oni reveal themselves. Wait there for them to engage you, do not charge up at them, as this would mean you would have to fight in a collapsing area.
+</p><dl><dt>Southern route</dt></dl><p>Foes on this route are primarily melee based. This path is also generally narrow in several spots, making skills that benefit from balled foes more effective, but that also means it is more difficult for your team to spread out.
+</p><p>Take the southern stairway. There will be a mob of Dredge at the top of the hill. All the Dredge groups on this route have a similar composition, mostly Gutters and Guardians with either one Gardner or one Gatherer. After the first mob, head through the doorway and there will be a similar mob of Dredge, and behind them will be two Blood Drinkers and Dark Fang (boss). In the doorway out of Dark Fang's room you will encounter three Oni popups.
+</p><p>In the following corridors there will be two more Dredge mobs followed by a pair of Blood Drinkers. The next Oni popups will be in the middle of a long set of stairs following the Blood Drinkers. Two more Dredge mobs follow and then the final Oni popups occur in a doorway just before one final mob of Dredge. 
+</p><p>It is worth noting that this pathway drops you out right next to the exit that Danika must open for you to complete the mission. If you flag your team and drop the ashes near that door, you can potentially avoid Danika suddenly rushing over there when The Judge is defeated, because she'll already be near the door.
+</p><dl><dt>Northern route</dt></dl><p>Take the stairway to your left. As you head up the stairs be prepared to meet your first group of 3 Oni. Defeat them and proceed to the top of the stairs, note that although you are outside the cathedral, you will still run into several areas with Cathedral Collapse. When you reach the courtyard, avoid the group to the left and eliminate the group on the right. Defeat <a href="https://wiki.guildwars.com/wiki/The_Ancient" rel="noopener" target="_blank" title="The Ancient">The Ancient</a> (spread out to avoid Shatterstone nuking your group) and go through the doorway.
+</p><p>Head south and then follow the right-hand wall. Again you can avoid the group to your east and just take care of the group directly ahead. At the end of the chamber, turn right again and head south up the stairs back into the cathedral.
+</p><p>As you go up the stairs, 3 Oni will appear. Defeat them and move up to the top of the stairs but be prepared for another set of 3 Oni to appear. Continue south down the hallway into the cathedral. 3 Oni will appear in the middle of the hallway and then another 2 when you reach the end of the hallway.  After defeating this final pair of Oni, continue forward to the sealed door guarded by Stone Judge.
+</p><dl><dt>Sealed door</dt></dl><p>All paths converge here. Upon reaching the wide open area with the closed door, several Stone Rain, two Stone Reapers and one <a href="https://wiki.guildwars.com/wiki/Stone_Soul" rel="noopener" target="_blank" title="Stone Soul">Stone Soul</a> will emerge from the stone pillars and gather around the <a href="https://wiki.guildwars.com/wiki/Stone_Judge" rel="noopener" target="_blank" title="Stone Judge">Stone Judge</a> boss. Try to intercept and take down one or two of the Stone Rains spawning next to you before they can join the group. Kill the Stone Judge last unless the Rains are overwhelming the party, since killing him causes Danika to rush towards the door to attempt to open it - whereby she aggros two Stone Crushers who awaken beside the doorway, and all surviving Elementals will also rush towards the door. Kill these to prevent them from interrupting Danika. The mission ends when Danika successfully opens the door, though this might be delayed a bit if she gets hit by falling boulders while opening it.
+</p></div>
+        </section>
+
+        <div class="row-bonus-hm">
+          <section class="panel bonus" id="bonus">
+            <h2 class="panel-title"><span class="icon icon-bonus">★</span> Bonus</h2>
+            <div class="panel-scroll wiki-block"><p class='lede'>See walkthrough and objectives for bonus details (if any).</p></div>
+          </section>
+          <section class="panel hard-mode" id="hard-mode">
+            <h2 class="panel-title"><span class="icon icon-hm">◆</span> Hard Mode</h2>
+            <div class="panel-scroll wiki-block"><p>The largest difference is that the Warden Mesmers and Elementalists become considerably more dangerous. This is especially noticeable with the first boss, as Ryver Mossplanter (Ranger) is fairly easily neutralized while Milefaun Mindflayer (Mesmer) can either severely damage or wipe out an entire party with <a href="https://wiki.guildwars.com/wiki/Energy_Surge" rel="noopener" target="_blank" title="Energy Surge">Energy Surge</a>, requiring the latter to be focused and disabled alongside the two accompanying Elementalists while the former can be ignored for last in most cases. 
+</p></div>
+          </section>
+        </div>
+
+        <div class="row-lower">
+          <section class="panel bosses" id="bosses">
+            <h2 class="panel-title"><span class="icon icon-boss">☠</span> Bosses &amp; Elites</h2>
+            <div class="panel-scroll"><div class='boss-grid'>
+<article class="boss-card">
+  <div class="boss-card-head"><a href="https://wiki.guildwars.com/wiki/Dark_Fang" target="_blank" rel="noopener"><strong>Dark Fang</strong></a></div>
+  <div class="boss-elite"><span class="elite-label">Elite:</span> <a class="elite-link" href="https://wiki.guildwars.com/wiki/Vampiric_Spirit" target="_blank" rel="noopener">Vampiric Spirit</a></div>
+  <div class="boss-meta">28</div>
+</article>
+<article class="boss-card">
+  <div class="boss-card-head"><a href="https://wiki.guildwars.com/wiki/The_Ancient" target="_blank" rel="noopener"><strong>The Ancient</strong></a></div>
+  <div class="boss-elite"><span class="elite-label">Elite:</span> <a class="elite-link" href="https://wiki.guildwars.com/wiki/Shatterstone" target="_blank" rel="noopener">Shatterstone</a></div>
+  <div class="boss-meta">28</div>
+</article>
+<article class="boss-card">
+  <div class="boss-card-head"><a href="https://wiki.guildwars.com/wiki/Stone_Judge" target="_blank" rel="noopener"><strong>Stone Judge</strong></a></div>
+  <div class="boss-elite"><span class="elite-label">Elite:</span> <a class="elite-link" href="https://wiki.guildwars.com/wiki/Forceful_Blow" target="_blank" rel="noopener">Forceful Blow</a></div>
+  <div class="boss-meta">28 (30)</div>
+</article>
+<article class="boss-card">
+  <div class="boss-card-head"><a href="https://wiki.guildwars.com/wiki/Ryver_Mossplanter" target="_blank" rel="noopener"><strong>Ryver Mossplanter</strong></a></div>
+  <div class="boss-elite"><span class="elite-label">Elite:</span> <a class="elite-link" href="https://wiki.guildwars.com/wiki/Lacerate" target="_blank" rel="noopener">Lacerate</a></div>
+  <div class="boss-meta">28 (30)</div>
+</article>
+<article class="boss-card">
+  <div class="boss-card-head"><a href="https://wiki.guildwars.com/wiki/Milefaun_Mindflayer" target="_blank" rel="noopener"><strong>Milefaun Mindflayer</strong></a></div>
+  <div class="boss-elite"><span class="elite-label">Elite:</span> <a class="elite-link" href="https://wiki.guildwars.com/wiki/Energy_Surge" target="_blank" rel="noopener">Energy Surge</a></div>
+  <div class="boss-meta">24 (30)</div>
+</article>
+</div></div>
+          </section>
+          <section class="panel other" id="other">
+            <h2 class="panel-title"><span class="icon icon-other">✦</span> Tips &amp; Notes</h2>
+            <div class="panel-scroll"><h3 style='font-size:0.8rem;color:var(--accent);margin:0.3rem 0;'>Skill recommendations</h3><div class='wiki-block'><ul><li>Standard <a class="mw-redirect" href="https://wiki.guildwars.com/wiki/Melee_counter" rel="noopener" target="_blank" title="Melee counter">melee counter</a> techniques are helpful to dispose of the Oni and other <a class="mw-redirect" href="https://wiki.guildwars.com/wiki/Physical_attacker" rel="noopener" target="_blank" title="Physical attacker">physical attackers</a> (including the Stone Judge).</li>
+<li>You can prevent or avoid <a href="https://wiki.guildwars.com/wiki/Interrupt" rel="noopener" target="_blank" title="Interrupt">interruptions</a> due to <a href="https://wiki.guildwars.com/wiki/Cathedral_Collapse" rel="noopener" target="_blank" title="Cathedral Collapse">Cathedral Collapse</a> in several ways: bring short-activation time skills, <a href="https://wiki.guildwars.com/wiki/Activation_time#Skills_that_reduce_activation_time" rel="noopener" target="_blank" title="Activation time">skills that reduce activation time</a>, or <a href="https://wiki.guildwars.com/wiki/Interrupt#Interrupt_prevention" rel="noopener" target="_blank" title="Interrupt">interrupt-prevention skills</a> (e.g. <a href="https://wiki.guildwars.com/wiki/Mantra_of_Resolve" rel="noopener" target="_blank" title="Mantra of Resolve">Mantra of Resolve</a> or <a href="https://wiki.guildwars.com/wiki/Glyph_of_Concentration" rel="noopener" target="_blank" title="Glyph of Concentration">Glyph of Concentration</a>); mesmers can increase their <a href="https://wiki.guildwars.com/wiki/Fast_Casting" rel="noopener" target="_blank" title="Fast Casting">Fast Casting</a> rank.</li>
+<li>Use caution with <a href="https://wiki.guildwars.com/wiki/Overcast" rel="noopener" target="_blank" title="Overcast">overcast</a>-causing skills, since that effect is triggered immediately; if you are interrupted, you will be overcast and waste the energy cost of the skill.</li>
+<li><a href="https://wiki.guildwars.com/wiki/Minion_master" rel="noopener" target="_blank" title="Minion master">Minion master</a> builds are tricky to use during this mission: Danika can be delayed by healing them, the final battle lacks any <a href="https://wiki.guildwars.com/wiki/Fleshy" rel="noopener" target="_blank" title="Fleshy">fleshy</a> enemies, and most skills that create minions have long activation times that can be interrupted by Cathedral Collapse.</li>
+<li>Consider bringing <a href="https://wiki.guildwars.com/wiki/Bundle#Skills_with_effects_that_trigger_if_holding_a_bundle_when_cast" rel="noopener" target="_blank" title="Bundle">skills that benefit from holding a bundle</a> on the character that carries the Urn.</li></ul></div>
+<h3 style='font-size:0.8rem;color:var(--accent);margin:0.3rem 0;'>Notes</h3><div class='wiki-block'><ul><li>Once you have picked up the Urn, you can safely drop it and wander off without failing the mission. If you finish the mission without holding the Urn, your character will talk about recovering the Urn in the post-mission cinematic, but you will be empty-handed.</li>
+<li>If any of your characters have completed this mission as well as <a class="mw-redirect" href="https://wiki.guildwars.com/wiki/Eternal_Grove" rel="noopener" target="_blank" title="Eternal Grove">Eternal Grove</a> and <a href="https://wiki.guildwars.com/wiki/Unwaking_Waters" rel="noopener" target="_blank" title="Unwaking Waters">Unwaking Waters</a>, your <a href="https://wiki.guildwars.com/wiki/Kurzick_faction" rel="noopener" target="_blank" title="Kurzick faction">Kurzick Faction cap limit</a> is increased by 7,000 points (this increase can only be applied once per account).</li>
+<li>Completion of this mission will fill in page #4 of the <a href="https://wiki.guildwars.com/wiki/Shiro%27s_Return" rel="noopener" target="_blank" title="Shiro's Return">Shiro's Return</a> <a href="https://wiki.guildwars.com/wiki/Storybook" rel="noopener" target="_blank" title="Storybook">storybook</a>.</li>
+<li>After completing this mission, your party will be taken to <a href="https://wiki.guildwars.com/wiki/Altrumm_Ruins_(outpost)" rel="noopener" target="_blank" title="Altrumm Ruins (outpost)">Altrumm Ruins</a>.</li></ul><div style="margin: 1em; border: solid silver; border-width: 1px 0px; padding: 2px 1em 2px 5em;"><strong class="hiddenlinks" style="position: absolute; margin-left: -4.8em; color: #900;"><a class="image" href="https://wiki.guildwars.com/wiki/File:Bug.png" rel="noopener" target="_blank" title="Bug"><img alt="Bug" data-file-height="32" data-file-width="32" decoding="async" height="18" loading="lazy" src="https://wiki.guildwars.com/images/thumb/7/7d/Bug.png/18px-Bug.png" srcset="/images/thumb/7/7d/Bug.png/27px-Bug.png 1.5x, /images/7/7d/Bug.png 2x" width="18"/></a> <a href="https://wiki.guildwars.com/wiki/Bug" rel="noopener" target="_blank" title="Bug">Bug</a>.</strong>
+<ul><li>Sometimes Danika will get stuck on one of the randomly spawned chests. Either have the urn bearer attempt to drag her out of it or place someone who has lost some health just out of range of her (and in a direction she can move) to try and bait her to approach them to use a healing skill on them to get her out of there. You will have to restart if she is permanently stuck.</li>
+<li>If you leave the central area without waiting for Danika to follow, she will run through the center route on her own.  There is a high probability of her dying if you took an alternate route, as she will run through the spawns attempting to get to the end of the mission.</li>
+<li>Sometimes Danika will get stuck against the wall on the northern route. You will often have to restart as she will return to this position even when dragged past by the urn bearer.</li>
+<li>The <a href="https://wiki.guildwars.com/wiki/Drinker" rel="noopener" target="_blank" title="Drinker">Drinker</a> group that includes <a href="https://wiki.guildwars.com/wiki/Dark_Fang" rel="noopener" target="_blank" title="Dark Fang">Dark Fang</a> sometimes spawns outside of the boundaries of the mission, sometimes still within the <a href="https://wiki.guildwars.com/wiki/Danger_Zone" rel="noopener" target="_blank" title="Danger Zone">Danger Zone</a> and sometimes outside of it.</li></ul></div></div></div>
+          </section>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="lightbox" id="lightbox" role="dialog" aria-label="Enlarged map">
+    <img src="../maps/factions_06_Arborstone_map.jpg" alt="Arborstone mission map (enlarged)" />
+  </div>
+  <script>
+    (function () {
+      var open = document.getElementById("mapOpen");
+      var box = document.getElementById("lightbox");
+      if (!open || !box) return;
+      open.addEventListener("click", function () { box.classList.add("open"); });
+      box.addEventListener("click", function () { box.classList.remove("open"); });
+      document.addEventListener("keydown", function (e) {
+        if (e.key === "Escape") box.classList.remove("open");
+      });
+    })();
+  </script>
+
+</body>
+</html>
