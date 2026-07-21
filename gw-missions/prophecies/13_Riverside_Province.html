@@ -206,11 +206,11 @@ a:hover { color: #7de0ff; text-decoration: underline; }
 
 .map-wrap {
   flex: 1; min-height: 0; display: flex; flex-direction: column;
-  align-items: center; justify-content: center; gap: 0.4rem;
+  align-items: center; justify-content: flex-start; gap: 0.4rem;
 }
 .map-frame {
   flex: 1; min-height: 0; width: 100%;
-  display: flex; align-items: center; justify-content: center;
+  display: flex; align-items: flex-start; justify-content: center;
   border-radius: 10px; overflow: hidden;
   border: 2px solid var(--border-glow);
   box-shadow: 0 0 0 1px rgba(62, 207, 255, 0.1), 0 12px 40px rgba(0, 0, 0, 0.45);
@@ -223,6 +223,7 @@ a:hover { color: #7de0ff; text-decoration: underline; }
   max-width: 100%;
   max-height: 100%;
   object-fit: contain;
+  object-position: top center;
   image-rendering: auto;
 }
 .map-caption { font-size: 0.72rem; color: var(--text-dim); flex-shrink: 0; }
