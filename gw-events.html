@@ -602,7 +602,7 @@
                 const endTime = raw.end.split('T')[1].split('+')[0];
 
                 // Build dates for the current calendar year
-                let start = new Date(`${currentYear}-${startMonth}-${startDay}T${startTime}+10:00`);
+                let start = new Date(`${currentYear}-${startMonth}-${startDay}T${startTime}+10:00`).addHours(24); // ds - fixing 1 day bug;
                 let endYear = currentYear;
 
                 // Handle events that cross into the next year (e.g. Wintersday Dec 20 → Jan 3)
@@ -611,7 +611,7 @@
                     endYear = currentYear + 1;
                 }
 
-                let end = new Date(`${endYear}-${endMonth}-${endDay}T${endTime}+10:00`);
+                let end = new Date(`${endYear}-${endMonth}-${endDay}T${endTime}+10:00`).addHours(24); // ds - fixing 1 day bug;
 
                 // Copy url
                 const url = raw.url || null;
@@ -626,7 +626,7 @@
                         const fTime = fStr.split('T')[1].split('+')[0];
                         // Use same year logic as end date for crossing events
                         const fYear = (parseInt(fMonth) < parseInt(startMonth)) ? currentYear + 1 : currentYear;
-                        return new Date(`${fYear}-${fMonth}-${fDay}T${fTime}+10:00`);
+                        return new Date(`${fYear}-${fMonth}-${fDay}T${fTime}+10:00`).addHours(24); // ds - fixing 1 day bug
                     }).sort((a, b) => a - b); // ensure chronological order
                 }
 
