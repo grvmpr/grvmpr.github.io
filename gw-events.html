@@ -588,30 +588,31 @@
             const now = new Date();
             const currentYear = now.getFullYear();
 
+            // Extract YYYY-MM-DD and HH:MM:SS directly from the ISO string so we never
+            // lose a day to UTC conversion (the +10:00 offset would otherwise push
+            // early-morning times into the previous calendar day when using getUTC*).
+            function parseIsoParts(iso) {
+                const [datePart, timePart] = iso.split('T');
+                const [, month, day] = datePart.split('-');
+                const time = timePart.split('+')[0].split('-')[0]; // strip any offset
+                return { month, day, time };
+            }
+
             return rawEvents.map(raw => {
-                // Parse original dates to extract month/day/time (preserving +10:00 logic)
-                const origStart = new Date(raw.start);
-                const origEnd = new Date(raw.end);
-
-                const startMonth = String(origStart.getUTCMonth() + 1).padStart(2, '0');
-                const startDay = String(origStart.getUTCDate()).padStart(2, '0');
-                const startTime = raw.start.split('T')[1].split('+')[0];
-
-                const endMonth = String(origEnd.getUTCMonth() + 1).padStart(2, '0');
-                const endDay = String(origEnd.getUTCDate()).padStart(2, '0');
-                const endTime = raw.end.split('T')[1].split('+')[0];
+                const startParts = parseIsoParts(raw.start);
+                const endParts = parseIsoParts(raw.end);
 
                 // Build dates for the current calendar year
-                let start = new Date(`${currentYear}-${startMonth}-${startDay}T${startTime}+10:00`).addHours(24); // ds - fixing 1 day bug;
+                let start = new Date(`${currentYear}-${startParts.month}-${startParts.day}T${startParts.time}+10:00`);
                 let endYear = currentYear;
 
                 // Handle events that cross into the next year (e.g. Wintersday Dec 20 → Jan 3)
-                if (parseInt(endMonth) < parseInt(startMonth) ||
-                    (parseInt(endMonth) === parseInt(startMonth) && parseInt(endDay) < parseInt(startDay))) {
+                if (parseInt(endParts.month) < parseInt(startParts.month) ||
+                    (parseInt(endParts.month) === parseInt(startParts.month) && parseInt(endParts.day) < parseInt(startParts.day))) {
                     endYear = currentYear + 1;
                 }
 
-                let end = new Date(`${endYear}-${endMonth}-${endDay}T${endTime}+10:00`).addHours(24); // ds - fixing 1 day bug;
+                let end = new Date(`${endYear}-${endParts.month}-${endParts.day}T${endParts.time}+10:00`);
 
                 // Copy url
                 const url = raw.url || null;
@@ -620,13 +621,10 @@
                 let finales = null;
                 if (raw.finale && Array.isArray(raw.finale)) {
                     finales = raw.finale.map(fStr => {
-                        const fDate = new Date(fStr);
-                        const fMonth = String(fDate.getUTCMonth() + 1).padStart(2, '0');
-                        const fDay = String(fDate.getUTCDate()).padStart(2, '0');
-                        const fTime = fStr.split('T')[1].split('+')[0];
+                        const fParts = parseIsoParts(fStr);
                         // Use same year logic as end date for crossing events
-                        const fYear = (parseInt(fMonth) < parseInt(startMonth)) ? currentYear + 1 : currentYear;
-                        return new Date(`${fYear}-${fMonth}-${fDay}T${fTime}+10:00`).addHours(24); // ds - fixing 1 day bug
+                        const fYear = (parseInt(fParts.month) < parseInt(startParts.month)) ? currentYear + 1 : currentYear;
+                        return new Date(`${fYear}-${fParts.month}-${fParts.day}T${fParts.time}+10:00`);
                     }).sort((a, b) => a - b); // ensure chronological order
                 }
 
