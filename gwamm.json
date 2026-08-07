@@ -1,0 +1,366 @@
+{
+  "title": "God Walking Amongst Mere Mortals (GWAMM)",
+  "recommended_titles": [
+    {
+      "category": "Experience-based",
+      "titles": [
+        {
+          "name": "Legendary Defender of Ascalon",
+          "max_rank": "Legendary Defender of Ascalon",
+          "notes": "Prophecies characters only (pre-Searing). Highly recommended – allows skipping Master of the North or Party Animal.",
+          "current_progress": 0,
+          "achieved": false
+        },
+        {
+          "name": "Legendary Survivor",
+          "max_rank": "Legendary Survivor",
+          "requirement": "1,337,500 XP without dying",
+          "current_progress": 0,
+          "achieved": false
+        }
+      ]
+    },
+    {
+      "category": "Mission Completion",
+      "titles": [
+        {
+          "name": "Protector of Tyria",
+          "max_rank": "Protector of Tyria",
+          "missions": 25,
+          "current_progress": 0,
+          "achieved": false
+        },
+        {
+          "name": "Protector of Cantha",
+          "max_rank": "Protector of Cantha",
+          "missions": 13,
+          "current_progress": 0,
+          "achieved": false
+        },
+        {
+          "name": "Protector of Elona",
+          "max_rank": "Protector of Elona",
+          "missions": 20,
+          "current_progress": 0,
+          "achieved": false
+        },
+        {
+          "name": "Guardian of Tyria",
+          "max_rank": "Guardian of Tyria",
+          "missions": 25,
+          "current_progress": 0,
+          "achieved": false
+        },
+        {
+          "name": "Guardian of Cantha",
+          "max_rank": "Guardian of Cantha",
+          "missions": 13,
+          "current_progress": 0,
+          "achieved": false
+        },
+        {
+          "name": "Guardian of Elona",
+          "max_rank": "Guardian of Elona",
+          "missions": 20,
+          "current_progress": 0,
+          "achieved": false
+        },
+        {
+          "name": "Legendary Guardian",
+          "max_rank": "Legendary Guardian",
+          "notes": "Requires completing all 25 Prophecies + 13 Factions + 20 Nightfall missions in Hard Mode",
+          "achieved": false
+        }
+      ],
+      "optimal_times": [
+        "2026-09-28",
+        "2026-11-30",
+        "2027-02-01",
+        "2027-04-05",
+        "2027-06-07"
+      ]
+    },
+    {
+      "category": "Eye of the North",
+      "titles": [
+        {
+          "name": "Asura",
+          "max_rank": "Not Too Shabby",
+          "rep_needed": 160000,
+          "current_progress": 0,
+          "achieved": false
+        },
+        {
+          "name": "Deldrimor",
+          "max_rank": "Legendary Delver",
+          "rep_needed": 160000,
+          "current_progress": 0,
+          "achieved": false
+        },
+        {
+          "name": "Ebon Vanguard",
+          "max_rank": "Secret Agent",
+          "rep_needed": 160000,
+          "current_progress": 0,
+          "achieved": false
+        },
+        {
+          "name": "Norn",
+          "max_rank": "Slayer of All",
+          "rep_needed": 160000,
+          "current_progress": 0,
+          "achieved": false
+        },
+        {
+          "name": "Master of the North",
+          "max_rank": "Legendary Master of the North",
+          "points_needed": 1000,
+          "notes": "Mastery points (max 1000 for Legendary). Can be skipped if you have Legendary Defender of Ascalon",
+          "current_progress": 0,
+          "achieved": false
+        }
+      ],
+      "optimal_times": [
+        "2026-09-21",
+        "2026-11-23",
+        "2027-01-25",
+        "2027-03-29",
+        "2027-05-31",
+        "2027-08-02"
+      ]
+    },
+    {
+      "category": "Exploration & Combat",
+      "titles": [
+        {
+          "name": "Tyrian Vanquisher",
+          "max_rank": "Tyrian Vanquisher",
+          "zones": 54,
+          "current_progress": 0,
+          "achieved": false
+        },
+        {
+          "name": "Canthan Vanquisher",
+          "max_rank": "Canthan Vanquisher",
+          "zones": 33,
+          "current_progress": 0,
+          "achieved": false
+        },
+        {
+          "name": "Elonian Vanquisher",
+          "max_rank": "Elonian Vanquisher",
+          "zones": 34,
+          "current_progress": 0,
+          "achieved": false,
+          "optimal_times": [
+            "2026-08-17",
+            "2026-08-31",
+            "2026-10-19",
+            "2026-11-02",
+            "2026-12-21",
+            "2027-01-04",
+            "2027-02-22",
+            "2027-03-08",
+            "2027-04-26",
+            "2027-05-10",
+            "2027-06-28",
+            "2027-07-12"
+          ]
+        },
+        {
+          "name": "Legendary Vanquisher",
+          "max_rank": "Legendary Vanquisher",
+          "achieved": false
+        },
+        {
+          "name": "Tyrian Cartographer",
+          "max_rank": "Tyrian Grandmaster Cartographer",
+          "current_progress": 0,
+          "achieved": false
+        },
+        {
+          "name": "Canthan Cartographer",
+          "max_rank": "Canthan Grandmaster Cartographer",
+          "current_progress": 0,
+          "achieved": false
+        },
+        {
+          "name": "Elonian Cartographer",
+          "max_rank": "Elonian Grandmaster Cartographer",
+          "current_progress": 0,
+          "achieved": false
+        },
+        {
+          "name": "Legendary Cartographer",
+          "max_rank": "Legendary Cartographer",
+          "achieved": false
+        },
+        {
+          "name": "Tyrian Skill Hunter",
+          "max_rank": "Tyrian Elite Skill Hunter",
+          "skills_required": 90,
+          "notes": "Includes Core elite skills (count toward all three Skill Hunter tracks)",
+          "current_progress": 0,
+          "achieved": false,
+          "optimal_times": [
+            "2026-09-07",
+            "2026-11-09",
+            "2027-01-11",
+            "2027-03-15",
+            "2027-05-17",
+            "2027-07-19"
+          ]
+        },
+        {
+          "name": "Canthan Skill Hunter",
+          "max_rank": "Canthan Elite Skill Hunter",
+          "skills_required": 120,
+          "notes": "Includes Core elite skills (count toward all three Skill Hunter tracks)",
+          "current_progress": 0,
+          "achieved": false,
+          "optimal_times": [
+            "2026-09-07",
+            "2026-11-09",
+            "2027-01-11",
+            "2027-03-15",
+            "2027-05-17",
+            "2027-07-19"
+          ]
+        },
+        {
+          "name": "Elonian Skill Hunter",
+          "max_rank": "Elonian Elite Skill Hunter",
+          "skills_required": 140,
+          "notes": "Includes Core elite skills (count toward all three Skill Hunter tracks)",
+          "current_progress": 0,
+          "achieved": false,
+          "optimal_times": [
+            "2026-09-07",
+            "2026-11-09",
+            "2027-01-11",
+            "2027-03-15",
+            "2027-05-17",
+            "2027-07-19"
+          ]
+        },
+        {
+          "name": "Legendary Skill Hunter",
+          "max_rank": "Legendary Skill Hunter",
+          "notes": "Requires maxing all three continental Skill Hunter titles (unique elites total 290). Composite title — no separate progress track.",
+          "achieved": false,
+          "optimal_times": [
+            "2026-09-07",
+            "2026-11-09",
+            "2027-01-11",
+            "2027-03-15",
+            "2027-05-17",
+            "2027-07-19"
+          ]
+        }
+      ]
+    },
+    {
+      "category": "Nightfall Reputation",
+      "titles": [
+        {
+          "name": "Sunspear",
+          "max_rank": "Legendary Spearmarshal",
+          "rep_needed": 50000,
+          "current_progress": 0,
+          "achieved": false
+        },
+        {
+          "name": "Lightbringer",
+          "max_rank": "Holy Lightbringer",
+          "rep_needed": 50000,
+          "current_progress": 0,
+          "achieved": false
+        }
+      ],
+      "optimal_times": [
+        "2026-08-31",
+        "2026-11-02",
+        "2027-01-04",
+        "2027-03-08",
+        "2027-05-10",
+        "2027-07-12"
+      ]
+    },
+    {
+      "category": "Factions Reputation",
+      "titles": [
+        {
+          "name": "Kurzick",
+          "max_rank": "Savior of the Kurzicks",
+          "rep_needed": 10000000,
+          "notes": "Account-wide. Points are earned by transferring/spending Kurzick faction.",
+          "current_progress": 0,
+          "achieved": false
+        },
+        {
+          "name": "Luxon",
+          "max_rank": "Savior of the Luxons",
+          "rep_needed": 10000000,
+          "notes": "Account-wide. Points are earned by transferring/spending Luxon faction.",
+          "current_progress": 0,
+          "achieved": false
+        }
+      ],
+      "optimal_times": [
+        "2026-08-10",
+        "2026-10-12",
+        "2026-12-14",
+        "2027-02-15",
+        "2027-04-19",
+        "2027-06-21"
+      ]
+    },
+    {
+      "category": "Consumables",
+      "titles": [
+        {
+          "name": "Drunkard",
+          "max_rank": "Incorrigible Ale-Hound",
+          "points_needed": 10000,
+          "current_progress": 0,
+          "achieved": false
+        },
+        {
+          "name": "Sweet Tooth",
+          "max_rank": "Connoisseur of Confectionaries",
+          "points_needed": 10000,
+          "current_progress": 0,
+          "achieved": false
+        },
+        {
+          "name": "Party Animal",
+          "max_rank": "Life of the Party",
+          "points_needed": 10000,
+          "current_progress": 0,
+          "achieved": false
+        }
+      ]
+    },
+    {
+      "category": "Account Loot",
+      "titles": [
+        {
+          "name": "Wisdom",
+          "max_rank": "Source of Wisdom",
+          "points_needed": 10000,
+          "notes": "Account-wide. One point per identified gold (rare) item.",
+          "current_progress": 0,
+          "achieved": false
+        },
+        {
+          "name": "Treasure Hunter",
+          "max_rank": "Grandmaster Treasure Hunter",
+          "points_needed": 10000,
+          "notes": "Account-wide. One point per high-end locked chest opened (or Golden Eggs during Sweet Treats Week).",
+          "current_progress": 0,
+          "achieved": false
+        }
+      ]
+    }
+  ]
+}

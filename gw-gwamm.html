@@ -1,0 +1,1479 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>GWAMM Tracker</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #0b0d12;
+      --bg-elevated: #12151d;
+      --bg-card: #171b26;
+      --bg-card-hover: #1c2230;
+      --border: #2a3142;
+      --border-strong: #3d4660;
+      --text: #e8ecf5;
+      --text-muted: #9aa3b8;
+      --text-dim: #6b7388;
+      --accent: #d4a84b;
+      --accent-soft: rgba(212, 168, 75, 0.16);
+      --accent-glow: rgba(212, 168, 75, 0.35);
+      --achieved: #3ecf8e;
+      --achieved-soft: rgba(62, 207, 142, 0.14);
+      --achieved-border: rgba(62, 207, 142, 0.55);
+      --danger: #e85d6a;
+      --danger-soft: rgba(232, 93, 106, 0.14);
+      --track: #252b3a;
+      --slider: #d4a84b;
+      --radius: 18px;
+      --shadow: 0 12px 40px rgba(0, 0, 0, 0.35);
+      --font: "Segoe UI", system-ui, -apple-system, sans-serif;
+      --mono: "Cascadia Code", "Consolas", ui-monospace, monospace;
+    }
+
+    * { box-sizing: border-box; }
+
+    html {
+      font-size: clamp(18px, 1.05vw, 26px);
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: var(--font);
+      background:
+        radial-gradient(ellipse 120% 40% at 50% -10%, rgba(212, 168, 75, 0.12), transparent 55%),
+        radial-gradient(ellipse 80% 30% at 100% 20%, rgba(80, 120, 220, 0.06), transparent 50%),
+        var(--bg);
+      color: var(--text);
+      line-height: 1.45;
+    }
+
+    .app {
+      width: min(100%, 2100px);
+      margin: 0 auto;
+      padding: 1.25rem 1.5rem 4rem;
+    }
+
+    .header {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      margin: 0 -0.25rem 1.5rem;
+      padding: 1rem 1.25rem 1.15rem;
+      background: rgba(11, 13, 18, 0.9);
+      backdrop-filter: blur(16px);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+    }
+
+    .header-top {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 1.5rem;
+      flex-wrap: wrap;
+    }
+
+    .brand h1 {
+      margin: 0;
+      font-size: clamp(1.4rem, 2.2vw, 2.4rem);
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      background: linear-gradient(120deg, #f0d78c, var(--accent) 45%, #a67c2a);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+
+    .brand p {
+      margin: 0.35rem 0 0;
+      color: var(--text-muted);
+      font-size: 0.95rem;
+    }
+
+    .scoreboard {
+      display: flex;
+      align-items: center;
+      gap: 1.25rem;
+      flex-shrink: 0;
+    }
+
+    .count-block { text-align: right; }
+
+    .count-label {
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--text-dim);
+      font-weight: 600;
+    }
+
+    .count-value {
+      font-size: clamp(2.8rem, 5vw, 4.5rem);
+      font-weight: 800;
+      line-height: 1;
+      font-variant-numeric: tabular-nums;
+      letter-spacing: -0.03em;
+    }
+
+    .count-value .current {
+      color: var(--accent);
+      text-shadow: 0 0 28px var(--accent-glow);
+    }
+
+    .count-value .sep {
+      color: var(--text-dim);
+      font-weight: 500;
+      margin: 0 0.1em;
+    }
+
+    .count-value .target {
+      color: var(--text-muted);
+      font-size: 0.72em;
+    }
+
+    .count-value.complete .current {
+      color: var(--achieved);
+      text-shadow: 0 0 28px rgba(62, 207, 142, 0.45);
+    }
+
+    .ring-wrap {
+      width: clamp(72px, 8vw, 100px);
+      height: clamp(72px, 8vw, 100px);
+      position: relative;
+    }
+
+    .ring-wrap svg {
+      width: 100%;
+      height: 100%;
+      transform: rotate(-90deg);
+    }
+
+    .ring-bg { fill: none; stroke: var(--track); stroke-width: 8; }
+    .ring-fg {
+      fill: none;
+      stroke: var(--accent);
+      stroke-width: 8;
+      stroke-linecap: round;
+      transition: stroke-dashoffset 0.35s ease, stroke 0.25s ease;
+    }
+    .ring-wrap.complete .ring-fg { stroke: var(--achieved); }
+
+    .ring-pct {
+      position: absolute;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .progress-bar-track {
+      margin-top: 1rem;
+      height: 10px;
+      background: var(--track);
+      border-radius: 999px;
+      overflow: hidden;
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      width: 0%;
+      border-radius: 999px;
+      background: linear-gradient(90deg, #a67c2a, var(--accent), #f0d78c);
+      transition: width 0.35s ease, background 0.25s ease;
+    }
+
+    .progress-bar-fill.complete {
+      background: linear-gradient(90deg, #1f9d63, var(--achieved), #7dffc2);
+    }
+
+    .toolbar {
+      display: flex;
+      gap: 0.75rem;
+      margin-top: 1rem;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .search-wrap {
+      flex: 1 1 18rem;
+      min-width: 12rem;
+      position: relative;
+    }
+
+    .search-wrap input {
+      width: 100%;
+      font: inherit;
+      padding: 0.65rem 0.9rem 0.65rem 2.4rem;
+      border-radius: 12px;
+      border: 1px solid var(--border-strong);
+      background: var(--bg-elevated);
+      color: var(--text);
+    }
+
+    .search-wrap input:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px var(--accent-soft);
+    }
+
+    .search-wrap input::placeholder { color: var(--text-dim); }
+
+    .search-wrap .search-icon {
+      position: absolute;
+      left: 0.75rem;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-dim);
+      pointer-events: none;
+      font-size: 1rem;
+    }
+
+    .search-hint {
+      font-size: 0.75rem;
+      color: var(--text-dim);
+      width: 100%;
+      margin-top: -0.25rem;
+    }
+
+    button, .btn-toggle {
+      font: inherit;
+      cursor: pointer;
+      border: 1px solid var(--border-strong);
+      background: var(--bg-elevated);
+      color: var(--text);
+      border-radius: 12px;
+      padding: 0.65rem 1.15rem;
+      font-weight: 600;
+      transition: background 0.15s, border-color 0.15s, transform 0.1s;
+      white-space: nowrap;
+    }
+
+    button:hover, .btn-toggle:hover {
+      background: var(--bg-card-hover);
+      border-color: var(--accent);
+    }
+
+    button:active, .btn-toggle:active { transform: scale(0.98); }
+
+    button.danger {
+      border-color: rgba(232, 93, 106, 0.45);
+      color: #ffb4bb;
+      background: var(--danger-soft);
+    }
+
+    button.danger:hover {
+      border-color: var(--danger);
+      background: rgba(232, 93, 106, 0.22);
+    }
+
+    button.active, .btn-toggle.active {
+      border-color: var(--accent);
+      background: var(--accent-soft);
+      color: var(--accent);
+    }
+
+    .status-msg {
+      margin-left: auto;
+      font-size: 0.85rem;
+      color: var(--text-dim);
+      min-height: 1.2em;
+    }
+
+    .status-msg.saved { color: var(--achieved); }
+
+    .empty-filter {
+      padding: 2rem;
+      text-align: center;
+      color: var(--text-muted);
+      border: 1px dashed var(--border);
+      border-radius: var(--radius);
+    }
+
+    /* Categories */
+    .category {
+      margin-bottom: 1.25rem;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      background: rgba(18, 21, 29, 0.45);
+      overflow: hidden;
+    }
+
+    .category.hidden-by-filter { display: none; }
+
+    .category-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      flex-wrap: wrap;
+      padding: 0.9rem 1.1rem;
+      cursor: pointer;
+      user-select: none;
+      list-style: none;
+      background: var(--bg-elevated);
+      border: none;
+      width: 100%;
+      text-align: left;
+      color: inherit;
+      font: inherit;
+      border-radius: 0;
+    }
+
+    .category-header::-webkit-details-marker { display: none; }
+
+    .category-header:hover { background: var(--bg-card-hover); }
+
+    .category-header-left {
+      display: flex;
+      align-items: center;
+      gap: 0.65rem;
+      min-width: 0;
+    }
+
+    .collapse-chevron {
+      width: 1.1rem;
+      height: 1.1rem;
+      flex-shrink: 0;
+      color: var(--text-dim);
+      transition: transform 0.2s ease;
+    }
+
+    details[open] > .category-header .collapse-chevron {
+      transform: rotate(90deg);
+    }
+
+    .category-header h2 {
+      margin: 0;
+      font-size: clamp(1.1rem, 1.5vw, 1.45rem);
+      font-weight: 700;
+    }
+
+    .category-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      align-items: center;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      padding: 0.25rem 0.65rem;
+      border-radius: 999px;
+      background: var(--accent-soft);
+      color: var(--accent);
+      border: 1px solid rgba(212, 168, 75, 0.28);
+      font-weight: 600;
+      font-size: 0.8rem;
+    }
+
+    .chip.done {
+      background: var(--achieved-soft);
+      color: var(--achieved);
+      border-color: rgba(62, 207, 142, 0.35);
+    }
+
+    .chip.pct {
+      background: rgba(120, 140, 200, 0.14);
+      color: #a8b8e0;
+      border-color: rgba(120, 140, 200, 0.3);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .chip.pct.done {
+      background: var(--achieved-soft);
+      color: var(--achieved);
+      border-color: rgba(62, 207, 142, 0.35);
+    }
+
+    .category-body { padding: 0.85rem 1rem 1rem; }
+
+    /* Default two-column flow for ungrouped sections */
+    .titles {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.85rem;
+    }
+
+    /* Family groups: each group is one column (protectors, guardians, etc.) */
+    .titles.grouped {
+      display: grid;
+      grid-template-columns: repeat(var(--group-cols, 2), minmax(0, 1fr));
+      gap: 0.85rem 1rem;
+      align-items: start;
+    }
+
+    .title-column {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      min-width: 0;
+    }
+
+    .column-label {
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--text-dim);
+      font-weight: 700;
+      padding: 0.15rem 0.35rem 0.35rem;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 0.1rem;
+    }
+
+    @media (max-width: 1100px) {
+      .titles,
+      .titles.grouped {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .title-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1rem 1.1rem 1.1rem;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.18);
+      transition: border-color 0.2s, background 0.2s, box-shadow 0.2s;
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+    }
+
+    .title-card:hover {
+      background: var(--bg-card-hover);
+      border-color: var(--border-strong);
+    }
+
+    .title-card.achieved {
+      background: linear-gradient(135deg, rgba(62, 207, 142, 0.08), var(--bg-card) 45%);
+      border-color: var(--achieved-border);
+      box-shadow: 0 0 0 1px rgba(62, 207, 142, 0.12), 0 8px 28px rgba(62, 207, 142, 0.08);
+    }
+
+    .title-card.hidden-card {
+      opacity: 0.72;
+      border-style: dashed;
+    }
+
+    .title-top {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 0.75rem;
+    }
+
+    .title-info { min-width: 0; flex: 1; }
+
+    .title-name-row {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+
+    .title-name {
+      margin: 0;
+      font-size: clamp(1rem, 1.25vw, 1.25rem);
+      font-weight: 700;
+      letter-spacing: -0.01em;
+    }
+
+    .title-card.achieved .title-name { color: var(--achieved); }
+
+    .badge-achieved {
+      display: none;
+      align-items: center;
+      gap: 0.3rem;
+      padding: 0.2rem 0.55rem;
+      border-radius: 999px;
+      background: var(--achieved);
+      color: #042816;
+      font-size: 0.68rem;
+      font-weight: 800;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    .title-card.achieved .badge-achieved { display: inline-flex; }
+
+    .badge-achieved svg { width: 0.9em; height: 0.9em; }
+
+    .max-rank {
+      margin: 0.2rem 0 0;
+      color: var(--text-muted);
+      font-size: 0.85rem;
+    }
+
+    .notes {
+      margin: 0.4rem 0 0;
+      color: var(--text-dim);
+      font-size: 0.82rem;
+    }
+
+    .optimal {
+      margin: 0.45rem 0 0;
+      font-size: 0.78rem;
+      color: var(--accent);
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.3rem 0.65rem;
+      align-items: baseline;
+    }
+
+    .optimal strong { font-weight: 700; color: #e8c878; }
+
+    .optimal-dates {
+      color: var(--text-muted);
+      font-family: var(--mono);
+      font-size: 0.75rem;
+    }
+
+    .title-actions {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.45rem;
+      flex-shrink: 0;
+    }
+
+    .hide-btn {
+      padding: 0.35rem 0.55rem;
+      font-size: 0.72rem;
+      border-radius: 8px;
+      color: var(--text-dim);
+      border-color: var(--border);
+      background: transparent;
+      font-weight: 600;
+    }
+
+    .hide-btn:hover {
+      color: var(--text);
+      border-color: var(--border-strong);
+    }
+
+    .achieve-toggle {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.3rem;
+      user-select: none;
+    }
+
+    .achieve-toggle span.label {
+      font-size: 0.68rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-dim);
+      font-weight: 600;
+    }
+
+    .achieve-toggle input {
+      position: absolute;
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .achieve-box {
+      width: 2.85rem;
+      height: 2.85rem;
+      border-radius: 14px;
+      border: 2px solid var(--border-strong);
+      background: var(--bg-elevated);
+      display: grid;
+      place-items: center;
+      cursor: pointer;
+      transition: all 0.18s ease;
+    }
+
+    .achieve-box svg {
+      width: 1.5rem;
+      height: 1.5rem;
+      opacity: 0;
+      transform: scale(0.6);
+      transition: all 0.18s ease;
+      stroke: #042816;
+      stroke-width: 3;
+      fill: none;
+    }
+
+    .achieve-toggle input:focus-visible + .achieve-box {
+      outline: 2px solid var(--accent);
+      outline-offset: 3px;
+    }
+
+    .achieve-toggle input:checked + .achieve-box {
+      background: var(--achieved);
+      border-color: var(--achieved);
+      box-shadow: 0 0 20px rgba(62, 207, 142, 0.4);
+    }
+
+    .achieve-toggle input:checked + .achieve-box svg {
+      opacity: 1;
+      transform: scale(1);
+    }
+
+    .achieve-toggle:hover .achieve-box { border-color: var(--achieved); }
+
+    .progress-row {
+      margin-top: auto;
+      padding-top: 0.9rem;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 0.65rem 0.85rem;
+      align-items: center;
+    }
+
+    .slider-wrap {
+      display: flex;
+      flex-direction: column;
+      gap: 0.35rem;
+      min-width: 0;
+    }
+
+    .slider-labels {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.78rem;
+      color: var(--text-dim);
+      font-variant-numeric: tabular-nums;
+      gap: 0.5rem;
+    }
+
+    .slider-labels .pct {
+      color: var(--accent);
+      font-weight: 700;
+    }
+
+    input[type="range"] {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 100%;
+      height: 11px;
+      border-radius: 999px;
+      background: var(--track);
+      outline: none;
+      cursor: pointer;
+    }
+
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      background: var(--slider);
+      border: 3px solid #1a1408;
+      box-shadow: 0 0 0 2px rgba(212, 168, 75, 0.35), 0 2px 8px rgba(0, 0, 0, 0.4);
+      cursor: grab;
+    }
+
+    input[type="range"]::-moz-range-thumb {
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      background: var(--slider);
+      border: 3px solid #1a1408;
+      box-shadow: 0 0 0 2px rgba(212, 168, 75, 0.35);
+      cursor: grab;
+    }
+
+    .title-card.achieved input[type="range"]::-webkit-slider-thumb {
+      background: var(--achieved);
+      border-color: #042816;
+      box-shadow: 0 0 0 2px rgba(62, 207, 142, 0.4);
+    }
+
+    .num-input {
+      width: clamp(6.5rem, 10vw, 9rem);
+      font: inherit;
+      font-family: var(--mono);
+      font-size: 0.95rem;
+      font-weight: 600;
+      text-align: right;
+      padding: 0.55rem 0.65rem;
+      border-radius: 12px;
+      border: 1px solid var(--border-strong);
+      background: var(--bg-elevated);
+      color: var(--text);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .num-input:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px var(--accent-soft);
+    }
+
+    .max-hint {
+      grid-column: 1 / -1;
+      font-size: 0.78rem;
+      color: var(--text-dim);
+      margin-top: -0.15rem;
+    }
+
+    .error-banner {
+      padding: 1.5rem;
+      border: 1px solid rgba(232, 93, 106, 0.45);
+      background: var(--danger-soft);
+      border-radius: var(--radius);
+      color: #ffb4bb;
+    }
+
+    .error-banner code {
+      font-family: var(--mono);
+      color: var(--text);
+    }
+
+    dialog {
+      border: 1px solid var(--border-strong);
+      border-radius: var(--radius);
+      background: var(--bg-elevated);
+      color: var(--text);
+      padding: 1.5rem 1.75rem;
+      max-width: 28rem;
+      box-shadow: var(--shadow);
+    }
+
+    dialog::backdrop { background: rgba(0, 0, 0, 0.65); }
+
+    dialog h3 { margin: 0 0 0.5rem; font-size: 1.25rem; }
+    dialog p { margin: 0 0 1.25rem; color: var(--text-muted); }
+    dialog .actions {
+      display: flex;
+      gap: 0.75rem;
+      justify-content: flex-end;
+    }
+
+    @media (max-width: 700px) {
+      .progress-row { grid-template-columns: 1fr; }
+      .num-input { width: 100%; text-align: left; }
+      .count-block { text-align: left; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app" id="app">
+    <header class="header" id="header">
+      <div class="header-top">
+        <div class="brand">
+          <h1 id="page-title">GWAMM Tracker</h1>
+          <p>Track title progress toward God Walking Amongst Mere Mortals</p>
+        </div>
+        <div class="scoreboard">
+          <div class="count-block">
+            <div class="count-label">Titles achieved</div>
+            <div class="count-value" id="count-value">
+              <span class="current" id="count-current">0</span><span class="sep">/</span><span class="target" id="count-target">30</span>
+            </div>
+          </div>
+          <div class="ring-wrap" id="ring-wrap" aria-hidden="true">
+            <svg viewBox="0 0 100 100">
+              <circle class="ring-bg" cx="50" cy="50" r="42"></circle>
+              <circle class="ring-fg" id="ring-fg" cx="50" cy="50" r="42"
+                stroke-dasharray="263.89" stroke-dashoffset="263.89"></circle>
+            </svg>
+            <div class="ring-pct" id="ring-pct">0%</div>
+          </div>
+        </div>
+      </div>
+      <div class="progress-bar-track" aria-hidden="true">
+        <div class="progress-bar-fill" id="bar-fill"></div>
+      </div>
+      <div class="toolbar">
+        <div class="search-wrap">
+          <span class="search-icon" aria-hidden="true">⌕</span>
+          <input
+            type="search"
+            id="filter-input"
+            placeholder="Filter titles or sections…"
+            autocomplete="off"
+            spellcheck="false"
+          />
+        </div>
+        <button type="button" id="btn-show-hidden" class="btn-toggle" title="Show titles you have hidden">Show hidden</button>
+        <button type="button" id="btn-expand-all">Expand all</button>
+        <button type="button" id="btn-collapse-all">Collapse all</button>
+        <button type="button" class="danger" id="btn-reset">Reset progress</button>
+        <span class="status-msg" id="status-msg" aria-live="polite"></span>
+      </div>
+      <div class="search-hint">Wildcard filter: <code>*</code> any chars, <code>?</code> one char. Matches title name or section. Example: <code>*skill*</code> or <code>night*</code></div>
+    </header>
+
+    <main id="main"></main>
+  </div>
+
+  <dialog id="reset-dialog">
+    <h3>Reset all progress?</h3>
+    <p>Clears progress and achieved state. Hidden titles stay hidden. Base checklist reloads from <code>gwamm.json</code>.</p>
+    <div class="actions">
+      <button type="button" id="btn-cancel-reset">Cancel</button>
+      <button type="button" class="danger" id="btn-confirm-reset">Reset</button>
+    </div>
+  </dialog>
+
+  <script>
+    const STORAGE_KEY = "gwamm-tracker-v1";
+    const TARGET = 30;
+    const CIRCUMFERENCE = 2 * Math.PI * 42;
+
+    /** @type {object|null} */
+    let data = null;
+    /** @type {Set<string>} */
+    let hiddenTitles = new Set();
+    /** @type {Record<string, boolean>} */
+    let collapsedSections = {};
+    let showHidden = false;
+    let filterQuery = "";
+    let saveTimer = null;
+
+    const $ = (sel, root = document) => root.querySelector(sel);
+
+    function formatNumber(n) {
+      return new Intl.NumberFormat("en-US").format(n);
+    }
+
+    function parseXpRequirement(text) {
+      if (!text) return null;
+      const m = String(text).replace(/,/g, "").match(/(\d+)\s*XP/i);
+      return m ? Number(m[1]) : null;
+    }
+
+    function getProgressMeta(title) {
+      // Explicit binary / composite titles never get a slider
+      if (title.name === "Legendary Skill Hunter") return null;
+
+      if (typeof title.missions === "number") {
+        return { max: title.missions, unit: "missions", kind: "missions" };
+      }
+      if (typeof title.zones === "number") {
+        return { max: title.zones, unit: "zones", kind: "zones" };
+      }
+      if (typeof title.rep_needed === "number") {
+        return { max: title.rep_needed, unit: "reputation", kind: "rep" };
+      }
+      if (typeof title.skills_required === "number") {
+        return { max: title.skills_required, unit: "skills", kind: "skills" };
+      }
+      if (typeof title.points_needed === "number") {
+        return { max: title.points_needed, unit: "points", kind: "points" };
+      }
+      const xp = parseXpRequirement(title.requirement);
+      if (xp) {
+        return { max: xp, unit: "XP", kind: "xp" };
+      }
+      if (/cartographer/i.test(title.name) && !/legendary/i.test(title.name)) {
+        return { max: 100, unit: "% explored", kind: "percent" };
+      }
+      return null;
+    }
+
+    /** 0–100 completion for one title (achieved = 100). */
+    function getTitleCompletionPct(title) {
+      if (title.achieved) return 100;
+      const meta = getProgressMeta(title);
+      if (!meta) return 0;
+      const progress = typeof title.current_progress === "number" ? title.current_progress : 0;
+      return Math.min(100, Math.max(0, (progress / meta.max) * 100));
+    }
+
+    /**
+     * Approx section completion: mean of each non-hidden title's % complete.
+     * @param {object[]} titles
+     */
+    function getSectionApproxPct(titles) {
+      const nonHidden = titles.filter((t) => !hiddenTitles.has(t.name));
+      if (!nonHidden.length) return 0;
+      const sum = nonHidden.reduce((acc, t) => acc + getTitleCompletionPct(t), 0);
+      return Math.round(sum / nonHidden.length);
+    }
+
+    /** Family column for layout grouping. */
+    function getTitleGroup(title) {
+      const n = title.name;
+      if (/protector/i.test(n)) return "protector";
+      if (/guardian/i.test(n)) return "guardian";
+      if (/vanquisher/i.test(n)) return "vanquisher";
+      if (/cartographer/i.test(n)) return "cartographer";
+      if (/skill\s*hunter/i.test(n)) return "skill_hunter";
+      return "other";
+    }
+
+    const GROUP_META = {
+      protector: { id: "protector", label: "Protectors" },
+      guardian: { id: "guardian", label: "Guardians" },
+      vanquisher: { id: "vanquisher", label: "Vanquishers" },
+      cartographer: { id: "cartographer", label: "Cartographers" },
+      skill_hunter: { id: "skill_hunter", label: "Skill Hunters" },
+      other: { id: "other", label: "Other" },
+    };
+
+    /** Preferred column order when a section has family groups. */
+    const GROUP_ORDER = [
+      "protector",
+      "guardian",
+      "vanquisher",
+      "cartographer",
+      "skill_hunter",
+      "other",
+    ];
+
+    /**
+     * Build column groups for layout. Uses family columns when any
+     * protector/guardian/vanquisher/cartographer/skill hunter is present;
+     * otherwise returns null (default 2-col flow).
+     */
+    function buildLayoutColumns(titles) {
+      const buckets = {
+        protector: [],
+        guardian: [],
+        vanquisher: [],
+        cartographer: [],
+        skill_hunter: [],
+        other: [],
+      };
+      for (const t of titles) {
+        buckets[getTitleGroup(t)].push(t);
+      }
+
+      const hasFamily = GROUP_ORDER.some(
+        (k) => k !== "other" && buckets[k].length > 0
+      );
+      if (!hasFamily) return null;
+
+      return GROUP_ORDER.filter((k) => buckets[k].length > 0).map((k) => ({
+        ...GROUP_META[k],
+        titles: buckets[k],
+      }));
+    }
+
+    function allTitles() {
+      if (!data) return [];
+      const list = [];
+      for (const cat of data.recommended_titles) {
+        for (const title of cat.titles) list.push(title);
+      }
+      return list;
+    }
+
+    function countAchieved() {
+      // Count achieved even if hidden — they still count toward GWAMM
+      return allTitles().filter((t) => t.achieved).length;
+    }
+
+    function wildcardToRegExp(pattern) {
+      const trimmed = pattern.trim();
+      if (!trimmed) return null;
+      // If user didn't use wildcards, treat as substring (contains)
+      const hasWild = /[*?]/.test(trimmed);
+      const source = hasWild
+        ? "^" +
+          trimmed
+            .replace(/[.+^${}()|[\]\\]/g, "\\$&")
+            .replace(/\*/g, ".*")
+            .replace(/\?/g, ".") +
+          "$"
+        : trimmed.replace(/[.+^${}()|[\]\\]/g, "\\$&");
+      try {
+        return new RegExp(source, "i");
+      } catch {
+        return null;
+      }
+    }
+
+    function matchesFilter(titleName, categoryName) {
+      const re = wildcardToRegExp(filterQuery);
+      if (!re) return true;
+      const hasWild = /[*?]/.test(filterQuery.trim());
+      if (hasWild) {
+        return re.test(titleName) || re.test(categoryName);
+      }
+      return re.test(titleName) || re.test(categoryName);
+    }
+
+    function loadStorage() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (!raw) return null;
+        return JSON.parse(raw);
+      } catch {
+        return null;
+      }
+    }
+
+    function applyStoredState(stored) {
+      if (!stored) return;
+      if (stored.titles) {
+        for (const title of allTitles()) {
+          const s = stored.titles[title.name];
+          if (!s) continue;
+          if (typeof s.current_progress === "number") title.current_progress = s.current_progress;
+          if (typeof s.achieved === "boolean") title.achieved = s.achieved;
+        }
+      }
+      if (Array.isArray(stored.hidden)) {
+        hiddenTitles = new Set(stored.hidden);
+      }
+      if (stored.collapsed && typeof stored.collapsed === "object") {
+        collapsedSections = { ...stored.collapsed };
+      }
+    }
+
+    function serializeState() {
+      const titles = {};
+      for (const t of allTitles()) {
+        titles[t.name] = {
+          current_progress: typeof t.current_progress === "number" ? t.current_progress : 0,
+          achieved: !!t.achieved,
+        };
+      }
+      return {
+        version: 2,
+        updatedAt: new Date().toISOString(),
+        titles,
+        hidden: [...hiddenTitles],
+        collapsed: collapsedSections,
+      };
+    }
+
+    function saveState() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(serializeState()));
+      const el = $("#status-msg");
+      el.textContent = "Saved";
+      el.classList.add("saved");
+      clearTimeout(saveTimer);
+      saveTimer = setTimeout(() => {
+        el.textContent = "";
+        el.classList.remove("saved");
+      }, 1400);
+    }
+
+    function resetProgress() {
+      for (const t of allTitles()) {
+        if ("current_progress" in t || getProgressMeta(t)) t.current_progress = 0;
+        t.achieved = false;
+      }
+      // Keep hidden + collapsed preferences
+      const prev = loadStorage() || {};
+      localStorage.setItem(
+        STORAGE_KEY,
+        JSON.stringify({
+          version: 2,
+          updatedAt: new Date().toISOString(),
+          titles: Object.fromEntries(
+            allTitles().map((t) => [
+              t.name,
+              { current_progress: 0, achieved: false },
+            ])
+          ),
+          hidden: prev.hidden || [...hiddenTitles],
+          collapsed: prev.collapsed || collapsedSections,
+        })
+      );
+      render();
+      const el = $("#status-msg");
+      el.textContent = "Progress reset";
+      el.classList.add("saved");
+    }
+
+    function updateScoreboard() {
+      const n = countAchieved();
+      const pct = Math.min(100, Math.round((n / TARGET) * 100));
+      const complete = n >= TARGET;
+
+      $("#count-current").textContent = String(n);
+      $("#count-target").textContent = String(TARGET);
+      $("#count-value").classList.toggle("complete", complete);
+      $("#ring-wrap").classList.toggle("complete", complete);
+      $("#ring-pct").textContent = pct + "%";
+
+      const offset = CIRCUMFERENCE * (1 - Math.min(n / TARGET, 1));
+      $("#ring-fg").style.strokeDashoffset = String(offset);
+
+      const bar = $("#bar-fill");
+      bar.style.width = pct + "%";
+      bar.classList.toggle("complete", complete);
+    }
+
+    function formatOptimalDates(dates) {
+      if (!dates || !dates.length) return null;
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const upcoming = dates
+        .map((d) => ({ raw: d, t: new Date(d + "T00:00:00Z") }))
+        .filter((d) => !Number.isNaN(d.t.getTime()));
+      if (!upcoming.length) return null;
+      const next = upcoming.find((d) => d.t >= today) || upcoming[upcoming.length - 1];
+      const shown = upcoming.slice(0, 3).map((d) => d.raw);
+      const more = upcoming.length > 3 ? ` +${upcoming.length - 3} more` : "";
+      return { next: next.raw, list: shown.join(", ") + more };
+    }
+
+    function setTitleProgress(title, value, meta) {
+      let v = Number(value);
+      if (Number.isNaN(v)) v = 0;
+      v = Math.max(0, Math.min(meta.max, Math.round(v)));
+      title.current_progress = v;
+      if (v >= meta.max) title.achieved = true;
+      refreshCardByName(title.name);
+      updateCategoryChips();
+      updateScoreboard();
+      saveState();
+    }
+
+    function setTitleAchieved(title, achieved) {
+      title.achieved = !!achieved;
+      refreshCardByName(title.name);
+      updateCategoryChips();
+      updateScoreboard();
+      saveState();
+    }
+
+    function toggleHideTitle(titleName) {
+      if (hiddenTitles.has(titleName)) hiddenTitles.delete(titleName);
+      else hiddenTitles.add(titleName);
+      saveState();
+      render();
+    }
+
+    function refreshCardByName(name) {
+      const title = allTitles().find((t) => t.name === name);
+      if (!title) return;
+      const card = document.querySelector(`.title-card[data-name="${CSS.escape(name)}"]`);
+      if (!card) return;
+      refreshCard(card, title, getProgressMeta(title));
+    }
+
+    function refreshCard(card, title, meta) {
+      card.classList.toggle("achieved", !!title.achieved);
+      card.classList.toggle("hidden-card", hiddenTitles.has(title.name));
+      const check = card.querySelector(".achieve-toggle input");
+      if (check) check.checked = !!title.achieved;
+
+      const hideBtn = card.querySelector(".hide-btn");
+      if (hideBtn) {
+        hideBtn.textContent = hiddenTitles.has(title.name) ? "Unhide" : "Hide";
+      }
+
+      if (!meta) return;
+      const progress = typeof title.current_progress === "number" ? title.current_progress : 0;
+      const pct = Math.round((progress / meta.max) * 100);
+      const range = card.querySelector('input[type="range"]');
+      const num = card.querySelector(".num-input");
+      const curLabel = card.querySelector(".slider-cur");
+      const pctLabel = card.querySelector(".slider-pct");
+      if (range) {
+        range.value = String(progress);
+        range.style.background = `linear-gradient(90deg, var(--slider) ${pct}%, var(--track) ${pct}%)`;
+      }
+      if (num && document.activeElement !== num) num.value = String(progress);
+      if (curLabel) curLabel.textContent = formatNumber(progress);
+      if (pctLabel) pctLabel.textContent = pct + "%";
+    }
+
+    function updateCategoryChips() {
+      document.querySelectorAll(".category").forEach((section) => {
+        const catName = section.dataset.category;
+        const cat = data.recommended_titles.find((c) => c.category === catName);
+        if (!cat) return;
+        const visible = cat.titles.filter((t) => showHidden || !hiddenTitles.has(t.name));
+        const forPct = cat.titles.filter((t) => !hiddenTitles.has(t.name));
+        const done = visible.filter((t) => t.achieved).length;
+        const approx = getSectionApproxPct(cat.titles);
+        const chip = section.querySelector(".chip-count");
+        if (chip) {
+          chip.textContent = `${done}/${visible.length} done`;
+          chip.classList.toggle("done", visible.length > 0 && done === visible.length);
+        }
+        const pctChip = section.querySelector(".chip-pct");
+        if (pctChip) {
+          pctChip.textContent = `~${approx}% complete`;
+          pctChip.classList.toggle("done", forPct.length > 0 && approx >= 100);
+        }
+      });
+    }
+
+    function escapeHtml(str) {
+      return String(str)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;");
+    }
+
+    function buildTitleCard(title, categoryOptimal) {
+      const meta = getProgressMeta(title);
+      if (meta && typeof title.current_progress !== "number") title.current_progress = 0;
+      const progress = typeof title.current_progress === "number" ? title.current_progress : 0;
+      const pct = meta ? Math.round((progress / meta.max) * 100) : 0;
+      const optimal = formatOptimalDates(title.optimal_times || categoryOptimal);
+      const isHidden = hiddenTitles.has(title.name);
+
+      const card = document.createElement("article");
+      card.className =
+        "title-card" +
+        (title.achieved ? " achieved" : "") +
+        (isHidden ? " hidden-card" : "");
+      card.dataset.name = title.name;
+
+      const notesHtml = title.notes
+        ? `<p class="notes">${escapeHtml(title.notes)}</p>`
+        : title.requirement
+          ? `<p class="notes">${escapeHtml(title.requirement)}</p>`
+          : "";
+
+      const optimalHtml = optimal
+        ? `<div class="optimal"><strong>Optimal:</strong> next <strong>${escapeHtml(optimal.next || "—")}</strong>
+            <span class="optimal-dates">${escapeHtml(optimal.list)}</span></div>`
+        : "";
+
+      const step =
+        meta && meta.max > 10000
+          ? Math.max(1, Math.floor(meta.max / 1000))
+          : meta && meta.max > 1000
+            ? Math.max(1, Math.floor(meta.max / 500))
+            : 1;
+
+      const progressHtml = meta
+        ? `<div class="progress-row">
+            <div class="slider-wrap">
+              <div class="slider-labels">
+                <span><span class="slider-cur">${formatNumber(progress)}</span> / ${formatNumber(meta.max)} ${escapeHtml(meta.unit)}</span>
+                <span class="pct slider-pct">${pct}%</span>
+              </div>
+              <input type="range" min="0" max="${meta.max}" step="${step}" value="${progress}" aria-label="Progress for ${escapeHtml(title.name)}" />
+            </div>
+            <input class="num-input" type="number" min="0" max="${meta.max}" step="1" value="${progress}" aria-label="Numeric progress for ${escapeHtml(title.name)}" />
+            <div class="max-hint">Max rank: ${escapeHtml(title.max_rank || title.name)}</div>
+          </div>`
+        : `<div class="progress-row">
+            <div class="max-hint" style="grid-column:1/-1;margin:0">Composite / binary title — mark achieved when complete. Max rank: ${escapeHtml(title.max_rank || title.name)}</div>
+          </div>`;
+
+      card.innerHTML = `
+        <div class="title-top">
+          <div class="title-info">
+            <div class="title-name-row">
+              <h3 class="title-name">${escapeHtml(title.name)}</h3>
+              <span class="badge-achieved">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                Achieved
+              </span>
+            </div>
+            <p class="max-rank">${escapeHtml(title.max_rank || "")}</p>
+            ${notesHtml}
+            ${optimalHtml}
+          </div>
+          <div class="title-actions">
+            <label class="achieve-toggle" title="Mark as achieved">
+              <span class="label">Done</span>
+              <input type="checkbox" ${title.achieved ? "checked" : ""} />
+              <span class="achieve-box" aria-hidden="true">
+                <svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </span>
+            </label>
+            <button type="button" class="hide-btn">${isHidden ? "Unhide" : "Hide"}</button>
+          </div>
+        </div>
+        ${progressHtml}
+      `;
+
+      card.querySelector(".achieve-toggle input").addEventListener("change", (e) => {
+        setTitleAchieved(title, e.target.checked);
+      });
+
+      card.querySelector(".hide-btn").addEventListener("click", (e) => {
+        e.stopPropagation();
+        toggleHideTitle(title.name);
+      });
+
+      if (meta) {
+        const range = card.querySelector('input[type="range"]');
+        const num = card.querySelector(".num-input");
+        range.style.background = `linear-gradient(90deg, var(--slider) ${pct}%, var(--track) ${pct}%)`;
+
+        range.addEventListener("input", () => setTitleProgress(title, range.value, meta));
+        num.addEventListener("change", () => setTitleProgress(title, num.value, meta));
+        num.addEventListener("input", () => {
+          const v = Math.max(0, Math.min(meta.max, Number(num.value) || 0));
+          range.value = String(v);
+          const p = Math.round((v / meta.max) * 100);
+          range.style.background = `linear-gradient(90deg, var(--slider) ${p}%, var(--track) ${p}%)`;
+          card.querySelector(".slider-cur").textContent = formatNumber(v);
+          card.querySelector(".slider-pct").textContent = p + "%";
+        });
+        num.addEventListener("blur", () => setTitleProgress(title, num.value, meta));
+      }
+
+      return card;
+    }
+
+    function render() {
+      const main = $("#main");
+      main.innerHTML = "";
+      $("#page-title").textContent = data.title || "GWAMM Tracker";
+      $("#btn-show-hidden").classList.toggle("active", showHidden);
+      $("#btn-show-hidden").textContent = showHidden
+        ? `Hide hidden (${hiddenTitles.size})`
+        : `Show hidden (${hiddenTitles.size})`;
+
+      let anyVisible = false;
+
+      for (const cat of data.recommended_titles) {
+        const matchingTitles = cat.titles.filter((t) => {
+          if (!showHidden && hiddenTitles.has(t.name)) return false;
+          return matchesFilter(t.name, cat.category);
+        });
+
+        const section = document.createElement("details");
+        section.className = "category";
+        section.dataset.category = cat.category;
+
+        // Collapse state: default open unless saved collapsed; force open when filtering
+        const isFiltering = !!filterQuery.trim();
+        const savedCollapsed = collapsedSections[cat.category] === true;
+        section.open = isFiltering ? matchingTitles.length > 0 : !savedCollapsed;
+
+        if (matchingTitles.length === 0) {
+          section.classList.add("hidden-by-filter");
+        } else {
+          anyVisible = true;
+        }
+
+        const done = matchingTitles.filter((t) => t.achieved).length;
+        // Approx % always ignores hidden titles (even when "Show hidden" is on)
+        const approx = getSectionApproxPct(cat.titles.filter((t) => matchesFilter(t.name, cat.category)));
+        const opt = formatOptimalDates(cat.optimal_times);
+
+        const summary = document.createElement("summary");
+        summary.className = "category-header";
+        summary.innerHTML = `
+          <div class="category-header-left">
+            <svg class="collapse-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+              <path d="M9 6l6 6-6 6" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            <h2>${escapeHtml(cat.category)}</h2>
+          </div>
+          <div class="category-meta">
+            <span class="chip chip-count ${matchingTitles.length > 0 && done === matchingTitles.length ? "done" : ""}">${done}/${matchingTitles.length} done</span>
+            <span class="chip pct chip-pct ${approx >= 100 ? "done" : ""}" title="Average completion of non-hidden titles in this section">~${approx}% complete</span>
+            ${opt ? `<span class="chip">Next bonus: ${escapeHtml(opt.next || "—")}</span>` : ""}
+          </div>
+        `;
+        section.appendChild(summary);
+
+        section.addEventListener("toggle", () => {
+          if (isFiltering) return;
+          collapsedSections[cat.category] = !section.open;
+          saveState();
+        });
+
+        const body = document.createElement("div");
+        body.className = "category-body";
+        const list = document.createElement("div");
+        const columns = buildLayoutColumns(matchingTitles);
+
+        if (columns) {
+          list.className = "titles grouped";
+          list.style.setProperty("--group-cols", String(columns.length));
+          for (const col of columns) {
+            const colEl = document.createElement("div");
+            colEl.className = "title-column";
+            colEl.dataset.group = col.id;
+            const label = document.createElement("div");
+            label.className = "column-label";
+            label.textContent = col.label;
+            colEl.appendChild(label);
+            for (const title of col.titles) {
+              colEl.appendChild(buildTitleCard(title, cat.optimal_times));
+            }
+            list.appendChild(colEl);
+          }
+        } else {
+          list.className = "titles";
+          for (const title of matchingTitles) {
+            list.appendChild(buildTitleCard(title, cat.optimal_times));
+          }
+        }
+
+        body.appendChild(list);
+        section.appendChild(body);
+        main.appendChild(section);
+      }
+
+      if (!anyVisible) {
+        main.innerHTML = `<div class="empty-filter">No titles match your filter${showHidden ? "" : " (hidden titles are concealed — try Show hidden)"}.</div>`;
+      }
+
+      updateScoreboard();
+    }
+
+    async function init() {
+      const dialog = $("#reset-dialog");
+      $("#btn-reset").addEventListener("click", () => dialog.showModal());
+      $("#btn-cancel-reset").addEventListener("click", () => dialog.close());
+      $("#btn-confirm-reset").addEventListener("click", () => {
+        dialog.close();
+        resetProgress();
+      });
+
+      $("#filter-input").addEventListener("input", (e) => {
+        filterQuery = e.target.value;
+        render();
+      });
+
+      $("#btn-show-hidden").addEventListener("click", () => {
+        showHidden = !showHidden;
+        render();
+      });
+
+      $("#btn-expand-all").addEventListener("click", () => {
+        document.querySelectorAll("details.category").forEach((d) => {
+          d.open = true;
+          collapsedSections[d.dataset.category] = false;
+        });
+        saveState();
+      });
+
+      $("#btn-collapse-all").addEventListener("click", () => {
+        document.querySelectorAll("details.category").forEach((d) => {
+          d.open = false;
+          collapsedSections[d.dataset.category] = true;
+        });
+        saveState();
+      });
+
+      try {
+        const res = await fetch("gwamm.json", { cache: "no-store" });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        data = await res.json();
+      } catch (err) {
+        $("#main").innerHTML = `
+          <div class="error-banner">
+            <strong>Could not load <code>gwamm.json</code>.</strong><br />
+            Serve this folder locally (browsers block <code>fetch</code> from <code>file://</code>).<br /><br />
+            Example: <code>python -m http.server 8080</code><br /><br />
+            <span style="opacity:.8">Error: ${escapeHtml(err.message)}</span>
+          </div>`;
+        return;
+      }
+
+      applyStoredState(loadStorage());
+      render();
+    }
+
+    init();
+  </script>
+</body>
+</html>
